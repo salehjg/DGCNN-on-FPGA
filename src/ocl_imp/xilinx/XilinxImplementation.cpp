@@ -43,9 +43,6 @@ XilinxImplementation::XilinxImplementation(int aa) {
 			use_ndrange_kernel)
 			*/
 
-
-
-
     	/* IDX 0 :*/
     	new OclKernelObject(
     			KERNEL_DIR,

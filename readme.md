@@ -1,27 +1,16 @@
 # DeepPoint-V1 Project
-This repository contains the code base for pure C++, OpenCL and CUDA
-implementations of official DGCNN model.
+This repository contains the code base for Xilinx SDAccel FPGA implementation of official DGCNN model.
 
 ## Platforms
-Currenlty, only CPU, CUDA and OCL are supported. Each ModelArch class
-supports an specific platform.
+Currenlty, only Xilinx FPGAs are supported.
 
 Name | Supported Platform | Implementation
 ---  | ---                | ---
-ModelArch01 | CPU                   | CPU
-ModelArch02 | CPU, CUDA             | CPU - CUDA Mix
-ModelArch03 | CUDA                  | Pure CUDA **Without** Tensor Deletion
-ModelArch04 | CUDA                  | Pure CUDA **With** Tensor Deletion
-ModelArch05 | OCL                   | Pure OCL **With** Tensor Deletion
+ModelArch01 | CPU                   | CPU 
 
 ## UnitTests for Platforms
-DeepPoint uses UnitTest++ framework for managing and running unit tests.
-Currently, Platforms CUDA and OCL have their dedicated unit tests for
-each kernel. The pupose of unit tests are to compare results of CPU platform
-against the platform under test.
-
-- CudaTestAll.cpp
-- OclTestAll.cpp
+Unlike parent project, this repository does not use UnitTest++ framework for managing unittests.
+The reason is that declaring multiple executables in Eclipse SDAceel managed build environment is not straight forward. This repository has only one main executable(MainExecutable.cpp) that handles both classifier and unit tests while you can enable or disable each phase in the source code.
 
 ## Credit
 Used repositories are listed below:
