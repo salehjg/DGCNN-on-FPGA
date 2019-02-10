@@ -1,4 +1,4 @@
-kernel void kernel_reduce_max_try01(
+kernel void ndrange_reducemax(
         global const float * __restrict__  g_idata,
         global float * __restrict__  g_odata,
         const unsigned int dim0,

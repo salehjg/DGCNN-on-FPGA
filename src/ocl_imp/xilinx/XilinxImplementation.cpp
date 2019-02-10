@@ -50,6 +50,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"ndrange_sqrt",
 				"task_sqrt",
 				true),
+		/* IDX 2 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/reducemax.cl",
+				"binary_container_1.xclbin",
+				"ndrange_reducemax",
+				"",
+				true),
     };
     
     //======================================================================================================================
@@ -104,7 +112,9 @@ XilinxImplementation::XilinxImplementation(int aa) {
             }
         }
     }
+
     clReleaseProgram(program);
+    free(binary_content);
     std::cout<<"- - - - - - - - - - -"<<std::endl;
     
     //======================================================================================================================
@@ -112,9 +122,10 @@ XilinxImplementation::XilinxImplementation(int aa) {
 
 XilinxImplementation::~XilinxImplementation(){
 	cout<<"~XilinxImplementation"<<endl;
-	clReleaseContext(context);
 	clReleaseCommandQueue(queue);
+	clReleaseContext(context);
 	clReleaseDevice(device_id);
+
 	for(OclKernelObject *kernelObject : oclKernels){
 		if(kernelObject->use_ndrange_kernel)
 			clReleaseKernel(kernelObject->kernel_ndrange);
@@ -404,8 +415,86 @@ TensorF* XilinxImplementation::ReduceMax(
         TensorF* inputTn,
         int reductionDim){
     PrintInfo("ReduceMax","reductionDim",reductionDim,"",0,"",0,inputTn->getShape(),{},{});
-    return nullptr;
+    assert(inputTn->getRank()==4);
+
+    size_t kGrid;
+    int kDim0,kDim1,kDim2;
+    int overAxis0, overAxis1, overAxis2;
+    unsigned int _dim0,_dim1,_dim2,_dim3;
+    _dim0 = inputTn->getShape()[0];
+    _dim1 = inputTn->getShape()[1];
+    _dim2 = inputTn->getShape()[2];
+    _dim3 = inputTn->getShape()[3];
+
+    OclTensorF* rsltTn = nullptr;
+    if(inputTn->getRank()==4 &&  reductionDim==1)rsltTn= new OclTensorF(context, {_dim0,_dim2,_dim3});
+    if(inputTn->getRank()==4 &&  reductionDim==2)rsltTn= new OclTensorF(context, {_dim0,_dim1,_dim3});
+
+    if(reductionDim==2){
+        kDim0 = _dim0*_dim1;
+        kDim1 = _dim2;
+        kDim2 = _dim3;
+        kGrid = kDim0*kDim2;
+
+        overAxis0 = 0;
+        overAxis1 = 1;
+        overAxis2 = 0;
+    }
+
+    if(reductionDim==1){
+        kDim0 = _dim0;
+        kDim1 = _dim1;
+        kDim2 = _dim3;
+        kGrid = kDim0*kDim2;
+
+        overAxis0 = 0;
+        overAxis1 = 1;
+        overAxis2 = 0;
+    }
+
+    OclKernelObject *kernelObject = oclKernels[2];
     
+    if(kernelObject->use_ndrange_kernel){
+		cl_int error;
+        
+		error =  clSetKernelArg(kernelObject->kernel_ndrange, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 1 , sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 2 , sizeof(cl_uint) , (void*)&kDim2);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 3 , sizeof(cl_uint) , (void*)&kDim1);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 4 , sizeof(cl_uint) , (void*)&kDim0);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 5 , sizeof(cl_int), (void*)&overAxis0);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 6 , sizeof(cl_int), (void*)&overAxis1);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 7 , sizeof(cl_int), (void*)&overAxis2);
+
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		//unsigned long localThreads[]  = {16, 16};
+		size_t globalThreads[] = {kGrid};
+
+		error = clEnqueueNDRangeKernel(queue,
+									   kernelObject->kernel_ndrange,
+									   1,
+									   NULL,
+									   globalThreads,
+									   NULL, //localThreads,
+									   0,
+									   NULL,
+									   &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+
+		if(error != CL_SUCCESS) {
+			printf("Kernel execution failure!\n");
+			exit(-22);
+		}
+
+		return rsltTn;
+    }else{
+
+    }
+    return nullptr;
 }
 
 TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){

@@ -25,6 +25,7 @@ public:
 	ReportObject* TensorFloat();
 	ReportObject* KernelConcat2();
 	ReportObject* KernelSqrt();
+	ReportObject* KernelReduceMax();
 	~XilinxImpUnitTests();
 	void RunAll();
 private:
