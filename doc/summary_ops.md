@@ -8,6 +8,7 @@
 Op Name        | Batch | CPU  | OCL TASK | OCL NDRng| Optimized|Shape1    | Shape2| Combinations                  | Sett1         |Val1   |Sett2      |Val2   | Notes|
 ---            | ---   | ---  | ---      | ---      | ---      | ---      | ---   | --------------------          | ---           | ---   | ---       | ---   |  --- |
 Concat2        |     No|Yes   |**Yes**   |        No|        No|4D        |4D     |-                              |Concat2        |3      |           |-      |--
+Sqrt           |Yes    |Yes   |**Yes**   |**Yes**   |        No|3D        |-      |-                              |               |-      |           |-      |--
 ReduceMax      |     No|Yes   |        No|        No|        No|4D        |-      |-                              |reductionDim   |1,2    |           |-      |--
 ReduceSum4D    |     No|Yes   |        No|        No|        No|4D        |-      |{1-1-1-0}                      |               |-      |           |-      |--
 ReduceSum      |     No|Yes   |        No|        No|        No|2D,3D     |-      |{3D: 0-0-1}, {2D: 0-1-0}       |               |-      |           |-      |--
@@ -20,7 +21,6 @@ Conv2d         |Yes    |Yes   |        No|        No|        No|4D        |-    
 ReLU           |Yes    |Yes   |        No|        No|        No|2D,4D     |-      |-                              |               |-      |           |-      |--
 Matmul         |Yes    |Yes   |        No|        No|        No|2D,3D     |2D,3D  |-                              |               |-      |           |-      |20x Less performance compared to the tensorflow
 Square         |Yes    |Yes   |        No|        No|        No|3D        |-      |-                              |               |-      |           |-      |--
-Sqrt           |Yes    |Yes   |**Yes**   |**Yes**   |        No|3D        |-      |-                              |               |-      |           |-      |--
 TopK           |Yes    |Yes   |        No|        No|        No|3D        |-      |-                              |axis           |2      |k          |20     |From PointNet++
 Gather         |Yes    |Yes   |        No|        No|        No|3D        |3D     |-                              |indices_axis   |1      |           |-      |From PointNet++
 

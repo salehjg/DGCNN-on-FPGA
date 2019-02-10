@@ -33,7 +33,7 @@ class WeightsLoader {
 public:
     WeightsLoader(vector<PLATFORMS> neededPlatforms);
 #ifdef USE_OCL
-    void LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl::Context* oclContex, cl::CommandQueue* oclQueue) ;
+    void LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl_context oclContex, cl_command_queue oclQueue) ;
 #else
     void LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList) ;
 #endif
@@ -49,8 +49,7 @@ private:
 
     bool _isUsedCPU  = false;
     bool _isUsedCUDA = false;
-    bool _isUsedOCL  = false;
-    ///TODO: Implement weightMapOCL
+    bool _isUsedOCL  = false; 
 
 };
 

@@ -17,15 +17,15 @@ OclTensorF::OclTensorF(){
     platform = PLATFORMS::DEFAULT;
 }
 
-OclTensorF::OclTensorF(cl::Context *context, std::vector<unsigned int> shape){
+OclTensorF::OclTensorF(cl_context context, std::vector<unsigned int> shape){
     Init(context, shape);
 }
 
-OclTensorF::OclTensorF(std::vector<unsigned int> shape, cl::Buffer *clBuff){
+OclTensorF::OclTensorF(std::vector<unsigned int> shape, cl_mem clBuff){
     Init(shape,clBuff);
 }
 
-void OclTensorF::Init(cl::Context *context, std::vector<unsigned int> shape) {
+void OclTensorF::Init(cl_context context, std::vector<unsigned int> shape) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
@@ -38,11 +38,11 @@ void OclTensorF::Init(cl::Context *context, std::vector<unsigned int> shape) {
     unsigned long len = getLengthBytes();
     platform = PLATFORMS::GPU_OCL;
 
-    ocl_buff = new cl::Buffer(*context, CL_MEM_READ_WRITE, len, NULL, &ocl_stat);
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE, len, NULL, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 }
 
-void OclTensorF::Init(std::vector<unsigned int> shape, cl::Buffer *clBuff){
+void OclTensorF::Init(std::vector<unsigned int> shape, cl_mem clBuff){
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
@@ -58,7 +58,7 @@ void OclTensorF::Init(std::vector<unsigned int> shape, cl::Buffer *clBuff){
     ocl_buff = clBuff;
 }
 
-void OclTensorF::InitWithHostData(cl::Context *context, cl::CommandQueue *queue, std::vector<unsigned int> shape, float *hostBuff) {
+void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, float *hostBuff) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
@@ -76,7 +76,7 @@ void OclTensorF::InitWithHostData(cl::Context *context, cl::CommandQueue *queue,
         len = 16;
     }
 
-    ocl_buff = new cl::Buffer(*context, CL_MEM_READ_WRITE, len, NULL, &ocl_stat);
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE, len, NULL, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 
     // https://software.intel.com/en-us/forums/opencl/topic/731519
@@ -87,17 +87,15 @@ void OclTensorF::InitWithHostData(cl::Context *context, cl::CommandQueue *queue,
     //      the application after the clEnqueueWriteBuffer call returns.
     //
 
-    ocl_stat = queue->enqueueWriteBuffer(*ocl_buff,CL_TRUE,0,len,hostBuff,nullptr,nullptr);
-    		//clEnqueueWriteBuffer(queue, ocl_buff, CL_TRUE, 0, len, hostBuff, 0, NULL, NULL);
+    ocl_stat = clEnqueueWriteBuffer(queue, ocl_buff, CL_TRUE, 0, len, hostBuff, 0, NULL, NULL);
     assert(ocl_stat==CL_SUCCESS);
 }
 
-TensorF* OclTensorF::TransferToHost(cl::CommandQueue *queue) {
+TensorF* OclTensorF::TransferToHost(cl_command_queue queue) {
     TensorF* rsltTn;
     cl_int ocl_stat;
     float* hostBuff = new float[getLength()];
-    //ocl_stat = clEnqueueReadBuffer(queue, ocl_buff, CL_TRUE, 0, getLengthBytes(), hostBuff, 0, NULL, NULL);
-    ocl_stat = queue->enqueueReadBuffer(*ocl_buff, CL_TRUE, 0, getLengthBytes(), hostBuff, nullptr, nullptr);
+    ocl_stat = clEnqueueReadBuffer(queue, ocl_buff, CL_TRUE, 0, getLengthBytes(), hostBuff, 0, NULL, NULL);
     assert(ocl_stat==CL_SUCCESS);
     rsltTn = new TensorF(getShape(),hostBuff);
     return rsltTn;
@@ -110,7 +108,6 @@ OclTensorF::~OclTensorF() {
 
     if(initialized){
         //std::cout<<"--- OclTensorF: buffer deleted.\n";
-        //assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
-        delete(ocl_buff);
+        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
     }
 }

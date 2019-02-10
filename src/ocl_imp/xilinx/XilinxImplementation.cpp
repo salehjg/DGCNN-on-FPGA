@@ -12,23 +12,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
     a = aa;
     //======================================================================================================================
     {
-		// The get_xil_devices will return vector of Xilinx Devices 
-    	std::cout<<"- - - - - - - - - - -"<<std::endl;
-        std::vector<cl::Device> devices = xcl::get_xil_devices();
-        if(devices.size()>1){
-            cout<<"WARNING:  More than 1 xilinx device has been found. Selecting index zero as default device."<<endl;
-        }
-        device = devices[0];
-    }
-
-    //======================================================================================================================
-    {
-        //Creating Context and Command Queue for selected Device 
-        OCL_CHECK(err, context = new cl::Context(device, NULL, NULL, NULL, &err));
-        OCL_CHECK(err, queue = new cl::CommandQueue(*context, device, CL_QUEUE_PROFILING_ENABLE, &err));
-        OCL_CHECK(err, device_name = device.getInfo<CL_DEVICE_NAME>(&err));
-        std::cout << "Found Device=" << device_name.c_str() << std::endl;
-        std::cout<<"- - - - - - - - - - -"<<std::endl;
+        err = clGetPlatformIDs(1, &cpPlatform, NULL);
+        assert(err == CL_SUCCESS);
+        err = clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_ACCELERATOR, 1, &device_id, NULL);
+        assert(err == CL_SUCCESS);
+        context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
+        assert(err == CL_SUCCESS);
+        queue = clCreateCommandQueue(context, device_id, 0, &err);
+        assert(err == CL_SUCCESS);
     }
 
     //======================================================================================================================
@@ -62,47 +53,81 @@ XilinxImplementation::XilinxImplementation(int aa) {
     };
     
     //======================================================================================================================
-    //std::string emulation_mode = "Emulation-SW/";
-	//std::string binaryFile = "";
-	//binaryFile.append(REPO_DIR );
-	//binaryFile.append("Emulation-SW/" );
-	//binaryFile.append((kernelObject->containerName) );
-    /*
-    for(OclKernelObject *kernelObject : oclKernels){
-        std::string binaryFile = xcl::find_binary_file(device_name, kernelObject->containerName);
-        cl::Program::Binaries bins = xcl::import_binary_file(binaryFile);
-        std::cout << "\tProcessing Kernel(filename): " << kernelObject->fileName << std::endl;
-        std::cout << "\tKernel Name(function name): " << kernelObject->kernelName << std::endl;
-        std::cout << "\tBinary Container(filename):"<< binaryFile << std::endl;
-        OCL_CHECK(err, cl::Program program(*context, {device}, bins, NULL, &err));
-        OCL_CHECK(err, kernelObject->kernel = new cl::Kernel(program, kernelObject->kernelName, &err));
-    }*/
-
-    //======================================================================================================================
     //Using signle binary container for all of the kernels for now!
-    std::string binaryFile = xcl::find_binary_file(device_name, "binary_container_1.xclbin");
-    cl::Program::Binaries bins = xcl::import_binary_file(binaryFile);
-    OCL_CHECK(err, cl::Program program(*context, {device}, bins, NULL, &err));
-    for(OclKernelObject *kernelObject : oclKernels){
-         //std::cout << "\tProcessing Kernel(filename): " << kernelObject->fileName << std::endl;
-         //std::cout << "\tKernel Name(function name): " << kernelObject->kernelName << std::endl;
-         //std::cout << "\tBinary Container(filename):"<< binaryFile << std::endl;
-         if(kernelObject->use_ndrange_kernel){
-        	 OCL_CHECK(err, kernelObject->kernel_ndrange = new cl::Kernel(program, kernelObject->kernelName_ndrange, &err));
-         }else{
-        	 OCL_CHECK(err, kernelObject->kernel_task = new cl::Kernel(program, kernelObject->kernelName_task, &err));
-         }
-     }
-    std::cout<<"- - - - - - - - - - -"<<std::endl;
+    char *binary_content;
+    char *_xcl_mode = getenv("XCL_EMULATION_MODE");
+    string xcl_mode = string(_xcl_mode);
+    xcl_mode = 	xcl_mode=="sw_emu" ? "Emulation-SW/" :
+    			xcl_mode=="hw_emu" ? "Emulation-HW/" :
+    			xcl_mode=="system" ? "System/" : "UNDEF" ;
 
+    //cout<<xcl_mode<<endl;
+
+    cout<<"*Using first kernel's container as default container.\n*Multiple container scenario is not supported yet."<<endl;
+    size_t binary_content_length = load_file_to_memory( (REPO_DIR+ xcl_mode + oclKernels[0]->containerName   ).c_str(), &binary_content);
+
+    cl_program program = clCreateProgramWithBinary(
+                            context, 
+                            1,
+                            &device_id,
+							&binary_content_length,
+                            (const unsigned char**) &binary_content,
+                            NULL,
+                            &err);
+
+    if (err != CL_SUCCESS) {
+        cout<<"Failed to create OpenCL program from binary."<<endl;
+        std::exit(1);
+    }
+
+    err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+    if (err != CL_SUCCESS) {
+        cout<<"Failed on clBuildProgram."<<endl;
+        std::exit(1);
+    }
+ 
+    for(OclKernelObject *kernelObject : oclKernels){
+        if(kernelObject->use_ndrange_kernel){
+            //OCL_CHECK(err, kernelObject->kernel_ndrange = new cl::Kernel(program, kernelObject->kernelName_ndrange, &err));
+            kernelObject->kernel_ndrange = clCreateKernel(program, kernelObject->kernelName_ndrange, &err);
+            if (err != CL_SUCCESS) {
+                printf("Failed to create ndrange kernel %d\n", (int) err);
+                std::exit(1);
+            }
+
+        }else{
+            // OCL_CHECK(err, kernelObject->kernel_task = new cl::Kernel(program, kernelObject->kernelName_task, &err));
+            kernelObject->kernel_task = clCreateKernel(program, kernelObject->kernelName_task, &err);
+            if (err != CL_SUCCESS) {
+                printf("Failed to create task kernel %d\n", (int) err);
+                std::exit(1);
+            }
+        }
+    }
+    clReleaseProgram(program);
+    std::cout<<"- - - - - - - - - - -"<<std::endl;
+    
     //======================================================================================================================
 }
 
-cl::Context* XilinxImplementation::getContext(){
+XilinxImplementation::~XilinxImplementation(){
+	cout<<"~XilinxImplementation"<<endl;
+	clReleaseContext(context);
+	clReleaseCommandQueue(queue);
+	clReleaseDevice(device_id);
+	for(OclKernelObject *kernelObject : oclKernels){
+		if(kernelObject->use_ndrange_kernel)
+			clReleaseKernel(kernelObject->kernel_ndrange);
+		else
+			clReleaseKernel(kernelObject->kernel_task);
+	}
+}
+
+cl_context XilinxImplementation::getContext(){
     return context;
 }
 
-cl::CommandQueue* XilinxImplementation::getQueue() {
+cl_command_queue XilinxImplementation::getQueue() {
     return queue;
 }
 
@@ -147,6 +172,17 @@ void XilinxImplementation::PrintInfo(
     }
     finalStr+="\n";
     //cout<<finalStr;
+}
+
+void XilinxImplementation::GetPaddedWorkSize(
+        int dims,
+        size_t * inBlockSize,
+        size_t * inWorkSize,
+        size_t * outPaddedWorkSize){
+    for(int i = 0; i < dims; i++){
+        outPaddedWorkSize[i] = (inWorkSize[i] + inBlockSize[i] - 1 ) / (inBlockSize[i]);
+        outPaddedWorkSize[i] *= inBlockSize[i];
+    }
 }
 
 TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedMat){
@@ -238,27 +274,28 @@ TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
 	if(kernelObject->use_ndrange_kernel){
 		cl_int error;
 		cl_ulong len = inputTn->getLength();
+		error =  clSetKernelArg(kernelObject->kernel_ndrange, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 2, sizeof(cl_ulong), (void*)&len);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		//unsigned long localThreads[]  = {16, 16};
 		size_t globalThreads[] = {len};
-		int narg = 0;
 
-		kernelObject->kernel_ndrange->setArg(narg++, *((OclTensorF*)inputTn)->ocl_buff);
-		kernelObject->kernel_ndrange->setArg(narg++, *(rsltTn->ocl_buff));
-		kernelObject->kernel_ndrange->setArg(narg++, len);
+		error = clEnqueueNDRangeKernel(queue,
+									   kernelObject->kernel_ndrange,
+									   1, //two-dim
+									   NULL,
+									   globalThreads,
+									   NULL, //localThreads,
+									   0,
+									   NULL,
+									   &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 
-		cl::Event exeEvt;
-
-		//Launch the kernel
-		getQueue()->enqueueNDRangeKernel(
-				*kernelObject->kernel_ndrange,
-				cl::NullRange,
-				cl::NDRange(globalThreads[0]),
-				cl::NullRange,
-				NULL,
-				&exeEvt);
-
-		error = cl::WaitForEvents({exeEvt});
-		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
+		clWaitForEvents(1, &exeEvt);
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
 			exit(-22);
@@ -272,18 +309,21 @@ TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
 		size_t globalThreads[] = {len};
 		int narg = 0;
 
-		kernelObject->kernel_task->setArg(narg++, *((OclTensorF*)inputTn)->ocl_buff);
-		kernelObject->kernel_task->setArg(narg++, *(rsltTn->ocl_buff));
-		kernelObject->kernel_task->setArg(narg++, len);
+		error =  clSetKernelArg(kernelObject->kernel_ndrange, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_ndrange, 2, sizeof(cl_ulong), (void*)&len);
 
-		cl::Event exeEvt;
+		cl_event exeEvt;
 
 		//Launch the kernel
-		getQueue()->enqueueTask(*kernelObject->kernel_task, NULL, &exeEvt);
+		error = clEnqueueTask( queue,
+							   kernelObject->kernel_ndrange,
+							   0, //two-dim
+							   NULL,
+							   &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 
-		error = cl::WaitForEvents({exeEvt});
-		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
+		clWaitForEvents(1, &exeEvt);
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
 			exit(-22);
@@ -301,6 +341,7 @@ TensorF* XilinxImplementation::Concat2(
         TensorF* inputTn2,
         int concatDim){
     PrintInfo("Concat2","concatDim",concatDim,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
+
     unsigned int dimA0,dimA1,dimA2,dimA3;
     unsigned int dimB0,dimB1,dimB2,dimB3;
     dimA0 = inputTn1->getShape()[0]; dimB0 = inputTn2->getShape()[0];
@@ -310,34 +351,42 @@ TensorF* XilinxImplementation::Concat2(
     OclTensorF* rsltTn = new OclTensorF(context, {dimA0,dimA1,dimA2,dimA3+dimB3});
 
     OclKernelObject *kernelObject = oclKernels[0];
+    unsigned int EPT=4;
 
     if(kernelObject->use_ndrange_kernel){
 
     }
     else
     {
-    	int narg = 0;
-		kernelObject->kernel_task->setArg(narg++, *((OclTensorF*)inputTn1)->ocl_buff);
-		kernelObject->kernel_task->setArg(narg++, *((OclTensorF*)inputTn2)->ocl_buff);
-		kernelObject->kernel_task->setArg(narg++, *(rsltTn->ocl_buff));
+    	cl_int error;
+		error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn1)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn2)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
 
-		kernelObject->kernel_task->setArg(narg++, dimA0);
-		kernelObject->kernel_task->setArg(narg++, dimA1);
-		kernelObject->kernel_task->setArg(narg++, dimA2);
-		kernelObject->kernel_task->setArg(narg++, dimA3);
+		error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void*)&dimA0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&dimA1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_uint), (void*)&dimA2);
+		error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_uint), (void*)&dimA3);
 
-		kernelObject->kernel_task->setArg(narg++, dimB0);
-		kernelObject->kernel_task->setArg(narg++, dimB1);
-		kernelObject->kernel_task->setArg(narg++, dimB2);
-		kernelObject->kernel_task->setArg(narg++, dimB3);
+		error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_uint), (void*)&dimB0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 8, sizeof(cl_uint), (void*)&dimB1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 9, sizeof(cl_uint), (void*)&dimB2);
+		error |= clSetKernelArg(kernelObject->kernel_task, 10,sizeof(cl_uint), (void*)&dimB3);
 
-		cl::Event exeEvt;
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
 
-		//Launch the kernel
-		getQueue()->enqueueTask(*kernelObject->kernel_task, NULL, &exeEvt);
+		cl_event exeEvt;
+		//unsigned long localThreads[]  = {16, 16};
+		size_t globalThreads[] = {rsltTn->getLength()};
 
-		cl_int error = cl::WaitForEvents({exeEvt});
-		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+		error = clEnqueueTask( queue,
+							   kernelObject->kernel_task,
+							   NULL,
+							   NULL,
+							   &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
 
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
@@ -346,6 +395,7 @@ TensorF* XilinxImplementation::Concat2(
 
 		return rsltTn;
     }
+
     return nullptr;
 }
 
@@ -494,14 +544,17 @@ const char * XilinxImplementation::getErrorString(cl_int error)
     }
 }
 
-uint64_t XilinxImplementation::get_duration_ns (const cl::Event &event) {
-    uint64_t nstimestart, nstimeend;
-    event.getProfilingInfo<uint64_t>(CL_PROFILING_COMMAND_START,&nstimestart);
-    event.getProfilingInfo<uint64_t>(CL_PROFILING_COMMAND_END,&nstimeend);
+cl_ulong XilinxImplementation::get_duration_ns (const cl_event &event) {
+	cl_ulong nstimestart, nstimeend;
+    //event.getProfilingInfo<uint64_t>(CL_PROFILING_COMMAND_START,&nstimestart);
+    //event.getProfilingInfo<uint64_t>(CL_PROFILING_COMMAND_END,&nstimeend);
+    clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(nstimestart), &nstimestart, NULL);
+    clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(nstimeend), &nstimeend, NULL);
+
     return(nstimeend-nstimestart);
 }
 
-void XilinxImplementation::ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event){
+void XilinxImplementation::ReportDuration(const std::string &name, const bool &isNDRange, const cl_event &event){
 	uint64_t ns = get_duration_ns(event);
 #ifdef REPORT_EXECUTION_DURATION
 		std::cout<< "\t** "<< name << (isNDRange?"(ndrange)":"(task)")<<":: "<<

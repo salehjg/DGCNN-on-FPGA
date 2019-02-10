@@ -57,15 +57,19 @@ public:
     void     DumpMatrix(PLATFORMS platform, WorkScheduler scheduler, string npy_fname, TensorF* inputTn, string npy_dir=REPO_DIR"/data/matrix_dumps/");
     void     DumpMatrix(PLATFORMS platform, WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir=REPO_DIR"/data/matrix_dumps/");
     bool     CompareTensors(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
+    ~PlatformSelector();
 
     WeightsLoader* weightsLoader;
     PLATFORMS defaultPlatform;
 private:
+
+
     PlatformImplementation *cpuPlatformClass;
     PlatformImplementation *cudaPlatformClass;
 #ifdef USE_OCL
     XilinxImplementation *openclPlatformClass;
 #endif
+
 
 
 

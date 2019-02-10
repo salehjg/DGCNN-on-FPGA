@@ -106,3 +106,9 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelSqrt());
 }
 
+XilinxImpUnitTests::~XilinxImpUnitTests(){
+	cout<<"~XilinxImpUnitTests"<<endl;
+	delete(platformSelector);
+}
+
+
