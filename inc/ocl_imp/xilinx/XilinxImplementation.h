@@ -91,7 +91,32 @@ private:
                    const string &setting3, float val3, vector<unsigned int> shape1, vector<unsigned int> shape2, vector<bool> comb={});
     cl_ulong get_duration_ns (const cl_event &event);
     void ReportDuration(const std::string &name, const bool &isNDRange, const cl_event &event);
+    int _ReduceSum4D_Try05_NDRange_Find_Kernel_Launches_Needed(int sliceCount, int SPT, int TGPB);
+    void _ReduceSum4D_Try05_NDRange(
+            TensorF* inputTn,
+            TensorF* outputTn,
+            unsigned int dim0,
+            unsigned int dim1,
+            unsigned int dim2,
+            unsigned int dim3,
+            bool overaxis0,
+            bool overaxis1,
+            bool overaxis2,
+            bool overaxis3,
+            int pow_y);
 
+    void _ReduceSum4D_Task(
+            TensorF* inputTn,
+            TensorF* outputTn,
+            unsigned int dim0,
+            unsigned int dim1,
+            unsigned int dim2,
+            unsigned int dim3,
+            bool overaxis0,
+            bool overaxis1,
+            bool overaxis2,
+            bool overaxis3,
+            int pow_y);
 
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
 

@@ -26,6 +26,7 @@ public:
 	ReportObject* KernelConcat2();
 	ReportObject* KernelSqrt();
 	ReportObject* KernelReduceMax();
+	ReportObject* KernelReduceSum4D();
 	~XilinxImpUnitTests();
 	void RunAll();
 private:

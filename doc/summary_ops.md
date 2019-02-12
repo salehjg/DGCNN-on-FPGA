@@ -10,7 +10,7 @@ Op Name        | Batch | CPU  | OCL TASK | OCL NDRng| Optimized|Shape1    | Shap
 Concat2        |     No|Yes   |**Yes**   |        No|        No|4D        |4D     |-                              |Concat2        |3      |           |-      |--
 Sqrt           |Yes    |Yes   |**Yes**   |**Yes**   |        No|3D        |-      |-                              |               |-      |           |-      |--
 ReduceMax      |     No|Yes   |        No|**Yes**   |        No|4D        |-      |-                              |reductionDim   |1,2    |           |-      |--
-ReduceSum4D    |     No|Yes   |        No|        No|        No|4D        |-      |{1-1-1-0}                      |               |-      |           |-      |--
+ReduceSum4D    |     No|Yes   |**Yes**   |**BROKEN**|        No|4D        |-      |{1-1-1-0}                      |               |-      |           |-      |--
 ReduceSum      |     No|Yes   |        No|        No|        No|2D,3D     |-      |{3D: 0-0-1}, {2D: 0-1-0}       |               |-      |           |-      |--
 Mean           |     No|Yes   |        No|        No|        No|2D,4D     |-      |{1-0-0-0}, {1-1-1-0}           |               |-      |           |-      |--
 Variance       |     No|Yes   |        No|        No|        No|2D,4D     |-      |{2D: 1-0-0-0}, {4D: 1-1-1-0}   |               |-      |           |-      |--
