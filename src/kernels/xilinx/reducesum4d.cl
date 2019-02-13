@@ -91,7 +91,8 @@ kernel void ndrange_reducesum4d(
 
 }
 
-kernel void task_reducesum4d(
+kernel __attribute__((reqd_work_group_size(1, 1, 1)))
+void task_reducesum4d(
         global const float * __restrict__  g_idata,
         global float * __restrict__  g_odata,
         const int pow_y,

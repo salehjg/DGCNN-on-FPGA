@@ -33,3 +33,35 @@ kernel void ndrange_reducemax(
         }
     }
 }
+
+kernel __attribute__((reqd_work_group_size(1, 1, 1)))
+void task_reducemax(
+		global const float * __restrict__  g_idata,
+		global float * __restrict__  g_odata,
+		const unsigned int dim0,
+		const unsigned int dim1,
+		const unsigned int dim2,
+		const int overaxis0,
+		const int overaxis1,
+		const int overaxis2){
+    if(!overaxis2 && overaxis1 && !overaxis0){
+        unsigned long indxS,indxD;
+        float max_cte= FLT_MIN;
+        float max= FLT_MIN;
+
+        //output is of shape dim0xdim2
+        for(int d0=0;d0<dim0;d0++){
+            for(int d2=0;d2<dim2;d2++){
+                indxD = d0*dim2 + d2;
+                max = max_cte;
+                for(int d1=0;d1<dim1;d1++){
+                    indxS = d0*dim1*dim2 + d1*dim2 + d2;
+					if(max < g_idata[indxS]){
+						max = g_idata[indxS];
+					}
+                }
+                g_odata[indxD]=max;
+            }
+        }
+    }
+}

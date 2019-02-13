@@ -56,8 +56,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"/xilinx/reducemax.cl",
 				"binary_container_1.xclbin",
 				"ndrange_reducemax",
-				"",
-				true),
+				"task_reducemax",
+				false),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -717,7 +717,38 @@ TensorF* XilinxImplementation::ReduceMax(
 
 		return rsltTn;
     }else{
+    	cl_int error;
 
+		error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_uint) , (void*)&kDim0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_uint) , (void*)&kDim1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_uint) , (void*)&kDim2);
+		error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int), (void*)&overAxis0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 6 , sizeof(cl_int), (void*)&overAxis1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 7 , sizeof(cl_int), (void*)&overAxis2);
+
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		//unsigned long localThreads[]  = {16, 16};
+		size_t globalThreads[] = {kGrid};
+
+		error = clEnqueueTask( queue,
+							   kernelObject->kernel_task,
+							   0,
+							   NULL,
+							   &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+
+		if(error != CL_SUCCESS) {
+			printf("Kernel execution failure!\n");
+			exit(-22);
+		}
+
+		return rsltTn;
     }
     return nullptr;
 }
