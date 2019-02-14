@@ -30,6 +30,7 @@ public:
 	ReportObject* KernelReduceSum();
 	ReportObject* KernelTile();
 	ReportObject* KernelTranspose();
+	ReportObject* KernelRelu();
 	~XilinxImpUnitTests();
 	void RunAll();
 private:
