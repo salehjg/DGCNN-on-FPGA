@@ -205,6 +205,15 @@ ReportObject* XilinxImpUnitTests::KernelRelu(){
     return obj;
 }
 
+ReportObject* XilinxImpUnitTests::KernelSquare(){
+	TensorF* tensorSrc = GenerateTensor(3,{10,50,20});
+	TensorF* tensorCpu = platformSelector->Square(PLATFORMS::CPU,scheduler,tensorSrc);
+	TensorF* tensorGpu = platformSelector->Square(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
+	bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
 void XilinxImpUnitTests::RunAll(){
 	PrintReport(TensorFloat());
 	PrintReport(KernelConcat2());
@@ -215,6 +224,7 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelTile());
 	PrintReport(KernelTranspose());
 	PrintReport(KernelRelu());
+	PrintReport(KernelSquare());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

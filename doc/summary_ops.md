@@ -20,7 +20,7 @@ Transpose      |Yes    |Yes   |**Yes**   |        No|        No|3D        |-    
 Conv2d         |Yes    |Yes   |        No|        No|        No|4D        |-      |-                              |overrideDim2   |-1     |           |-      |3x Less performance compared to the tensorflow
 ReLU           |Yes    |Yes   |**Yes**   |        No|        No|2D,4D     |-      |-                              |               |-      |           |-      |--
 Matmul         |Yes    |Yes   |        No|        No|        No|2D,3D     |2D,3D  |-                              |               |-      |           |-      |20x Less performance compared to the tensorflow
-Square         |Yes    |Yes   |        No|        No|        No|3D        |-      |-                              |               |-      |           |-      |--
+Square         |Yes    |Yes   |**Yes**   |        No|        No|3D        |-      |-                              |               |-      |           |-      |--
 TopK           |Yes    |Yes   |        No|        No|        No|3D        |-      |-                              |axis           |2      |k          |20     |From PointNet++
 Gather         |Yes    |Yes   |        No|        No|        No|3D        |3D     |-                              |indices_axis   |1      |           |-      |From PointNet++
 

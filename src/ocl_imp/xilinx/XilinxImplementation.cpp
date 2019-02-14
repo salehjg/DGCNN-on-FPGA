@@ -106,6 +106,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"",
 				"task_relu",
 				false),
+		/* IDX 8 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/square.cl",
+				"binary_container_1.xclbin",
+				"",
+				"task_square",
+				false),
     };
     
     //======================================================================================================================
@@ -296,6 +304,36 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
 
 TensorF* XilinxImplementation::Square(WorkScheduler scheduler, TensorF* batchedMat){
     PrintInfo("Square","",0,"",0,"",0,batchedMat->getShape(),{});
+
+    assert(batchedMat->getLength()!=0);
+    OclTensorF*rsltTn = new OclTensorF(context,batchedMat->getShape());
+    OclKernelObject *kernelObject = oclKernels[8];
+
+	if(kernelObject->use_ndrange_kernel){
+
+	}else{
+		cl_int error;
+		cl_ulong len = batchedMat->getLength();
+		error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void*)&((OclTensorF*)batchedMat)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_ulong), (void*)&len);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		error = clEnqueueTask(queue, kernelObject->kernel_task, 0, NULL, &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+		if(error != CL_SUCCESS) {
+		  printf("Kernel execution failure!\n");
+		  exit(-22);
+		}
+
+		return rsltTn;
+	}
+
     return nullptr;
 }
 
