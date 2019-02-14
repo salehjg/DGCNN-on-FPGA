@@ -82,6 +82,22 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"",
 				"task_reducesum",
 				false),
+		/* IDX 5 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/tile.cl",
+				"binary_container_1.xclbin",
+				"",
+				"task_tile",
+				false),
+        /* IDX 6 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/transpose.cl",
+                "binary_container_1.xclbin",
+                "",
+                "task_transpose",
+                false),
     };
     
     //======================================================================================================================
@@ -222,6 +238,45 @@ void XilinxImplementation::GetPaddedWorkSize(
 
 TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedMat){
     PrintInfo("Transpose","",0,"",0,"",0,batchedMat->getShape(),{});
+
+    cl_int error;
+	assert(batchedMat->getRank()==2 || batchedMat->getRank()==3);
+	int rankDiff = 3 - batchedMat->getRank();
+	if(rankDiff) batchedMat->ExpandDimZero();
+
+	cl_uint dim0,dim1,dim2;
+	dim0 = batchedMat->getShape()[0];
+	dim1 = batchedMat->getShape()[1];
+	dim2 = batchedMat->getShape()[2];
+
+	OclTensorF *rsltTn = new OclTensorF(context,{dim0,dim2,dim1});
+	OclKernelObject *kernelObject = oclKernels[6];
+
+	if(kernelObject->use_ndrange_kernel){
+
+	}else{
+		error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void*)&((OclTensorF*)batchedMat)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_uint), (void*)&dim0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void*)&dim1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&dim2);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		error = clEnqueueTask(queue, kernelObject->kernel_task, 0, NULL, &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+		if(error != CL_SUCCESS) {
+			printf("Kernel execution failure!\n");
+			exit(-22);
+		}
+
+		if(rankDiff) batchedMat->SqueezeDimZero();
+		return rsltTn;
+	}
     return nullptr;
 }
 
@@ -865,8 +920,61 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
     // 1xD     ----> KxD            0               2
 
     PrintInfo("Tile","tileAxis",tileAxis,"tileCount",tileCount,"",0,inputTn->getShape(),{},{});
-    return nullptr;
 
+	int rank = inputTn->getRank();
+	unsigned int _dim0,_dim1,_dim2,_dim3;
+	_dim0 = inputTn->getShape()[0];
+	_dim1 = inputTn->getShape()[1];
+	_dim2 = inputTn->getShape()[2];
+	_dim3 = inputTn->getShape()[3];
+
+	OclTensorF* rsltTn = nullptr;
+	if(inputTn->getRank()==4 &&  tileAxis==2){
+	  rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned int)tileCount,_dim3});
+	}
+	if(inputTn->getRank()==3 &&  tileAxis==1){
+	  rsltTn= new OclTensorF(context, {_dim0,(unsigned int)tileCount,_dim2});
+	}
+	if(inputTn->getRank()==3 &&  tileAxis==2){
+	  rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned int)tileCount});
+	}
+
+	OclKernelObject *kernelObject = oclKernels[5];
+
+	if(kernelObject->use_ndrange_kernel){
+
+	}else{
+		cl_int error;
+		cl_ulong len = inputTn->getLength();
+		error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem),  (void*)&((OclTensorF*)inputTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem),  (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_uint), (void*)&_dim0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void*)&_dim1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&_dim2);
+		error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_uint), (void*)&_dim3);
+		error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_int),  (void*)&rank);
+		error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_int),  (void*)&tileAxis);
+		error |= clSetKernelArg(kernelObject->kernel_task, 8, sizeof(cl_int),  (void*)&tileCount);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		//unsigned long localThreads[]  = {16, 16};
+		size_t globalThreads[] = {len};
+
+		error = clEnqueueTask(queue,kernelObject->kernel_task,0,  NULL,&exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+		if(error != CL_SUCCESS) {
+		  printf("Kernel execution failure!\n");
+		  exit(-22);
+		}
+
+		return rsltTn;
+	}
+    return nullptr;
 }
 
 void XilinxImplementation::DumpMatrix(

@@ -152,6 +152,50 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum(){
     return obj;
 }
 
+ReportObject* XilinxImpUnitTests::KernelTile(){
+    bool comparisonResult=true;
+    //TEST(Rank4_Axis2)
+    {
+        int tileCount = 8;
+        int tileAxis  = 2;
+        TensorF* tensorSrc1 = GenerateTensor(3,{5,2,1,20});
+        TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
+        TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+
+    //TEST(Rank3_Axis2)
+    {
+        int tileCount = 8;
+        int tileAxis  = 2;
+        TensorF* tensorSrc1 = GenerateTensor(3,{5,20,1});
+        TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
+        TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+    
+    //TEST(Rank3_Axis1)
+    {
+        int tileCount = 8;
+        int tileAxis  = 1;
+        TensorF* tensorSrc1 = GenerateTensor(3,{5,1,20});
+        TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
+        TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
+ReportObject* XilinxImpUnitTests::KernelTranspose(){
+	TensorF* tensorSrc = GenerateTensor(3,{5,1,20});
+	TensorF* tensorCpu = platformSelector->Transpose(PLATFORMS::CPU,scheduler,tensorSrc);
+	TensorF* tensorGpu = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
+	bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
 void XilinxImpUnitTests::RunAll(){
 	PrintReport(TensorFloat());
 	PrintReport(KernelConcat2());
@@ -159,6 +203,8 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelReduceMax());
 	PrintReport(KernelReduceSum4D());
 	PrintReport(KernelReduceSum());
+	PrintReport(KernelTile());
+	PrintReport(KernelTranspose());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

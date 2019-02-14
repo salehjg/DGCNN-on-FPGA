@@ -28,6 +28,8 @@ public:
 	ReportObject* KernelReduceMax();
 	ReportObject* KernelReduceSum4D();
 	ReportObject* KernelReduceSum();
+	ReportObject* KernelTile();
+	ReportObject* KernelTranspose();
 	~XilinxImpUnitTests();
 	void RunAll();
 private:
