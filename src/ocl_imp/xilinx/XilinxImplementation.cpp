@@ -18,7 +18,15 @@ XilinxImplementation::XilinxImplementation(int aa) {
         assert(err == CL_SUCCESS);
         context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
         assert(err == CL_SUCCESS);
-        queue = clCreateCommandQueue(context, device_id, 0, &err);
+        queue = clCreateCommandQueue(
+        		context,
+				device_id,
+#ifdef REPORT_EXECUTION_DURATION
+				CL_QUEUE_PROFILING_ENABLE,
+#else
+				0,
+#endif
+				&err);
         assert(err == CL_SUCCESS);
     }
 
@@ -66,6 +74,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "ndrange_reducesum4d",
                 "task_reducesum4d",
                 false), 
+		/* IDX 4 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/reducesum.cl",
+				"binary_container_1.xclbin",
+				"",
+				"task_reducesum",
+				false),
     };
     
     //======================================================================================================================
@@ -226,6 +242,67 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
                                       bool over_axis1,
                                       bool over_axis2){
     PrintInfo("ReduceSum","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2});
+    unsigned int _dim0,_dim1,_dim2;
+	int _overAxis0, _overAxis1, _overAxis2;
+
+	_dim0 = inputTn->getShape()[0];
+	_dim1 = inputTn->getShape()[1];
+	_dim2 = inputTn->getShape()[2];
+
+	_overAxis0 = over_axis0;
+	_overAxis1 = over_axis1;
+	_overAxis2 = over_axis2;
+
+	OclTensorF* rsltTn ;
+	if(inputTn->getRank()==3 &&  !over_axis0 && !over_axis1 && over_axis2)rsltTn= new OclTensorF(context, {_dim0,_dim1});
+	if(inputTn->getRank()==3 &&  !over_axis0 && over_axis1 && !over_axis2)rsltTn= new OclTensorF(context, {_dim0,_dim2});
+	if(inputTn->getRank()==3 &&  over_axis0 && !over_axis1 && !over_axis2)rsltTn= new OclTensorF(context, {_dim1,_dim2});
+
+
+	if(inputTn->getRank()==2 &&  !over_axis0 && over_axis1 )rsltTn= new OclTensorF(context, {_dim0});
+
+	/*
+	reduce_sum_3d_try03(
+			inputTn->_buff,
+			rsltTn->_buff,
+			_dim0,
+			_dim1,
+			_dim2,
+			over_axis0,
+			over_axis1,
+			over_axis2);
+	*/
+
+	OclKernelObject *kernelObject = oclKernels[4];
+
+	if(kernelObject->use_ndrange_kernel){
+
+	}else{
+		cl_int error;
+		error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_uint), (void*)&_dim0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void*)&_dim1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&_dim2);
+		error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_int), (void*)&_overAxis0);
+		error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_int), (void*)&_overAxis1);
+		error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_int), (void*)&_overAxis2);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		error = clEnqueueTask(queue, kernelObject->kernel_task, 0, NULL, &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+		if(error != CL_SUCCESS) {
+			printf("Kernel execution failure!\n");
+			exit(-22);
+		}
+
+		return rsltTn;
+	}
     return nullptr;
 }
 
@@ -364,6 +441,7 @@ void XilinxImplementation::_ReduceSum4D_Try05_NDRange(
 
 
     clWaitForEvents(1, &exeEvt);
+	ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
     if(error != CL_SUCCESS) {
         printf("Kernel execution failure!\n");
@@ -421,6 +499,7 @@ void XilinxImplementation::_ReduceSum4D_Task(
 	if (error != CL_SUCCESS) cout << getErrorString(error) << endl;
 
     clWaitForEvents(1, &exeEvt);
+	ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
     if(error != CL_SUCCESS) {
         printf("Kernel execution failure!\n");
@@ -532,6 +611,7 @@ TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
 		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 
 		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
 			exit(-22);
@@ -542,8 +622,6 @@ TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
 	{
 		cl_int error;
 		cl_ulong len = inputTn->getLength();
-		size_t globalThreads[] = {len};
-		int narg = 0;
 
 		error =  clSetKernelArg(kernelObject->kernel_ndrange, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_ndrange, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
@@ -560,6 +638,7 @@ TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
 		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 
 		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
 			exit(-22);
@@ -587,7 +666,6 @@ TensorF* XilinxImplementation::Concat2(
     OclTensorF* rsltTn = new OclTensorF(context, {dimA0,dimA1,dimA2,dimA3+dimB3});
 
     OclKernelObject *kernelObject = oclKernels[0];
-    unsigned int EPT=4;
 
     if(kernelObject->use_ndrange_kernel){
 
@@ -613,8 +691,6 @@ TensorF* XilinxImplementation::Concat2(
 		assert(error==0);
 
 		cl_event exeEvt;
-		//unsigned long localThreads[]  = {16, 16};
-		size_t globalThreads[] = {rsltTn->getLength()};
 
 		error = clEnqueueTask( queue,
 							   kernelObject->kernel_task,
@@ -623,6 +699,7 @@ TensorF* XilinxImplementation::Concat2(
 							   &exeEvt);
 		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
@@ -709,6 +786,7 @@ TensorF* XilinxImplementation::ReduceMax(
 									   &exeEvt);
 		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
@@ -732,8 +810,6 @@ TensorF* XilinxImplementation::ReduceMax(
 		assert(error==0);
 
 		cl_event exeEvt;
-		//unsigned long localThreads[]  = {16, 16};
-		size_t globalThreads[] = {kGrid};
 
 		error = clEnqueueTask( queue,
 							   kernelObject->kernel_task,
@@ -742,6 +818,7 @@ TensorF* XilinxImplementation::ReduceMax(
 							   &exeEvt);
 		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
 		if(error != CL_SUCCESS) {
 			printf("Kernel execution failure!\n");
