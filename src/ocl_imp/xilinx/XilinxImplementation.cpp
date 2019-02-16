@@ -114,6 +114,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"",
 				"task_square",
 				false),
+		/* IDX 9 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/matops.cl",
+				"binary_container_1.xclbin",
+				"",
+				"task_matops",
+				false),
     };
     
     //======================================================================================================================
@@ -668,6 +676,141 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
                       mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
                       3),
               "",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
+
+
+    int rankDiff;
+
+	if(!(inputTn1->getRank()<=4 && inputTn1->getRank()>=1 && inputTn2->getRank()<=4 && inputTn2->getRank()>=1 )){
+		cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E1"<<endl;
+		return nullptr;
+	}
+
+	if(inputTn1->getRank() < inputTn2->getRank()){
+		cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E2"<<endl;
+	return nullptr;
+	}
+
+	//forcing inputTn1 to be of rank 4. (always)
+	rankDiff = 4- inputTn1->getRank();
+	while(inputTn1->getRank()<4){
+		inputTn1->ExpandDimZero();
+	}
+
+	unsigned long indxS1;
+	unsigned long indxS2;
+	unsigned int dim0, dim1, dim2, dim3;
+	unsigned int dim0B, dim1B, dim2B, dim3B;
+	int dim0B_IsNotZero, dim1B_IsNotZero, dim2B_IsNotZero, dim3B_IsNotZero;
+
+	OclTensorF* rsltTn = new OclTensorF(context, inputTn1->getShape() );
+    
+	dim0 = inputTn1->getShape()[0];
+	dim1 = inputTn1->getShape()[1];
+	dim2 = inputTn1->getShape()[2];
+	dim3 = inputTn1->getShape()[3];
+
+	if(inputTn2->getRank()==4){
+		dim0B=inputTn2->getShape()[0];
+		dim1B=inputTn2->getShape()[1];
+		dim2B=inputTn2->getShape()[2];
+		dim3B=inputTn2->getShape()[3];
+	}
+	if(inputTn2->getRank()==3){
+		dim0B=0                     ;
+		dim1B=inputTn2->getShape()[0];
+		dim2B=inputTn2->getShape()[1];
+		dim3B=inputTn2->getShape()[2];
+	}
+	if(inputTn2->getRank()==2){
+		dim0B=0;
+		dim1B=0;
+		dim2B=inputTn2->getShape()[0];
+		dim3B=inputTn2->getShape()[1];
+	}
+	if(inputTn2->getRank()==1 && inputTn2->getShape()[0]!=1){
+		dim0B=0;
+		dim1B=0;
+		dim2B=0;
+		dim3B=inputTn2->getShape()[0];
+	}
+	if(inputTn2->getShape()[0]==1){
+		dim0B=0;
+		dim1B=0;
+		dim2B=0;
+		dim3B=1; //and rank should be 1 which already is
+	}
+
+
+	int tmp =15>>(4-inputTn2->getRank());
+	dim0B_IsNotZero = (tmp >> 3) & 1;
+	dim1B_IsNotZero = (tmp >> 2) & 1;
+	dim2B_IsNotZero = (tmp >> 1) & 1;
+	dim3B_IsNotZero = (tmp >> 0) & 1;
+
+	if(inputTn2->getRank()==1 && dim0B==0&&dim1B==0&&dim2B==0&&dim3B==1){//scalar value
+		dim3B_IsNotZero=0; //force it to be zero, so in the kernel, indxS2 would be zero;
+	}
+    int operationMode = mode==MAT_OPS::ADD ? 0 :
+                        mode==MAT_OPS::SUB ? 1 :
+                        mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
+                        3;
+
+	OclKernelObject *kernelObject = oclKernels[9];
+	if(kernelObject->use_ndrange_kernel){
+
+		// NOT IMPLEMENTED YET
+
+		for(int i =0;i<rankDiff;i++){
+			inputTn1->SqueezeDimZero();
+			rsltTn->SqueezeDimZero();
+		}
+		return rsltTn;
+	}else{
+		int argcnt=0;
+		cl_int error;
+		error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn1)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn2)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&(rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim0);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim3);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim0B);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1B);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2B);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim3B);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim0B_IsNotZero);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim1B_IsNotZero);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim2B_IsNotZero);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim3B_IsNotZero);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&operationMode);
+
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+		error = clEnqueueTask(queue, kernelObject->kernel_task, 0, NULL, &exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+		if(error != CL_SUCCESS) {
+			printf("Kernel execution failure!\n");
+			exit(-22);
+		}
+
+		for(int i =0;i<rankDiff;i++){
+			inputTn1->SqueezeDimZero();
+			rsltTn->SqueezeDimZero();
+		}
+
+		return rsltTn;
+	}
+
+
+
+
+
     return nullptr;
 }
 
@@ -678,7 +821,10 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
                       mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
                       3),
               "",0,"",0,inputTn1->getShape(),{},{});
-    return nullptr;
+    float* val = new float[1]; val[0] = scalar;
+    OclTensorF* tmpTn = new OclTensorF();
+    tmpTn->InitWithHostData(context, queue, {1}, val);
+    return MatOps(scheduler,inputTn1,tmpTn,mode);
 }
 
 TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
