@@ -468,6 +468,29 @@ ReportObject* XilinxImpUnitTests::KernelVariance(){
     return obj;
 }
 
+ReportObject* XilinxImpUnitTests::KernelMatmul(){
+	bool comparisonResult = true;
+    //TEST(Kernel_Matmul1)
+    {
+        TensorF* tensorSrc1 = GenerateTensor(0,{1,50,20});
+        TensorF* tensorSrc2 = GenerateTensor(0,{1,20,60});
+        TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
+        TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+
+    //TEST(Kernel_Matmul2)
+    {
+        TensorF* tensorSrc1 = GenerateTensor(3,{25,1024});
+        TensorF* tensorSrc2 = GenerateTensor(3,{1024,512});
+        TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
+        TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
 void XilinxImpUnitTests::RunAll(){
 	PrintReport(TensorFloat());
 	PrintReport(KernelConcat2());
@@ -482,6 +505,7 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelMatops());
 	PrintReport(KernelMean());
 	PrintReport(KernelVariance());
+	PrintReport(KernelMatmul());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
