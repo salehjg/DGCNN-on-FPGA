@@ -216,7 +216,8 @@ ReportObject* XilinxImpUnitTests::KernelSquare(){
 
 ReportObject* XilinxImpUnitTests::KernelMatops(){
     bool comparisonResult=true;
-    cout << "TEST(Rank_4_4)"<<endl;
+    bool printLog=false;
+    if(printLog) cout << "TEST(Rank_4_4)"<<endl;
     {
         //Ranks: 4,4
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -230,7 +231,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_4_3)"<<endl;
+    if(printLog) cout << "TEST(Rank_4_3)"<<endl;
     {
         //Ranks: 4,3
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -243,7 +244,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_4_2)"<<endl;
+    if(printLog) cout << "TEST(Rank_4_2)"<<endl;
     {
         //Ranks: 4,2
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -256,7 +257,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_4_1)"<<endl;
+    if(printLog) cout << "TEST(Rank_4_1)"<<endl;
     {
         //Ranks: 4,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -269,7 +270,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_4_0)"<<endl;
+    if(printLog) cout << "TEST(Rank_4_0)"<<endl;
     {
         //Ranks: 4,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -281,7 +282,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_3_3)"<<endl;
+    if(printLog) cout << "TEST(Rank_3_3)"<<endl;
     {
         //Ranks: 3,3
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -294,7 +295,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_3_2)"<<endl;
+    if(printLog) cout << "TEST(Rank_3_2)"<<endl;
     {
         //Ranks: 3,2
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -307,7 +308,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_3_1)"<<endl;
+    if(printLog) cout << "TEST(Rank_3_1)"<<endl;
     {
         //Ranks: 3,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -320,7 +321,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_3_0)"<<endl;
+    if(printLog) cout << "TEST(Rank_3_0)"<<endl;
     {
         //Ranks: 3,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -332,7 +333,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_2_2)"<<endl;
+    if(printLog) cout << "TEST(Rank_2_2)"<<endl;
     {
         //Ranks: 2,2
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -345,7 +346,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_2_1)"<<endl;
+    if(printLog) cout << "TEST(Rank_2_1)"<<endl;
     {
         //Ranks: 2,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -358,7 +359,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_2_0)"<<endl;
+    if(printLog) cout << "TEST(Rank_2_0)"<<endl;
     {
         //Ranks: 2,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -370,7 +371,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_1_1)"<<endl;
+    if(printLog) cout << "TEST(Rank_1_1)"<<endl;
     {
         //Ranks: 1,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -383,7 +384,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_1_0)"<<endl;
+    if(printLog) cout << "TEST(Rank_1_0)"<<endl;
     {
         //Ranks: 1,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -395,7 +396,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(Rank_1_0V2)"<<endl;
+    if(printLog) cout << "TEST(Rank_1_0V2)"<<endl;
     {
         //Ranks: 1,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -407,7 +408,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(ETC_1)"<<endl;
+    if(printLog) cout << "TEST(ETC_1)"<<endl;
     {
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
         TensorF* tensorSrc1 = GenerateTensor(0,{5,1024,1024});
@@ -419,7 +420,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(ETC_2)"<<endl;
+    if(printLog) cout << "TEST(ETC_2)"<<endl;
     {
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
         TensorF* tensorSrc1 = GenerateTensor(0,{5,1024,1024});
@@ -432,7 +433,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    cout << "TEST(ETC_3)"<<endl;
+    if(printLog) cout << "TEST(ETC_3)"<<endl;
     {
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
         TensorF* tensorSrc1 = GenerateTensor(0,{8,256,256});
@@ -449,8 +450,16 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     return obj;
 }
 
+ReportObject* XilinxImpUnitTests::KernelMean(){
+	TensorF* tensorSrc = GenerateTensor(1,{5,1024,20,256});
+	TensorF* tensorCpu = platformSelector->Mean(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
+	TensorF* tensorGpu = platformSelector->Mean(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
+	bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
 void XilinxImpUnitTests::RunAll(){
-	/*
 	PrintReport(TensorFloat());
 	PrintReport(KernelConcat2());
 	PrintReport(KernelSqrt());
@@ -460,8 +469,9 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelTile());
 	PrintReport(KernelTranspose());
 	PrintReport(KernelRelu());
-	PrintReport(KernelSquare());*/
+	PrintReport(KernelSquare());
 	PrintReport(KernelMatops());
+	PrintReport(KernelMean());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

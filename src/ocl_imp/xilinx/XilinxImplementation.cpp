@@ -655,7 +655,28 @@ TensorF* XilinxImplementation::Mean(
         bool mean_axis3){
 
     PrintInfo("Mean","",0,"",0,"",0,inputTn->getShape(),{},{mean_axis0,mean_axis1,mean_axis2,mean_axis3});
-    return nullptr;
+	assert(inputTn->getRank()==2 || inputTn->getRank()==4);
+	assert(
+			(mean_axis0 && mean_axis1 && mean_axis2 && !mean_axis3 && inputTn->getRank()==4) ||
+			(mean_axis0 && !mean_axis1 && !mean_axis2 && !mean_axis3 && inputTn->getRank()==2)
+	);
+	bool expanded=false;
+	if (inputTn->getRank()==2){
+		inputTn->ExpandDims(0);
+		inputTn->ExpandDims(0);
+		expanded=true;
+	}
+
+	TensorF* reducedTn = ReduceSum4D(scheduler,inputTn,mean_axis0,mean_axis1,mean_axis2,mean_axis3);
+	float coef = inputTn->getLength() / reducedTn->getLength(); // dim0xdim1xdim2 (for TTTF)
+	TensorF* rsltTn = MatOps(scheduler,reducedTn,coef,MAT_OPS::DIV_ELEMENTWISE);
+
+	if(expanded){
+		inputTn->SqueezeDimZero();
+		inputTn->SqueezeDimZero();
+	}
+
+	return rsltTn;
 }
 
 TensorF* XilinxImplementation::Variance(
