@@ -34,6 +34,7 @@ public:
 	ReportObject* KernelSquare();
 	ReportObject* KernelMatops();
 	ReportObject* KernelMean();
+	ReportObject* KernelVariance();
 	~XilinxImpUnitTests();
 	void RunAll();
 private:

@@ -118,6 +118,14 @@ private:
             bool overaxis3,
             int pow_y);
 
+    TensorF* _ReduceSum4D(WorkScheduler scheduler,
+                                            TensorF* inputTn,
+                                            bool over_axis0,
+                                            bool over_axis1,
+                                            bool over_axis2,
+                                            bool over_axis3,
+    										int pow_y);
+
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
 
     std::string	device_name;

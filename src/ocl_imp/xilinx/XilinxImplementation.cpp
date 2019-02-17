@@ -646,6 +646,36 @@ TensorF* XilinxImplementation::ReduceSum4D(WorkScheduler scheduler,
     return nullptr;
 }
 
+TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
+                                        TensorF* inputTn,
+                                        bool over_axis0,
+                                        bool over_axis1,
+                                        bool over_axis2,
+                                        bool over_axis3,
+										int pow_y){
+    PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
+    assert(over_axis0&&over_axis1&&over_axis2&&!over_axis3); // TTTF ONLY
+
+    OclKernelObject *kernelObject = oclKernels[3];
+
+    unsigned int _dim0,_dim1,_dim2,_dim3;
+    _dim0 = inputTn->getShape()[0];
+    _dim1 = inputTn->getShape()[1];
+    _dim2 = inputTn->getShape()[2];
+    _dim3 = inputTn->getShape()[3];
+
+    OclTensorF* rsltTn = new OclTensorF(context, {_dim3}); // TTTF
+
+    if(kernelObject->use_ndrange_kernel){
+        _ReduceSum4D_Try05_NDRange(inputTn,rsltTn,_dim0,_dim1,_dim2,_dim3,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
+        return rsltTn;
+    }else{
+        _ReduceSum4D_Task(inputTn,rsltTn,_dim0,_dim1,_dim2,_dim3,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
+        return rsltTn;
+    }
+    return nullptr;
+}
+
 TensorF* XilinxImplementation::Mean(
         WorkScheduler scheduler,
         TensorF* inputTn,
@@ -667,7 +697,7 @@ TensorF* XilinxImplementation::Mean(
 		expanded=true;
 	}
 
-	TensorF* reducedTn = ReduceSum4D(scheduler,inputTn,mean_axis0,mean_axis1,mean_axis2,mean_axis3);
+	TensorF* reducedTn = _ReduceSum4D(scheduler,inputTn,mean_axis0,mean_axis1,mean_axis2,mean_axis3,1);
 	float coef = inputTn->getLength() / reducedTn->getLength(); // dim0xdim1xdim2 (for TTTF)
 	TensorF* rsltTn = MatOps(scheduler,reducedTn,coef,MAT_OPS::DIV_ELEMENTWISE);
 
@@ -687,7 +717,38 @@ TensorF* XilinxImplementation::Variance(
         bool variance_axis2,
         bool variance_axis3){
     PrintInfo("Variance","",0,"",0,"",0,inputTn->getShape(),{},{variance_axis0,variance_axis1,variance_axis2,variance_axis3});
-    return nullptr;
+    assert(inputTn->getRank()==2 || inputTn->getRank()==4);
+	assert(
+			(variance_axis0 && variance_axis1 && variance_axis2 && !variance_axis3 && inputTn->getRank()==4) ||
+			(variance_axis0 && !variance_axis1 && !variance_axis2 && !variance_axis3 && inputTn->getRank()==2)
+	);
+	bool expanded=false;
+	if (inputTn->getRank()==2){
+		inputTn->ExpandDims(0);
+		inputTn->ExpandDims(0);
+		expanded=true;
+	}
+
+	TensorF* tmpTn = _ReduceSum4D(scheduler,inputTn,variance_axis0,variance_axis1,variance_axis2,variance_axis3,1);
+	TensorF* varianceXi2Tn = _ReduceSum4D(scheduler,inputTn,variance_axis0,variance_axis1,variance_axis2,variance_axis3,2);
+
+	float coef = inputTn->getLength() / tmpTn->getLength(); // dim0xdim1xdim2 (for TTTF)
+	TensorF* meanTn = MatOps(scheduler,tmpTn,coef,MAT_OPS::DIV_ELEMENTWISE);
+	TensorF* tmp2Tn = MatOps(scheduler,varianceXi2Tn,coef,MAT_OPS::DIV_ELEMENTWISE);
+	TensorF* tmp3Tn = MatOps(scheduler,meanTn,meanTn,MAT_OPS::MUL_ELEMENTWISE);
+	TensorF* rsltTn = MatOps(scheduler,tmp2Tn,tmp3Tn,MAT_OPS::SUB);
+
+	if(expanded){
+		inputTn->SqueezeDimZero();
+		inputTn->SqueezeDimZero();
+	}
+
+    delete(tmpTn);
+    delete(tmp2Tn);
+    delete(tmp3Tn);
+    delete(varianceXi2Tn);
+    delete(meanTn);
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, TensorF *inputTn2, MAT_OPS mode){
