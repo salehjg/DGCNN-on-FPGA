@@ -51,6 +51,11 @@ TensorF* XilinxImpUnitTests::GenerateTensor(int pattern, vector<unsigned int> sh
             testTn->_buff[i] = pattern;
         }
     }
+    if(pattern==6){
+        for (unsigned long i = 0; i < _len; i++) {
+            testTn->_buff[i] = i;
+        }
+    }
     return testTn;
 }
 
@@ -491,7 +496,58 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
     return obj;
 }
 
+ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
+	TensorF* tensorSrc = GenerateTensor(3,{5,3,3,6});
+	TensorF* tensorWeight = GenerateTensor(3,{1,1,6,7});
+	TensorF* tensorBiases = GenerateTensor(-1,{7}); //THE SHAPE SHOULD BE 1D, NOT 4D LIKE {1,1,1,7}
+	TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
+	TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
+	bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
+ReportObject* XilinxImpUnitTests::KernelTopK(){
+    TensorF *tensorSrc = GenerateTensor(6, {8, 8, 8});
+    TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, 5);
+
+    /*
+    { //DBG ONLY
+        TensorI *cpuIndices = tensorCpu;
+
+        unsigned long lenI,lenV;
+        lenI = cpuIndices->getLength();
+        cout<<"**LenI:"<<lenI<<endl;
+
+        for(unsigned i =0;i<lenI;i++){
+        	cout<<"**I["<<i<<"] = "<< cpuIndices->_buff[i]<<endl;
+        }
+    }
+    */
+
+    TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, 5);
+    bool comparisonResult = true;
+    if (tensorCpu->getShape() != tensorGpu->getShape()){
+        comparisonResult = false;
+    }
+    else{
+        unsigned long len = tensorCpu->getLength();
+        TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
+        for (unsigned long i = 0; i < len; i++) {
+            int rCpu = tensorCpu->_buff[i];
+            int rGpu = tensorGpuTransfered->_buff[i];
+            if(rCpu != rGpu){
+                comparisonResult=false;
+                break;
+            }
+        }
+    }
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
 void XilinxImpUnitTests::RunAll(){
+
 	PrintReport(TensorFloat());
 	PrintReport(KernelConcat2());
 	PrintReport(KernelSqrt());
@@ -506,6 +562,8 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelMean());
 	PrintReport(KernelVariance());
 	PrintReport(KernelMatmul());
+	PrintReport(KernelConv2Mlp());
+    PrintReport(KernelTopK());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

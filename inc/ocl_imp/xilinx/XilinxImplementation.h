@@ -12,11 +12,14 @@
 #include <TensorI.h>
 #include <ocl_imp/OclTensorF.h>
 #include <ocl_imp/OclTensorI.h>
+#include <cnpy.h>
 
 #define XILINX_BOTTLENCK_BLOCKSIZE 1024
 
 //#define REPORT_EXECUTION_DURATION
 #undef REPORT_EXECUTION_DURATION
+
+#define DUMP_ENABLED
 
 struct OclKernelObject{
     string fileName;
