@@ -80,6 +80,8 @@ void task_topk(
 			a = &out[indxS];
 			ai= &outi[indxS];
 
+			//https://en.wikipedia.org/wiki/Selection_sort
+
 			/* a[0] to a[n-1] is the array to sort */
 			int i,j;
 			int n=dim2; // initialise to a's length

@@ -163,6 +163,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"",
 				"task_split_float",
 				false),
+		/* IDX 15 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/gather.cl",
+				"binary_container_1.xclbin",
+				"",
+				"task_gather",
+				false),
     };
     
     //======================================================================================================================
@@ -1341,6 +1349,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 										   0,
 										   NULL,
 										   &exeEvt);
+    		ReportDuration(std::string() +__func__ + "_topk",kernelObject->use_ndrange_kernel,exeEvt);
 			if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 			clWaitForEvents(1, &exeEvt);
 
@@ -1366,6 +1375,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
             error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
             if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
             clWaitForEvents(1, &exeEvt);
+    		ReportDuration(std::string() +__func__ + "_topk",kernelObject->use_ndrange_kernel,exeEvt);
 
             if(error != CL_SUCCESS) {
                 printf("Kernel execution failure!\n");
@@ -1416,6 +1426,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
             error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
             if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
             clWaitForEvents(1, &exeEvt);
+    		ReportDuration(std::string() +__func__ + "_splitfloat",kernelObject->use_ndrange_kernel,exeEvt);
 
             if(error != CL_SUCCESS) {
                 printf("Kernel execution failure!\n");
@@ -1447,6 +1458,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
             error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
             if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
             clWaitForEvents(1, &exeEvt);
+    		ReportDuration(std::string() +__func__ +"_splitinteger",kernelObject->use_ndrange_kernel,exeEvt);
 
             if(error != CL_SUCCESS) {
                 printf("Kernel execution failure!\n");
@@ -1462,8 +1474,49 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 
 TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, TensorI* indices, int indices_axis){
     PrintInfo("Gather","indices_axis",indices_axis,"",0,"",0,inputTn->getShape(),indices->getShape(),{});
-    return nullptr;
-    
+    assert(inputTn->getRank()==3);
+	assert(indices->getRank()==3);
+	assert(inputTn->getShape()[0]==indices->getShape()[0]);
+	assert(inputTn->getShape()[1]==indices->getShape()[1]);
+
+	unsigned int B,N,D,K;
+	B = inputTn->getShape()[0];
+	N = inputTn->getShape()[1];
+	D = inputTn->getShape()[2];
+	K = indices->getShape()[2];
+
+	OclTensorF* rsltTn = new OclTensorF(context,{B,N,K,D});
+	OclKernelObject *kernelObject = oclKernels[15];
+
+	if(kernelObject->use_ndrange_kernel){
+
+	}else{
+		cl_int error;
+		error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorI*)indices)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+		error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_uint) , (void*)&B);
+		error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_uint) , (void*)&N);
+		error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_uint) , (void*)&D);
+		error |= clSetKernelArg(kernelObject->kernel_task, 6 , sizeof(cl_uint) , (void*)&K);
+
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		assert(error==0);
+
+		cl_event exeEvt;
+
+		error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
+		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+		clWaitForEvents(1, &exeEvt);
+		ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+		if(error != CL_SUCCESS) {
+			printf("Kernel execution failure!\n");
+			exit(-22);
+		}
+
+		return rsltTn;
+	}
 }
 
 TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn, TensorF* weights, TensorF* biases, int overrideDim2){
