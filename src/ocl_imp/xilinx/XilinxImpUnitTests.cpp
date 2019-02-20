@@ -557,7 +557,6 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-	/*
 	PrintReport(TensorFloat());
 	PrintReport(KernelConcat2());
 	PrintReport(KernelSqrt());
@@ -573,7 +572,7 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelVariance());
 	PrintReport(KernelMatmul());
 	PrintReport(KernelConv2Mlp());
-    PrintReport(KernelTopK());*/
+    PrintReport(KernelTopK());
     PrintReport(KernelGather());
 }
 
