@@ -146,7 +146,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"binary_container_1.xclbin",
 				"ndrange_topk",
 				"task_topk",
-				false),
+				true),
 		/* IDX 13 :*/
 		new OclKernelObject(
 				KERNEL_DIR,
@@ -817,6 +817,18 @@ TensorF* XilinxImplementation::Mean(
 			(mean_axis0 && mean_axis1 && mean_axis2 && !mean_axis3 && inputTn->getRank()==4) ||
 			(mean_axis0 && !mean_axis1 && !mean_axis2 && !mean_axis3 && inputTn->getRank()==2)
 	);
+	bool _mean_axis0, _mean_axis1, _mean_axis2, _mean_axis3;
+	if(inputTn->getRank()==4){
+		_mean_axis0 = mean_axis0;
+		_mean_axis1 = mean_axis1;
+		_mean_axis2 = mean_axis2;
+		_mean_axis3 = mean_axis3;
+	}else if (inputTn->getRank()==2){
+		_mean_axis0 = true;
+		_mean_axis1 = true;
+		_mean_axis2 = true;
+		_mean_axis3 = false;
+	}
 	bool expanded=false;
 	if (inputTn->getRank()==2){
 		inputTn->ExpandDims(0);
@@ -824,7 +836,7 @@ TensorF* XilinxImplementation::Mean(
 		expanded=true;
 	}
 
-	TensorF* reducedTn = _ReduceSum4D(scheduler,inputTn,mean_axis0,mean_axis1,mean_axis2,mean_axis3,1);
+	TensorF* reducedTn = _ReduceSum4D(scheduler,inputTn,_mean_axis0,_mean_axis1,_mean_axis2,_mean_axis3,1);
 	float coef = inputTn->getLength() / reducedTn->getLength(); // dim0xdim1xdim2 (for TTTF)
 	TensorF* rsltTn = MatOps(scheduler,reducedTn,coef,MAT_OPS::DIV_ELEMENTWISE);
 
@@ -849,6 +861,18 @@ TensorF* XilinxImplementation::Variance(
 			(variance_axis0 && variance_axis1 && variance_axis2 && !variance_axis3 && inputTn->getRank()==4) ||
 			(variance_axis0 && !variance_axis1 && !variance_axis2 && !variance_axis3 && inputTn->getRank()==2)
 	);
+	bool _variance_axis0, _variance_axis1, _variance_axis2, _variance_axis3;
+	if(inputTn->getRank()==4){
+		_variance_axis0 = variance_axis0;
+		_variance_axis1 = variance_axis1;
+		_variance_axis2 = variance_axis2;
+		_variance_axis3 = variance_axis3;
+	}else if (inputTn->getRank()==2){
+		_variance_axis0 = true;
+		_variance_axis1 = true;
+		_variance_axis2 = true;
+		_variance_axis3 = false;
+	}
 	bool expanded=false;
 	if (inputTn->getRank()==2){
 		inputTn->ExpandDims(0);
@@ -856,8 +880,8 @@ TensorF* XilinxImplementation::Variance(
 		expanded=true;
 	}
 
-	TensorF* tmpTn = _ReduceSum4D(scheduler,inputTn,variance_axis0,variance_axis1,variance_axis2,variance_axis3,1);
-	TensorF* varianceXi2Tn = _ReduceSum4D(scheduler,inputTn,variance_axis0,variance_axis1,variance_axis2,variance_axis3,2);
+	TensorF* tmpTn = _ReduceSum4D(scheduler,inputTn,_variance_axis0,_variance_axis1,_variance_axis2,_variance_axis3,1);
+	TensorF* varianceXi2Tn = _ReduceSum4D(scheduler,inputTn,_variance_axis0,_variance_axis1,_variance_axis2,_variance_axis3,2);
 
 	float coef = inputTn->getLength() / tmpTn->getLength(); // dim0xdim1xdim2 (for TTTF)
 	TensorF* meanTn = MatOps(scheduler,tmpTn,coef,MAT_OPS::DIV_ELEMENTWISE);

@@ -56,6 +56,11 @@ TensorF* XilinxImpUnitTests::GenerateTensor(int pattern, vector<unsigned int> sh
             testTn->_buff[i] = i;
         }
     }
+    if(pattern==7){
+        for (unsigned long i = 0; i < _len; i++) {
+            testTn->_buff[i] = float_rand(-2.50f,2.50f);
+        }
+    }
     return testTn;
 }
 
@@ -202,7 +207,7 @@ ReportObject* XilinxImpUnitTests::KernelTranspose(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelRelu(){
-	TensorF* tensorSrc = GenerateTensor(3,{10,50,20});
+	TensorF* tensorSrc = GenerateTensor(7,{10,50,20});
 	TensorF* tensorCpu = platformSelector->ReLU(PLATFORMS::CPU,scheduler,tensorSrc);
 	TensorF* tensorGpu = platformSelector->ReLU(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
 	bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -497,9 +502,9 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
-	TensorF* tensorSrc = GenerateTensor(3,{5,3,3,6});
-	TensorF* tensorWeight = GenerateTensor(3,{1,1,6,7});
-	TensorF* tensorBiases = GenerateTensor(-1,{7}); //THE SHAPE SHOULD BE 1D, NOT 4D LIKE {1,1,1,7}
+	TensorF* tensorSrc = GenerateTensor(0,{25,1024,20,6});
+	TensorF* tensorWeight = GenerateTensor(0,{1,1,6,64});
+	TensorF* tensorBiases = GenerateTensor(0,{64}); //THE SHAPE SHOULD BE 1D, NOT 4D LIKE {1,1,1,7}
 	TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
 	TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
 	bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -508,8 +513,8 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
-    TensorF *tensorSrc = GenerateTensor(6, {8, 8, 8});
-    TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, 5);
+    TensorF *tensorSrc = GenerateTensor(6, {5, 1024, 1024});
+    TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, 20);
 
     /*
     { //DBG ONLY
@@ -525,7 +530,7 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
     }
     */
 
-    TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, 5);
+    TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, 20);
     bool comparisonResult = true;
     if (tensorCpu->getShape() != tensorGpu->getShape()){
         comparisonResult = false;
@@ -557,6 +562,7 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
+
 	PrintReport(TensorFloat());
 	PrintReport(KernelConcat2());
 	PrintReport(KernelSqrt());
@@ -574,6 +580,7 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelConv2Mlp());
     PrintReport(KernelTopK());
     PrintReport(KernelGather());
+
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
