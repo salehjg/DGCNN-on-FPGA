@@ -1,6 +1,6 @@
 // COPYRIGHT TO CHARLESQ34 @ GitHub : PointNet++
 // input: k (1), distance matrix dist (b,m,n)
-// output: idx (b,m,n), dist_out (b,m,n)
+// output: outi (b,m,n), out (b,m,n)
 // only the top k results within n are useful
 kernel void ndrange_topk(
         global const float * __restrict__ dist,
@@ -57,9 +57,9 @@ kernel void ndrange_topk(
 
 kernel __attribute__((reqd_work_group_size(1, 1, 1)))
 void task_topk(
-        global const float *dist, 	//dim0xdim1xdim2
-        global int *outi,			//dim0xdim1xdim2 (only first K elements over dim2 are valid)
-        global float *out,			//dim0xdim1xdim2 (only first K elements over dim2 are valid)
+        global const float *  dist, 	//dim0xdim1xdim2
+        global int *  outi,				//dim0xdim1xdim2 (only first K elements over dim2 are valid)
+        global float *  out,			//dim0xdim1xdim2 (only first K elements over dim2 are valid)
 		const int dim0,
 		const int dim1,
 		const int dim2,
@@ -71,53 +71,51 @@ void task_topk(
 		for(int d1=0;d1<dim1;d1++){
 			indxS = d0*dim1*dim2 + d1*dim2 + 0;
 			//copy input data into output and outputI
+
 			for(int q=0;q<dim2;q++){
 				out[indxS+q]  = dist[indxS+q];
 				outi[indxS+q] = q;
 			}
-
-			global float *a,*ai;
-			a = &out[indxS];
-			ai= &outi[indxS];
+ 
 
 			//https://en.wikipedia.org/wiki/Selection_sort
 
-			/* a[0] to a[n-1] is the array to sort */
+			// a[0] to a[n-1] is the array to sort
 			int i,j;
 			int n=dim2; // initialise to a's length
 
-			/* advance the position through the entire array */
-			/*   (could do j < n-1 because single element is also min element) */
-			for (j = 0; j < k/*n-1*/; j++){
-				/* find the min element in the unsorted a[j .. n-1] */
-				/* assume the min is the first element */
+			// advance the position through the entire array
+			//   (could do j < n-1 because single element is also min element)
+			for (j = 0; j < n-1; j++){
+				// find the min element in the unsorted a[j .. n-1]
+				// assume the min is the first element
 				int iMin = j;
-				/* test against elements after j to find the smallest */
+				// test against elements after j to find the smallest
 				for (i = j+1; i < n; i++){
-					/* if this element is less, then it is the new minimum */
-					if (a[i] < a[iMin]){
-						/* found new minimum; remember its index */
+					// if this element is less, then it is the new minimum
+					if (out[indxS+i] < out[indxS+iMin]){
+						// found new minimum; remember its index
 						iMin = i;
 					}
 				}
 
 				if (iMin != j){
 
-					{
-						//swap(a[j], a[iMin]);
-						float val = a[j];
-						a[j] = a[iMin];
-						a[iMin] = val;
+					{ 
+						float val = out[indxS+j];
+						out[indxS+j] = out[indxS+iMin];
+						out[indxS+iMin] = val;
 					}
 
 					{
-						int val = ai[j];
-						ai[j] = ai[iMin];
-						ai[iMin] = val;
+						int val = outi[indxS+j];
+						outi[indxS+j] = outi[indxS+iMin];
+						outi[indxS+iMin] = val;
 					}
 
-				}
+				} 
 			}
+
 
 		}
 	}

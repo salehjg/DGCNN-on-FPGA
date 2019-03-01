@@ -146,7 +146,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"binary_container_1.xclbin",
 				"ndrange_topk",
 				"task_topk",
-				true),
+				false),
 		/* IDX 13 :*/
 		new OclKernelObject(
 				KERNEL_DIR,
@@ -1388,8 +1388,8 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
             error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorI*)tmpIndicesTn)->ocl_buff);
             error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_mem) , (void*)&((OclTensorF*)tmpValTn)->ocl_buff);
             error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_int) , (void*)&b);
-            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_int) , (void*)&n);
-            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int) , (void*)&m);
+            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_int) , (void*)&m);
+            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int) , (void*)&n);
             error |= clSetKernelArg(kernelObject->kernel_task, 6 , sizeof(cl_int) , (void*)&k);
 
             if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
@@ -1408,25 +1408,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
         }
 
 	}
-    //==================================================================================================================
-    /*
-    { //DBG ONLY
-        TensorI *cpuIndices = tmpIndicesTn->TransferToHost(queue);
-        TensorF *cpuValues = tmpValTn->TransferToHost(queue);
 
-        unsigned long lenI,lenV;
-        lenI = cpuIndices->getLength();
-        lenV = cpuValues->getLength();
-        cout<<"LenI:"<<lenI<<endl;
-        cout<<"LenV:"<<lenV<<endl;
-
-        for(unsigned i =0;i<lenI;i++){
-        	cout<<"I["<<i<<"] = "<< cpuIndices->_buff[i]<<endl;
-        	cout<<"\t\tV["<<i<<"] = "<< cpuValues->_buff[i]<<endl;
-        }
-        DumpMatrix(scheduler,"dmpI.npy",tmpIndicesTn,"/tmp/");
-        DumpMatrix(scheduler,"dmpV.npy",tmpValTn,"/tmp/");
-    }*/
     //==================================================================================================================
     {//2.split_float   split BxMxN into BxMxK (float)
         OclKernelObject *kernelObject = oclKernels[14];
@@ -1438,10 +1420,10 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 
             error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)tmpValTn)->ocl_buff);
             error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorF*)rsltValTn)->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_int) , (void*)&b);
-            error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_int) , (void*)&m);
-            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_int) , (void*)&n);
-            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int) , (void*)&k);
+            error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_uint) , (void*)&b);
+            error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_uint) , (void*)&m);
+            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_uint) , (void*)&n);
+            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_uint) , (void*)&k);
 
             if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
             assert(error==0);
@@ -1470,10 +1452,10 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 
             error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorI*)tmpIndicesTn)->ocl_buff);
             error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorI*)rsltIndicesTn)->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_int) , (void*)&b);
-            error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_int) , (void*)&m);
-            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_int) , (void*)&n);
-            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int) , (void*)&k);
+            error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_uint) , (void*)&b);
+            error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_uint) , (void*)&m);
+            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_uint) , (void*)&n);
+            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_uint) , (void*)&k);
 
             if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
             assert(error==0);

@@ -1,4 +1,5 @@
 #include <ocl_imp/xilinx/XilinxImpUnitTests.h>
+#include <cnpy.h>
 
 XilinxImpUnitTests::XilinxImpUnitTests(){
 	// GPU_OCL is FPGA now, because there is no reason to run code both on FPGA and GPU at same executable!
@@ -513,37 +514,63 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
-    TensorF *tensorSrc = GenerateTensor(6, {5, 1024, 1024});
-    TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, 20);
+	cnpy::NpyArray tmp = cnpy::npy_load("/home/saleh/01_workspace/00_Xilinx_WS/DeepPoint-V1-FPGA/data/topkTest2.npy");
+	vector<unsigned int> __shape(tmp.shape.begin(),tmp.shape.end());
+	TensorF* testNpy = new TensorF(__shape, tmp.data<float>());
+
+	int kVal = 20;
+    TensorF *tensorSrc = GenerateTensor(0, {5, 1024, 1024});
+    //TensorF *tensorSrc = testNpy;
+
+    TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
+
+    TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, kVal);
+    TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
 
     /*
-    { //DBG ONLY
-        TensorI *cpuIndices = tensorCpu;
+    {
+    	unsigned int dim0,dim1,dim2;
+    	dim0 = tensorSrc->getShape()[0];
+    	dim1 = tensorSrc->getShape()[1];
+    	dim2 = tensorSrc->getShape()[2];
 
-        unsigned long lenI,lenV;
-        lenI = cpuIndices->getLength();
-        cout<<"**LenI:"<<lenI<<endl;
+    	for(int d0=0;d0<dim0;d0++){
+    		for(int d1=0;d1<dim1;d1++){
+    			cout<<"\n\nNew  Slice(Src-Dim2):\n";
+    			for(int d2=0;d2<dim2;d2++){
+    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + d2;
+    				cout << tensorSrc->_buff[indxS] << " - ";
+				}
 
-        for(unsigned i =0;i<lenI;i++){
-        	cout<<"**I["<<i<<"] = "<< cpuIndices->_buff[i]<<endl;
-        }
+    			cout<<"\n\nCPU Result Slice(Rslt-kVal):\n";
+				for(int d2=0;d2<kVal;d2++){
+    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + 0;
+    				unsigned long indxD = d0*dim1*kVal + d1*kVal + d2;
+					cout << tensorSrc->_buff[indxS+ tensorCpu->_buff[indxD]] << " - ";
+				}
+				cout<<"\n\nFPGA Result Slice(Rslt-kVal):\n";
+				for(int d2=0;d2<kVal;d2++){
+    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + 0;
+    				unsigned long indxD = d0*dim1*kVal + d1*kVal + d2;
+					cout << tensorSrc->_buff[indxS+ tensorGpuTransfered->_buff[indxD]] << " - ";
+				}
+				cout<<endl;
+			}
+    	}
     }
-    */
+	*/
 
-    TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, 20);
     bool comparisonResult = true;
     if (tensorCpu->getShape() != tensorGpu->getShape()){
         comparisonResult = false;
     }
     else{
         unsigned long len = tensorCpu->getLength();
-        TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
         for (unsigned long i = 0; i < len; i++) {
             int rCpu = tensorCpu->_buff[i];
             int rGpu = tensorGpuTransfered->_buff[i];
             if(rCpu != rGpu){
                 comparisonResult=false;
-                break;
             }
         }
     }
