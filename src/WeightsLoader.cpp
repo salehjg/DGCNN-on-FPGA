@@ -32,7 +32,7 @@ WeightsLoader::WeightsLoader(vector<PLATFORMS> neededPlatforms) {
     }
 }
 #ifdef USE_OCL
-void WeightsLoader::LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl::Context* oclContex, cl::CommandQueue* oclQueue) {
+void WeightsLoader::LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl_context oclContex, cl_command_queue oclQueue) {
 #else
 void WeightsLoader::LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList) {
 #endif

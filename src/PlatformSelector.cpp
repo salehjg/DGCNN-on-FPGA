@@ -56,6 +56,13 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
 #endif
 }
 
+PlatformSelector::~PlatformSelector(){
+	cout<<"~PlatformSelector"<<endl;
+	delete(weightsLoader);
+	delete(cpuPlatformClass);
+	delete(openclPlatformClass);
+}
+
 TensorF* PlatformSelector::CrossThePlatform(TensorF *srcTn, PLATFORMS platform) {
     switch(srcTn->getPlatform()){
         case PLATFORMS::CPU :{

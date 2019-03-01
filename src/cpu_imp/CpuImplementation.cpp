@@ -1329,6 +1329,7 @@ TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, i
     if(batchedMat->getRank() != 3){cout<<"TopK: ERROR_UNIMPLEMENTED_TENSOR_RANK"<<endl;return nullptr;}
     if(axis != 2){cout<<"TopK: ERROR_UNIMPLEMENTED_AXIS"<<endl;return nullptr;}
     if(k < 1 || k > batchedMat->getShape()[2]){cout<<"TopK: ERROR_BAD_K"<<endl;return nullptr;}
+    if(batchedMat->getShape()[1] != batchedMat->getShape()[2]){cout<<"TopK: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
 
     //batchedMat is considered as BxNxN
     //we will use std::sort in ascending order.

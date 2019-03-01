@@ -5,7 +5,8 @@ kernel void ndrange_sqrt(global const float * __restrict__ g_idata, global float
     }
 }
 
-kernel void task_sqrt(global const float * __restrict__ g_idata, global float * __restrict__ g_odata, const unsigned long len){
+kernel __attribute__((reqd_work_group_size(1, 1, 1)))
+void task_sqrt(global const float * __restrict__ g_idata, global float * __restrict__ g_odata, const unsigned long len){
     for(unsigned long d=0;d<len;d++) {
     	g_odata[d] = sqrt(g_idata[d]);
     }

@@ -17,6 +17,7 @@ int main(){
 		cout<< "Running Kernel Unit Tests ...\n" <<endl;
 		XilinxImpUnitTests xilinxImpUnitTests;
 		xilinxImpUnitTests.RunAll();
+		//xilinxImpUnitTests.~XilinxImpUnitTests();
 	}
 	//---------------------
 	if(RUN_MODELARCH){
