@@ -5,7 +5,7 @@ XilinxImpUnitTests::XilinxImpUnitTests(){
 	// GPU_OCL is FPGA now, because there is no reason to run code both on FPGA and GPU at same executable!
 	// So ... 
 	// GPU_OCL with attention to OCL part of the name means FPGA 
-	platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL, {PLATFORMS::CPU,PLATFORMS::GPU_OCL});
+	platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL, {PLATFORMS::CPU,PLATFORMS::GPU_OCL},false);
 }
 
 float XilinxImpUnitTests::float_rand( float min, float max )
@@ -153,7 +153,7 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum(){
 	bool comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu2,tensorGpu2);
 
 	//TEST(Rank3_OverAxis2)
-	TensorF* tensorSrc3 = GenerateTensor(1,{50,25,50});
+	TensorF* tensorSrc3 = GenerateTensor(1,{50,25,20});
 	TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
 	TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
 	bool comparisonResult3 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
@@ -406,7 +406,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
             comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu, tensorGpu);
         }
     }
-
+    /*
     if(printLog) cout << "TEST(Rank_1_0V2)"<<endl;
     {
         //Ranks: 1,0
@@ -455,7 +455,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
             TensorF* tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,op);
             comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
         }
-    }
+    }*/
 
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;

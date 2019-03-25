@@ -20,7 +20,7 @@
 #include "../inc/ocl_imp/OclTensorI.h"
 #endif
 
-PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> neededPlatforms) {
+PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> neededPlatforms,bool loadWeights) {
     this->defaultPlatform = defaultPlatform;
 
     for(std::vector<PLATFORMS>::iterator it = neededPlatforms.begin(); it != neededPlatforms.end(); ++it) {
@@ -45,14 +45,19 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
     }
 
     weightsLoader = new WeightsLoader(neededPlatforms);
+    if(!loadWeights) cout<<"/!\\ Weight are not loaded into device memory."<<endl;
 #ifdef USE_OCL
-    weightsLoader->LoadFromDisk(REPO_DIR "/data/weights/",
-                                REPO_DIR "/data/weights/filelist.txt",
-                                openclPlatformClass->getContext(),
-                                openclPlatformClass->getQueue());
+    if(loadWeights){
+		weightsLoader->LoadFromDisk(REPO_DIR "/data/weights/",
+									REPO_DIR "/data/weights/filelist.txt",
+									openclPlatformClass->getContext(),
+									openclPlatformClass->getQueue());
+    }
 #else
-    weightsLoader->LoadFromDisk(REPO_DIR "/data/weights/",
-                                REPO_DIR "/data/weights/filelist.txt" );
+    if(loadWeights){
+		weightsLoader->LoadFromDisk(REPO_DIR "/data/weights/",
+									REPO_DIR "/data/weights/filelist.txt" );
+    }
 #endif
 }
 
