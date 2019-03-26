@@ -9,74 +9,74 @@
 * Best Results: results of the best HW-EMU of optimized versions of task kernels.
 
 
-Op Name    |Task-Base |Best Results|
----        |---       |---         |
-Concat2    |          |            |	    
-Sqrt       |          |            |	    
-ReduceMax  |          |            |	    
-ReduceSum4D|          |            |	    
-ReduceSum  |          |            |	    
-Mean       |          |            |	    
-Variance   |          |            |	    
-Tile       |          |            |	    
-MatOps     |          |            |	    
-Transpose  |          |            |	    
-Conv2d     |          |            |	    
-ReLU       |          |            |	    
-Matmul     |          |            |	    
-Square     |          |            |	    
-TopK       |          |            |	    
-Gather     |          |            |	    
+Op Name    |Task-Base 		|Best Results|
+---        |---       		|---         |
+Concat2    |0.017          	|            |	    
+Sqrt       |0.004          	|            |	    
+ReduceMax  |0.005, 0.008    |            |	    
+ReduceSum4D|          		|            |	    
+ReduceSum  |          		|            |	    
+Mean       |          		|            |	    
+Variance   |          		|            |	    
+Tile       |          		|            |	    
+MatOps     |          		|            |	    
+Transpose  |0.013          	|            |	    
+Conv2d     |          		|            |	    
+ReLU       |0.002          	|            |	    
+Matmul     |          		|            |	    
+Square     |0.002          	|            |	    
+TopK       |0.062          	|            |	    
+Gather     |          		|            |	    
 
 ## In-depth Review
 ### Concat2 (Task)
-    InputTn1 = 5,2,50,20
-    InputTn2 = 5,2,50,30
+    InputTn1 = 2,2,2,3
+    InputTn2 = 2,2,2,2
     ConcatDim = 3
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### Sqrt (Task)
-    InputTn1 = 5,2,50,20 
+    InputTn1 = 2,2,2,2
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### ReduceMax (Task)
-    InputTn1 = 5,2,50,20 
+    InputTn1 = 2,2,3,2
     OverDim = 2
     ---
-    InputTn1 = 5,5,1,20 
+    InputTn1 = 2,3,2,2
     OverDim = 1
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### ReduceSum4D (Task)
-    InputTn1 = 5,1024,20,256
+    InputTn1 = 2,2,2,5
     OverDim = TTTF
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### ReduceSum (Task)
-    InputTn1 = 50,25,20
+    InputTn1 = 2,2,2
     OverDim = TFF, FTF, FFT
 Commit|Duration|Description
 ---|---|---
 000|000|0000
     
 ### Tile (Task)
-    InputTn1 = 5,2,1,20
+    InputTn1 = 2,2,1,2
     TileCount = 8
     TileAxis = 2
     ---
-    InputTn1 = 5,2,1
+    InputTn1 = 2,2,1
     TileCount = 8
     TileAxis = 2
     ---
-    InputTn1 = 5,1,20
+    InputTn1 = 2,1,2
     TileCount = 8
     TileAxis = 1
 Commit|Duration|Description
@@ -84,64 +84,64 @@ Commit|Duration|Description
 000|000|0000
 
 ### Transpose (Task)
-    InputTn1 = 5,1,20 
+    InputTn1 = 3,4,5 
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### ReLU (Task)
-    InputTn1 = 10,50,20 
+    InputTn1 = 2,2,2 
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### Square (Task)
-    InputTn1 = 10,50,20 
+    InputTn1 = 2,2,2 
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### MatOps (Task)
-    InputTn1 = 11,12,13,14 
-    InputTn2 = 11,12,13,14 
+    InputTn1 = 2,2,2,2 
+    InputTn2 = 2,2,2,2 
     ---
-    InputTn1 = 11,12,13,14 
-    InputTn2 = 12,13,14 
+    InputTn1 = 2,2,2,2 
+    InputTn2 = 2,2,2
     ---
-    InputTn1 = 11,12,13,14 
-    InputTn2 = 13,14 
+    InputTn1 = 2,2,2,2
+    InputTn2 = 2,2
     ---
-    InputTn1 = 11,12,13,14 
-    InputTn2 = 14 
+    InputTn1 = 2,2,2,2
+    InputTn2 = 2
     ---
-    InputTn1 = 11,12,13,14 
+    InputTn1 = 2,2,2,2
     InputTn2 = SCALAR
     ---
-    InputTn1 = 12,13,14 
-    InputTn2 = 12,13,14 
+    InputTn1 = 2,2,2
+    InputTn2 = 2,2,2
     ---
-    InputTn1 = 12,13,14 
-    InputTn2 = 13,14 
+    InputTn1 = 2,2,2
+    InputTn2 = 2,2 
     ---
-    InputTn1 = 12,13,14 
-    InputTn2 = 14 
+    InputTn1 = 2,2,2 
+    InputTn2 = 2
     ---
-    InputTn1 = 12,13,14 
+    InputTn1 = 2,2,2 
     InputTn2 = SCALAR
     ---
-    InputTn1 = 13,14 
-    InputTn2 = 13,14 
+    InputTn1 = 2,2 
+    InputTn2 = 2,2 
     ---
-    InputTn1 = 13,14 
-    InputTn2 = 14 
+    InputTn1 = 2,2 
+    InputTn2 = 2 
     ---
-    InputTn1 = 13,14 
+    InputTn1 = 2,2 
     InputTn2 = SCALAR
     ---
-    InputTn1 = 14 
-    InputTn2 = 14 
+    InputTn1 = 2 
+    InputTn2 = 2 
     ---
-    InputTn1 = 14 
+    InputTn1 = 2 
     InputTn2 = SCALAR
     
 Commit|Duration|Description
@@ -149,47 +149,47 @@ Commit|Duration|Description
 000|000|0000
 
 ### Mean (Task)
-    InputTn1 = 5,1024,20,256
+    InputTn1 = 2,2,2,5
     OverDim = TTTF
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### Variance (Task)
-    InputTn1 = 5,1024,20,256
+    InputTn1 = 2,2,2,5
     OverDim = TTTF
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### MatMul (Task)
-    InputTn1 = 1,50,20
-    InputTn2 = 1,20,60
+    InputTn1 = 1,5,2
+    InputTn2 = 1,2,5
     ---
-    InputTn1 = 25,1024
-    InputTn2 = 1024,512
+    InputTn1 = 3,4
+    InputTn2 = 4,5
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### Conv2MLP (Task)
-    InputTn1 = 25,1024,20,6
-    Weight = 1,1,6,64
-    Bias = 64
+    InputTn1 = 2,2,3,3
+    Weight = 1,1,3,4
+    Bias = 4
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### TopK (Task)
-    InputTn1 = 5,1024,1024
-    K = 20
+    InputTn1 = 2,5,5
+    K = 3
 Commit|Duration|Description
 ---|---|---
 000|000|0000
 
 ### Gather (Task)
-    InputTn1 = 5,1024,6
-    IndicesTn = 5,1024,20 
+    InputTn1 = 5,5,2
+    IndicesTn = 5,5,3
 Commit|Duration|Description
 ---|---|---
 000|000|0000
