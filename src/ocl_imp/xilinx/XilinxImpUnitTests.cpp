@@ -89,8 +89,10 @@ ReportObject* XilinxImpUnitTests::TensorFloat(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelConcat2(){
-	TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
-	TensorF* tensorSrc2 = GenerateTensor(3,{2,2,2,2});
+	//TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
+	//TensorF* tensorSrc2 = GenerateTensor(3,{2,2,2,2});
+    TensorF* tensorSrc1 = GenerateTensor(3,{2,5,2,52});
+    TensorF* tensorSrc2 = GenerateTensor(3,{2,5,2,60});
 
 	TensorF* tensorCpu = platformSelector->Concat2(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,3);
 	TensorF* tensorGpu = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,3);
@@ -113,12 +115,12 @@ ReportObject* XilinxImpUnitTests::KernelSqrt(){
 
 
 ReportObject* XilinxImpUnitTests::KernelReduceMax(){
-    TensorF* tensorSrc1 = GenerateTensor(0,{2,2,3,2});
+    TensorF* tensorSrc1 = GenerateTensor(0,{21,31,31,21});
     TensorF* tensorCpu1 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc1,2);
     TensorF* tensorGpu1 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,2);
     bool comparisonResult1 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
 
-    TensorF* tensorSrc2 = GenerateTensor(0,{2,3,2,2});
+    TensorF* tensorSrc2 = GenerateTensor(0,{20,30,1,20});
     TensorF* tensorCpu2 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc2,1);
     TensorF* tensorGpu2 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc2,1);
     bool comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu2,tensorGpu2);
@@ -591,9 +593,10 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 void XilinxImpUnitTests::RunAll(){
 
 	//PrintReport(TensorFloat());
-	PrintReport(KernelConcat2());
-	PrintReport(KernelSqrt());
+	//PrintReport(KernelConcat2());
+	//PrintReport(KernelSqrt());
 	PrintReport(KernelReduceMax());
+	/*
 	PrintReport(KernelReduceSum4D());
 	PrintReport(KernelReduceSum());
 	PrintReport(KernelTile());
@@ -607,7 +610,7 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelConv2Mlp());
     PrintReport(KernelTopK());
     PrintReport(KernelGather());
-
+	*/
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

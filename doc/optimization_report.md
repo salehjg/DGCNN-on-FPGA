@@ -2,6 +2,7 @@
 
 ## Ground Rules
 * Each op runs on specific input tensor. 
+* Reports are for C/C++ HLS entery point, not OpenCL.
 
 
 ## Summary
@@ -36,6 +37,11 @@ Gather     |          		|            |
 Commit|Duration|Description
 ---|---|---
 000|000|0000
+
+* Different bundles are used for inputs and output to achieve seperat mAXI and burst read and write of gmem.
+* The loop_flatten pragma requires perfect or semi-perfect nested loops which means that outermost for-loop should have constant bound.
+* The loop_flatten pragma hinders loop_tripcount pragma and causes it to
+* Compiler and or linker options are needed to assign different memory banks to mAXI ports.
 
 ### Sqrt (Task)
     InputTn1 = 2,2,2,2
