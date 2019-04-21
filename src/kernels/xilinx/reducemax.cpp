@@ -14,10 +14,15 @@
 #include <string.h>
 #include <hls_math.h>
 
-#define CONFIG_SLICE_SIZE  1024
-#define CONFIG_SLICE_COUNT 2
+#define CONFIG_SLICE_SIZE  		1024
+#define CONFIG_SLICE_COUNT 		2
+
 
 extern "C" {
+
+
+
+
 void task_reducemax(
         float* inputTn,
         float* outputTn,
@@ -43,33 +48,44 @@ void task_reducemax(
 #pragma HLS INTERFACE s_axilite port=return     bundle=control
 
     float buff[CONFIG_SLICE_COUNT+1][CONFIG_SLICE_SIZE];
+#pragma HLS ARRAY_PARTITION variable=buff complete dim=0
 
     if(!overaxis2 && overaxis1 && !overaxis0){
         unsigned long indxS,indxD;
 
-		for(int d0=0;d0<dim0;d0++){
-			for(int d1=0;d1<dim1;d1+=CONFIG_SLICE_COUNT){
+		LoopD0:for(int d0=0;d0<dim0;d0++){
+#pragma HLS LOOP_TRIPCOUNT min=5 max=5120
+			LoopD1:for(int d1=0;d1<dim1;d1+=CONFIG_SLICE_COUNT){
+#pragma HLS LOOP_TRIPCOUNT min=20 max=1024
 
 				//reading slices to local buffers while checking bounds before burst reading.
-				for(int s=0;s<CONFIG_SLICE_COUNT;s++){
+				LoopRead1:for(int s=0;s<CONFIG_SLICE_COUNT;s++){
 					int d1_ex = d1 + s;
 					if(d1_ex<dim1){
 						indxS = d0*dim1*dim2 + (d1_ex)*dim2 + 0;
 						//memcpy(dst,src,len in bytes)
 						//buf[0] is for final results only.
-						memcpy(&buff[1+s][0], &inputTn[indxS], dim2*sizeof(float));
+						//memcpy(&buff[1+s][0], &inputTn[indxS], dim2*sizeof(float));
+						//-------------------------------------------------------------------
+						//Using for-loop for burst reading because trip-count pragma is not available for memcpy
+						LoopCPY1:for(unsigned long i=0;i<dim2;i++){
+#pragma HLS PIPELINE
+#pragma HLS LOOP_TRIPCOUNT min=64 max=1024
+							buff[1+s][i] = inputTn[indxS+i];
+						}
 					}
 				}
 
 				//comparing buff[1] and buff[2] and then comparing maxed result with buff[0]
 				//so we have a maxing engine working parallel on "CONFIG_SLICE_COUNT" slices and 
 				//then comparing the results with last run's results and updating final(buff[0]).
-				for(int s=0;s<CONFIG_SLICE_COUNT;s+=2){
+				LoopCMP1:for(int s=0;s<CONFIG_SLICE_COUNT;s+=2){
 						//Keep nested loop perfect and avoid if statements here.
 
 						//compare elements of slice0 and slice "s"
 						//pay attention to the const bound of the loop.
-						for(int d2=0;d2<CONFIG_SLICE_SIZE;d2++){
+						LoopCMP2:for(int d2=0;d2<CONFIG_SLICE_SIZE;d2++){
+#pragma HLS UNROLL factor=4
 							int d1_ex = d1 + s;
 							if(d1_ex<dim1){
 								if(d2<dim2){
@@ -83,6 +99,7 @@ void task_reducemax(
 									}else{
 										buff[0][d2] = max > buff[0][d2] ? max : buff[0][d2];
 									}
+
 								}
 							}
 						}
@@ -91,7 +108,14 @@ void task_reducemax(
 
 				//Writing final results(buff[0]) to output tensor:
 				indxD = d0*dim2 + 0;
-				memcpy(&outputTn[indxD], &buff[0][0], dim2*sizeof(float));
+				//memcpy(&outputTn[indxD], &buff[0][0], dim2*sizeof(float));
+				//----------------------------------------------------------
+				//using for-loop for burst writing because tripcount pragma is not available for memcpy
+				LoopCPY2:for(unsigned long i=0;i<dim2;i++){
+#pragma HLS PIPELINE
+#pragma HLS LOOP_TRIPCOUNT min=64 max=1024
+					outputTn[indxD+i] = buff[0][i];
+				}
 
 
 			}
