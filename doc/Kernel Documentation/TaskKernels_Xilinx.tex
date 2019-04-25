@@ -1,0 +1,245 @@
+\documentclass[•]{article}
+%this is a comment line.
+
+\usepackage[margin=1 in]{geometry}
+\usepackage{graphicx}
+\geometry{a4paper}
+
+%These are for source code snippets in 
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=C++,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{Detailed Documentation of Task Kernels for Xilinx Platform}
+\author{SalehJG}
+
+\begin{document}
+\maketitle
+
+\section{Intro}
+This document is meant to be a detailed guide to understand the source code for each kernels and the challenges that are known for each scenario.
+Most of material here has documented while Deep-Point was under development, so, they might not be updated as you would expect but they are intended to be up to date.
+
+\subsection{Repository Information}
+This document is a part of Deep-Point-FPGA project which is open-source. The Deep-Point-FGPA is a subset of Deep-Point focusing on implementing it on FPGAs.
+
+\subsection{Programming}
+\begin{itemize}
+\item Xilinx Vivado 2018.2
+\item Xilinx SDAccel 2018.2
+\item Cent OS 7.4 X64
+\end{itemize}
+
+\pagebreak
+
+\section{Concat2}
+Concatenates two tensors of rank four into one over a dimension.
+\subsection{Top Function}
+\begin{lstlisting}
+void task_concat(
+		float* inputTn1,
+	    float* inputTn2,
+	    float* outputTn,
+
+		unsigned int dimA0,
+		unsigned int dimA1,
+		unsigned int dimA2,
+		unsigned int dimA3,
+
+		unsigned int dimB0,
+		unsigned int dimB1,
+		unsigned int dimB2,
+		unsigned int dimB3)
+\end{lstlisting}
+
+\subsection{Usage}
+Cocat Over Dim: 3
+\vspace{0.5cm}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			1024 &
+			1, 20 &
+			3, 64, 128, 192 \\ 
+		\hline
+		InputTn2 &
+			5 & 
+			1024 & 
+			1, 20 & 
+			3, 64, 128 \\
+		\hline
+		OutputTn &
+			Dim0 & 
+			Dim1 & 
+			Dim2 & 
+			DimA3+DimB3 \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Fixed Shape Instances}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Fixed Shaped Instances of Kernel Template}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|} 
+		\hline	
+		  & Instance 1\\ 
+		\hline	
+		DimA0 &
+			5 \\ 
+		\hline
+		DimA1 & 
+			1024\\
+		\hline
+		DimB0 & 
+			5\\
+		\hline
+		DimB1 & 
+			1024\\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+\section{Sqrt}
+Takes second root of each element in the input tensor of any rank.
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_sqrt(
+        float* inputTn,
+        float* outputTn,
+        unsigned long len)
+\end{lstlisting}
+
+\subsection{Usage}
+Not available.
+
+\subsection{Fixed Shape Instances}
+None.
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+
+\section{ReduceMax}
+A reduction kernel with \textit{max} operator reducing on the element over the given dimension. The kernel is designed to operate on tensors of \textbf{rank three} for simplicity but it takes tensors of \textbf{rank four} in the usage cases as it is described below.
+\subsection{Top Function}
+\begin{lstlisting}
+void task_reducemax(
+        float* inputTn,
+        float* outputTn,
+		const unsigned int dim0,
+		const unsigned int dim1,
+		const unsigned int dim2,
+		const int overaxis0,
+		const int overaxis1,
+		const int overaxis2)
+\end{lstlisting}
+
+\subsection{Usage}
+Combination: FTF
+\vspace{0.5cm}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn with reduction dim of 1 &
+			5 &
+			1024 &
+			1 &
+			1024 \\ 
+		\hline	
+		InputTn with reduction dim of 2 &
+			5 &
+			1024 &
+			20 &
+			64, 128 \\ 
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Kernel inputs for given usage instances}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Reduction Dim & Arg Dim0 & Arg Dim1 & Arg Dim2 & Condition\\ 
+		\hline	
+		1 &
+			Dim0 &
+			Dim1 &
+			Dim3 &
+			Dim2=1 \\ 
+		\hline	
+		2 &
+			Dim0*Dim1 &
+			Dim2 &
+			Dim3 &
+			None \\ 
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Fixed Shape Instances}
+None.
+
+
+
+
+
+
+\pagebreak
+
+\end{document}
