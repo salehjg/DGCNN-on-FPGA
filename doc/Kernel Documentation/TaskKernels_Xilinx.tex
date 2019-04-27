@@ -71,7 +71,7 @@ void task_concat(
 \end{lstlisting}
 
 \subsection{Usage}
-Cocat Over Dim: 3
+Concat Over Dim: 3
 \vspace{0.5cm}
 \begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
 \caption{Usage Instances and Tensor Shapes}
@@ -128,9 +128,10 @@ Cocat Over Dim: 3
 	\end{center}
 \end{table}
 
-
-
-
+\subsection{Technical Details}
+\begin{enumerate}
+\item sadasd
+\end{enumerate}
 
 
 \pagebreak
@@ -155,6 +156,11 @@ Not available.
 
 \subsection{Fixed Shape Instances}
 None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item sadasd
+\end{enumerate}
 
 
 
@@ -235,7 +241,108 @@ Combination: FTF
 \subsection{Fixed Shape Instances}
 None.
 
+\subsection{Technical Details}
+\begin{enumerate}
+\item sadasd
+\end{enumerate}
 
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+
+\section{Reduce Sum 4D}
+A reduction kernel with summation operator, reducing elements of a four dimensional input tensor.
+\subsection{Top Function}
+\begin{lstlisting}
+void task_reducesum4d(
+        const float* inputTn,
+        float* outputTn,
+        const int pow_y,
+        const unsigned int dim0,
+        const unsigned int dim1,
+        const unsigned int dim2,
+        const unsigned int dim3,
+        const int overaxis0,
+        const int overaxis1,
+        const int overaxis2,
+        const int overaxis3)
+\end{lstlisting}
+
+\subsection{Usage}
+Reduction Over Dim: 0,1,2 (TTTF)
+\vspace{0.5cm}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			1024 &
+			1, 20 &
+			64, 128, 1024 \\ 
+		\hline
+		OutputTn &
+			Dim3 & 
+			 & 
+			 & 
+			 \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item Pipelined loop with variable bound is used for moving data to and from global memory, because \emph{LOOP\_TRIPCOUNT} pragma could be used to estimate latency of the design. In contrast, it is not possible to add \emph{LOOP\_TRIPCOUNT} pragma for HLS \emph{memcpy(...)} with variable data length, meaning that latency estimation will not be available.
+
+\item Unrolling a nested loop causes all of the sub-loops to be copied. For example if outermost loop has a trip count of four and it is completely unrolled, this means that there are four copies of any sub-loops in it.
+
+\item A loop with burst read or write sub-loops can not be pipelined. Something like this.
+\begin{lstlisting}
+for(..){ // This loop can not be pipelined.
+	for(..){//burst read
+		..
+	}
+	
+	for(..){//burst write
+		..
+	}
+}
+\end{lstlisting}
+
+\item Unlike GPGPU, if-statements are favored in FPGA HLS. This is the reason of using a constant bound for-loop with a if-statement in the body of it, for checking the variable boundary.
+
+\item For implementing \emph{pow\_y}, \emph{pow(..)} is not used, because the kernel does not require a floating point number as the power. Only the base is a floating point number. Using \emph{pow\_y} will result in higher latency.
+\begin{lstlisting}
+float pow_rslt = buff_tmp[i];
+for(int ipwr=0;ipwr<(MAX_POW_Y_MINUS_ONE);ipwr++){
+#pragma HLS UNROLL
+	if(ipwr<pow_y_minus_one){
+		pow_rslt = pow_rslt * pow_rslt;
+	}
+}
+\end{lstlisting}
+
+\item Three for-loops for \emph{dim0, dim1 and dim2} are fused together to decrease unnecessary latency of switching from one for-loop to another.
+
+\item It might be a good idea to apply dataflow pragma in this kernel.
+
+\end{enumerate}
 
 
 

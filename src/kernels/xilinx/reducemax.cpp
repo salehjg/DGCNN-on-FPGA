@@ -129,7 +129,7 @@ void task_reducemax(
 */
 
 void task_reducemax(
-        float* inputTn,
+        const float* inputTn,
         float* outputTn,
 		const unsigned int dim0,
 		const unsigned int dim1,

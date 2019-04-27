@@ -132,7 +132,7 @@ ReportObject* XilinxImpUnitTests::KernelReduceMax(){
 ReportObject* XilinxImpUnitTests::KernelReduceSum4D(){
     //Rank4_TTTF
     //TensorF* tensorSrc = GenerateTensor(1,{5,1024,20,256});
-    TensorF* tensorSrc = GenerateTensor(1,{2,2,2,5});
+    TensorF* tensorSrc = GenerateTensor(4,{2,2,2,5});
     TensorF* tensorCpu = platformSelector->ReduceSum4D(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
     TensorF* tensorGpu = platformSelector->ReduceSum4D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
     bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -595,9 +595,8 @@ void XilinxImpUnitTests::RunAll(){
 	//PrintReport(TensorFloat());
 	//PrintReport(KernelConcat2());
 	//PrintReport(KernelSqrt());
-	PrintReport(KernelReduceMax());
-	/*
-	PrintReport(KernelReduceSum4D());
+	//PrintReport(KernelReduceMax());
+	PrintReport(KernelReduceSum4D());/*
 	PrintReport(KernelReduceSum());
 	PrintReport(KernelTile());
 	PrintReport(KernelTranspose());
