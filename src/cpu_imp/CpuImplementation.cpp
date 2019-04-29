@@ -1584,8 +1584,8 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn
         for(unsigned long i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
             //cout<< "CurrentDiff "<<i<<" :"<<currentDiff<<endl;
-            //cout<< "Gold "<<i<<" :"<<inputTn1->_buff[i]<<endl;
-            //cout<< "UDT  "<<i<<" :"<<inputTn2->_buff[i]<<endl;
+            cout<< "Gold "<<i<<" :"<<inputTn1->_buff[i]<<endl;
+            cout<< "UDT  "<<i<<" :"<<inputTn2->_buff[i]<<endl;
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }

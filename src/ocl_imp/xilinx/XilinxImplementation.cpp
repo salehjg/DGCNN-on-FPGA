@@ -74,14 +74,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "",
                 "task_reducesum4d",
                 false),
-//		/* IDX 4 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/reducesum.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_reducesum",
-//				false),
+		/* IDX 4 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/reducesum.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_reducesum",
+				false),
 //		/* IDX 5 :*/
 //		new OclKernelObject(
 //				KERNEL_DIR,

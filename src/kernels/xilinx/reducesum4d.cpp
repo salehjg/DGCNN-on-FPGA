@@ -18,7 +18,7 @@
 ** ReduceSum4D: , Shape1=5x1024x1x1024x, ,  Combination=1-1-1-0-,
 ** ReduceSum4D: , Shape1=5x1024x1x1024x, ,  Combination=1-1-1-0-,
  */
-#define CONFIG_SLICE_SIZE       128
+#define CONFIG_SLICE_SIZE       32
 #define CONFIG_MAX_POW_Y		3
 
 #define MAX_POW_Y_MINUS_ONE		(CONFIG_MAX_POW_Y-1)
@@ -59,9 +59,9 @@ void task_reducesum4d(
 
     if (overaxis0 && overaxis1 && overaxis2 && !overaxis3) {
         float buff_tmp[CONFIG_SLICE_SIZE];
-//#pragma HLS ARRAY_PARTITION variable=buff_tmp complete dim=0
+#pragma HLS ARRAY_PARTITION variable=buff_tmp complete dim=0
         float buff_rslt[CONFIG_SLICE_SIZE];
-//#pragma HLS ARRAY_PARTITION variable=buff_rslt complete dim=0
+#pragma HLS ARRAY_PARTITION variable=buff_rslt complete dim=0
 
         unsigned long indxS;
         unsigned long d0d1d2 = dim0 * dim1 * dim2;

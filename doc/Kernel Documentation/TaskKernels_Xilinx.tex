@@ -349,4 +349,105 @@ for(int ipwr=0;ipwr<(MAX_POW_Y_MINUS_ONE);ipwr++){
 
 \pagebreak
 
+
+
+
+
+
+
+
+
+\section{Reduce Sum}
+A reduction kernel with summation operator, reducing elements of a three dimensional input tensor.
+\subsection{Top Function}
+\begin{lstlisting}
+void task_reducesum(
+        const float * inputTn,
+        float * outputTn,
+        const unsigned int dim0,
+        const unsigned int dim1,
+        const unsigned int dim2,
+        const int overaxis0,
+        const int overaxis1,
+        const int overaxis2)
+\end{lstlisting}
+
+\subsection{Usage}
+Reduction Over Dim: 2 (FFT)
+\vspace{0.5cm}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			1024 &
+			3, 64 \\ 
+		\hline
+		OutputTn &
+			Dim0 & 
+			Dim1 & 
+				\\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item This kernel also uses fused loops for \emph{dim0} and \emph{dim1}.
+
+\item Fused loop is not pipelined, because it contains multiple sequential sub-loops.
+
+\item Each slice of dim2 is read in burst mode and then processed by reduction sub-loop.
+
+\item Different approaches have been tested for reduction sub-loop, details of each try and latency information is gathered in the following sub sections:
+
+\subsubsection{Bypass with No Reduction}
+Latency = 0.8 M clk
+
+\subsubsection{Simple For-loop Reduction}
+Latency = 4.3 M clk
+\begin{lstlisting}
+for(int i = 1 ; i< CONFIG_SLICE_SIZE;i++){
+    	buff[0] += buff[i];
+}
+\end{lstlisting}
+
+\subsubsection{Interleaved Parallel Reduction}
+Latency = 4.0 M clk \\
+Local buffer is partition with cyclic mode and factor of \emph{(CONFIG\_SLICE\_SIZE/2)}.
+
+\begin{lstlisting}
+#define CONFIG_SLICE_SIZE 64
+float buff[CONFIG_SLICE_SIZE];
+#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=32 dim=1
+
+//Parallel Reduction - Interleaved Addressing with Cyclic Partitioning of Local Buffer
+//Compare cached slice with reduced slice(buff_rslt)
+LoopReduction :for(int s=CONFIG_SLICE_SIZE/2;s>0;s>>=1){
+#pragma HLS PIPELINE
+#pragma HLS LOOP_FLATTEN off
+#pragma HLS DEPENDENCE variable=buff array inter RAW true
+	LoopIteration:for(int i=0;i<CONFIG_SLICE_SIZE/2;i++){
+#pragma HLS LOOP_FLATTEN off
+#pragma HLS UNROLL
+#pragma HLS DEPENDENCE variable=buff array inter RAW false
+
+		if(i<s){
+			buff[i] += buff[i+s];
+		}
+
+	}
+}
+\end{lstlisting}
+
+\end{enumerate}
 \end{document}
