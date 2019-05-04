@@ -1,6 +1,5 @@
 \documentclass[•]{article}
 %this is a comment line.
-
 \usepackage[margin=1 in]{geometry}
 \usepackage{graphicx}
 \geometry{a4paper}
@@ -478,4 +477,358 @@ LoopDim0: for(int d0=0; d0<dim0; d0++){
 \end{lstlisting}
 
 \end{enumerate}
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+
+\section{MatOps}
+Takes two input tensor and implements addition, subtraction, multiplication and division in a auto-tiling manner.
+\subsection{Top Function}
+\begin{lstlisting}
+void task_matops(
+		const float *inputTn1,
+		const float *inputTn2,
+		float * outputTn,
+		const unsigned int dim0,
+		const unsigned int dim1,
+		const unsigned int dim2,
+		const unsigned int dim3,
+		const unsigned int dim0B,
+		const unsigned int dim1B,
+		const unsigned int dim2B,
+		const unsigned int dim3B,
+		const int dim0B_IsNotZero,
+		const int dim1B_IsNotZero,
+		const int dim2B_IsNotZero,
+		const int dim3B_IsNotZero,
+		const int mode)
+\end{lstlisting}
+
+\subsection{Usage}
+
+
+\begin{table}[h]
+\caption{Usage Instances and Tensor Shapes(Mode=0, Addition)}
+\label{tab:shapes_matops}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor  & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			5,1024 &
+			1,5,20,1024 &
+			9,40,64,128,256,512,1024\\
+		\hline	
+		InputTn2 &
+			 &
+			5 &
+			1024 &
+			1,9,40,64,128,256,512,1024\\	
+		\hline
+		OutputTn &
+			\multicolumn{4}{|c|}{Shape of InputTn1} \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[h]
+\caption{Usage Instances and Tensor Shapes(Mode=1, Subtraction)}
+\label{tab:shapes_matops}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor  & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			1024 &
+			1,5,20 &
+			3,64,128,256,512,1024\\
+		\hline	
+		InputTn2 &
+			5 &
+			1024 &
+			20 &
+			3,64,128,256,512,1024\\	
+		\hline
+		OutputTn &
+			\multicolumn{4}{|c|}{Shape of InputTn1} \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[h]
+\caption{Usage Instances and Tensor Shapes(Mode=2, Multiplication)}
+\label{tab:shapes_matops}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor  & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			1024 &
+			1,5,20,1024 &
+			64,128,256,1024\\
+		\hline	
+		InputTn2 &
+			 &
+			 &
+			 &
+			1,64,128,256,1024\\	
+		\hline
+		OutputTn &
+			\multicolumn{4}{|c|}{Shape of InputTn1} \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Usage Instances and Tensor Shapes(Mode=3, Division)}
+\label{tab:shapes_matops}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor  & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn1 &
+			5&
+			1024&
+			1,5,20&
+			64,128,256,512,1024\\
+		\hline	
+		InputTn2 &
+			&
+			&
+			&
+			64,128,256,1024\\	
+		\hline
+		OutputTn &
+			\multicolumn{4}{|c|}{Shape of InputTn1} \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+\vspace{2 cm}
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item All four of the for-loops are fused together as a single loop to avoid unnecessary delays.
+\item Fused loop is pipelined with II=1.
+\end{enumerate}
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+\section{ReLU}
+Takes ReLU of input tensor of any shape.
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_relu(
+		const float *inputTn,
+		float *outputTn,
+		const unsigned long len)
+\end{lstlisting}
+
+\subsection{Usage}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			256,512,1024 &
+			1,20 &
+			64,128,1024 \\ 
+		\hline
+		OutputTn &
+			Dim0 & 
+			Dim1 & 
+			Dim2 &
+			Dim3	\\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item The for-loop is pipelined with II=1.
+\end{enumerate}
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+\section{Square}
+Takes an input tensor of any shape and squares each element of it.
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_square(
+		const float * inputTn,
+		float *outputTn,
+		const unsigned long len)
+\end{lstlisting}
+
+\subsection{Usage}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2\\ 
+		\hline	
+		InputTn1 &
+			5 &
+			1024 &
+			3,64\\ 
+		\hline
+		OutputTn &
+			Dim0 & 
+			Dim1 & 
+			Dim2 \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item The for-loop is pipelined with II=1.
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Tile}
+Tiles the input tensor of rank three and four over the given dimension.
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_tile(
+		const float *inputTn,
+		float *outputTn,
+		unsigned int dim0,
+		unsigned int dim1,
+		unsigned int dim2,
+		unsigned int dim3,
+		unsigned int rank,
+		unsigned int tileAxis,
+		unsigned int tileCount)
+\end{lstlisting}
+
+\subsection{Usage}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2 & Dim3 & TileCount\\ 
+		\hline	
+		InputTn of Rank 3 and Tile Dim 1&
+			5 &
+			1 &
+			1024 &
+			  &
+			1024\\ 
+		\hline	
+		InputTn of Rank 3 and Tile Dim 2&
+			5 &
+			1024 &
+			1 &
+			  &
+			1024\\ 
+		\hline 
+		InputTn of Rank 4 and Tile Dim 2&
+			5 &
+			1024 &
+			1 &
+			3,64&
+			20 \\ 
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item Outermost for-loops are fused together.
+\end{enumerate}
+
+
+
+
+
+
+
+
+
 \end{document}

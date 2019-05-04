@@ -597,14 +597,14 @@ void XilinxImpUnitTests::RunAll(){
 	//PrintReport(KernelSqrt());
 	//PrintReport(KernelReduceMax());
 	//PrintReport(KernelReduceSum4D());
-	PrintReport(KernelReduceSum());/*
-	PrintReport(KernelTile());
+	//PrintReport(KernelReduceSum());
+	//PrintReport(KernelMatops());
+	//PrintReport(KernelMean());
+	//PrintReport(KernelVariance());
+	//PrintReport(KernelRelu());
+	//PrintReport(KernelSquare());
+	PrintReport(KernelTile() );/*
 	PrintReport(KernelTranspose());
-	PrintReport(KernelRelu());
-	PrintReport(KernelSquare());
-	PrintReport(KernelMatops());
-	PrintReport(KernelMean());
-	PrintReport(KernelVariance());
 	PrintReport(KernelMatmul());
 	PrintReport(KernelConv2Mlp());
     PrintReport(KernelTopK());

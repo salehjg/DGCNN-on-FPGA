@@ -82,14 +82,38 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"",
 				"task_reducesum",
 				false),
-//		/* IDX 5 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/tile.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_tile",
-//				false),
+		/* IDX 5 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/matops.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_matops",
+				false),
+		/* IDX 6 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/relu.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_relu",
+				false),
+		/* IDX 7 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/square.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_square",
+				false),
+		/* IDX 8 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/tile.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_tile",
+				false),
 //        /* IDX 6 :*/
 //        new OclKernelObject(
 //                KERNEL_DIR,
@@ -98,30 +122,10 @@ XilinxImplementation::XilinxImplementation(int aa) {
 //                "",
 //                "task_transpose",
 //                false),
-//		/* IDX 7 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/relu.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_relu",
-//				false),
-//		/* IDX 8 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/square.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_square",
-//				false),
-//		/* IDX 9 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/matops.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_matops",
-//				false),
+
+
+			// mathops was here as idx 9
+
 //
 //		/* IDX 10 :*/
 //		new OclKernelObject(
@@ -442,7 +446,7 @@ TensorF* XilinxImplementation::Square(WorkScheduler scheduler, TensorF* batchedM
 
     assert(batchedMat->getLength()!=0);
     OclTensorF*rsltTn = new OclTensorF(context,batchedMat->getShape());
-    OclKernelObject *kernelObject = oclKernels[8];
+    OclKernelObject *kernelObject = oclKernels[7];
 
 	if(kernelObject->use_ndrange_kernel){
 
@@ -988,7 +992,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
                         mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
                         3;
 
-	OclKernelObject *kernelObject = oclKernels[9];
+	OclKernelObject *kernelObject = oclKernels[5];
 	if(kernelObject->use_ndrange_kernel){
 
 		// NOT IMPLEMENTED YET
@@ -1589,7 +1593,7 @@ TensorF* XilinxImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
 
     assert(inputTn->getLength()!=0);
 	OclTensorF*rsltTn = new OclTensorF(context,inputTn->getShape());
-	OclKernelObject *kernelObject = oclKernels[7];
+	OclKernelObject *kernelObject = oclKernels[6];
 
 	if(kernelObject->use_ndrange_kernel){
 
@@ -1648,7 +1652,7 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
 	  rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned int)tileCount});
 	}
 
-	OclKernelObject *kernelObject = oclKernels[5];
+	OclKernelObject *kernelObject = oclKernels[8];
 
 	if(kernelObject->use_ndrange_kernel){
 
