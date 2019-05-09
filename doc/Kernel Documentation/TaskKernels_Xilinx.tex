@@ -2,7 +2,11 @@
 %this is a comment line.
 \usepackage[margin=1 in]{geometry}
 \usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{tikz-dimline}
+\usepackage{hyperref}
 \geometry{a4paper}
+
 
 %These are for source code snippets in 
 \usepackage{listings}
@@ -822,6 +826,148 @@ None.
 \begin{enumerate}
 \item Outermost for-loops are fused together.
 \end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+
+\pagebreak
+
+
+
+
+
+
+
+
+
+
+
+
+\section{MatMul}
+Batch matrix multiplication kernel. Takes two tensor of A and B of rank three as input and computes C=AB. Both matrices must be row-major and none should be transposed.
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_matmul(
+		int *inputTn1,
+		int *inputTn2,
+		int *outputTn,
+
+		int dim0A,
+		int dim1A,
+		int dim2A,
+
+		int dim0B,
+		int dim1B,
+		int dim2B)
+\end{lstlisting}
+
+\subsection{Usage}
+
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Input tensor requirements}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		 & Dim0 & Dim1 & Dim2\\ 
+		\hline	
+		Matrix Data &
+			Batch &
+			Rows &
+			Columns\\ 
+		\hline 
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances and Tensor Shapes}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2\\ 
+		\hline	
+		InputTn1 &
+			1,5 &
+			5,1024 &
+			3,64,256,512,1024\\ 
+		\hline
+		InputTn2 &
+			1,5 &
+			3,64,256,512,1024 &
+			3,9,40,256,512,1024\\ 
+		\hline
+		OutputTn &
+			Dim0 & 
+			Dim1A & 
+			Dim2B \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item The kernel uses tiled matrix multiplication approach which helps with non coalesced memory accesses for matrix B.
+\item The basic operation of the kernel is illustrated in the figure \ref{fig:matmul01}.
+
+\begin{figure}[h] 
+\caption{MatMul Operation for Batch=1}
+\label{fig:matmul01}
+\centering
+\begin{tikzpicture}
+\draw [fill=yellow] 	(0,1) rectangle (4,3); 
+\draw [fill=yellow] 	(6,1) rectangle (8,3); 
+\draw [fill=yellow] 	(6,5) rectangle (8,9); 
+\draw [] 	(0,0) rectangle (4,4);
+\draw [] 	(5,0) rectangle (9,4);
+\draw [] 	(5,5) rectangle (9,9);
+\node [below left] at  (4,4) {A};
+\node [below right] at (5,4) {C};
+\node [above right] at (5,5) {B};
+\dimline [color=cyan,extension start length=0.5 cm, extension end length=0.5 cm] {(0,4.5)}  {(4,4.5)}  {Common Dim}
+\dimline [color=cyan,extension start length=0.5 cm, extension end length=0.5 cm] {(4.5,5)} {(4.5,9)} {Common Dim} 
+\dimline [color=cyan,extension start length=0.5 cm, extension end length=0.5 cm] {(5,9.5)} {(9,9.5)} {Dim2B} 
+\dimline [color=cyan,extension start length=0.5 cm, extension end length=0.5 cm] {(-0.5,0)} {(-0.5,4)} {Dim1A} 
+\dimline [color=cyan,extension start length=-0.5 cm, extension end length=-0.5 cm] {(6,-0.5)} {(8,-0.5)} {Buffer\\Depth} 
+\dimline [color=cyan,extension start length=-0.5 cm, extension end length=-0.5 cm] {(9.5,1)} {(9.5,3)} {Buffer\\Depth} 
+\end{tikzpicture}
+\end{figure}
+
+
+\item It is important to note that in order to maximize performance it is essential to read elements of MatB less frequently, so the kernel will read the given tile of MatB once and hold it in the local buffer, then it will continuously read related tiles of MatA and compute output elements for given two local buffers of matrices A and B. 
+
+\item According to \url{https://www.xilinx.com/support/answers/71596.html}, the memory banks for \emph{MatMul} kernel must be manually assigned by --sp option of the linker(XOCC). The option that is used is the following: \emph{--sp task\_matmul\_1.inputTn1:bank0 --sp task\_matmul\_1.inputTn2:bank0 --sp task\_matmul\_1.outputTn:bank0}
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+\clearpage
+
+
+
+
+
 
 
 

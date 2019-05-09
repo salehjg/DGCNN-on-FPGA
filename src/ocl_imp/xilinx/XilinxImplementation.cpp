@@ -114,6 +114,17 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"",
 				"task_tile",
 				false),
+		/* IDX 9 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/matmul.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_matmul",
+				false),
+
+
+
 //        /* IDX 6 :*/
 //        new OclKernelObject(
 //                KERNEL_DIR,
@@ -127,14 +138,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
 			// mathops was here as idx 9
 
 //
-//		/* IDX 10 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/matmul.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_matmul",
-//				false),
+
 //		/* IDX 11 :*/
 //		new OclKernelObject(
 //				KERNEL_DIR,
@@ -386,7 +390,7 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
 	assert(dim2A == dim1B);
 
 	OclTensorF*rsltTn = new OclTensorF(context,{dim0A,dim1A, dim2B});
-	OclKernelObject *kernelObject = oclKernels[10];
+	OclKernelObject *kernelObject = oclKernels[9];
 
 	if(kernelObject->use_ndrange_kernel){
 
@@ -1555,7 +1559,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
 	if(kernelObject->use_ndrange_kernel){
 
 	}else{
-		cl_int error; int argcnt;
+		cl_int error; int argcnt=0;
 		error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_mem) , (void*)&((OclTensorF*)weights)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_mem) , (void*)&((OclTensorF*)biases)->ocl_buff);
