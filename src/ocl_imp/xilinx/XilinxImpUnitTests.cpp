@@ -201,7 +201,7 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTranspose(){
-	TensorF* tensorSrc = GenerateTensor(3,{3,4,5});
+	TensorF* tensorSrc = GenerateTensor(6,{3,8,8});
 	TensorF* tensorCpu = platformSelector->Transpose(PLATFORMS::CPU,scheduler,tensorSrc);
 	TensorF* tensorGpu = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
 	bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -604,8 +604,8 @@ void XilinxImpUnitTests::RunAll(){
 	//PrintReport(KernelRelu());
 	//PrintReport(KernelSquare());
 	//PrintReport(KernelTile() );
-	PrintReport(KernelMatmul());/*
-	PrintReport(KernelTranspose());
+	//PrintReport(KernelMatmul());
+	PrintReport(KernelTranspose());/*
 	PrintReport(KernelConv2Mlp());
     PrintReport(KernelTopK());
     PrintReport(KernelGather());

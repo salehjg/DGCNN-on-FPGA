@@ -122,17 +122,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"",
 				"task_matmul",
 				false),
-
-
-
-//        /* IDX 6 :*/
-//        new OclKernelObject(
-//                KERNEL_DIR,
-//                "/xilinx/transpose.cl",
-//                "binary_container_1.xclbin",
-//                "",
-//                "task_transpose",
-//                false),
+        /* IDX 10 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/transpose.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_transpose",
+                false),
 
 
 			// mathops was here as idx 9
@@ -331,7 +328,7 @@ TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batch
 	dim2 = batchedMat->getShape()[2];
 
 	OclTensorF *rsltTn = new OclTensorF(context,{dim0,dim2,dim1});
-	OclKernelObject *kernelObject = oclKernels[6];
+	OclKernelObject *kernelObject = oclKernels[10];
 
 	if(kernelObject->use_ndrange_kernel){
 
