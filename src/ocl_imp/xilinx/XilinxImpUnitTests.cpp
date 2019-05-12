@@ -581,8 +581,8 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelGather(){
-    TensorF* tensorSrc = GenerateTensor(3,{5,5,2});
-    TensorI* tensorIndices = GenerateTensor(0,1023,{5,5,3});
+    TensorF* tensorSrc = GenerateTensor(7,{5,5,2});
+    TensorI* tensorIndices = GenerateTensor(0,5,{5,5,3});
     TensorF* tensorCpu = platformSelector->Gather(PLATFORMS::CPU,scheduler,tensorSrc,tensorIndices,1);
     TensorF* tensorGpu = platformSelector->Gather(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorIndices,1);
     bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -605,10 +605,10 @@ void XilinxImpUnitTests::RunAll(){
 	//PrintReport(KernelSquare());
 	//PrintReport(KernelTile() );
 	//PrintReport(KernelMatmul());
-	PrintReport(KernelTranspose());/*
+	//PrintReport(KernelTranspose());
+    PrintReport(KernelGather());/*
 	PrintReport(KernelConv2Mlp());
     PrintReport(KernelTopK());
-    PrintReport(KernelGather());
 	*/
 }
 

@@ -1078,10 +1078,111 @@ None.
 
 
 
+\clearpage
+
+
+
+
+
+
+
+
+\section{Gather}
+Takes two tensors of rank three, \emph{inputTn} and \emph{indicesTn}. Data types of \emph{inputTn} and \emph{indicesTn} are \emph{float} and \emph{int32} respectively. The kernel gathers the elements of \emph{inputTn} with the given indices over the given axis.
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_gather(
+	const float* inputTn,
+	const int*   indicesTn,
+	float* outputTn,
+	int indices_axis,
+	int inputDim0,
+	int inputDim1,
+	int inputDim2,
+	int indicesDim0,
+	int indicesDim1,
+	int indicesDim2)
+\end{lstlisting}
+
+\subsection{Usage}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Tensor Shape Definitions}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|c|c|} 
+		\hline	
+		Tensor & Rank & Data Range & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn &
+			3 &
+			Float &
+			B &
+			N &
+			D &
+			\\ 
+		\hline	
+		IndicesTn &
+			3 &
+			0 to (N-1) &
+			B &
+			N &
+			K &
+			\\ 
+		\hline
+		OutputTn &
+			4 &
+			Float &
+			B & 
+			N & 
+			K &
+			D \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances for \emph{indices\_axis}=1}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2\\ 
+		\hline	
+		InputTn &
+			5 &
+			1024 &
+			3,64
+			\\ 
+		\hline	
+		IndicesTn &
+			5 &
+			1024 &
+			20 
+			\\ 
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item The for-loop is pipelined with II=1.
+\item Four nested loops of B,N,K and D are fused together as a single pipelined loop of II=1.
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
 \pagebreak
-
-
-
-
-
 \end{document}

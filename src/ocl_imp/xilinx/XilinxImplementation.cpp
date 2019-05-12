@@ -130,11 +130,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "",
                 "task_transpose",
                 false),
-
-
-			// mathops was here as idx 9
-
-//
+		/* IDX 11 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/gather.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_gather",
+				false),
 
 //		/* IDX 11 :*/
 //		new OclKernelObject(
@@ -168,14 +171,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
 //				"",
 //				"task_split_float",
 //				false),
-//		/* IDX 15 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/gather.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_gather",
-//				false),
+
     };
     
     //======================================================================================================================
@@ -1494,14 +1490,15 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
 	assert(inputTn->getShape()[0]==indices->getShape()[0]);
 	assert(inputTn->getShape()[1]==indices->getShape()[1]);
 
-	unsigned int B,N,D,K;
+	unsigned int B,N,D,K,indicesAxis;
 	B = inputTn->getShape()[0];
 	N = inputTn->getShape()[1];
 	D = inputTn->getShape()[2];
 	K = indices->getShape()[2];
+	indicesAxis = 1;
 
 	OclTensorF* rsltTn = new OclTensorF(context,{B,N,K,D});
-	OclKernelObject *kernelObject = oclKernels[15];
+	OclKernelObject *kernelObject = oclKernels[11];
 
 	if(kernelObject->use_ndrange_kernel){
 
@@ -1510,10 +1507,13 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
 		error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorI*)indices)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
-		error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_uint) , (void*)&B);
-		error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_uint) , (void*)&N);
-		error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_uint) , (void*)&D);
-		error |= clSetKernelArg(kernelObject->kernel_task, 6 , sizeof(cl_uint) , (void*)&K);
+		error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_uint) , (void*)&indicesAxis);
+		error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_uint) , (void*)&B);
+		error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_uint) , (void*)&N);
+		error |= clSetKernelArg(kernelObject->kernel_task, 6 , sizeof(cl_uint) , (void*)&D);
+		error |= clSetKernelArg(kernelObject->kernel_task, 7 , sizeof(cl_uint) , (void*)&B);
+		error |= clSetKernelArg(kernelObject->kernel_task, 8 , sizeof(cl_uint) , (void*)&N);
+		error |= clSetKernelArg(kernelObject->kernel_task, 9 , sizeof(cl_uint) , (void*)&K);
 
 		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 		assert(error==0);
