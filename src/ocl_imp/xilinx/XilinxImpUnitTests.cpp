@@ -606,8 +606,8 @@ void XilinxImpUnitTests::RunAll(){
 	//PrintReport(KernelTile() );
 	//PrintReport(KernelMatmul());
 	//PrintReport(KernelTranspose());
-    PrintReport(KernelGather());/*
-	PrintReport(KernelConv2Mlp());
+    //PrintReport(KernelGather());
+	PrintReport(KernelConv2Mlp());/*
     PrintReport(KernelTopK());
 	*/
 }

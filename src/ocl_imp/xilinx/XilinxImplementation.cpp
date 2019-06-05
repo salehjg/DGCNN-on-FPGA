@@ -139,14 +139,14 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"task_gather",
 				false),
 
-//		/* IDX 11 :*/
-//		new OclKernelObject(
-//				KERNEL_DIR,
-//				"/xilinx/conv2mlp.cl",
-//				"binary_container_1.xclbin",
-//				"",
-//				"task_conv2d_mlp",
-//				false),
+		/* IDX 12 :*/
+		new OclKernelObject(
+				KERNEL_DIR,
+				"/xilinx/conv2_1x1_direct.cpp",
+				"binary_container_1.xclbin",
+				"",
+				"task_conv2_1x1_direct",
+				false),
 //		/* IDX 12 :*/
 //		new OclKernelObject(
 //				KERNEL_DIR,
@@ -1551,21 +1551,36 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
 
 	assert(D<=XILINX_BOTTLENCK_BLOCKSIZE); // this kernel cannot accept dim3>OCL_BOTTLENCK_BLOCKSIZE
 
-	OclKernelObject *kernelObject = oclKernels[11];
+	OclKernelObject *kernelObject = oclKernels[12];
 
 	if(kernelObject->use_ndrange_kernel){
 
 	}else{
+		unsigned int dim0D, dim1D, dim2D, dim3D, dim0W,  dim1W,  dim2W,  dim3W,  dim0B;
+		dim0D = B;
+		dim1D = N;
+		dim2D = K;
+		dim3D = D;
+		dim0W = 1; // 1x1 conv2d kernel
+		dim1W = 1; // 1x1 conv2d kernel
+		dim2W = D;
+		dim3W = chOut;
+		dim0B = chOut;
+
 		cl_int error; int argcnt=0;
 		error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)inputTn)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_mem) , (void*)&((OclTensorF*)weights)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_mem) , (void*)&((OclTensorF*)biases)->ocl_buff);
 		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
-		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&B);
-		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&N);
-		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&K);
-		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&D);
-		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&chOut);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim0D);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim1D);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim2D);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim3D);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim0W);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim1W);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim2W);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim3W);
+		error |= clSetKernelArg(kernelObject->kernel_task, argcnt++ , sizeof(cl_uint) , (void*)&dim0B);
 
 		if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 		assert(error==0);
