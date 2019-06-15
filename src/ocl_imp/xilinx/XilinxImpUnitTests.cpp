@@ -521,12 +521,15 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
 	//TensorF* testNpy = new TensorF(__shape, tmp.data<float>());
 
 	int kVal = 3;
-    TensorF *tensorSrc = GenerateTensor(0, {2, 5, 5});
+	int B=2;
+	int N=5;
+    TensorF *tensorSrc = GenerateTensor(6, {B, N, N});
     //TensorF *tensorSrc = testNpy;
 
-    TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
 
     TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, kVal);
+    TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
+
     TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
 
     /*
@@ -567,14 +570,28 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
         comparisonResult = false;
     }
     else{
-        unsigned long len = tensorCpu->getLength();
-        for (unsigned long i = 0; i < len; i++) {
-            int rCpu = tensorCpu->_buff[i];
-            int rGpu = tensorGpuTransfered->_buff[i];
-            if(rCpu != rGpu){
-                comparisonResult=false;
-            }
+
+        for(int b=0;b<B;b++){
+        	for(int n1=0;n1<N;n1++){
+        		for(int kk=0;kk<kVal;kk++){
+        			unsigned int i = b*N*kVal + n1*kVal + kk;
+        			int rCpu = tensorCpu->_buff[i];
+					int rGpu = tensorGpuTransfered->_buff[i];
+					cout <<
+							"Index(B,N,K)= ("<< b <<", "<<n1<<", "<<kk<<")   " <<
+							" ,iCPU= "<<rCpu<<" ,iGPU= " <<rGpu<< ",   "
+							"Value[iCPU]= " << tensorSrc->_buff[b*N*kVal+ n1*kVal+ rCpu] << ", "
+							"Value[iGPU]= " << tensorSrc->_buff[b*N*kVal+ n1*kVal+ rGpu] <<
+							endl;
+					if(rCpu != rGpu){
+						comparisonResult=false;
+					}
+        		}
+        	}
         }
+
+
+
     }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
@@ -607,8 +624,8 @@ void XilinxImpUnitTests::RunAll(){
 	//PrintReport(KernelMatmul());
 	//PrintReport(KernelTranspose());
     //PrintReport(KernelGather());
-	PrintReport(KernelConv2Mlp());/*
-    PrintReport(KernelTopK());
+	//PrintReport(KernelConv2Mlp());
+    PrintReport(KernelTopK());/*
 	*/
 }
 

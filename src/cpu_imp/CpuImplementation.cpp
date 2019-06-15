@@ -1340,10 +1340,12 @@ TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, i
 
     float tmp_array[N];
     int indices[N];
-    for(int i = 0 ;i<N;i++)
-        indices[i]=i;
+
 
     for(int b=0;b<B;b++){
+        for(int i = 0 ;i<N;i++)
+            indices[i]=i;
+
         for(int n=0;n<N;n++){
             indxS = b*N*N + n*N + 0;
             //start of dim2

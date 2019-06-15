@@ -35,7 +35,14 @@
 \author{SalehJG}
 
 \begin{document}
+
 \maketitle
+
+\newpage
+\tableofcontents
+\newpage
+
+
 
 \section{Intro}
 This document is meant to be a detailed guide to understand the source code for each one of the kernels and the challenges that are known for each scenario.
@@ -1186,4 +1193,126 @@ None.
 
 
 \pagebreak
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Conv2D}
+Implements two-dimensional convolution on input tensor of rank four, weight tensor of rank four and bias tensor of rank one. The current version only supports 1x1 kernels.
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_conv2_1x1_direct(
+	const float *inputTn,
+	const float *weightTn,
+	const float *biasTn,
+	float *outputTn,
+	unsigned int dim0D,
+	unsigned int dim1D,
+	unsigned int dim2D,
+	unsigned int dim3D,
+	unsigned int dim0W,
+	unsigned int dim1W,
+	unsigned int dim2W,
+	unsigned int dim3W,
+	unsigned int dim0B)
+\end{lstlisting}
+
+\subsection{Usage}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Tensor Shape Definitions}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|c|} 
+		\hline	
+		Tensor & Rank & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn &
+			4 & 
+			B &
+			N &
+			K &
+			D\\ 
+		\hline	
+		WeightTn &
+			4 & 
+			1 &
+			1 &
+			D &
+			chOut\\ 
+		\hline
+		BiasTn &
+			1 & 
+			chOut &
+			- &
+			- &
+			-\\ 
+		\hline
+		OutputTn &
+			4 & 
+			B & 
+			N & 
+			K &
+			chOut \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances}
+\label{tab:shapes_transpose}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|c|c|} 
+		\hline	
+		Tensor & Rank & Dim0 & Dim1 & Dim2 & Dim3\\ 
+		\hline	
+		InputTn &
+			4 &
+			5 &
+			1024 &
+			1, 20 &
+			6, 64, 128, 320\\ 
+		\hline
+		WeightTn &
+			4 &
+			1 &
+			1 &
+			6, 64, 128, 320 &
+			64, 128, 1024\\ 
+		\hline
+		BiasTn &
+			1 &
+			64, 128, 1024 &
+			- &
+			- &
+			-\\ 
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+\subsection{Fixed Shape Instances}
+None.
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item Not documented yet.
+\end{enumerate}
+
+
+
+
+
+
+
 \end{document}

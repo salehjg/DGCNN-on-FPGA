@@ -16,8 +16,8 @@ Mean           |     No|Yes   |**Yes**   |        No|**Yes**   |2D,4D     |-    
 Variance       |     No|Yes   |**Yes**   |        No|**Yes**   |2D,4D     |-      |{2D: 1-0-0-0}, {4D: 1-1-1-0}   |               |-      |           |-      |--
 Tile           |     No|Yes   |**Yes**   |        No|**Yes**   |3D,4D     |-      |-                              |tileAxis       |1,2    |tileCount  |20,1024|only tileAxis=2 implemented
 MatOps         |Yes    |Yes   |**Yes**   |        No|**Yes**   |4D,3D,2D,1D|4D,3D,2D,1D,0D|-                              |               |-      |           |-      |ADD,SUB,MUL_ELEMENT,DIV_ELEMENT, shapes could be different
-Transpose      |Yes    |Yes   |**Yes**   |        No|        No|3D        |-      |-                              |               |-      |           |-      |--
-Conv2d         |Yes    |Yes   |**Yes**   |        No|        No|4D        |-      |-                              |overrideDim2   |-1     |           |-      |3x Less performance compared to the tensorflow
+Transpose      |Yes    |Yes   |**Yes**   |        No|**Yes**   |3D        |-      |-                              |               |-      |           |-      |--
+Conv2d         |Yes    |Yes   |**Yes**   |        No|**Yes**   |4D        |-      |-                              |overrideDim2   |-1     |           |-      |3x Less performance compared to the tensorflow
 ReLU           |Yes    |Yes   |**Yes**   |        No|**Yes**   |2D,4D     |-      |-                              |               |-      |           |-      |--
 Matmul         |Yes    |Yes   |**Yes**   |        No|**Yes**   |2D,3D     |2D,3D  |-                              |               |-      |           |-      |20x Less performance compared to the tensorflow
 Square         |Yes    |Yes   |**Yes**   |        No|**Yes**   |3D        |-      |-                              |               |-      |           |-      |--
