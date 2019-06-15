@@ -10,7 +10,7 @@ void BatchSelectionSortTopK(
 	int dim2,
 	int kValue){
 
-	int i, j, max_idx;
+	int i, j, min_idx;
 	unsigned long indxS,indxD;
 	assert(kValue<dim2);
 
@@ -35,20 +35,20 @@ void BatchSelectionSortTopK(
 		for (i = 0; i < kValue; i++)
 		{
 			// Find the maximum element in unsorted array
-			max_idx = i;
+			min_idx = i;
 			for (j = i+1; j < dim2; j++){
-				if (outputTn[batch*dim2 + j] > outputTn[batch*dim2 + max_idx])
-					max_idx = j;
+				if (outputTn[batch*dim2 + j] < outputTn[batch*dim2 + min_idx])
+					min_idx = j;
 			}
 
 			// Swap the found maximum element with the first element
-			if(max_idx != i){
-				float tmp = outputTn[batch*dim2 + max_idx];
-				outputTn[batch*dim2 + max_idx] = outputTn[batch*dim2 + i];
+			if(min_idx != i){
+				float tmp = outputTn[batch*dim2 + min_idx];
+				outputTn[batch*dim2 + min_idx] = outputTn[batch*dim2 + i];
 				outputTn[batch*dim2 + i] = tmp;
 				//------------------------------------------------------------
-				int tmpi = indicesTn[batch*dim2 + max_idx];
-				indicesTn[batch*dim2 + max_idx] = indicesTn[batch*dim2 + i];
+				int tmpi = indicesTn[batch*dim2 + min_idx];
+				indicesTn[batch*dim2 + min_idx] = indicesTn[batch*dim2 + i];
 				indicesTn[batch*dim2 + i] = tmpi;
 			}
 		}
