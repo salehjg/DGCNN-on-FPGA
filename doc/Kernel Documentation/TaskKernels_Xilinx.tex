@@ -1314,5 +1314,110 @@ None.
 
 
 
+\pagebreak
+
+
+
+
+
+
+
+
+
+
+
+
+\section{TopK}
+Implements batch \emph{selection sort} in \emph{ascending order} on N-element slices of the batch square distance input tensor of rank three. To decrease run-time, it terminates sorting each slice when \emph{K} elements are already sorted. Because it is impossible to make selection sort parallel, this layer leverages multiple integrated compute units running in parallel on different slices of input tensor to increase throughput of the kernel. 
+
+\subsection{Top Function}
+\begin{lstlisting}
+void task_topk(
+		const float* inputTn,
+		int* indicesSplitedTn,
+		int dim0,
+		int dim1,
+		int dim2,
+		int kValue)
+\end{lstlisting}
+
+\subsection{Usage}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Tensor Shape Definitions}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2 \\ 
+		\hline	
+		InputTn &
+			B &
+			N &
+			N\\ 
+		\hline	
+		OutputTn &
+			B & 
+			N & 
+			K \\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Usage Instances}
+\label{tab:shapes_transpose}
+	\begin{center}
+		\begin{tabular}{|r|c|c|c|c|} 
+		\hline	
+		Tensor & Dim0 & Dim1 & Dim2 \\ 
+		\hline	
+		InputTn &
+			5 &
+			1024 &
+			1024 \\ 
+		\hline
+		OutputTn &
+			5 &
+			1024 & 
+			20\\ 
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+\subsection{Fixed Shape Instances}
+\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
+\caption{Fixed Shaped Instances of Kernel Template}
+\label{tab:shapes_concat}
+	\begin{center}
+		\begin{tabular}{|r|c|} 
+		\hline	
+		  & Instance 1\\ 
+		\hline	
+		Dim0 &
+			5 \\ 
+		\hline
+		Dim1 & 
+			1024\\
+		\hline
+		Dim2 & 
+			1024\\
+		\hline
+		K & 
+			20\\
+		\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\subsection{Technical Details}
+\begin{enumerate}
+\item Not documented yet.
+\end{enumerate}
+
+
+
 
 \end{document}
