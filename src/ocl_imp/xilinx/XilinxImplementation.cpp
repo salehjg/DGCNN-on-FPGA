@@ -1332,18 +1332,6 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 		   (unsigned int)k
 	});
 
-	OclTensorI *tmpIndicesTn = new OclTensorI(context,{
-		   b,
-		   m,
-		   (unsigned int)n
-	});
-
-	OclTensorF *tmpValTn = new OclTensorF(context,{
-		   b,
-		   m,
-		   n
-	});
-
 	//==================================================================================================================
 	{//1.topk.cl.cc
  
@@ -1355,13 +1343,11 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
             cl_int error;
 
             error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)batchedMat)->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorI*)tmpIndicesTn )->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_mem) , (void*)&((OclTensorI*)rsltIndicesSlicedTn)->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_mem) , (void*)&((OclTensorF*)tmpValTn)->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_int) , (void*)&b);
-            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int) , (void*)&m);
-            error |= clSetKernelArg(kernelObject->kernel_task, 6 , sizeof(cl_int) , (void*)&n);
-            error |= clSetKernelArg(kernelObject->kernel_task, 7 , sizeof(cl_int) , (void*)&k);
+            error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorI*)rsltIndicesSlicedTn)->ocl_buff);
+            error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_int) , (void*)&b);
+            error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_int) , (void*)&m);
+            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_int) , (void*)&n);
+            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int) , (void*)&k);
 
             if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
             assert(error==0);
@@ -1382,8 +1368,6 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 
     //==================================================================================================================
 
-    delete(tmpValTn);
-    delete(tmpIndicesTn);
     return rsltIndicesSlicedTn;
 }
 

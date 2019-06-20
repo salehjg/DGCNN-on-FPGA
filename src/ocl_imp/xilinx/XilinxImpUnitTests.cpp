@@ -521,14 +521,15 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
 	//TensorF* testNpy = new TensorF(__shape, tmp.data<float>());
 
 	int kVal = 3;
-	int B=2;
+	int B=9;
 	int N=5;
-    TensorF *tensorSrc = GenerateTensor(6, {B, N, N});
+    TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
     //TensorF *tensorSrc = testNpy;
 
 
-    TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, kVal);
+
     TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
+    TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, kVal);
 
     TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
 
@@ -580,8 +581,8 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
 					cout <<
 							"Index(B,N,K)= ("<< b <<", "<<n1<<", "<<kk<<")   " <<
 							" ,iCPU= "<<rCpu<<" ,iGPU= " <<rGpu<< ",   "
-							"Value[iCPU]= " << tensorSrc->_buff[b*N*kVal+ n1*kVal+ rCpu] << ", "
-							"Value[iGPU]= " << tensorSrc->_buff[b*N*kVal+ n1*kVal+ rGpu] <<
+							"Value[iCPU]= " << tensorSrc->_buff[b*N*N+ n1*N+ rCpu] << ", "
+							"Value[iGPU]= " << tensorSrc->_buff[b*N*N+ n1*N+ rGpu] <<
 							endl;
 					if(rCpu != rGpu){
 						comparisonResult=false;

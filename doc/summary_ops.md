@@ -21,6 +21,6 @@ Conv2d         |Yes    |Yes   |**Yes**   |        No|**Yes**   |4D        |-    
 ReLU           |Yes    |Yes   |**Yes**   |        No|**Yes**   |2D,4D     |-      |-                              |               |-      |           |-      |--
 Matmul         |Yes    |Yes   |**Yes**   |        No|**Yes**   |2D,3D     |2D,3D  |-                              |               |-      |           |-      |20x Less performance compared to the tensorflow
 Square         |Yes    |Yes   |**Yes**   |        No|**Yes**   |3D        |-      |-                              |               |-      |           |-      |--
-TopK           |Yes    |Yes   |**Yes**   |**Yes**   |        No|3D        |-      |-                              |axis           |2      |k          |20     |From PointNet++
+TopK           |Yes    |Yes   |**Yes**   |**Yes**   |**Yes**   |3D        |-      |-                              |axis           |2      |k          |20     |From PointNet++
 Gather         |Yes    |Yes   |**Yes**   |        No|        No|3D        |3D     |-                              |indices_axis   |1      |           |-      |From PointNet++
 
