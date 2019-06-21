@@ -207,14 +207,14 @@ TensorF* ModelArchTop05::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input
 
 TensorF* ModelArchTop05::PairwiseDistance(WorkScheduler scheduler, TensorF *input_BxNxD) {
 
-    TensorF* point_cloud_transpose = platformSelector->Transpose(PLATFORMS::CPU,scheduler,input_BxNxD);
+    TensorF* point_cloud_transpose = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
     TensorF* point_cloud_inner =  platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,point_cloud_transpose);
     TensorF* point_cloud_inner2 = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner,-2.0f,MAT_OPS::MUL_ELEMENTWISE);
     TensorF* point_cloud_inner2p2 = platformSelector->Square(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
     TensorF* point_cloud_sum = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner2p2,false,false,true);
     point_cloud_sum->ExpandDims(-1);
     //2D Matrix fed into function with virutal batch size of 1
-    TensorF* point_cloud_sum_transpose = platformSelector->Transpose(PLATFORMS::CPU,scheduler,point_cloud_sum);  //changed dims
+    TensorF* point_cloud_sum_transpose = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum);  //changed dims
 
     TensorF* point_cloud_sum_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum,2,N); //result is BxNxK for k=N
     TensorF* point_cloud_sum_transpose_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum_transpose,1,N); //result is BxkxN for k=N

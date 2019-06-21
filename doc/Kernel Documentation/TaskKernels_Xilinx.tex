@@ -1020,7 +1020,7 @@ None.
 \begin{enumerate}
 \item The main idea behind the approach of the kernel is to minimize the latency that is in result of strided global memory accesses. This kernel reads and writes elements in a coalesced fashion. It uses the local buffer to facilitate the problem of high latency of the strided memory access for transposing operation.
 
-\item To take advantage of burst reading and writing, the tile width is better to be large, on the other hand, it should be smaller than \emph{Max(Dim2)}.
+\item (?) Possibly, to minimize the kernel's run-time, tile shape should be an square and size of this square should be as large as possible, but preferably(not necessarily) smaller than \emph{Min\{Dim1, Dim2\}}.
 
 \item In the following figure, the arrows show the direction of memory r/w operations. The input and output are row-major arrays, So, horizontal arrows stand for coalesced memory accesses and vertical arrows stand for strided memory accesses.
 

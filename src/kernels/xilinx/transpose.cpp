@@ -47,15 +47,15 @@ void BatchTranspose(
 
 				//=====================================================
 				//Sec.2: Write current block's data into output tensor
-				LoopWriteJ:for(int j=0; j<CONFIG_BLOCK_HEIGHT; j++){
-					LoopWriteI:for(int i=0; i<CONFIG_BLOCK_WIDTH; i++){
-						tmp1 = d2+j;
-						tmp2 = d1+i;
+				LoopWriteI:for(int i=0; i<CONFIG_BLOCK_WIDTH; i++){
+					LoopWriteJ:for(int j=0; j<CONFIG_BLOCK_HEIGHT; j++){
+						tmp1 = d2+i;
+						tmp2 = d1+j;
 						if(tmp1<dim2 && tmp2<dim1){
 							indxD = (batch)*dim2*dim1 +
 									(tmp1)*dim1+
 									(tmp2);
-							outputTn[indxD] = buff[i][j];
+							outputTn[indxD] = buff[j][i];
 							//cout<<"IndexD = " << indxD << endl;
 						}
 					}
