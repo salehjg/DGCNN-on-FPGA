@@ -18,7 +18,7 @@
 ** ReduceSum4D: , Shape1=5x1024x1x1024x, ,  Combination=1-1-1-0-,
 ** ReduceSum4D: , Shape1=5x1024x1x1024x, ,  Combination=1-1-1-0-,
  */
-#define CONFIG_SLICE_SIZE       32
+#define CONFIG_SLICE_SIZE       1024
 #define CONFIG_MAX_POW_Y		3
 
 #define MAX_POW_Y_MINUS_ONE		(CONFIG_MAX_POW_Y-1)
