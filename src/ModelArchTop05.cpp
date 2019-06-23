@@ -196,7 +196,7 @@ TensorF* ModelArchTop05::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input
     TensorF* features = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler, point_cloud_neighbors,point_cloud_central,MAT_OPS::SUB);
 
     //concatenate centrals and features (BxNxKxD) and (BxNxKxD)
-    TensorF* edge_feature = platformSelector->Concat2(PLATFORMS::CPU,scheduler, point_cloud_central,features,3);
+    TensorF* edge_feature = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, point_cloud_central,features,3);
 
     delete(point_cloud_neighbors);
     delete(point_cloud_central);
@@ -723,13 +723,13 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
         endpoint_1->ExpandDims(2);
         endpoint_2->ExpandDims(2);
         endpoint_3->ExpandDims(2);
-        TensorF *concatA = platformSelector->Concat2(PLATFORMS::CPU,scheduler, endpoint_0, endpoint_1, 3);
+        TensorF *concatA = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, endpoint_0, endpoint_1, 3);
         delete(endpoint_0);
         delete(endpoint_1);
-        TensorF *concatB = platformSelector->Concat2(PLATFORMS::CPU,scheduler, concatA, endpoint_2, 3);
+        TensorF *concatB = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, concatA, endpoint_2, 3);
         delete(endpoint_2);
         delete(concatA);
-        TensorF *concatC = platformSelector->Concat2(PLATFORMS::CPU,scheduler, concatB, endpoint_3, 3);
+        TensorF *concatC = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, concatB, endpoint_3, 3);
         delete(endpoint_3);
         delete(concatB);
 

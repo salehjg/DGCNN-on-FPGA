@@ -9,27 +9,19 @@ Shape1=5x1024x20x3x, 	, Shape2=5x1024x20x3x,
 Shape1=5x1024x20x3x, 	, Shape2=5x1024x20x3x,
 */
 
-template<
-	unsigned int dimA0,
-	unsigned int dimA1,
-	unsigned int dimB0,
-	unsigned int dimB1
-	>
-void task_template_concat(
+void concat2(
 	float* inputTn1,
     float* inputTn2,
     float* outputTn,
-
-	//unsigned int dimA0,
-	//unsigned int dimA1,
+	unsigned int dimA0,
+	unsigned int dimA1,
 	unsigned int dimA2,
 	unsigned int dimA3,
-
-	//unsigned int dimB0,
-	//unsigned int dimB1,
+	unsigned int dimB0,
+	unsigned int dimB1,
 	unsigned int dimB2,
-	unsigned int dimB3
-			){
+	unsigned int dimB3){
+
 	unsigned int  dimR0,dimR1,dimR2,dimR3;
     dimR0 = dimA0;
     dimR1 = dimA1;
@@ -38,19 +30,15 @@ void task_template_concat(
     unsigned long indxS1,indxS2,indxD;
 
     Loop1: for(int d0=0;d0<dimA0;d0++){
- #pragma HLS LOOP_FLATTEN off
- #pragma HLS PIPELINE off
+#pragma HLS LOOP_TRIPCOUNT min=5 max=5
      	Loop2: for(int d1=0;d1<dimA1;d1++){
- #pragma HLS LOOP_FLATTEN off
- #pragma HLS PIPELINE off
+#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
      		Loop3: for(int d2=0;d2<dimA2;d2++){
- #pragma HLS LOOP_FLATTEN off
- #pragma HLS LOOP_TRIPCOUNT min=1 max=20
- #pragma HLS PIPELINE off
+#pragma HLS LOOP_TRIPCOUNT min=1 max=20
      			Loop4: for(int d3=0;d3<dimA3;d3++){
- #pragma HLS LOOP_FLATTEN off
- #pragma HLS LOOP_TRIPCOUNT min=3 max=192
- #pragma HLS PIPELINE II=1
+#pragma HLS LOOP_TRIPCOUNT min=3 max=192
+#pragma HLS PIPELINE II=1
+
  					indxS1 = d0*dimA1*dimA2*dimA3 +
  							 d1*dimA2*dimA3+
  							 d2*dimA3+
@@ -65,22 +53,16 @@ void task_template_concat(
  		}
  	}
 
-     Loop5: for(int d0=0;d0<dimB0;d0++){
- #pragma HLS PIPELINE off
- #pragma HLS LOOP_FLATTEN off
- #pragma HLS LOOP_FLATTEN
+    Loop5: for(int d0=0;d0<dimB0;d0++){
+#pragma HLS LOOP_TRIPCOUNT min=5 max=5
      	Loop6: for(int d1=0;d1<dimB1;d1++){
- #pragma HLS PIPELINE off
- #pragma HLS LOOP_FLATTEN off
- #pragma HLS LOOP_FLATTEN
+#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
      		Loop7: for(int d2=0;d2<dimB2;d2++){
- #pragma HLS LOOP_TRIPCOUNT min=1 max=20
- #pragma HLS PIPELINE off
- #pragma HLS LOOP_FLATTEN
+#pragma HLS LOOP_TRIPCOUNT min=1 max=20
      			Loop8: for(int d3=0;d3<dimB3;d3++){
- #pragma HLS LOOP_TRIPCOUNT min=3 max=128
- #pragma HLS PIPELINE II=1
- #pragma HLS LOOP_FLATTEN off
+#pragma HLS LOOP_TRIPCOUNT min=3 max=128
+#pragma HLS PIPELINE II=1
+
  					indxS2 = d0*dimB1*dimB2*dimB3 +
  							 d1*dimB2*dimB3+
  							 d2*dimB3+
@@ -131,16 +113,18 @@ void task_concat(
 
     #pragma HLS INTERFACE s_axilite port=return     bundle=control
 
-    if(dimA0==2 && dimA1==5 && dimB0==2 && dimB1==5){
+	concat2(
+			inputTn1,
+			inputTn2,
+			outputTn,
+			dimA0,
+			dimA1,
+			dimA2,
+			dimA3,
+			dimB0,
+			dimB1,
+			dimB2,
+			dimB3);
 
-        task_template_concat<2,5,2,5>(
-                inputTn1,
-                inputTn2,
-                outputTn,
-                dimA2,
-                dimA3,
-                dimB2,
-                dimB3);
-    }
 }
 }
