@@ -59,9 +59,9 @@ void task_reducesum4d(
 
     if (overaxis0 && overaxis1 && overaxis2 && !overaxis3) {
         float buff_tmp[CONFIG_SLICE_SIZE];
-#pragma HLS ARRAY_PARTITION variable=buff_tmp complete dim=0
+//#pragma HLS ARRAY_PARTITION variable=buff_tmp complete dim=0
         float buff_rslt[CONFIG_SLICE_SIZE];
-#pragma HLS ARRAY_PARTITION variable=buff_rslt complete dim=0
+//#pragma HLS ARRAY_PARTITION variable=buff_rslt complete dim=0
 
         unsigned long indxS;
         unsigned long d0d1d2 = dim0 * dim1 * dim2;
@@ -97,7 +97,8 @@ void task_reducesum4d(
             if(!(d0==0 && d1==0 && d2==0)){
                 //Compare cached slice with reduced slice(buff_rslt)
                 LoopReduction:for(int i=0;i<CONFIG_SLICE_SIZE;i++){
-#pragma HLS UNROLL
+//#pragma HLS UNROLL
+#pragma HLS PIPELINE
                     if(i<dim3){
                     	//std::cout<<"**indxI="<<i << " ,buff_tmp= "<< buff_tmp[i] << " ,buff_rslt= "<< buff_rslt[i] <<std::endl;
                     	float pow_rslt = buff_tmp[i];

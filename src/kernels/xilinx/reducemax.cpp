@@ -187,7 +187,7 @@ void task_reducemax(
         	if(d1!=0){
 	        	//Compare cached slice with reduced slice(buff_rslt)
 	        	LoopCompare:for(int i=0;i<CONFIG_SLICE_SIZE;i++){
-#pragma HLS UNROLL
+#pragma HLS PIPELINE
 	        		if(i<dim2){
 						if(buff_tmp[i]>buff_rslt[i]){
 							buff_rslt[i] = buff_tmp[i];
