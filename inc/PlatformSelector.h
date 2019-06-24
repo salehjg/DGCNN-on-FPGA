@@ -21,7 +21,7 @@ using namespace std;
 
 class PlatformSelector {
 public:
-    PlatformSelector(PLATFORMS defaultPlatform , vector<PLATFORMS> neededPlatforms);
+    PlatformSelector(PLATFORMS defaultPlatform , vector<PLATFORMS> neededPlatforms, bool loadWeights);
     TensorF* CrossThePlatform(TensorF* srcTn, PLATFORMS platform);
     TensorI* CrossThePlatform(TensorI* srcTn, PLATFORMS platform);
     TensorF* Transpose(PLATFORMS platform, WorkScheduler scheduler, TensorF *batchedMat);

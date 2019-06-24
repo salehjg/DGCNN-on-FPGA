@@ -13,8 +13,8 @@
 
 using namespace std;
 
-//#undef DUMP_ENABLED
-#define DUMP_ENABLED
+#undef DUMP_ENABLED
+//#define DUMP_ENABLED
 
 class CpuImplementation: public PlatformImplementation {
 public:

@@ -6,7 +6,7 @@
 
 
 ModelArchTop05::ModelArchTop05(int dataset_offset, int batchsize, int pointcount, int knn_k) {
-    platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL});
+    platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
     DB_OFFSET = dataset_offset;
     B = (unsigned int)batchsize;
     N = (unsigned int)pointcount;
@@ -77,14 +77,14 @@ TensorF* ModelArchTop05::Batchnorm_Forward(WorkScheduler scheduler, TensorF* inp
         }*/
 
         //mu and var is of shape (dim3)
-        mu = platformSelector->Mean(PLATFORMS::GPU_OCL, scheduler, input, true, true, true, false);
+        mu = platformSelector->Mean(PLATFORMS::CPU, scheduler, input, true, true, true, false);
         /*
         {// JUST FOR DEBUGGING
             TensorF *mu_cpu = platformSelector->Mean(PLATFORMS::GPU_OCL, scheduler, input, true, true, true, false);
             assert(platformSelector->CompareTensors(PLATFORMS::GPU_OCL,scheduler,mu,mu_cpu));
         }*/
 
-        var = platformSelector->Variance(PLATFORMS::GPU_OCL, scheduler, input, true, true, true, false);
+        var = platformSelector->Variance(PLATFORMS::CPU, scheduler, input, true, true, true, false);
 
         // Exponential Moving Average for mu and var
         TensorF *update_delta_ave, *update_delta_var;
@@ -137,14 +137,14 @@ TensorF* ModelArchTop05::Batchnorm_Forward(WorkScheduler scheduler, TensorF* inp
         }*/
 
         //mu and var is of shape (dim1)
-        mu = platformSelector->Mean(PLATFORMS::GPU_OCL, scheduler, input, true, false, false, false);
+        mu = platformSelector->Mean(PLATFORMS::CPU, scheduler, input, true, false, false, false);
         /*
         {// JUST FOR DEBUGGING
             TensorF *mu_cpu = platformSelector->Mean(PLATFORMS::GPU_OCL, scheduler, input, true, false, false, false);
             assert(platformSelector->CompareTensors(PLATFORMS::GPU_OCL,scheduler,mu,mu_cpu));
         }*/
 
-        var = platformSelector->Variance(PLATFORMS::GPU_OCL, scheduler, input, true, false, false, false);
+        var = platformSelector->Variance(PLATFORMS::CPU, scheduler, input, true, false, false, false);
 
         // Exponential Moving Average for mu and var
         TensorF *update_delta_ave, *update_delta_var;
@@ -253,13 +253,13 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv1.bn.gamma.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv1.bn.gamma.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv1.bn.beta.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv1.bn.beta.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                        PLATFORMS::CPU,"transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A02_tnet_bn.npy",net2);
@@ -295,13 +295,13 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv2.bn.gamma.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv2.bn.gamma.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv2.bn.beta.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv2.bn.beta.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                        PLATFORMS::CPU,"transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A05_tnet_bn.npy",net2);
@@ -348,13 +348,13 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv3.bn.gamma.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv3.bn.gamma.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv3.bn.beta.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv3.bn.beta.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                        PLATFORMS::CPU,"transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                        PLATFORMS::CPU,"transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A09_tnet_bn.npy",net2);
@@ -392,9 +392,9 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 scheduler,
                 net,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc1.weights.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc1.weights.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc1.biases.npy")
+                        PLATFORMS::CPU,"transform_net1.tfc1.biases.npy")
                 );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A12_tnet_fc.npy",net1);
@@ -402,13 +402,13 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc1.bn.gamma.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc1.bn.gamma.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc1.bn.beta.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc1.bn.beta.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                        PLATFORMS::CPU,"transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A13_tnet_bn.npy",net2);
@@ -434,9 +434,9 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 scheduler,
                 net,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc2.weights.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc2.weights.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc2.biases.npy")
+                        PLATFORMS::CPU,"transform_net1.tfc2.biases.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A14_tnet_fc.npy",net1);
@@ -444,13 +444,13 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc2.bn.gamma.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc2.bn.gamma.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc2.bn.beta.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc2.bn.beta.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                        PLATFORMS::CPU,"transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                        PLATFORMS::CPU,"transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A15_tnet_bn.npy",net2);
@@ -471,9 +471,9 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
     //----------------------------------------------------------------------------
     {
         TensorF* weights = platformSelector->weightsLoader->AccessWeights(
-                PLATFORMS::GPU_OCL,"transform_net1.transform_XYZ.weights.npy");
+                PLATFORMS::CPU,"transform_net1.transform_XYZ.weights.npy");
         TensorF* _biases = platformSelector->weightsLoader->AccessWeights(
-                PLATFORMS::GPU_OCL,"transform_net1.transform_XYZ.biases.npy");
+                PLATFORMS::CPU,"transform_net1.transform_XYZ.biases.npy");
 
         float eyeData[] = {1,0,0,
                            0,1,0,
@@ -563,13 +563,13 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn1.bn.gamma.npy"),
+                                                  PLATFORMS::CPU,"dgcnn1.bn.gamma.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn1.bn.beta.npy"),
+                                                  PLATFORMS::CPU,"dgcnn1.bn.beta.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn1.bn.dgcnn1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                                                  PLATFORMS::CPU,"dgcnn1.bn.dgcnn1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn1.bn.dgcnn1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                                  PLATFORMS::CPU,"dgcnn1.bn.dgcnn1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C03_dg1_bn.npy",net2);
 
@@ -606,13 +606,13 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn2.bn.gamma.npy"),
+                                                  PLATFORMS::CPU,"dgcnn2.bn.gamma.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn2.bn.beta.npy"),
+                                                  PLATFORMS::CPU,"dgcnn2.bn.beta.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn2.bn.dgcnn2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                                                  PLATFORMS::CPU,"dgcnn2.bn.dgcnn2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn2.bn.dgcnn2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                                  PLATFORMS::CPU,"dgcnn2.bn.dgcnn2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::GPU_OCL,scheduler,net2);
@@ -648,13 +648,13 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn3.bn.gamma.npy"),
+                                                  PLATFORMS::CPU,"dgcnn3.bn.gamma.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn3.bn.beta.npy"),
+                                                  PLATFORMS::CPU,"dgcnn3.bn.beta.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn3.bn.dgcnn3.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                                                  PLATFORMS::CPU,"dgcnn3.bn.dgcnn3.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn3.bn.dgcnn3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                                  PLATFORMS::CPU,"dgcnn3.bn.dgcnn3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::GPU_OCL,scheduler,net2);
@@ -690,13 +690,13 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn4.bn.gamma.npy"),
+                                                  PLATFORMS::CPU,"dgcnn4.bn.gamma.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn4.bn.beta.npy"),
+                                                  PLATFORMS::CPU,"dgcnn4.bn.beta.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn4.bn.dgcnn4.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                                                  PLATFORMS::CPU,"dgcnn4.bn.dgcnn4.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"dgcnn4.bn.dgcnn4.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                                  PLATFORMS::CPU,"dgcnn4.bn.dgcnn4.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::GPU_OCL,scheduler,net2);
@@ -748,13 +748,13 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"agg.bn.gamma.npy"),
+                                                  PLATFORMS::CPU,"agg.bn.gamma.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"agg.bn.beta.npy"),
+                                                  PLATFORMS::CPU,"agg.bn.beta.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"agg.bn.agg.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                                                  PLATFORMS::CPU,"agg.bn.agg.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"agg.bn.agg.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                                  PLATFORMS::CPU,"agg.bn.agg.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
 
@@ -788,22 +788,22 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
                                              platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::GPU_OCL,"fc1.weights.npy"),
+                                                     PLATFORMS::CPU,"fc1.weights.npy"),
                                              platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::GPU_OCL,"fc1.biases.npy")
+                                                     PLATFORMS::CPU,"fc1.biases.npy")
         );
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B13_fc.npy",net1);
 
         //net1 is of shape Bx1x1x512
         TensorF *net2 = Batchnorm_Forward(scheduler,net1,
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc1.bn.gamma.npy"),
+                                                  PLATFORMS::CPU,"fc1.bn.gamma.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc1.bn.beta.npy"),
+                                                  PLATFORMS::CPU,"fc1.bn.beta.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc1.bn.fc1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                                                  PLATFORMS::CPU,"fc1.bn.fc1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc1.bn.fc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                                  PLATFORMS::CPU,"fc1.bn.fc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B14_fc.npy",net2);
 
@@ -821,22 +821,22 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
                                              platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::GPU_OCL,"fc2.weights.npy"),
+                                                     PLATFORMS::CPU,"fc2.weights.npy"),
                                              platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::GPU_OCL,"fc2.biases.npy")
+                                                     PLATFORMS::CPU,"fc2.biases.npy")
         );
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B15_fc.npy",net1);
 
         //net1 is of shape Bx1x1x512
         TensorF *net2 = Batchnorm_Forward(scheduler,net1,
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc2.bn.gamma.npy"),
+                                                  PLATFORMS::CPU,"fc2.bn.gamma.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc2.bn.beta.npy"),
+                                                  PLATFORMS::CPU,"fc2.bn.beta.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc2.bn.fc2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
+                                                  PLATFORMS::CPU,"fc2.bn.fc2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
                                           platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::GPU_OCL,"fc2.bn.fc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                                  PLATFORMS::CPU,"fc2.bn.fc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B16_fc.npy",net2);
@@ -855,9 +855,9 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
                                              platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::GPU_OCL,"fc3.weights.npy"),
+                                                     PLATFORMS::CPU,"fc3.weights.npy"),
                                              platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::GPU_OCL,"fc3.biases.npy")
+                                                     PLATFORMS::CPU,"fc3.biases.npy")
         );
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B17_fc.npy",net1);
         net = net1;

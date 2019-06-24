@@ -1340,10 +1340,12 @@ TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, i
 
     float tmp_array[N];
     int indices[N];
-    for(int i = 0 ;i<N;i++)
-        indices[i]=i;
+
 
     for(int b=0;b<B;b++){
+        for(int i = 0 ;i<N;i++)
+            indices[i]=i;
+
         for(int n=0;n<N;n++){
             indxS = b*N*N + n*N + 0;
             //start of dim2
@@ -1583,6 +1585,9 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn
         unsigned long _len = inputTn1->getLength();
         for(unsigned long i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
+            //cout<< "CurrentDiff "<<i<<" :"<<currentDiff<<endl;
+            cout<< "Gold "<<i<<" :"<<inputTn1->_buff[i]<<endl;
+            cout<< "UDT  "<<i<<" :"<<inputTn2->_buff[i]<<endl;
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }
