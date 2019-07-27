@@ -186,7 +186,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
     //cout<<xcl_mode<<endl;
 
     cout<<"*Using first kernel's container as default container.\n*Multiple container scenario is not supported yet."<<endl;
-    size_t binary_content_length = load_file_to_memory( (REPO_DIR+ xcl_mode + oclKernels[0]->containerName   ).c_str(), &binary_content);
+    size_t binary_content_length = load_file_to_memory(globalArgXclBin, &binary_content);
 
     cl_program program = clCreateProgramWithBinary(
                             context, 

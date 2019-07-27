@@ -48,8 +48,12 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
     if(!loadWeights) cout<<"/!\\ Weight are not loaded into device memory."<<endl;
 #ifdef USE_OCL
     if(loadWeights){
-		weightsLoader->LoadFromDisk(REPO_DIR "/data/weights/",
-									REPO_DIR "/data/weights/filelist.txt",
+    	std::string wDir(globalArgDataPath); wDir.append("/weights/");
+    	std::string wFileList(globalArgDataPath); wFileList.append("/weights/filelist.txt");
+    	cout<< "Weights Dir: " << wDir << endl;
+    	cout<< "Weights File List Path: " << wFileList << endl;
+		weightsLoader->LoadFromDisk(wDir.c_str() ,
+									wFileList.c_str() ,
 									openclPlatformClass->getContext(),
 									openclPlatformClass->getQueue());
     }

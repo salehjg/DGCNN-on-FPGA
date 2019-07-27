@@ -62,8 +62,14 @@ void ClassifierMultiplatform(){
     WorkScheduler scheduler;
     int batchsize=5;
     ModelArchTop05 modelArchTop(0,batchsize,1024,20);
-    modelArchTop.SetModelInput_data(REPO_DIR "/data/dataset/dataset_B5_pcl.npy");
-    modelArchTop.SetModelInput_labels(REPO_DIR"/data/dataset/dataset_B5_labels_int32.npy");
+    std::string pclPath(globalArgDataPath); pclPath.append("/dataset/dataset_B5_pcl.npy");
+    std::string labelPath(globalArgDataPath); labelPath.append("/dataset/dataset_B5_labels_int32.npy");
+
+    cout<<"PCL NPY PATH: "<<pclPath<<endl;
+    cout<<"LBL NPY PATH: "<<labelPath<<endl;
+
+    modelArchTop.SetModelInput_data(pclPath.c_str());
+    modelArchTop.SetModelInput_labels(labelPath.c_str());
 
     double timerStart = seconds();
     TensorF* classScores = modelArchTop.Execute(scheduler);
