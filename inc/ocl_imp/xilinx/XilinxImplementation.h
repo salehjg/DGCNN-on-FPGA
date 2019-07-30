@@ -84,6 +84,7 @@ public:
 
     cl_context          getContext();
     cl_command_queue    getQueue();
+    cl_program          getProgram();
     void                GetPaddedWorkSize(int dims, size_t * inBlockSize, size_t * inWorkSize, size_t * outPaddedWorkSize);
     ~XilinxImplementation();
 
@@ -138,6 +139,7 @@ private:
     cl_context context;               // context
     cl_command_queue queue;           // command queue
     cl_program program;               // program
+    char *binary_content;             // program binary content
     cl_int err;
 };
 

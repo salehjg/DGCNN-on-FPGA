@@ -88,6 +88,28 @@ ReportObject* XilinxImpUnitTests::TensorFloat(){
 	return obj;
 }
 
+ReportObject* XilinxImpUnitTests::TensorBankFloat(){
+    TensorF* tensorCpu = GenerateTensor(7,{5,5,2});
+    OclTensorF* tensorSrc_defaultBank0 = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
+    
+    bool rslt_before_changing_bank = platformSelector->CompareTensors(
+        PLATFORMS::CPU,
+        scheduler,
+        tensorCpu,
+        tensorSrc_defaultBank0);
+    
+    tensorSrc_defaultBank0->ChangeDDRBank(
+        platformSelector->openclPlatformClass->getProgram(),
+		platformSelector->openclPlatformClass->getContext(),
+        platformSelector->openclPlatformClass->getQueue(),
+        1);
+    
+    bool rslt_after_changing_bank = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank0);
+    
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank);
+    return obj;
+}
+
 ReportObject* XilinxImpUnitTests::KernelConcat2(){
 	//TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
 	//TensorF* tensorSrc2 = GenerateTensor(3,{2,2,2,2});
@@ -609,7 +631,7 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-
+    PrintReport(TensorBankFloat());
 	//PrintReport(TensorFloat());
 	//PrintReport(KernelConcat2());
 	//PrintReport(KernelSqrt());
@@ -623,7 +645,7 @@ void XilinxImpUnitTests::RunAll(){
 	//PrintReport(KernelSquare());
 	//PrintReport(KernelTile() );
 	//PrintReport(KernelMatmul());
-	PrintReport(KernelTranspose());
+	//PrintReport(KernelTranspose());
     //PrintReport(KernelGather());
 	//PrintReport(KernelConv2Mlp());
     //PrintReport(KernelTopK());

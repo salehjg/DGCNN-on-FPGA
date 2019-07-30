@@ -23,6 +23,7 @@ public:
 	XilinxImpUnitTests();
 
 	ReportObject* TensorFloat();
+	ReportObject* TensorBankFloat();
 	ReportObject* KernelConcat2();
 	ReportObject* KernelSqrt();
 	ReportObject* KernelReduceMax();

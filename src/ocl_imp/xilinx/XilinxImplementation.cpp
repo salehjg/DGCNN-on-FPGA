@@ -176,7 +176,6 @@ XilinxImplementation::XilinxImplementation(int aa) {
     
     //======================================================================================================================
     //Using signle binary container for all of the kernels for now!
-    char *binary_content;
     char *_xcl_mode = getenv("XCL_EMULATION_MODE");
     string xcl_mode = string(_xcl_mode);
     xcl_mode = 	xcl_mode=="sw_emu" ? "Emulation-SW/" :
@@ -188,7 +187,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
     cout<<"*Using first kernel's container as default container.\n*Multiple container scenario is not supported yet."<<endl;
     size_t binary_content_length = load_file_to_memory(globalArgXclBin, &binary_content);
 
-    cl_program program = clCreateProgramWithBinary(
+    program = clCreateProgramWithBinary(
                             context, 
                             1,
                             &device_id,
@@ -227,8 +226,11 @@ XilinxImplementation::XilinxImplementation(int aa) {
         }
     }
 
-    clReleaseProgram(program);
-    free(binary_content);
+    //Cannot release these two just yet, because OclTensorF and OclTensorI classes will be needing them for datamover kernel-
+    //creation.
+    //clReleaseProgram(program);
+    //free(binary_content);
+
     std::cout<<"- - - - - - - - - - -"<<std::endl;
     
     //======================================================================================================================
@@ -250,6 +252,10 @@ XilinxImplementation::~XilinxImplementation(){
 
 cl_context XilinxImplementation::getContext(){
     return context;
+}
+
+cl_program XilinxImplementation::getProgram() {
+    return program;
 }
 
 cl_command_queue XilinxImplementation::getQueue() {
