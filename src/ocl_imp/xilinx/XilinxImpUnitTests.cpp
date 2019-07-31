@@ -90,23 +90,33 @@ ReportObject* XilinxImpUnitTests::TensorFloat(){
 
 ReportObject* XilinxImpUnitTests::TensorBankFloat(){
     TensorF* tensorCpu = GenerateTensor(7,{5,5,2});
-    OclTensorF* tensorSrc_defaultBank0 = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
+    OclTensorF* tensorSrc_defaultBank = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
     
     bool rslt_before_changing_bank = platformSelector->CompareTensors(
         PLATFORMS::CPU,
         scheduler,
         tensorCpu,
-        tensorSrc_defaultBank0);
+        tensorSrc_defaultBank);
     
-    tensorSrc_defaultBank0->ChangeDDRBank(
+    tensorSrc_defaultBank->ChangeDDRBank(
+        platformSelector->openclPlatformClass->getProgram(),
+		platformSelector->openclPlatformClass->getContext(),
+        platformSelector->openclPlatformClass->getQueue(),
+        2);
+    
+    bool rslt_after_changing_bank = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
+
+
+    tensorSrc_defaultBank->ChangeDDRBank(
         platformSelector->openclPlatformClass->getProgram(),
 		platformSelector->openclPlatformClass->getContext(),
         platformSelector->openclPlatformClass->getQueue(),
         1);
+
+    bool rslt_after_changing_bank_reverse = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
+
     
-    bool rslt_after_changing_bank = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank0);
-    
-    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank);
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
     return obj;
 }
 

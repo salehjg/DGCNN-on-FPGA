@@ -127,10 +127,10 @@ int OclTensorF::LaunchDataMover(
 
     cl_int error;
 
-    if(!(srcBank>=0 && srcBank<=1)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
-    if(!(dstBank>=0 && dstBank<=1)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
+    if(!(srcBank>=DATAMOVER_KERNEL_BANK_A_INDEX && srcBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
+    if(!(dstBank>=DATAMOVER_KERNEL_BANK_A_INDEX && dstBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
 
-    cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover_b0_to_b1_float", &error);
+    cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover_mod1_float", &error);
     if (error != CL_SUCCESS) {
         cout<<  "Failed to create internal data-mover task kernel, Err: " << error << endl;
         std::exit(1);
@@ -139,7 +139,7 @@ int OclTensorF::LaunchDataMover(
     //Current datamover kernel only supports srcBuff within bank0 and dstBuff within bank1.
     //reverseSwitch=0 : Copy srcBuff(bank0) to dstBuff(bank1).
     //reverseSwitch=1 : Copy dstBuff(bank1) to srcBuff(bank0).
-    int reverseSwitch = (srcBank==0) ? 0 : 1;
+    int reverseSwitch = (srcBank==DATAMOVER_KERNEL_BANK_A_INDEX) ? 0 : 1;
 
     int argcnt=0;
     if(reverseSwitch==0){
@@ -216,6 +216,7 @@ int OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_command
         //Replacing old released buffer with new one.
         ocl_buff = newBuff;
 
+        dramBank = bank;
 
     }else{
         //The tensor has not yet been initialized, meaning that it does not contain clBuffer object yet to change its bank.
