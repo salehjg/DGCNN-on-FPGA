@@ -690,24 +690,24 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    //PrintReport(TensorBankFloat());
+    PrintReport(TensorBankFloat());
 	PrintReport(TensorBankInteger());
-	//PrintReport(TensorFloat());
-	//PrintReport(KernelConcat2());
-	//PrintReport(KernelSqrt());
-	//PrintReport(KernelReduceMax());
-	//PrintReport(KernelReduceSum4D());
-	//PrintReport(KernelReduceSum());
-	//PrintReport(KernelMatops());
-	//PrintReport(KernelMean());
-	//PrintReport(KernelVariance());
-	//PrintReport(KernelRelu());
-	//PrintReport(KernelSquare());
-	//PrintReport(KernelTile() );
-	//PrintReport(KernelMatmul());
-	//PrintReport(KernelTranspose());
-    //PrintReport(KernelGather());
-	//PrintReport(KernelConv2Mlp());
+	PrintReport(TensorFloat());
+	PrintReport(KernelConcat2());
+	PrintReport(KernelSqrt());
+	PrintReport(KernelReduceMax());
+	PrintReport(KernelReduceSum4D());
+	PrintReport(KernelReduceSum());
+	PrintReport(KernelMatops());
+	PrintReport(KernelMean());
+	PrintReport(KernelVariance());
+	PrintReport(KernelRelu());
+	PrintReport(KernelSquare());
+	PrintReport(KernelTile() );
+	PrintReport(KernelMatmul());
+	PrintReport(KernelTranspose());
+    PrintReport(KernelGather());
+	PrintReport(KernelConv2Mlp());
     //PrintReport(KernelTopK());
 	/*
 	*/

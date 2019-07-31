@@ -14,7 +14,7 @@ static void _task_datamover(
 		DType *dstBuff,
 		int reverseSwitch,
 		const unsigned long len){
-
+#pragma HLS inline
 
 	if(reverseSwitch==0){
 		for(unsigned long i=0;i<len;i++){
@@ -52,22 +52,6 @@ void task_datamover_b0_to_b1_integer(
 
 // The --sp option decides which bank is bankA and which is bankB
 // Currently, bankA is bank1 & bankB is bank2 and no SLR assignment is done.
-void task_datamover_mod1_float(
-		float *srcBuff,
-		float *dstBuff,
-		int reverseSwitch,
-		const unsigned long len){
-#pragma HLS INTERFACE m_axi     port=srcBuff    		offset=slave bundle=gmem0
-#pragma HLS INTERFACE m_axi     port=dstBuff   			offset=slave bundle=gmem1
-#pragma HLS INTERFACE s_axilite port=srcBuff    		bundle=control
-#pragma HLS INTERFACE s_axilite port=dstBuff   			bundle=control
-#pragma HLS INTERFACE s_axilite port=reverseSwitch      bundle=control
-#pragma HLS INTERFACE s_axilite port=len        		bundle=control
-#pragma HLS INTERFACE s_axilite port=return     		bundle=control
-
-	_task_datamover<float>(srcBuff, dstBuff, reverseSwitch, len);
-}
-
 void task_datamover_mod1_int(
 		int *srcBuff,
 		int *dstBuff,

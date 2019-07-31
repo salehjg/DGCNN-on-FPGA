@@ -302,7 +302,7 @@ void XilinxImplementation::PrintInfo(
         finalStr += ", ";
     }
     finalStr+="\n";
-    cout<<finalStr;
+    //cout<<finalStr;
 }
 
 void XilinxImplementation::GetPaddedWorkSize(
