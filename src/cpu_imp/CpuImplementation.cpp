@@ -1600,7 +1600,7 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn
     return false;
 }
 
-bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorI *inputTn1, TensorI *inputTn2) {
+bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *inputTn1, TensorI *inputTn2) {
     float totalDiff=0;
     int currentDiff=0;
     if(inputTn1->getShape() == inputTn2->getShape()){

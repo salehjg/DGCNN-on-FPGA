@@ -47,6 +47,7 @@ public:
     void     DumpMatrix(PLATFORMS platform, WorkScheduler scheduler, string npy_fname, TensorF* inputTn, string npy_dir=REPO_DIR"/data/matrix_dumps/");
     void     DumpMatrix(PLATFORMS platform, WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir=REPO_DIR"/data/matrix_dumps/");
     bool     CompareTensors(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
+    bool     CompareTensorsInteger(PLATFORMS platform, WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
     ~PlatformSelector();
 
     WeightsLoader* weightsLoader;

@@ -700,3 +700,27 @@ bool PlatformSelector::CompareTensors(PLATFORMS platform, WorkScheduler schedule
     }
     return false;
 }
+
+bool PlatformSelector::CompareTensorsInteger(PLATFORMS platform, WorkScheduler scheduler, TensorI *inputTn1, TensorI *inputTn2) {
+	TensorI* __inputTn1 = CrossThePlatform(inputTn1, platform);
+	TensorI* __inputTn2 = CrossThePlatform(inputTn2, platform);
+    switch(platform){
+        case PLATFORMS::CPU :{
+            return cpuPlatformClass->CompareTensorsInteger(scheduler, __inputTn1,__inputTn2);
+            break;
+        }
+#ifdef USE_CUDA
+        case PLATFORMS::GPU_CUDA :{
+            throw "Not Implement.";
+            break;
+        }
+#endif
+#ifdef USE_OCL
+        case PLATFORMS::GPU_OCL :{
+            throw "Not Implement.";
+            break;
+        }
+#endif
+    }
+    return false;
+}

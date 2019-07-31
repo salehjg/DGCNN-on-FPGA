@@ -68,4 +68,20 @@ void task_datamover_mod1_float(
 	_task_datamover<float>(srcBuff, dstBuff, reverseSwitch, len);
 }
 
+void task_datamover_mod1_int(
+		int *srcBuff,
+		int *dstBuff,
+		int reverseSwitch,
+		const unsigned long len){
+#pragma HLS INTERFACE m_axi     port=srcBuff    		offset=slave bundle=gmemi0
+#pragma HLS INTERFACE m_axi     port=dstBuff   			offset=slave bundle=gmemi1
+#pragma HLS INTERFACE s_axilite port=srcBuff    		bundle=control
+#pragma HLS INTERFACE s_axilite port=dstBuff   			bundle=control
+#pragma HLS INTERFACE s_axilite port=reverseSwitch      bundle=control
+#pragma HLS INTERFACE s_axilite port=len        		bundle=control
+#pragma HLS INTERFACE s_axilite port=return     		bundle=control
+
+	_task_datamover<int>(srcBuff, dstBuff, reverseSwitch, len);
+}
+
 }

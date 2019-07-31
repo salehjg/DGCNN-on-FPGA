@@ -1336,7 +1336,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 		   b,
 		   m,
 		   (unsigned int)k
-	});
+	},-1);
 
 	//==================================================================================================================
 	{//1.topk.cl.cc
@@ -1627,6 +1627,10 @@ void XilinxImplementation::DumpMatrix(
 }
 
 bool XilinxImplementation::CompareTensors(WorkScheduler scheduler,TensorF *inputTn1, TensorF *inputTn2) {
+    return false;
+}
+
+bool XilinxImplementation::CompareTensorsInteger(WorkScheduler scheduler,TensorI *inputTn1, TensorI *inputTn2) {
     return false;
 }
 
