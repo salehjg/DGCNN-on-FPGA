@@ -1610,7 +1610,7 @@ bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }
-        cout<< "totalDiff: "<<totalDiff<<endl;
+        if(totalDiff!=0)cout<< "totalDiff: "<<totalDiff<<endl;
         if((totalDiff!=0) ) {
             return false;
         }

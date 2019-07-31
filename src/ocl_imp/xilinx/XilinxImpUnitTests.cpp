@@ -597,55 +597,13 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
-	//cnpy::NpyArray tmp = cnpy::npy_load("/home/saleh/01_workspace/00_Xilinx_WS/DeepPoint-V1-FPGA/data/topkTest2.npy");
-	//vector<unsigned int> __shape(tmp.shape.begin(),tmp.shape.end());
-	//TensorF* testNpy = new TensorF(__shape, tmp.data<float>());
+	cout<<"Please confirm that TOPK kernel is configured for K=3 and N=5, Press any key to continue..."<<endl; cin.get();
+	int kVal=3 , N=5 , B=2;
 
-	int kVal = 3;
-	int B=9;
-	int N=5;
     TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
-    //TensorF *tensorSrc = testNpy;
-
-
-
     TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
     TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, kVal);
-
     TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
-
-    /*
-    {
-    	unsigned int dim0,dim1,dim2;
-    	dim0 = tensorSrc->getShape()[0];
-    	dim1 = tensorSrc->getShape()[1];
-    	dim2 = tensorSrc->getShape()[2];
-
-    	for(int d0=0;d0<dim0;d0++){
-    		for(int d1=0;d1<dim1;d1++){
-    			cout<<"\n\nNew  Slice(Src-Dim2):\n";
-    			for(int d2=0;d2<dim2;d2++){
-    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + d2;
-    				cout << tensorSrc->_buff[indxS] << " - ";
-				}
-
-    			cout<<"\n\nCPU Result Slice(Rslt-kVal):\n";
-				for(int d2=0;d2<kVal;d2++){
-    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + 0;
-    				unsigned long indxD = d0*dim1*kVal + d1*kVal + d2;
-					cout << tensorSrc->_buff[indxS+ tensorCpu->_buff[indxD]] << " - ";
-				}
-				cout<<"\n\nFPGA Result Slice(Rslt-kVal):\n";
-				for(int d2=0;d2<kVal;d2++){
-    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + 0;
-    				unsigned long indxD = d0*dim1*kVal + d1*kVal + d2;
-					cout << tensorSrc->_buff[indxS+ tensorGpuTransfered->_buff[indxD]] << " - ";
-				}
-				cout<<endl;
-			}
-    	}
-    }
-	*/
 
     bool comparisonResult = true;
     if (tensorCpu->getShape() != tensorGpu->getShape()){
@@ -671,8 +629,6 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
         		}
         	}
         }
-
-
 
     }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
@@ -708,9 +664,7 @@ void XilinxImpUnitTests::RunAll(){
 	PrintReport(KernelTranspose());
     PrintReport(KernelGather());
 	PrintReport(KernelConv2Mlp());
-    //PrintReport(KernelTopK());
-	/*
-	*/
+    PrintReport(KernelTopK());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
