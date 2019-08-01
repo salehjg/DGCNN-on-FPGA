@@ -10,8 +10,10 @@
 #include <stdio.h>
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 #include <vector>
 
+using namespace std;
 
 
 OclTensorI::OclTensorI(){
@@ -19,19 +21,19 @@ OclTensorI::OclTensorI(){
     platform = PLATFORMS::DEFAULT;
 }
 
-OclTensorI::OclTensorI(cl_context context, std::vector<unsigned int> shape){
-    Init(context, shape);
+OclTensorI::OclTensorI(cl_context context, std::vector<unsigned int> shape, int bank){
+    Init(context, shape, bank);
 }
 
-OclTensorI::OclTensorI( std::vector<unsigned int> shape, cl_mem clBuff){
-    Init(shape, clBuff);
+OclTensorI::OclTensorI( std::vector<unsigned int> shape, cl_mem clBuff, int bank){
+    Init(shape, clBuff, bank);
 }
 
 
-void OclTensorI::Init(cl_context context, std::vector<unsigned int> shape) {
+void OclTensorI::Init(cl_context context, std::vector<unsigned int> shape, int bank) {
     cl_int ocl_stat;
     if(initialized){
-        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
     }
     this->shape = shape;
@@ -40,14 +42,21 @@ void OclTensorI::Init(cl_context context, std::vector<unsigned int> shape) {
     unsigned long len = getLengthBytes();
     platform = PLATFORMS::GPU_OCL;
 
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE, len, NULL, &ocl_stat);
+    dramBank = bank==-1 ? dramBank : bank;
+
+    cl_mem_ext_ptr_t memExt;
+    memExt.flags = TranslateBankIndex(dramBank);
+    memExt.obj = NULL;
+    memExt.param = 0;
+
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, len, &memExt, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 }
 
-void OclTensorI::Init(std::vector<unsigned int> shape, cl_mem clBuff){
+void OclTensorI::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     cl_int ocl_stat;
     if(initialized){
-        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
     }
     this->shape = shape;
@@ -55,14 +64,16 @@ void OclTensorI::Init(std::vector<unsigned int> shape, cl_mem clBuff){
     this->initialized = true;
     unsigned long len = getLengthBytes();
     platform = PLATFORMS::GPU_OCL;
+
+    dramBank = bank==-1 ? dramBank : bank;
 
     ocl_buff = clBuff;
 }
 
-void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, int *hostBuff) {
+void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, int *hostBuff, int bank) {
     cl_int ocl_stat;
     if(initialized){
-        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
     }
     this->shape = shape;
@@ -71,7 +82,14 @@ void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, st
     unsigned long len = getLengthBytes();
     platform = PLATFORMS::GPU_OCL;
 
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE, len, NULL, &ocl_stat);
+    dramBank = bank==-1 ? dramBank : bank;
+
+    cl_mem_ext_ptr_t memExt;
+    memExt.flags = TranslateBankIndex(dramBank);
+    memExt.obj = NULL;
+    memExt.param = 0;
+
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, len, &memExt, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 
     // https://software.intel.com/en-us/forums/opencl/topic/731519
@@ -86,13 +104,117 @@ void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, st
     assert(ocl_stat==CL_SUCCESS);
 }
 
-OclTensorI::~OclTensorI() {
-    /* https://stackoverflow.com/questions/17923370/override-identifier-after-destructor-in-c11
-     * Even though destructors are not inherited, a destructor in a derived class
-     * overrides a base class destructor declared virtual; see 12.4 and 12.5. */
+int OclTensorI::getDramBank(){
+    return dramBank;
+}
+
+
+int OclTensorI::LaunchDataMover( 
+    cl_program program,
+    cl_command_queue queue, 
+    int srcBank, 
+    int dstBank, 
+    cl_mem srcBuff, 
+    cl_mem dstBuff, 
+    unsigned long len){
+
+    cl_int error;
+
+    if(!(srcBank>=DATAMOVER_KERNEL_BANK_A_INDEX && srcBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported srcBank. (OclTensorI)" <<endl; std::exit(3);}
+    if(!(dstBank>=DATAMOVER_KERNEL_BANK_A_INDEX && dstBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported dstBank. (OclTensorI)" <<endl; std::exit(3);}
+
+    cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover_mod1_int", &error);
+    if (error != CL_SUCCESS) {
+        cout<<  "Failed to create internal data-mover task kernel (OclTensorI), Err: " << error << endl;
+        std::exit(1);
+    }
+
+    //Current datamover kernel only supports srcBuff within bank0 and dstBuff within bank1.
+    //reverseSwitch=0 : Copy srcBuff(bank0) to dstBuff(bank1).
+    //reverseSwitch=1 : Copy dstBuff(bank1) to srcBuff(bank0).
+    int reverseSwitch = (srcBank==DATAMOVER_KERNEL_BANK_A_INDEX) ? 0 : 1;
+
+    int argcnt=0;
+    if(reverseSwitch==0){
+        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff); //Arg0 should always be on bank0
+        error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff); 
+    }else{
+        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff); //Arg0 should always be on bank0
+        error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff); 
+    }
+    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_int), (void*)&reverseSwitch); 
+    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_ulong), (void*)&len);
+    
+    if(error != CL_SUCCESS) cout<<"Failed to set internal data-mover kernel args (OclTensorI), Err: "<< error <<endl;
+    assert(error==CL_SUCCESS);
+
+    cl_event exeEvt;
+    error = clEnqueueTask( queue,
+                           kernel_datamover,
+                           0,
+                           NULL,
+                           &exeEvt);
+    if(error != CL_SUCCESS) cout<<"Failed to launch internal data-mover kernel (OclTensorI), Err: "<< error <<endl;
+    assert(error==CL_SUCCESS);
+    clWaitForEvents(1, &exeEvt);
+
+    cout<< "_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully (OclTensorI) -_-_-_-_-_-_-_-_"<<endl;
+
+    error = clReleaseKernel(kernel_datamover);
+    if(error != CL_SUCCESS) cout<<"Failed to release internal data-mover kernel (OclTensorI), Err: "<< error <<endl;
+    assert(error==CL_SUCCESS);
+}
+
+// The idea is to hide FPGA specific memory bank related stuff from the top ModelArch.
+// The only planned access to this method should be through 'XilinxImplementation' class.
+// Because of this, XilinxImpUnitTests wont be able to access cl_program directely.
+// It should be accessed through platformSelector.openclPlatformClass(They are public)
+int OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
     if(initialized){
-        //std::cout<<"--- OclTensorF: buffer deleted.\n";
-        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+        //The tensor has been initialized and DOES contain a clBuffer within a different bank.
+        //We will run a kernel to read data from old bank and simelteneously write it to the new bank.
+
+        //Forcing memory bank requirements using xilinx external memory extension to opencl.
+        cl_mem_ext_ptr_t memExt;
+        memExt.flags = TranslateBankIndex(bank);
+        memExt.obj = NULL;
+        memExt.param = 0;
+
+        unsigned long lenBytes = getLengthBytes();
+        unsigned long lenWords = getLength();
+
+        //Creating new buffer within requested memory bank.
+        cl_int ocl_stat;
+        cl_mem newBuff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenBytes, &memExt, &ocl_stat);
+        assert(ocl_stat==CL_SUCCESS);
+
+        //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
+        //Unsupported memory banks will be checked within 'LaunchDataMover' method.
+        LaunchDataMover(
+            program, 
+            queue, 
+            dramBank, 
+            bank, 
+            ocl_buff, 
+            newBuff, 
+            lenWords);
+
+        //Now we have to release the old buffer and replace it with the new one.
+        cl_int error = clReleaseMemObject(ocl_buff);
+        if(error != CL_SUCCESS){
+            cout<<"Failed to release old buffer(opencl) (OclTensorI), Err: " << error << endl;
+            assert(error==CL_SUCCESS);
+        }
+
+        //Replacing old released buffer with new one.
+        ocl_buff = newBuff;
+
+        dramBank = bank;
+
+    }else{
+        //The tensor has not yet been initialized, meaning that it does not contain clBuffer object yet to change its bank.
+        dramBank = bank;
+        return 1;
     }
 }
 
@@ -105,3 +227,32 @@ TensorI* OclTensorI::TransferToHost(cl_command_queue queue) {
     rsltTn = new TensorI(getShape(),hostBuff);
     return rsltTn;
 }
+
+int OclTensorI::TranslateBankIndex(int bankIndex){
+    switch(bankIndex){
+        case 0:{
+            return XCL_MEM_DDR_BANK0;
+        }break;
+        case 1:{
+            return XCL_MEM_DDR_BANK1;
+        }break;
+        case 2:{
+            return XCL_MEM_DDR_BANK2;
+        }break;
+        case 3:{
+            return XCL_MEM_DDR_BANK3;
+        }break;
+    };
+}
+
+OclTensorI::~OclTensorI() {
+    /* https://stackoverflow.com/questions/17923370/override-identifier-after-destructor-in-c11
+     * Even though destructors are not inherited, a destructor in a derived class
+     * overrides a base class destructor declared virtual; see 12.4 and 12.5. */
+    if(initialized){
+        //std::cout<<"--- OclTensorI: buffer deleted.\n";
+        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+    }
+}
+
+

@@ -32,19 +32,9 @@ public:
     TensorF* ReduceSum4D(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, bool over_axis0, bool over_axis1, bool over_axis2, bool over_axis3);
     TensorF* Mean(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, bool mean_axis0, bool mean_axis1, bool mean_axis2, bool mean_axis3);
     TensorF* Variance(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, bool variance_axis0, bool variance_axis1, bool variance_axis2, bool variance_axis3);
-    //TensorF* MatAdd(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
-    //TensorF* MatSub(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
-    //TensorF* MatAddTiled(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputSmallTn2);
-    //TensorF* MatSubTiled(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputSmallTn2);
-    //TensorF* MatAddTiled(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, float scalar);
-    //TensorF* MatSubTiled(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, float scalar);
     TensorF* MatOps(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2, MAT_OPS mode);
     TensorF* MatOps(PLATFORMS platform, WorkScheduler scheduler, TensorF *inputTn1, float scalar, MAT_OPS mode);
     TensorF* Sqrt(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn);
-    //TensorF* Multiply(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
-    //TensorF* Divide(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
-    //TensorF* MultiplyTiled(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
-    //TensorF* DivideTiled(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
     TensorF* Concat2(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2, int concatDim);
     TensorF* ReduceMax(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, int reductionDim);
 
@@ -57,21 +47,17 @@ public:
     void     DumpMatrix(PLATFORMS platform, WorkScheduler scheduler, string npy_fname, TensorF* inputTn, string npy_dir=REPO_DIR"/data/matrix_dumps/");
     void     DumpMatrix(PLATFORMS platform, WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir=REPO_DIR"/data/matrix_dumps/");
     bool     CompareTensors(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
+    bool     CompareTensorsInteger(PLATFORMS platform, WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
     ~PlatformSelector();
 
     WeightsLoader* weightsLoader;
     PLATFORMS defaultPlatform;
-private:
-
-
     PlatformImplementation *cpuPlatformClass;
     PlatformImplementation *cudaPlatformClass;
-#ifdef USE_OCL
+    #ifdef USE_OCL
     XilinxImplementation *openclPlatformClass;
-#endif
-
-
-
+    #endif
+private:
 
 };
 

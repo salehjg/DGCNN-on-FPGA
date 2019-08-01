@@ -16,8 +16,8 @@
 
 #define XILINX_BOTTLENCK_BLOCKSIZE 1024
 
-#define REPORT_EXECUTION_DURATION
-//#undef REPORT_EXECUTION_DURATION
+//#define REPORT_EXECUTION_DURATION
+#undef REPORT_EXECUTION_DURATION
 
 //#define DUMP_ENABLED
 #undef DUMP_ENABLED
@@ -80,10 +80,12 @@ public:
     void     DumpMatrix(WorkScheduler scheduler, string npy_fname, TensorF* inputTn, string npy_dir);
     void     DumpMatrix(WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir);
     bool     CompareTensors(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
+    bool     CompareTensorsInteger(WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
     const char * getErrorString(cl_int error);
 
     cl_context          getContext();
     cl_command_queue    getQueue();
+    cl_program          getProgram();
     void                GetPaddedWorkSize(int dims, size_t * inBlockSize, size_t * inWorkSize, size_t * outPaddedWorkSize);
     ~XilinxImplementation();
 
@@ -138,6 +140,7 @@ private:
     cl_context context;               // context
     cl_command_queue queue;           // command queue
     cl_program program;               // program
+    char *binary_content;             // program binary content
     cl_int err;
 };
 

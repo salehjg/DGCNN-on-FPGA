@@ -65,6 +65,23 @@ TensorF* XilinxImpUnitTests::GenerateTensor(int pattern, vector<unsigned int> sh
     return testTn;
 }
 
+TensorI* XilinxImpUnitTests::GenerateTensorInteger(int pattern, vector<unsigned int> shape){
+	TensorI *testTn = new TensorI(shape);
+    unsigned long _len = testTn->getLength();
+    if(pattern==-1){
+        for (unsigned long i = 0; i < _len; i++) {
+            testTn->_buff[i] = 0;
+        }
+    }
+    if(pattern==1){
+        for (unsigned long i = 0; i < _len; i++) {
+            testTn->_buff[i] = i%5 + i ;
+        }
+    }
+
+    return testTn;
+}
+
 TensorI* XilinxImpUnitTests::GenerateTensor(int intMin, int intMax, vector<unsigned int> shape){
     TensorI *testTn = new TensorI(shape);
     unsigned long _len = testTn->getLength();
@@ -86,6 +103,70 @@ ReportObject* XilinxImpUnitTests::TensorFloat(){
 	bool rslt = platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, src, srcDevice);
 	ReportObject* obj = new ReportObject(__FUNCTION__, rslt);
 	return obj;
+}
+
+ReportObject* XilinxImpUnitTests::TensorBankFloat(){
+    TensorF* tensorCpu = GenerateTensor(7,{5,5,2});
+    OclTensorF* tensorSrc_defaultBank = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
+    
+    bool rslt_before_changing_bank = platformSelector->CompareTensors(
+        PLATFORMS::CPU,
+        scheduler,
+        tensorCpu,
+        tensorSrc_defaultBank);
+    
+    tensorSrc_defaultBank->ChangeDDRBank(
+        platformSelector->openclPlatformClass->getProgram(),
+		platformSelector->openclPlatformClass->getContext(),
+        platformSelector->openclPlatformClass->getQueue(),
+		DATAMOVER_KERNEL_BANK_B_INDEX);
+    
+    bool rslt_after_changing_bank = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
+
+
+    tensorSrc_defaultBank->ChangeDDRBank(
+        platformSelector->openclPlatformClass->getProgram(),
+		platformSelector->openclPlatformClass->getContext(),
+        platformSelector->openclPlatformClass->getQueue(),
+		DATAMOVER_KERNEL_BANK_A_INDEX);
+
+    bool rslt_after_changing_bank_reverse = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
+
+    
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
+    return obj;
+}
+
+ReportObject* XilinxImpUnitTests::TensorBankInteger(){
+    TensorI* tensorCpu = GenerateTensorInteger(7,{5,5,2});
+    OclTensorI* tensorSrc_defaultBank = (OclTensorI*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
+
+    bool rslt_before_changing_bank = platformSelector->CompareTensorsInteger(
+        PLATFORMS::CPU,
+        scheduler,
+        tensorCpu,
+        tensorSrc_defaultBank);
+
+    tensorSrc_defaultBank->ChangeDDRBank(
+        platformSelector->openclPlatformClass->getProgram(),
+		platformSelector->openclPlatformClass->getContext(),
+        platformSelector->openclPlatformClass->getQueue(),
+		DATAMOVER_KERNEL_BANK_B_INDEX);
+
+    bool rslt_after_changing_bank = platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
+
+
+    tensorSrc_defaultBank->ChangeDDRBank(
+        platformSelector->openclPlatformClass->getProgram(),
+		platformSelector->openclPlatformClass->getContext(),
+        platformSelector->openclPlatformClass->getQueue(),
+		DATAMOVER_KERNEL_BANK_A_INDEX);
+
+    bool rslt_after_changing_bank_reverse = platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
+
+
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
+    return obj;
 }
 
 ReportObject* XilinxImpUnitTests::KernelConcat2(){
@@ -516,55 +597,13 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
-	//cnpy::NpyArray tmp = cnpy::npy_load("/home/saleh/01_workspace/00_Xilinx_WS/DeepPoint-V1-FPGA/data/topkTest2.npy");
-	//vector<unsigned int> __shape(tmp.shape.begin(),tmp.shape.end());
-	//TensorF* testNpy = new TensorF(__shape, tmp.data<float>());
+	cout<<"Please confirm that TOPK kernel is configured for K=3 and N=5, Press any key to continue..."<<endl; cin.get();
+	int kVal=3 , N=5 , B=2;
 
-	int kVal = 3;
-	int B=9;
-	int N=5;
     TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
-    //TensorF *tensorSrc = testNpy;
-
-
-
     TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
     TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, kVal);
-
     TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
-
-    /*
-    {
-    	unsigned int dim0,dim1,dim2;
-    	dim0 = tensorSrc->getShape()[0];
-    	dim1 = tensorSrc->getShape()[1];
-    	dim2 = tensorSrc->getShape()[2];
-
-    	for(int d0=0;d0<dim0;d0++){
-    		for(int d1=0;d1<dim1;d1++){
-    			cout<<"\n\nNew  Slice(Src-Dim2):\n";
-    			for(int d2=0;d2<dim2;d2++){
-    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + d2;
-    				cout << tensorSrc->_buff[indxS] << " - ";
-				}
-
-    			cout<<"\n\nCPU Result Slice(Rslt-kVal):\n";
-				for(int d2=0;d2<kVal;d2++){
-    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + 0;
-    				unsigned long indxD = d0*dim1*kVal + d1*kVal + d2;
-					cout << tensorSrc->_buff[indxS+ tensorCpu->_buff[indxD]] << " - ";
-				}
-				cout<<"\n\nFPGA Result Slice(Rslt-kVal):\n";
-				for(int d2=0;d2<kVal;d2++){
-    				unsigned long indxS = d0*dim1*dim2 + d1*dim2 + 0;
-    				unsigned long indxD = d0*dim1*kVal + d1*kVal + d2;
-					cout << tensorSrc->_buff[indxS+ tensorGpuTransfered->_buff[indxD]] << " - ";
-				}
-				cout<<endl;
-			}
-    	}
-    }
-	*/
 
     bool comparisonResult = true;
     if (tensorCpu->getShape() != tensorGpu->getShape()){
@@ -591,8 +630,6 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
         	}
         }
 
-
-
     }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
@@ -609,26 +646,25 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-
-	//PrintReport(TensorFloat());
-	//PrintReport(KernelConcat2());
-	//PrintReport(KernelSqrt());
-	//PrintReport(KernelReduceMax());
-	//PrintReport(KernelReduceSum4D());
-	//PrintReport(KernelReduceSum());
-	//PrintReport(KernelMatops());
-	//PrintReport(KernelMean());
-	//PrintReport(KernelVariance());
-	//PrintReport(KernelRelu());
-	//PrintReport(KernelSquare());
-	//PrintReport(KernelTile() );
-	//PrintReport(KernelMatmul());
+    PrintReport(TensorBankFloat());
+	PrintReport(TensorBankInteger());
+	PrintReport(TensorFloat());
+	PrintReport(KernelConcat2());
+	PrintReport(KernelSqrt());
+	PrintReport(KernelReduceMax());
+	PrintReport(KernelReduceSum4D());
+	PrintReport(KernelReduceSum());
+	PrintReport(KernelMatops());
+	PrintReport(KernelMean());
+	PrintReport(KernelVariance());
+	PrintReport(KernelRelu());
+	PrintReport(KernelSquare());
+	PrintReport(KernelTile() );
+	PrintReport(KernelMatmul());
 	PrintReport(KernelTranspose());
-    //PrintReport(KernelGather());
-	//PrintReport(KernelConv2Mlp());
-    //PrintReport(KernelTopK());
-	/*
-	*/
+    PrintReport(KernelGather());
+	PrintReport(KernelConv2Mlp());
+    PrintReport(KernelTopK());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

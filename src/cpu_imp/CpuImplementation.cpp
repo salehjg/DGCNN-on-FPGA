@@ -1586,8 +1586,8 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn
         for(unsigned long i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
             //cout<< "CurrentDiff "<<i<<" :"<<currentDiff<<endl;
-            cout<< "Gold "<<i<<" :"<<inputTn1->_buff[i]<<endl;
-            cout<< "UDT  "<<i<<" :"<<inputTn2->_buff[i]<<endl;
+            //cout<< "Gold "<<i<<" :"<<inputTn1->_buff[i]<<endl;
+            //cout<< "UDT  "<<i<<" :"<<inputTn2->_buff[i]<<endl;
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }
@@ -1600,7 +1600,7 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn
     return false;
 }
 
-bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorI *inputTn1, TensorI *inputTn2) {
+bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *inputTn1, TensorI *inputTn2) {
     float totalDiff=0;
     int currentDiff=0;
     if(inputTn1->getShape() == inputTn2->getShape()){
@@ -1610,7 +1610,7 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorI *inputTn
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }
-        cout<< "totalDiff: "<<totalDiff<<endl;
+        if(totalDiff!=0)cout<< "totalDiff: "<<totalDiff<<endl;
         if((totalDiff!=0) ) {
             return false;
         }
