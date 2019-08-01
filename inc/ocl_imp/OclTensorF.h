@@ -20,7 +20,8 @@ public:
     void Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank=-1);
     void InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, float *hostBuff, int bank=-1);
     int getDramBank();
-    int ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
+    void ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
+    TensorF* CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
     TensorF* TransferToHost(cl_command_queue queue);
     virtual ~OclTensorF();
     cl_mem ocl_buff;
