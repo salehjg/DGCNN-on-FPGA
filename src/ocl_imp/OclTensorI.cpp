@@ -169,7 +169,7 @@ int OclTensorI::LaunchDataMover(
 // The only planned access to this method should be through 'XilinxImplementation' class.
 // Because of this, XilinxImpUnitTests wont be able to access cl_program directely.
 // It should be accessed through platformSelector.openclPlatformClass(They are public)
-int OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
+void OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
     if(initialized){
         //The tensor has been initialized and DOES contain a clBuffer within a different bank.
         //We will run a kernel to read data from old bank and simelteneously write it to the new bank.
@@ -214,7 +214,35 @@ int OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_command
     }else{
         //The tensor has not yet been initialized, meaning that it does not contain clBuffer object yet to change its bank.
         dramBank = bank;
-        return 1;
+    }
+}
+
+//Creates a new tensor within bank index 'arg:bank' and copies the content there, then returns the new tensor.
+//The content and the bank of the current tensor will be remained untouched. 
+TensorI* OclTensorI::CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
+    if(initialized){
+        //Creating new blank tensor within the required bank 
+        OclTensorI* clonedTensor = new OclTensorI(context, shape, bank);
+
+        unsigned long lenWords = getLength();
+
+        //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
+        //Unsupported memory banks will be checked within 'LaunchDataMover' method.
+        LaunchDataMover(
+            program, 
+            queue, 
+            dramBank, 
+            bank, 
+            ocl_buff, 
+            clonedTensor->ocl_buff, 
+            lenWords);
+
+        return clonedTensor;
+        
+    }else{
+        //The tensor has not yet been initialized!
+        cout<<"Trying to clone an uninitialized tensor(OclTensorI)" << endl;
+        assert(false);
     }
 }
 

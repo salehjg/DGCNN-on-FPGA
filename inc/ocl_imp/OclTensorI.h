@@ -23,7 +23,8 @@ public:
     void Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank=-1);
     void InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, int *hostBuff, int bank=-1);
     int getDramBank();
-    int ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
+    void ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
+    TensorI* CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
     TensorI* TransferToHost(cl_command_queue queue);
     virtual ~OclTensorI();
     cl_mem ocl_buff;
