@@ -181,6 +181,8 @@ void OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_comman
         //The tensor has been initialized and DOES contain a clBuffer within a different bank.
         //We will run a kernel to read data from old bank and simelteneously write it to the new bank.
 
+    	if(bank == dramBank){cout<<"Trying to change to the same bank (OclTensorF)."<<endl; std::exit(3);}
+
         //Forcing memory bank requirements using xilinx external memory extension to opencl.
         cl_mem_ext_ptr_t memExt;
         memExt.flags = TranslateBankIndex(bank);
@@ -228,6 +230,8 @@ void OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_comman
 //The content and the bank of the current tensor will be remained untouched. 
 TensorF* OclTensorF::CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
     if(initialized){
+    	if(bank == dramBank){cout<<"Trying to clone to the same bank (OclTensorF)."<<endl; std::exit(3);}
+
         //Creating new blank tensor within the required bank 
         OclTensorF* clonedTensor = new OclTensorF(context, shape, bank);
 
