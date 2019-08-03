@@ -28,6 +28,7 @@ struct OclKernelObject{
     const char *kernelName_ndrange, *kernelName_task;
     cl_kernel kernel_ndrange,kernel_task;
     bool use_ndrange_kernel;
+    bool disabled;
 
     OclKernelObject(
     		string dir,
@@ -35,7 +36,8 @@ struct OclKernelObject{
 			string containerName,
 			string kernelName_ndrange,
 			string kernelName_task,
-			bool use_ndrange_kernel){
+			bool use_ndrange_kernel,
+			bool isDisabled=false){
         string *fPath = new string();
         fPath->append(dir);
         fPath->append(fname);
@@ -52,6 +54,8 @@ struct OclKernelObject{
         this->containerName = containerName;
 
         this->use_ndrange_kernel = use_ndrange_kernel;
+
+        this->disabled = isDisabled;
     }
 };
 

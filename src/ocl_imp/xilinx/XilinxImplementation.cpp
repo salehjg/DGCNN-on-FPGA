@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#define DISABLED_KERNEL	(true)
+
 XilinxImplementation::XilinxImplementation(int aa) {
     a = aa;
     //======================================================================================================================
@@ -49,7 +51,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"binary_container_1.xclbin",
 				"",
 				"task_concat",
-				false),
+				false,
+				DISABLED_KERNEL),
 		/* IDX 1 :*/
 		new OclKernelObject(
 				KERNEL_DIR,
@@ -81,7 +84,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"binary_container_1.xclbin",
 				"",
 				"task_reducesum",
-				false),
+				false,
+				DISABLED_KERNEL),
 		/* IDX 5 :*/
 		new OclKernelObject(
 				KERNEL_DIR,
@@ -105,7 +109,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"binary_container_1.xclbin",
 				"",
 				"task_square",
-				false),
+				false,
+				DISABLED_KERNEL),
 		/* IDX 8 :*/
 		new OclKernelObject(
 				KERNEL_DIR,
@@ -137,7 +142,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
 				"binary_container_1.xclbin",
 				"",
 				"task_gather",
-				false),
+				false,
+				DISABLED_KERNEL),
 
 		/* IDX 12 :*/
 		new OclKernelObject(
@@ -208,6 +214,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
     }
  
     for(OclKernelObject *kernelObject : oclKernels){
+    	if(kernelObject->disabled) continue;
         if(kernelObject->use_ndrange_kernel){
             //OCL_CHECK(err, kernelObject->kernel_ndrange = new cl::Kernel(program, kernelObject->kernelName_ndrange, &err));
             kernelObject->kernel_ndrange = clCreateKernel(program, kernelObject->kernelName_ndrange, &err);
