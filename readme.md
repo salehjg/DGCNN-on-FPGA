@@ -25,7 +25,7 @@ make compile_hw
 ```
 
 ## 3. Link FPGA Kernels
-Considering that step one is already done and current directory is `build`. This step generates requested `*.xclbin` file needed for the host program.
+Considering that steps one and two are already done and current directory is `build`. This step generates requested `*.xclbin` file needed for the host program.
 For HW-Emulation:
 ```
 make link_hwemu
@@ -35,11 +35,23 @@ For HW(system build for real FPGA):
 make link_hw
 ```
 
-## 4. Setting Kernel Clock Frequencies 
+## 4. Launch The Host Program
+Considering that steps one, two and three are already done, current directory is `build` and the default shell is `bash`. This command is the unified solution to launch the host program in `sw-emu`, `hw-emu` or `hw` modes.
+```
+sh LaunchDeepPointV1FPGA.sh
+```
+
+## Extra. Setting Kernel Clock Frequencies 
 Reffer to `CMakeLists.txt` script to change each kernel's clock frequency.
 
-## 5. Setting Kernel DDR Banks 
+## Extra. Setting Kernel DDR Banks 
 Reffer to `CMakeLists.txt` script to assign DDR bank to each kernel's bundle names.
+
+## Extra. Run Synthesis Only
+Considering that step one is already done and current directory is `build`. This command will only run hls synthesis on all of the kernels.
+```
+make synthesis
+```
 
 # Platforms
 Reffer to the table below.
