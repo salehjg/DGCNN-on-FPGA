@@ -2,7 +2,7 @@
 This repository contains the code base for Xilinx SDAccel FPGA implementation of official DGCNN model.
 
 # Build System
-As easy it is to use SDx GUI, it is recommended to use provided cmake scripts to run synthesis and build the binaries for both FPGA and the host.
+As easy as it is to use SDx GUI, it is recommended to use provided cmake scripts to run synthesis and build the binaries for both FPGA and the host.
 
 # How to...
 ## 1. Build Host
