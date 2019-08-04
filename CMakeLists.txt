@@ -1,0 +1,336 @@
+###############################################################################################################
+# Targets:
+#           synthesis       : Synthesizes all of the kernels
+#           ---------------------------------------------------------------------------------------------------
+#           compile_hw      : Compiles all of the kernels to generate *.xo files. (system build equivalent)
+#           link_hw         : Links all of the *.xo files to generate a xclbin file. (system link equivalent)
+#           ---------------------------------------------------------------------------------------------------
+#           compile_hwemu   : Compiles all of the kernels to generate *.xo files. (hw-emu build equivalent)
+#           link_hwemu      : Links all of the *.xo files to generate a xclbin file. (hw-emu link equivalent)
+###############################################################################################################
+
+
+cmake_minimum_required(VERSION 3.0)
+project(DeepPointV1FPGA)
+set(HostExecutableName DeepPointV1FPGA)
+
+
+#==========================================================================================================================================
+
+
+
+# Target options 
+set(HLSLIB_PART_NAME "xcku115-flvb2104-2-e" CACHE STRING "Part name for HLS.")
+set(DSA_NAME "xilinx_kcu1500_dynamic_5_0" CACHE STRING "DSA string for xocc.")
+set(CLOCK_UNCERTAINTY 1.08 CACHE STRING "Clock uncertainty for HLS.")
+set(MM_TMP_DIR /tmp CACHE STRING "Temporary directory for SDx build files")
+set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information")
+set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
+set(QUICK_BUILD OFF CACHE BOOL "Enable quick build option for xocc")
+set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
+    ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/hlslib/cmake)
+
+find_package(SDAccel REQUIRED)
+find_package(Threads REQUIRED)
+
+
+
+#==========================================================================================================================================
+
+
+
+include_directories(inc hlslib/include ${CMAKE_BINARY_DIR} ${SDAccel_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+add_definitions("-DHLSLIB_STREAM_TIMEOUT=16")
+if(((${SDAccel_MAJOR_VERSION} LESS 2018) AND (${SDAccel_MINOR_VERSION} LESS 3)) OR ${SDAccel_MAJOR_VERSION} LESS 2017)
+  add_definitions(-DHLSLIB_LEGACY_SDX=1)
+else()
+  add_definitions(-DHLSLIB_LEGACY_SDX=0)
+endif()
+
+
+#add_library(xilkernels ${XILINX_KERNELS_SRC})
+#target_link_libraries(xilkernels ${CMAKE_THREAD_LIBS_INIT})
+
+
+
+#==========================================================================================================================================
+
+
+SET(hw_link_command "")
+SET(hwemu_link_command "")
+
+SET(hw_link "")
+SET(hwemu_link "")
+
+
+set(SYNTHESIS_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -O3")
+
+
+
+#==========================================================================================================================================
+
+
+
+function(floatexpr expr output)
+    SET(FLOAT_EXPR_SRC "
+    #include <stdio.h>
+    int main(int argc, char *argv[]){printf(\"%f\", ${expr})\; return 0\;}
+    ")
+    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CMakeFloatExpr.c ${FLOAT_EXPR_SRC})
+
+    try_run(RESULT COMPRES ${CMAKE_CURRENT_BINARY_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}/CMakeFloatExpr.c
+            RUN_OUTPUT_VARIABLE __output)
+
+    set(${output} ${__output} PARENT_SCOPE)
+endfunction()
+
+
+
+#==========================================================================================================================================
+
+
+
+
+# Creates TCL scripts for the given kernel.
+function(synthesis_target 
+    KERNEL_FILE 
+    KERNEL_NAME 
+    KERNEL_CLOCK 
+    KERNEL_CLOCK_UNCERTAINTY 
+    ADDITIONAL_FLAGS)
+
+  set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
+  set(HLSLIB_SRC_SYNTHESIS "${KERNEL_FILE}")
+  set(HLSLIB_ENTRY_FUNCTION "${KERNEL_NAME}")
+  set(HLSLIB_TARGET_CLOCK "${KERNEL_CLOCK}")
+  set(HLSLIB_TARGET_CLOCK_UNCERTAINTY "${KERNEL_CLOCK_UNCERTAINTY}")
+  set(HLSLIB_SYNTHESIS_FLAGS ${SYNTHESIS_FLAGS})
+  configure_file(scripts/Synthesis.tcl.in Synthesize${KERNEL_NAME}.tcl)
+  #add_custom_target(synthesize_${KERNEL_NAME}
+  #  COMMAND ${SDAccel_VIVADO_HLS} -f Synthesize${KERNEL_NAME}.tcl) 
+
+endfunction()
+
+
+
+#==========================================================================================================================================
+
+
+
+# Generates and appends commands for compiling and linking the given kernel.
+function(sdaccel_target 
+    KERNEL_FILE
+    KERNEL_FNAME_WITHOUT_EXTENSION 
+    KERNEL_NAME 
+    KERNEL_CLOCK 
+    IS_PROFILED
+    IS_MULTI_DDR_BANK
+    MULTI_DDR_SP_TAG
+    ADDITIONAL_FLAGS)
+    set(HLSLIB_SYNTHESIS_FLAGS "${SYNTHESIS_FLAGS} ${ADDITIONAL_FLAGS}")
+    #string(REPLACE " " ";" XOCC_FLAGS "${XOCC_FLAGS}")
+    set(SYNTHESIS_FLAGS "") #should be ';' seperated
+    set(XOCC_COMMAND
+        -s
+        ${XOCC_FLAGS}
+        -I${CMAKE_SOURCE_DIR}/inc
+        -I${CMAKE_SOURCE_DIR}/hlslib/include
+        -I${CMAKE_BINARY_DIR}
+        --kernel ${KERNEL_NAME} 
+        --platform ${DSA_NAME}
+        --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${SYNTHESIS_FLAGS}"
+        --xp misc:solution_name="${KERNEL_NAME}_solution" 
+        --max_memory_ports all
+    )
+
+    if(ENABLE_PROFILING)
+        set(XOCC_COMMAND ${XOCC_COMMAND}
+            --profile_kernel "data:all:all:all"
+            --profile_kernel "stall:all:all"
+            --profile_kernel "exec:all:all")
+    endif()
+
+    if(QUICK_BUILD)
+        set(XOCC_COMMAND ${XOCC_COMMAND} -Oquick)
+    else()
+        set(XOCC_COMMAND ${XOCC_COMMAND} -O3)
+    endif()
+
+    #if(ENABLE_DEBUGGING)
+    #  set(XOCC_COMMAND ${XOCC_COMMAND} -g
+    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM0
+    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM1
+    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM2)
+    #endif()
+    if(KERNEL_CLOCK GREATER 0)
+        if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
+            floatexpr("1000.0 / ${KERNEL_CLOCK}" KERNEL_PERIOD)
+            message(WARNING "Bug workaround for SDx2017.4 : https://forums.xilinx.com/t5/SDAccel/How-to-set-the-target-frequency-for-the-kernel-in-SDACCL-2018-2/m-p/916088 https://forums.xilinx.com/t5/SDAccel/sdx2017-4-XOCC-kernel-compiler-cannot-set-kernel-frequency/td-p/894185")
+            message("Calculated period for ${KERNEL_NAME}: ${KERNEL_PERIOD} nanoseconds")
+            configure_file(scripts/KernelFreqSDx20174.tcl.in Frequency_${KERNEL_NAME}.tcl) 
+            set(XOCC_COMMAND ${XOCC_COMMAND}
+                --xp prop:solution.hls_pre_tcl=Frequency_${KERNEL_NAME}.tcl
+            )
+        else()
+            set(XOCC_COMMAND ${XOCC_COMMAND}
+                --kernel_frequency ${KERNEL_CLOCK}
+            )
+        endif()
+    endif()
+    string (REPLACE ";" " " XOCC_COMMAND "${XOCC_COMMAND}")
+
+    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
+    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
+    file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${hw_compile}\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${hwemu_compile}\n")
+
+    #---------------------------------------------------------------------------------------------------------
+    # Generating linker commands
+    set(hw_link "${hw_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo" PARENT_SCOPE) 
+    set(hwemu_link "${hwemu_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo" PARENT_SCOPE) 
+
+    set(hw_link_command "${hw_link_command} --nk ${KERNEL_NAME}:1" PARENT_SCOPE)
+    if(IS_PROFILED)
+        set(hw_link_command "${hw_link_command} --profile_kernel data:${KERNEL_NAME}:all:all" PARENT_SCOPE)
+    endif()
+    if(IS_MULTI_DDR_BANK)
+        set(hw_link_command "${hw_link_command} --sp ${KERNEL_NAME}_1.${MULTI_DDR_SP_TAG}" PARENT_SCOPE)
+    endif()
+
+    # Identical commands for hw-emu link process
+    set(hwemu_link_command "${hw_link_command}" PARENT_SCOPE)
+    #---------------------------------------------------------------------------------------------------------
+endfunction()
+
+
+
+
+#==========================================================================================================================================
+
+
+
+
+configure_file(scripts/SynthesisScriptLauncherBatch.sh.in SynthesisScriptLauncherBatch.sh)
+add_custom_target(synthesis COMMAND sh SynthesisScriptLauncherBatch.sh) 
+
+# Creating required tcl scripts to run hls synthesis
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"               "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"     "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float" "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"   "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"               "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"               "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"               "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"            "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"            "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"        "task_reducesum4d"          "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"               "task_relu"                 "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"               "task_sqrt"                 "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"             "task_square"               "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                 "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"               "task_topk"                 "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"            "300" "${CLOCK_UNCERTAINTY}" "")
+
+
+
+
+#==========================================================================================================================================
+
+
+
+
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "")
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "")
+
+ 
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"               "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 "250" FALSE FALSE "" "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            "250" FALSE FALSE "" "" )
+
+
+
+
+
+#==========================================================================================================================================
+
+
+
+# Generating bash script to compile the kernels to get *.xo files on a cmake custom target
+
+foreach(i ${hw_compile})
+    file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${i}\n")
+endforeach(i)
+
+
+foreach(i ${hwemu_compile})
+    file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${i}\n")
+endforeach(i)
+
+add_custom_target(compile_hw COMMAND sh Compile_Hw_Batch.sh) 
+add_custom_target(compile_hwemu COMMAND sh Compile_HwEmu_Batch.sh) 
+
+# Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
+file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw --platform ${DSA_NAME} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+)
+
+file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" 
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw_emu --platform ${DSA_NAME} ${hw_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
+)
+add_custom_target(link_hw COMMAND sh Link_Hw_Batch.sh) 
+add_custom_target(link_hwemu COMMAND sh Link_HwEmu_Batch.sh ) 
+
+
+
+
+#==========================================================================================================================================
+
+
+
+
+# Host code to launch kernel
+set(HOSTSIDE_SRC
+    src/ClassifierMultiPlatform.cpp
+    src/cnpy.cpp
+    src/MainExecutable.cpp
+    src/ModelArchTop05.cpp
+    src/PlatformImplementation.cpp
+    src/PlatformSelector.cpp
+    src/TensorF.cpp
+    src/TensorI.cpp
+    src/WeightsLoader.cpp
+    src/WorkScheduler.cpp
+    src/cpu_imp/CpuImplementation.cpp
+    src/ocl_imp/OclTensorF.cpp
+    src/ocl_imp/OclTensorI.cpp
+    src/ocl_imp/xilinx/xcl.cpp
+    src/ocl_imp/xilinx/XilinxImplementation.cpp
+    src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
+)
+
+add_executable(${HostExecutableName} ${HOSTSIDE_SRC})
+target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
+
+set(xcl_path_swemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw_emu.xclbin")
+set(xcl_path_hwemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw_emu.xclbin")
+set(xcl_path_hw "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw.xclbin")
+set(HostExecutablePath "${CMAKE_BINARY_DIR}/${HostExecutableName}")
+set(DataDirectory "${CMAKE_SOURCE_DIR}/data")
+configure_file(scripts/LaunchDeepPointV1FPGA.sh.in LaunchDeepPointV1FPGA.sh @ONLY)
