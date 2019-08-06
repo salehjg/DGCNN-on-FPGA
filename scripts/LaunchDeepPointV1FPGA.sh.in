@@ -22,6 +22,14 @@ platform=@DSA_NAME@
 hostsideexe=@HostExecutablePath@
 datadir=@DataDirectory@
 
+if [ -e $hostsideexe ]
+then
+    echo -e "${GREEN}Found The Host Executable: ${hostsideexe}${NC}"
+else
+    echo -e "${RED}ERROR${NC}: The required host program(${hostsideexe}) was not found. Please run $ make DeepPointV1FPGA ."
+    exit 1
+fi
+
 case $mode in
 1)      
 	#------------------------------------------Checking if xclbin exists:
