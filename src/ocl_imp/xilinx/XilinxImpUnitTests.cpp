@@ -711,17 +711,37 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
     return obj;
 }
 
-void XilinxImpUnitTests::RunAll(){
+ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
+	bool comparisonResult=true;
 
+
+	cout << "TEST(Rank_4_0)"<<endl;
+	{
+		//Ranks: 4,0
+		vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
+		TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,2});
+		for(MAT_OPS op : ops) {
+			TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, 1.5f,op);
+			TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1, 1.5f,op);
+			comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu,tensorGpu);
+		}
+	}
+
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
+void XilinxImpUnitTests::RunAll(){
+	
 	PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
     PrintReport(TensorCloneBankInteger());
 
-    PrintReport(KernelTile() );			// Bank_B Kernel
-    //PrintReport(KernelConv2Mlp());		// Bank_B Kernel
-
+    PrintReport(KernelTile() );			      // Bank_B Kernel
+    //PrintReport(KernelConv2Mlp());		  // Bank_B Kernel
+    
     PrintReport(KernelReduceMax());
     PrintReport(KernelMatops());
     PrintReport(KernelSqrt()); //Has Problems
@@ -736,7 +756,7 @@ void XilinxImpUnitTests::RunAll(){
     //PrintReport(KernelSquare());  	//Disabled Kernel
     //PrintReport(KernelGather()); 		//Disabled Kernel
     //PrintReport(KernelReduceSum()); 	//Disabled Kernel
-    //PrintReport(KernelConcat2());  	//Disabled Kernel
+    //PrintReport(KernelConcat2());  	//Disabled Kernel     //Bank_B Kernel
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

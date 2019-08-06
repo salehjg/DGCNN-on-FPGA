@@ -85,11 +85,6 @@ void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, st
     unsigned long len = getLengthBytes();
     platform = PLATFORMS::GPU_OCL;
 
-    if(len==0){
-        std::cout<<"--- OclTensorF: Warning, Zero Buffer Length.\n";
-        len = 16;
-    }
-
     dramBank = bank==-1 ? dramBank : bank;
 
     cl_mem_ext_ptr_t memExt;
