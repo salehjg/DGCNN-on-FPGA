@@ -452,7 +452,7 @@ void task_topk(
 
 #pragma HLS INTERFACE s_axilite port=return     bundle=control
 
-	BatchSelectionSortTopK_try04<float, int, 8>(inputTn, indicesSplitedTn, dim0, dim1, dim2, kValue);
+	BatchSelectionSortTopK_try04<float, int, 4>(inputTn, indicesSplitedTn, dim0, dim1, dim2, kValue);
 
 }
 }

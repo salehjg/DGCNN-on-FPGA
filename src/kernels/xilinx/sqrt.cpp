@@ -17,7 +17,7 @@ void task_sqrt(
 
     Loop1:for(unsigned long i=0;i<len;i++){
 #pragma HLS PIPELINE II=1
-    	outputTn[j] = sqrt(inputTn[j]);
+    	outputTn[i] = sqrt(inputTn[i]);
     }
 }
 }
