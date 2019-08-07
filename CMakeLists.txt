@@ -26,7 +26,7 @@ set(CLOCK_UNCERTAINTY 1.08 CACHE STRING "Clock uncertainty for HLS.")
 set(MM_TMP_DIR /tmp CACHE STRING "Temporary directory for SDx build files")
 set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information")
 set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
-set(QUICK_BUILD OFF CACHE BOOL "Enable quick build option for xocc")
+set(OPTIMIZATION_OPTION "s" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
@@ -156,12 +156,6 @@ function(sdaccel_target
             --profile_kernel "exec:all:all")
     endif()
 
-    if(QUICK_BUILD)
-        set(XOCC_COMMAND ${XOCC_COMMAND} -Oquick)
-    else()
-        set(XOCC_COMMAND ${XOCC_COMMAND} -O3)
-    endif()
-
     #if(ENABLE_DEBUGGING)
     #  set(XOCC_COMMAND ${XOCC_COMMAND} -g
     #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM0
@@ -198,7 +192,7 @@ function(sdaccel_target
     set(hwemu_link "${hwemu_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo" PARENT_SCOPE) 
     set(swemu_link "${swemu_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo" PARENT_SCOPE) 
 
-    set(hw_link_command "${hw_link_command} --nk ${KERNEL_NAME}:1" PARENT_SCOPE)
+    set(hw_link_command "${hw_link_command} --optimize${OPTIMIZATION_OPTION} --nk ${KERNEL_NAME}:1" PARENT_SCOPE)
     if(IS_PROFILED)
         set(hw_link_command "${hw_link_command} --profile_kernel data:${KERNEL_NAME}:all:all" PARENT_SCOPE)
     endif()
