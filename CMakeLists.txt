@@ -179,8 +179,8 @@ function(sdaccel_target
     endif()
     string (REPLACE ";" " " XOCC_COMMAND "${XOCC_COMMAND}")
 
-    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
-    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
+    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw ${XOCC_COMMAND} --report system ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
+    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw_emu ${XOCC_COMMAND} --report estimate ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
     set(swemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t sw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo") 
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${hw_compile}\n")
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${hwemu_compile}\n")
@@ -192,17 +192,22 @@ function(sdaccel_target
     set(hwemu_link "${hwemu_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo" PARENT_SCOPE) 
     set(swemu_link "${swemu_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo" PARENT_SCOPE) 
 
-    set(hw_link_command "${hw_link_command} --optimize${OPTIMIZATION_OPTION} --nk ${KERNEL_NAME}:1" PARENT_SCOPE)
+    set(hw_link_command "${hw_link_command} --nk ${KERNEL_NAME}:1")
     if(IS_PROFILED)
-        set(hw_link_command "${hw_link_command} --profile_kernel data:${KERNEL_NAME}:all:all" PARENT_SCOPE)
+        set(hw_link_command "${hw_link_command} --profile_kernel data:${KERNEL_NAME}:all:all")
     endif()
     if(IS_MULTI_DDR_BANK)
-        set(hw_link_command "${hw_link_command} ${MULTI_DDR_SP_TAG}" PARENT_SCOPE)
+        set(hw_link_command "${hw_link_command} ${MULTI_DDR_SP_TAG}")
     endif()
 
     # Identical commands for hw-emu link process
-    set(hwemu_link_command "${hw_link_command}" PARENT_SCOPE)
-    set(swemu_link_command "${hw_link_command}" PARENT_SCOPE)
+    set(hwemu_link_command "${hw_link_command}")
+    set(swemu_link_command "${hw_link_command}")
+
+    # Set link commands globally
+    set(hw_link_command         "${hw_link_command}"        PARENT_SCOPE)
+    set(hwemu_link_command      "${hwemu_link_command}"     PARENT_SCOPE)
+    set(swemu_link_command      "${swemu_link_command}"     PARENT_SCOPE)
     #---------------------------------------------------------------------------------------------------------
 endfunction()
 
@@ -275,7 +280,7 @@ SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.m_axi_gmem1:bank1")
 
 
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               "250" FALSE TRUE ${SP_TAG_CONCAT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     "200" FALSE TRUE ${SP_TAG_CONV2D} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     "150" FALSE TRUE ${SP_TAG_CONV2D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" "300" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   "300" FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               "250" FALSE TRUE ${SP_TAG_GATHER} "" )
@@ -320,15 +325,15 @@ add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh)
 
 # Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw --platform ${DSA_NAME} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw_emu --platform ${DSA_NAME} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_SwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t sw_emu --platform ${DSA_NAME} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t sw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
 )
 add_custom_target(link_hw COMMAND sh Link_Hw_Batch.sh) 
 add_custom_target(link_hwemu COMMAND sh Link_HwEmu_Batch.sh ) 
