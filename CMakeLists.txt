@@ -28,6 +28,8 @@ set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information")
 set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "s" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
+set(KERNEL_CLOCK "200" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
+set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty, (?) nanoseconds (?)")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
     ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/hlslib/cmake)
@@ -101,8 +103,6 @@ endfunction()
 function(synthesis_target 
     KERNEL_FILE 
     KERNEL_NAME 
-    KERNEL_CLOCK 
-    KERNEL_CLOCK_UNCERTAINTY 
     ADDITIONAL_FLAGS)
 
   set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
@@ -127,8 +127,7 @@ endfunction()
 function(sdaccel_target 
     KERNEL_FILE
     KERNEL_FNAME_WITHOUT_EXTENSION 
-    KERNEL_NAME 
-    KERNEL_CLOCK 
+    KERNEL_NAME  
     IS_PROFILED
     IS_MULTI_DDR_BANK
     MULTI_DDR_SP_TAG
@@ -164,12 +163,8 @@ function(sdaccel_target
     #endif()
     if(KERNEL_CLOCK GREATER 0)
         if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
-            floatexpr("1000.0 / ${KERNEL_CLOCK}" KERNEL_PERIOD)
-            message(WARNING "Bug workaround for SDx2017.4 : https://forums.xilinx.com/t5/SDAccel/How-to-set-the-target-frequency-for-the-kernel-in-SDACCL-2018-2/m-p/916088 https://forums.xilinx.com/t5/SDAccel/sdx2017-4-XOCC-kernel-compiler-cannot-set-kernel-frequency/td-p/894185")
-            message("Calculated period for ${KERNEL_NAME}: ${KERNEL_PERIOD} nanoseconds")
-            configure_file(scripts/KernelFreqSDx20174.tcl.in Frequency_${KERNEL_NAME}.tcl) 
             set(XOCC_COMMAND ${XOCC_COMMAND}
-                --xp prop:solution.hls_pre_tcl=Frequency_${KERNEL_NAME}.tcl
+                --xp prop:solution.hls_pre_tcl=KernelFreqSDx20174.tcl
             )
         else()
             set(XOCC_COMMAND ${XOCC_COMMAND}
@@ -243,7 +238,43 @@ synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"         
 
 
 
+
+
+
+
 #==========================================================================================================================================
+
+
+
+
+
+
+
+#Setting frequency override option.
+if(KERNEL_CLOCK GREATER 0)
+    if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
+        floatexpr("1000.0 / ${KERNEL_CLOCK}" KERNEL_PERIOD)
+        message(WARNING "Bug workaround for SDx2017.4 : https://forums.xilinx.com/t5/SDAccel/How-to-set-the-target-frequency-for-the-kernel-in-SDACCL-2018-2/m-p/916088 https://forums.xilinx.com/t5/SDAccel/sdx2017-4-XOCC-kernel-compiler-cannot-set-kernel-frequency/td-p/894185")
+        message("Calculated period for all of the kernels: ${KERNEL_PERIOD} nanoseconds")
+        configure_file(scripts/KernelFreqSDx20174.tcl.in KernelFreqSDx20174.tcl) 
+        set(hw_link_command "${hw_link_command} --xp prop:solution.hls_pre_tcl=${CMAKE_BINARY_DIR}/KernelFreqSDx20174.tcl")
+    else()
+    	message("Overriding default kernel clock frequency normally with kernel_frequency option...")
+    	set(hw_link_command "${hw_link_command} --kernel_frequency ${KERNEL_CLOCK}")
+    endif()
+endif()
+
+
+
+
+
+
+
+
+#==========================================================================================================================================
+
+
+
 
 
 
@@ -340,6 +371,11 @@ add_custom_target(link_hwemu COMMAND sh Link_HwEmu_Batch.sh )
 add_custom_target(link_swemu COMMAND sh Link_SwEmu_Batch.sh ) 
 
 
+file(WRITE "${CMAKE_BINARY_DIR}/Interactrive_Hw_Batch.sh" 
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin --interactive synth"
+)
+add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh) 
+
 
 
 #==========================================================================================================================================
@@ -376,3 +412,8 @@ set(xcl_path_hw "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw.xclbin")
 set(HostExecutablePath "${CMAKE_BINARY_DIR}/${HostExecutableName}")
 set(DataDirectory "${CMAKE_SOURCE_DIR}/data")
 configure_file(scripts/LaunchDeepPointV1FPGA.sh.in LaunchDeepPointV1FPGA.sh @ONLY)
+
+
+
+#-t hw --platform xilinx_kcu1500_dynamic_5_0 --save-temps -Os --report system -l --nk task_conv2_1x1_direct:1 --profile_kernel data:task_conv2_1x1_direct:all:all --nk task_matmul:1 --nk task_matops:1 --nk task_reducesum4d:1 --nk task_relu:1 --nk task_sqrt:1 --nk task_tile:1 --nk task_topk:1 --profile_kernel data:task_topk:all:all --nk task_transpose:1 --nk task_datamover_mod1_float:1 --nk task_datamover_mod1_int:1 --nk task_reducemax:1 --messageDb binary_container_1.mdb --xp misc:solution_name=_xocc_link_binary_container_1 --sp task_datamover_mod1_float_1.m_axi_gmem0:bank1 --sp task_datamover_mod1_float_1.m_axi_gmem1:bank2 --sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 --sp task_datamover_mod1_int_1.m_axi_gmemi1:bank2 --sp task_tile_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2 --remote_ip_cache /home/saleh/02_workspace/00_SDx2017.4/ip_cache -obinary_container_1.xclbin binary_container_1/task_conv2_1x1_direct.xo binary_container_1/task_matmul.xo binary_container_1/task_matops.xo binary_container_1/task_reducesum4d.xo binary_container_1/task_relu.xo binary_container_1/task_sqrt.xo binary_container_1/task_tile.xo binary_container_1/task_topk.xo binary_container_1/task_transpose.xo binary_container_1/task_datamover_mod1_float.xo binary_container_1/task_datamover_mod1_int.xo binary_container_1/task_reducemax.xo
+# --interactive synth
