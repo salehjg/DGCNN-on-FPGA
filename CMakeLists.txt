@@ -28,7 +28,7 @@ set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information")
 set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "s" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
-set(KERNEL_CLOCK "140" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
+set(KERNEL_CLOCK "110" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty, (?) nanoseconds (?)")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
@@ -290,10 +290,10 @@ SET(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 -
 SET(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2")
 SET(SP_TAG_TILE             "--sp task_tile_1.m_axi_gmem1:bank2")
 SET(SP_TAG_CONCAT           "--sp task_concat_1.m_axi_gmem1:bank2 --sp task_concat_1.m_axi_gmem2:bank2")
+SET(SP_TAG_GATHER           "--sp task_gather_1.m_axi_gmem1:bank2 --sp task_gather_1.m_axi_gmem2:bank2")
+SET(SP_TAG_MATMUL           "--sp task_matmul_1.m_axi_gmem1:bank2 --sp task_matmul_1.m_axi_gmem2:bank2")
+SET(SP_TAG_MATOPS           "--sp task_matops_1.m_axi_gmem1:bank2 --sp task_matops_1.m_axi_gmem2:bank2")
 
-SET(SP_TAG_GATHER           "--sp task_gather_1.m_axi_gmem1:bank1 --sp task_gather_1.m_axi_gmem2:bank1")
-SET(SP_TAG_MATMUL           "--sp task_matmul_1.m_axi_gmem1:bank1 --sp task_matmul_1.m_axi_gmem2:bank1")
-SET(SP_TAG_MATOPS           "--sp task_matops_1.m_axi_gmem1:bank1 --sp task_matops_1.m_axi_gmem2:bank1")
 SET(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.m_axi_gmem1:bank1 --sp task_reducemax_1.m_axi_gmem2:bank1")
 SET(SP_TAG_REDUCESUM        "--sp task_reducesum_1.m_axi_gmem1:bank1 --sp task_reducesum_1.m_axi_gmem2:bank1")
 SET(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.m_axi_gmem1:bank1 --sp task_reducesum4d_1.m_axi_gmem2:bank1")
@@ -310,7 +310,7 @@ SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.m_axi_gmem1:bank1")
 
 
 
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"              FALSE TRUE ${SP_TAG_CONCAT} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"              FALSE TRUE ${SP_TAG_CONCAT} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
@@ -320,10 +320,10 @@ sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"           FALSE TRUE ${SP_TAG_REDUCESUM} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
-##sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 FALSE TRUE ${SP_TAG_RELU} "" )
-##sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 FALSE TRUE ${SP_TAG_SQRT} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"              FALSE TRUE ${SP_TAG_SQUARE} "" )
-##sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 FALSE TRUE ${SP_TAG_RELU} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 FALSE TRUE ${SP_TAG_SQRT} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"              FALSE TRUE ${SP_TAG_SQUARE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
 
