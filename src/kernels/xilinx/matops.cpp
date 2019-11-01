@@ -1,5 +1,3 @@
-#include <hls_stream.h>
-
 //Latency is for 5x1024x20x64 and 5x1024x20x64
 extern "C" {
 void task_matops(

@@ -44,6 +44,8 @@ public:
 	ReportObject* KernelTopK();
 	ReportObject* KernelGather();
 
+	ReportObject* temporaryUnitTest1();
+
 	~XilinxImpUnitTests();
 	void RunAll();
 private:

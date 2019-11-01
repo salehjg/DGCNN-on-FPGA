@@ -12,7 +12,6 @@
 */
 #include <stdio.h>
 #include <string.h>
-#include <hls_math.h>
 
 #define CONFIG_SLICE_SIZE  		1024
 //#define CONFIG_SLICE_COUNT 		5
