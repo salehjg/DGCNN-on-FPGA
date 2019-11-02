@@ -4,9 +4,11 @@
 #           ---------------------------------------------------------------------------------------------------
 #           compile_hw      : Compiles all of the kernels to generate *.xo files. (system build equivalent)
 #           link_hw         : Links all of the *.xo files to generate a xclbin file. (system link equivalent)
+#           interactive_hw  : Experimental...
 #           ---------------------------------------------------------------------------------------------------
 #           compile_hwemu   : Compiles all of the kernels to generate *.xo files. (hw-emu build equivalent)
 #           link_hwemu      : Links all of the *.xo files to generate a xclbin file. (hw-emu link equivalent)
+#           ---------------------------------------------------------------------------------------------------
 ###############################################################################################################
 
 
@@ -21,7 +23,8 @@ set(HostExecutableName DeepPointV1FPGA)
 
 # Target options 
 set(HLSLIB_PART_NAME "xcku115-flvb2104-2-e" CACHE STRING "Part name for HLS.")
-set(DSA_NAME "xilinx_kcu1500_dynamic_5_0" CACHE STRING "DSA string for xocc.")
+# $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
+set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "DSA string for xocc.") 
 set(CLOCK_UNCERTAINTY 1.08 CACHE STRING "Clock uncertainty for HLS.")
 set(MM_TMP_DIR /tmp CACHE STRING "Temporary directory for SDx build files")
 set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information")
@@ -102,8 +105,7 @@ endfunction()
 # Creates TCL scripts for the given kernel.
 function(synthesis_target 
     KERNEL_FILE 
-    KERNEL_NAME 
-    ADDITIONAL_FLAGS)
+    KERNEL_NAME)
 
   set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
   set(HLSLIB_SRC_SYNTHESIS "${KERNEL_FILE}")
@@ -112,8 +114,6 @@ function(synthesis_target
   set(HLSLIB_TARGET_CLOCK_UNCERTAINTY "${KERNEL_CLOCK_UNCERTAINTY}")
   set(HLSLIB_SYNTHESIS_FLAGS ${SYNTHESIS_FLAGS})
   configure_file(scripts/Synthesis.tcl.in Synthesize${KERNEL_NAME}.tcl)
-  #add_custom_target(synthesize_${KERNEL_NAME}
-  #  COMMAND ${SDAccel_VIVADO_HLS} -f Synthesize${KERNEL_NAME}.tcl) 
 
 endfunction()
 
@@ -218,22 +218,22 @@ configure_file(scripts/SynthesisScriptLauncherBatch.sh.in SynthesisScriptLaunche
 add_custom_target(synthesis COMMAND sh SynthesisScriptLauncherBatch.sh) 
 
 # Creating required tcl scripts to run hls synthesis
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"               "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"     "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float" "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"   "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"               "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"               "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"               "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"            "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"            "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"        "task_reducesum4d"          "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"               "task_relu"                 "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"               "task_sqrt"                 "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"             "task_square"               "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                 "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"               "task_topk"                 "300" "${CLOCK_UNCERTAINTY}" "")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"            "300" "${CLOCK_UNCERTAINTY}" "")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"              )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"  )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"              )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"           )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"           )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"        "task_reducesum4d"         )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"               "task_relu"                )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"               "task_sqrt"                )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"             "task_square"              )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"               "task_topk"                )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"           )
 
 
 
@@ -259,7 +259,7 @@ if(KERNEL_CLOCK GREATER 0)
         configure_file(scripts/KernelFreqSDx20174.tcl.in KernelFreqSDx20174.tcl) 
         set(hw_link_command "${hw_link_command} --xp prop:solution.hls_pre_tcl=${CMAKE_BINARY_DIR}/KernelFreqSDx20174.tcl")
     else()
-    	message("Overriding default kernel clock frequency normally with kernel_frequency option...")
+    	message("Overriding default kernel clock frequency normally with the kernel_frequency option...")
     	set(hw_link_command "${hw_link_command} --kernel_frequency ${KERNEL_CLOCK}")
     endif()
 endif()
@@ -310,19 +310,19 @@ SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.m_axi_gmem1:bank1")
 
 
 
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"              FALSE TRUE ${SP_TAG_CONCAT} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"              FALSE TRUE ${SP_TAG_GATHER} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"           FALSE TRUE ${SP_TAG_REDUCESUM} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 FALSE TRUE ${SP_TAG_RELU} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 FALSE TRUE ${SP_TAG_SQRT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"              FALSE TRUE ${SP_TAG_SQUARE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"               FALSE TRUE ${SP_TAG_SQUARE} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
