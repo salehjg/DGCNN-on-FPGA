@@ -21,18 +21,14 @@ set(HostExecutableName DeepPointV1FPGA)
 
 
 
-# Target options 
-set(HLSLIB_PART_NAME "xcku115-flvb2104-2-e" CACHE STRING "Part name for HLS.")
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
-set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "DSA string for xocc.") 
-set(CLOCK_UNCERTAINTY 1.08 CACHE STRING "Clock uncertainty for HLS.")
-set(MM_TMP_DIR /tmp CACHE STRING "Temporary directory for SDx build files")
+set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
 set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information")
 set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
-set(OPTIMIZATION_OPTION "s" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
+set(OPTIMIZATION_OPTION "3" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
 set(KERNEL_CLOCK "110" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
-set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty, (?) nanoseconds (?)")
+set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
     ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/hlslib/cmake)
@@ -56,23 +52,17 @@ else()
 endif()
 
 
-#add_library(xilkernels ${XILINX_KERNELS_SRC})
-#target_link_libraries(xilkernels ${CMAKE_THREAD_LIBS_INIT})
-
-
 
 #==========================================================================================================================================
+
 
 
 SET(hw_link_command "")
 SET(hwemu_link_command "")
 SET(swemu_link_command "")
-
 SET(hw_link "")
 SET(hwemu_link "")
 SET(swemu_link "")
-
-
 set(SYNTHESIS_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -O3")
 
 
@@ -101,19 +91,18 @@ endfunction()
 
 
 
-
 # Creates TCL scripts for the given kernel.
 function(synthesis_target 
     KERNEL_FILE 
     KERNEL_NAME)
 
-  set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
-  set(HLSLIB_SRC_SYNTHESIS "${KERNEL_FILE}")
-  set(HLSLIB_ENTRY_FUNCTION "${KERNEL_NAME}")
-  set(HLSLIB_TARGET_CLOCK "${KERNEL_CLOCK}")
-  set(HLSLIB_TARGET_CLOCK_UNCERTAINTY "${KERNEL_CLOCK_UNCERTAINTY}")
-  set(HLSLIB_SYNTHESIS_FLAGS ${SYNTHESIS_FLAGS})
-  configure_file(scripts/Synthesis.tcl.in Synthesize${KERNEL_NAME}.tcl)
+    set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
+    set(HLSLIB_SRC_SYNTHESIS "${KERNEL_FILE}")
+    set(HLSLIB_ENTRY_FUNCTION "${KERNEL_NAME}")
+    set(HLSLIB_TARGET_CLOCK "${KERNEL_CLOCK}")
+    set(HLSLIB_TARGET_CLOCK_UNCERTAINTY "${KERNEL_CLOCK_UNCERTAINTY}")
+    set(HLSLIB_SYNTHESIS_FLAGS ${SYNTHESIS_FLAGS})
+    configure_file(scripts/Synthesis.tcl.in Synthesize${KERNEL_NAME}.tcl)
 
 endfunction()
 
@@ -174,8 +163,8 @@ function(sdaccel_target
     endif()
     string (REPLACE ";" " " XOCC_COMMAND "${XOCC_COMMAND}")
 
-    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw ${XOCC_COMMAND} --report system ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
-    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw_emu ${XOCC_COMMAND} --report estimate ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
+    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw ${XOCC_COMMAND} -R2 ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
+    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw_emu ${XOCC_COMMAND} -Restimate ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
     set(swemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t sw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo") 
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${hw_compile}\n")
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${hwemu_compile}\n")
@@ -268,42 +257,59 @@ endif()
 
 
 
-
-
-
-#==========================================================================================================================================
-
-
-
-
-
-
-
 file(WRITE "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "")
 file(WRITE "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "")
 file(WRITE "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "")
 
 
 
-SET(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.m_axi_gmem0:bank1 --sp task_datamover_mod1_float_1.m_axi_gmem1:bank2")
-SET(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 --sp task_datamover_mod1_int_1.m_axi_gmemi1:bank2")
-SET(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2")
-SET(SP_TAG_TILE             "--sp task_tile_1.m_axi_gmem1:bank2")
-SET(SP_TAG_CONCAT           "--sp task_concat_1.m_axi_gmem1:bank2 --sp task_concat_1.m_axi_gmem2:bank2")
-SET(SP_TAG_GATHER           "--sp task_gather_1.m_axi_gmem1:bank2 --sp task_gather_1.m_axi_gmem2:bank2")
-SET(SP_TAG_MATMUL           "--sp task_matmul_1.m_axi_gmem1:bank2 --sp task_matmul_1.m_axi_gmem2:bank2")
-SET(SP_TAG_MATOPS           "--sp task_matops_1.m_axi_gmem1:bank2 --sp task_matops_1.m_axi_gmem2:bank2")
-
-SET(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.m_axi_gmem1:bank1 --sp task_reducemax_1.m_axi_gmem2:bank1")
-SET(SP_TAG_REDUCESUM        "--sp task_reducesum_1.m_axi_gmem1:bank1 --sp task_reducesum_1.m_axi_gmem2:bank1")
-SET(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.m_axi_gmem1:bank1 --sp task_reducesum4d_1.m_axi_gmem2:bank1")
-SET(SP_TAG_RELU             "--sp task_relu_1.m_axi_gmem1:bank1")
-SET(SP_TAG_SQRT             "--sp task_sqrt_1.m_axi_gmem1:bank1")
-SET(SP_TAG_SQUARE           "--sp task_square_1.m_axi_gmem1:bank1")
-SET(SP_TAG_TOPK             "--sp task_topk_1.m_axi_gmem1:bank1 --sp task_topk_1.m_axi_gmem2:bank1")
-SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.m_axi_gmem1:bank1")
 
 
+#==========================================================================================================================================
+
+if(
+    ((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4)) OR
+    ((${SDAccel_MAJOR_VERSION} EQUAL 2018) AND (${SDAccel_MINOR_VERSION} EQUAL 2)) 
+)
+    # V2018.2 and before: old sp tag style
+    message(FATAL_ERROR "OLD --SP STYLE IS NO LONGER SUPPORTED")
+    #SET(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.m_axi_gmem0:bank1 --sp task_datamover_mod1_float_1.m_axi_gmem1:bank2")
+    #SET(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 --sp task_datamover_mod1_int_1.m_axi_gmemi1:bank2")
+    #SET(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2")
+    #SET(SP_TAG_TILE             "--sp task_tile_1.m_axi_gmem1:bank2")
+    #SET(SP_TAG_CONCAT           "--sp task_concat_1.m_axi_gmem1:bank2 --sp task_concat_1.m_axi_gmem2:bank2")
+    #SET(SP_TAG_GATHER           "--sp task_gather_1.m_axi_gmem1:bank2 --sp task_gather_1.m_axi_gmem2:bank2")
+    #SET(SP_TAG_MATMUL           "--sp task_matmul_1.m_axi_gmem1:bank2 --sp task_matmul_1.m_axi_gmem2:bank2")
+    #SET(SP_TAG_MATOPS           "--sp task_matops_1.m_axi_gmem1:bank2 --sp task_matops_1.m_axi_gmem2:bank2")
+    #SET(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.m_axi_gmem1:bank1 --sp task_reducemax_1.m_axi_gmem2:bank1")
+    #SET(SP_TAG_REDUCESUM        "--sp task_reducesum_1.m_axi_gmem1:bank1 --sp task_reducesum_1.m_axi_gmem2:bank1")
+    #SET(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.m_axi_gmem1:bank1 --sp task_reducesum4d_1.m_axi_gmem2:bank1")
+    #SET(SP_TAG_RELU             "--sp task_relu_1.m_axi_gmem1:bank1")
+    #SET(SP_TAG_SQRT             "--sp task_sqrt_1.m_axi_gmem1:bank1")
+    #SET(SP_TAG_SQUARE           "--sp task_square_1.m_axi_gmem1:bank1")
+    #SET(SP_TAG_TOPK             "--sp task_topk_1.m_axi_gmem1:bank1 --sp task_topk_1.m_axi_gmem2:bank1")
+    #SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.m_axi_gmem1:bank1")
+else()
+    # V2018.3 and on: new sp tag style
+    SET(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.srcBuff:DDR[1] --sp task_datamover_mod1_float_1.dstBuff:DDR[2]")
+    SET(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.srcBuff:DDR[1] --sp task_datamover_mod1_int_1.dstBuff:DDR[2]")
+
+    SET(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.inputTn:DDR[2] --sp task_conv2_1x1_direct_1.weightTn:DDR[2] --sp task_conv2_1x1_direct_1.biasTn:DDR[2] --sp task_conv2_1x1_direct_1.outputTn:DDR[2]")
+    SET(SP_TAG_TILE             "--sp task_tile_1.inputTn:DDR[2] --sp task_tile_1.outputTn:DDR[2]")
+    SET(SP_TAG_CONCAT           "--sp task_concat_1.inputTn1:DDR[2] --sp task_concat_1.inputTn2:DDR[2] --sp task_concat_1.outputTn:DDR[2]")
+    SET(SP_TAG_GATHER           "--sp task_gather_1.inputTn:DDR[2] --sp task_gather_1.indicesTn:DDR[2] --sp task_gather_1.outputTn:DDR[2]")
+    SET(SP_TAG_MATMUL           "--sp task_matmul_1.inputTn1:DDR[2] --sp task_matmul_1.inputTn2:DDR[2] --sp task_matmul_1.outputTn:DDR[2]")
+    SET(SP_TAG_MATOPS           "--sp task_matops_1.inputTn1:DDR[2] --sp task_matops_1.inputTn2:DDR[2] --sp task_matops_1.outputTn:DDR[2]")
+
+    SET(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.inputTn:DDR[1] --sp task_reducemax_1.outputTn:DDR[1]")
+    SET(SP_TAG_REDUCESUM        "--sp task_reducesum_1.inputTn:DDR[1] --sp task_reducesum_1.outputTn:DDR[1]")
+    SET(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.inputTn:DDR[1] --sp task_reducesum4d_1.outputTn:DDR[1]")
+    SET(SP_TAG_RELU             "--sp task_relu_1.inputTn:DDR[1] --sp task_relu_1.outputTn:DDR[1]")
+    SET(SP_TAG_SQRT             "--sp task_sqrt_1.inputTn:DDR[1] --sp task_sqrt_1.outputTn:DDR[1]")
+    SET(SP_TAG_SQUARE           "--sp task_square_1.inputTn:DDR[1] --sp task_square_1.outputTn:DDR[1]")
+    SET(SP_TAG_TOPK             "--sp task_topk_1.inputTn:DDR[1] --sp task_topk_1.indicesSplitedTn:DDR[1]")
+    SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.inputTn:DDR[1] --sp task_transpose_1.outputTn:DDR[1]")
+endif()
 
 
 
