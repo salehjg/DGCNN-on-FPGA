@@ -23,11 +23,11 @@ set(HostExecutableName DeepPointV1FPGA)
 
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
-set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information")
+set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
 set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
-set(OPTIMIZATION_OPTION "s" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
+set(OPTIMIZATION_OPTION "2" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
-set(KERNEL_CLOCK "-1" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
+set(KERNEL_CLOCK "110" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
