@@ -27,7 +27,7 @@ set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
 set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
-set(KERNEL_CLOCK "110" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
+set(KERNEL_CLOCK "-1" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
