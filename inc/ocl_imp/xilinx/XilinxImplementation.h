@@ -31,13 +31,13 @@ struct OclKernelObject{
     bool disabled;
 
     OclKernelObject(
-    		string dir,
-			string fname,
-			string containerName,
-			string kernelName_ndrange,
-			string kernelName_task,
-			bool use_ndrange_kernel,
-			bool isDisabled=false){
+            string dir,
+            string fname,
+            string containerName,
+            string kernelName_ndrange,
+            string kernelName_task,
+            bool use_ndrange_kernel,
+            bool isDisabled=false){
         string *fPath = new string();
         fPath->append(dir);
         fPath->append(fname);
@@ -61,7 +61,7 @@ struct OclKernelObject{
 
 class XilinxImplementation: public PlatformImplementation {
 public:
-	XilinxImplementation(int aa); ///TODO: Constructor should handle platform initialization procedure!
+    XilinxImplementation(int aa); ///TODO: Constructor should handle platform initialization procedure!
 
     TensorF* Transpose(WorkScheduler scheduler, TensorF *batchedMat);
     TensorF* MatMul(WorkScheduler scheduler, TensorF* batchedMat1, TensorF* batchedMat2);
@@ -134,11 +134,11 @@ private:
                                             bool over_axis1,
                                             bool over_axis2,
                                             bool over_axis3,
-    										int pow_y);
+                                            int pow_y);
 
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
 
-    std::string	device_name;
+    std::string device_name;
     cl_platform_id cpPlatform;        // OpenCL platform
     cl_device_id device_id;           // device ID
     cl_context context;               // context

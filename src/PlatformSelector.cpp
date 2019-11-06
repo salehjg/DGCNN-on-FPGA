@@ -48,28 +48,28 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
     if(!loadWeights) cout<<"/!\\ Weight are not loaded into device memory."<<endl;
 #ifdef USE_OCL
     if(loadWeights){
-    	std::string wDir(globalArgDataPath); wDir.append("/weights/");
-    	std::string wFileList(globalArgDataPath); wFileList.append("/weights/filelist.txt");
-    	cout<< "Weights Dir: " << wDir << endl;
-    	cout<< "Weights File List Path: " << wFileList << endl;
-		weightsLoader->LoadFromDisk(wDir.c_str() ,
-									wFileList.c_str() ,
-									openclPlatformClass->getContext(),
-									openclPlatformClass->getQueue());
+        std::string wDir(globalArgDataPath); wDir.append("/weights/");
+        std::string wFileList(globalArgDataPath); wFileList.append("/weights/filelist.txt");
+        cout<< "Weights Dir: " << wDir << endl;
+        cout<< "Weights File List Path: " << wFileList << endl;
+        weightsLoader->LoadFromDisk(wDir.c_str() ,
+                                    wFileList.c_str() ,
+                                    openclPlatformClass->getContext(),
+                                    openclPlatformClass->getQueue());
     }
 #else
     if(loadWeights){
-		weightsLoader->LoadFromDisk(REPO_DIR "/data/weights/",
-									REPO_DIR "/data/weights/filelist.txt" );
+        weightsLoader->LoadFromDisk(REPO_DIR "/data/weights/",
+                                    REPO_DIR "/data/weights/filelist.txt" );
     }
 #endif
 }
 
 PlatformSelector::~PlatformSelector(){
-	cout<<"~PlatformSelector"<<endl;
-	delete(weightsLoader);
-	delete(cpuPlatformClass);
-	delete(openclPlatformClass);
+    cout<<"~PlatformSelector"<<endl;
+    delete(weightsLoader);
+    delete(cpuPlatformClass);
+    delete(openclPlatformClass);
 }
 
 TensorF* PlatformSelector::CrossThePlatform(TensorF *srcTn, PLATFORMS platform) {
@@ -702,8 +702,8 @@ bool PlatformSelector::CompareTensors(PLATFORMS platform, WorkScheduler schedule
 }
 
 bool PlatformSelector::CompareTensorsInteger(PLATFORMS platform, WorkScheduler scheduler, TensorI *inputTn1, TensorI *inputTn2) {
-	TensorI* __inputTn1 = CrossThePlatform(inputTn1, platform);
-	TensorI* __inputTn2 = CrossThePlatform(inputTn2, platform);
+    TensorI* __inputTn1 = CrossThePlatform(inputTn1, platform);
+    TensorI* __inputTn2 = CrossThePlatform(inputTn2, platform);
     switch(platform){
         case PLATFORMS::CPU :{
             return cpuPlatformClass->CompareTensorsInteger(scheduler, __inputTn1,__inputTn2);

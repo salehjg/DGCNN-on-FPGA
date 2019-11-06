@@ -9,51 +9,51 @@
 using namespace std;
 
 struct ReportObject{
-	std::string unitTestName;
-	bool passed;
+    std::string unitTestName;
+    bool passed;
 
-	ReportObject(string name, bool isPassed){
-		unitTestName = name;
-		passed = isPassed;
-	}
+    ReportObject(string name, bool isPassed){
+        unitTestName = name;
+        passed = isPassed;
+    }
 };
 
 class XilinxImpUnitTests{
 public:
-	XilinxImpUnitTests();
+    XilinxImpUnitTests();
 
-	ReportObject* TensorFloat();
-	ReportObject* TensorBankFloat();
-	ReportObject* TensorBankInteger();
-	ReportObject* TensorCloneBankFloat();
-	ReportObject* TensorCloneBankInteger();
-	ReportObject* KernelConcat2();
-	ReportObject* KernelSqrt();
-	ReportObject* KernelReduceMax();
-	ReportObject* KernelReduceSum4D();
-	ReportObject* KernelReduceSum();
-	ReportObject* KernelTile();
-	ReportObject* KernelTranspose();
-	ReportObject* KernelRelu();
-	ReportObject* KernelSquare();
-	ReportObject* KernelMatops();
-	ReportObject* KernelMean();
-	ReportObject* KernelVariance();
-	ReportObject* KernelMatmul();
-	ReportObject* KernelConv2Mlp();
-	ReportObject* KernelTopK();
-	ReportObject* KernelGather();
+    ReportObject* TensorFloat();
+    ReportObject* TensorBankFloat();
+    ReportObject* TensorBankInteger();
+    ReportObject* TensorCloneBankFloat();
+    ReportObject* TensorCloneBankInteger();
+    ReportObject* KernelConcat2();
+    ReportObject* KernelSqrt();
+    ReportObject* KernelReduceMax();
+    ReportObject* KernelReduceSum4D();
+    ReportObject* KernelReduceSum();
+    ReportObject* KernelTile();
+    ReportObject* KernelTranspose();
+    ReportObject* KernelRelu();
+    ReportObject* KernelSquare();
+    ReportObject* KernelMatops();
+    ReportObject* KernelMean();
+    ReportObject* KernelVariance();
+    ReportObject* KernelMatmul();
+    ReportObject* KernelConv2Mlp();
+    ReportObject* KernelTopK();
+    ReportObject* KernelGather();
 
-	ReportObject* temporaryUnitTest1();
+    ReportObject* temporaryUnitTest1();
 
-	~XilinxImpUnitTests();
-	void RunAll();
+    ~XilinxImpUnitTests();
+    void RunAll();
 private:
-	TensorF* GenerateTensor(int pattern, vector<unsigned int> shape);
-	TensorI* GenerateTensorInteger(int pattern, vector<unsigned int> shape);
-	float float_rand(float min, float max);
-	TensorI* GenerateTensor(int intMin, int intMax, vector<unsigned int> shape);
-	void PrintReport(ReportObject *reportObj);
+    TensorF* GenerateTensor(int pattern, vector<unsigned int> shape);
+    TensorI* GenerateTensorInteger(int pattern, vector<unsigned int> shape);
+    float float_rand(float min, float max);
+    TensorI* GenerateTensor(int intMin, int intMax, vector<unsigned int> shape);
+    void PrintReport(ReportObject *reportObj);
 
 
     PlatformSelector* platformSelector;

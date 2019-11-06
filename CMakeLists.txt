@@ -341,21 +341,6 @@ sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           
 
 
 # Generating bash script to compile the kernels to get *.xo files on a cmake custom target
-
-#foreach(i ${hw_compile})
-#    file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${i}\n")
-#endforeach(i)
-
-
-#foreach(i ${hwemu_compile})
-#    file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${i}\n")
-#endforeach(i)
-
-
-#foreach(i ${swemu_compile})
-#    file(APPEND "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "${i}\n")
-#endforeach(i)
-
 add_custom_target(compile_hw COMMAND sh Compile_Hw_Batch.sh) 
 add_custom_target(compile_hwemu COMMAND sh Compile_HwEmu_Batch.sh) 
 add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh) 

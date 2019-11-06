@@ -50,10 +50,10 @@ ALL TIMES.
 #include <CL/opencl.h>
 
 typedef struct {
-	cl_platform_id platform_id;
-	cl_device_id device_id;
-	cl_context context;
-	cl_command_queue command_queue;
+    cl_platform_id platform_id;
+    cl_device_id device_id;
+    cl_context context;
+    cl_command_queue command_queue;
 } xcl_world;
 
 /* xcl_world_single

@@ -19,9 +19,9 @@
 ** ReduceSum4D: , Shape1=5x1024x1x1024x, ,  Combination=1-1-1-0-,
  */
 #define CONFIG_SLICE_SIZE       1024
-#define CONFIG_MAX_POW_Y		3
+#define CONFIG_MAX_POW_Y        3
 
-#define MAX_POW_Y_MINUS_ONE		(CONFIG_MAX_POW_Y-1)
+#define MAX_POW_Y_MINUS_ONE     (CONFIG_MAX_POW_Y-1)
 
 extern "C" {
 
@@ -50,10 +50,10 @@ void task_reducesum4d(
 #pragma HLS INTERFACE s_axilite port=dim2       bundle=control
 #pragma HLS INTERFACE s_axilite port=dim3       bundle=control
 
-#pragma HLS INTERFACE s_axilite port=overaxis0	bundle=control
-#pragma HLS INTERFACE s_axilite port=overaxis1	bundle=control
-#pragma HLS INTERFACE s_axilite port=overaxis2	bundle=control
-#pragma HLS INTERFACE s_axilite port=overaxis3	bundle=control
+#pragma HLS INTERFACE s_axilite port=overaxis0  bundle=control
+#pragma HLS INTERFACE s_axilite port=overaxis1  bundle=control
+#pragma HLS INTERFACE s_axilite port=overaxis2  bundle=control
+#pragma HLS INTERFACE s_axilite port=overaxis3  bundle=control
 
 #pragma HLS INTERFACE s_axilite port=return     bundle=control
 
@@ -100,17 +100,17 @@ void task_reducesum4d(
 //#pragma HLS UNROLL
 #pragma HLS PIPELINE
                     if(i<dim3){
-                    	//std::cout<<"**indxI="<<i << " ,buff_tmp= "<< buff_tmp[i] << " ,buff_rslt= "<< buff_rslt[i] <<std::endl;
-                    	float pow_rslt = buff_tmp[i];
-						LoopPow:for(int ipwr=0;ipwr<(MAX_POW_Y_MINUS_ONE);ipwr++){
+                        //std::cout<<"**indxI="<<i << " ,buff_tmp= "<< buff_tmp[i] << " ,buff_rslt= "<< buff_rslt[i] <<std::endl;
+                        float pow_rslt = buff_tmp[i];
+                        LoopPow:for(int ipwr=0;ipwr<(MAX_POW_Y_MINUS_ONE);ipwr++){
 #pragma HLS UNROLL
-							if(ipwr<pow_y_minus_one){
-								pow_rslt = pow_rslt * pow_rslt;
-							}
-						}
-						//std::cout<<"**indxI="<<i << " ,pow_rslt= "<< pow_rslt <<std::endl;
+                            if(ipwr<pow_y_minus_one){
+                                pow_rslt = pow_rslt * pow_rslt;
+                            }
+                        }
+                        //std::cout<<"**indxI="<<i << " ,pow_rslt= "<< pow_rslt <<std::endl;
                         buff_rslt[i] = buff_rslt[i] + pow_rslt;
-                    	//std::cout<<"**indxI="<<i << " ,Sum= "<< buff_rslt[i] <<std::endl;
+                        //std::cout<<"**indxI="<<i << " ,Sum= "<< buff_rslt[i] <<std::endl;
 
                     }
                 }

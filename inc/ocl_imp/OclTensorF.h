@@ -8,8 +8,8 @@
 #include <ocl_imp/xilinx/xcl.h>
 #include "../../inc/TensorF.h"
 
-#define DATAMOVER_KERNEL_BANK_A_INDEX	1
-#define DATAMOVER_KERNEL_BANK_B_INDEX	2
+#define DATAMOVER_KERNEL_BANK_A_INDEX   1
+#define DATAMOVER_KERNEL_BANK_B_INDEX   2
 
 class OclTensorF: public TensorF {
 public:
@@ -26,12 +26,12 @@ public:
     virtual ~OclTensorF();
     cl_mem ocl_buff;
 private:
-	int LaunchDataMover(cl_program program, cl_command_queue queue, int srcBank, int dstBank, cl_mem srcBuff, cl_mem dstBuff, unsigned long len);
-	int TranslateBankIndex(int bankIndex);
+    int LaunchDataMover(cl_program program, cl_command_queue queue, int srcBank, int dstBank, cl_mem srcBuff, cl_mem dstBuff, unsigned long len);
+    int TranslateBankIndex(int bankIndex);
 
-	//If bank arg were not specified, tensor would be allocated
-	//on default bank which is default value of 'dramBank'
-	int dramBank = DATAMOVER_KERNEL_BANK_A_INDEX;
+    //If bank arg were not specified, tensor would be allocated
+    //on default bank which is default value of 'dramBank'
+    int dramBank = DATAMOVER_KERNEL_BANK_A_INDEX;
 };
 
 
