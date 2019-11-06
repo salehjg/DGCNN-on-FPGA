@@ -42,19 +42,19 @@ sh LaunchDeepPointV1FPGA.sh
 ```
 
 ## Extra. Setting Kernel Clock Frequencies 
-Reffer to `CMakeLists.txt` script to change each kernel's clock frequency.
+Refer to `CMakeLists.txt` script to change kernel clock frequency.
 
-## Extra. Setting Kernel DDR Banks 
-Reffer to `CMakeLists.txt` script to assign DDR bank to each kernel's bundle names.
+## Extra. Setting Kernel Arguments' DDR Banks 
+Refer to `CMakeLists.txt` script to assign DDR bank for each kernel's arguments.
 
 ## Extra. Run Synthesis Only
-Considering that step one is already done and current directory is `build`. This command will only run hls synthesis on all of the kernels.
+Considering that step one is already done and current directory is `build`, the following command would only run hls synthesis for all of the kernels.
 ```
 make synthesis
 ```
 
 # Platforms
-Reffer to the table below.
+Refer to the table below.
 
 Name | Supported Platform | Implementation
 ---  | ---                | ---
