@@ -14,7 +14,7 @@ make DeepPointV1FPGA
 ```
 
 ## 2. Compile FPGA Kernels
-Considering that step one is already done and current directory is `build`. This step generates `*.xo` files needed for the linking process. 
+Considering that step one is already done and current directory is `build`. This step generates `*.xo` files needed for the linking process.  
 For SW-Emulation:
 ```
 make compile_swemu
@@ -29,7 +29,7 @@ make compile_hw
 ```
 
 ## 3. Link FPGA Kernels
-Considering that steps one and two are already done and current directory is `build`. This step generates requested `*.xclbin` file needed for the host program.
+Considering that steps one and two are already done and current directory is `build`. This step generates requested `*.xclbin` file needed for the host program.  
 For SW-Emulation:
 ```
 make link_swemu
