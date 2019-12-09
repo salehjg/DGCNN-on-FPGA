@@ -43,7 +43,23 @@ For HW(system build for real FPGA):
 make link_hw
 ```
 
-## 4. Launching The Host Program
+## 4. Automated Build
+The autobuild scripts are intended to make building process on an AWS instance easier. They compile and link the project consecutively and take log of each step in a text file. Finally, after finishing up, the instance would be powered off with the `sudo poweroff` command. (considering that the root user has no password)
+For SW-Emulation:
+```
+bash autobuild_swemu
+```
+For HW-Emulation:
+```
+bash autobuild_hwemu
+```
+For HW(system build for real FPGA):
+```
+bash autobuild_hw
+```
+
+
+## 5. Launching The Host Program
 Considering that steps one, two and three are already done, current directory is `build` and the default shell is `bash`. This command is the unified solution to launch the host program in `sw-emu`, `hw-emu` or `hw` modes.
 ```
 sh LaunchDeepPointV1FPGA.sh
