@@ -402,8 +402,10 @@ set(xcl_path_hwemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw_emu.xclbin")
 set(xcl_path_hw "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw.xclbin")
 set(HostExecutablePath "${CMAKE_BINARY_DIR}/${HostExecutableName}")
 set(DataDirectory "${CMAKE_SOURCE_DIR}/data")
-configure_file(scripts/LaunchDeepPointV1FPGA.sh.in LaunchDeepPointV1FPGA.sh @ONLY)
-
+configure_file(${CMAKE_SOURCE_DIR}/scripts/LaunchDeepPointV1FPGA.sh.in LaunchDeepPointV1FPGA.sh @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_swemu.sh ${CMAKE_BINARY_DIR}/autobuild_swemu.sh COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hwemu.sh ${CMAKE_BINARY_DIR}/autobuild_hwemu.sh COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hw.sh ${CMAKE_BINARY_DIR}/autobuild_hw.sh COPYONLY)
 
 
 #-t hw --platform xilinx_kcu1500_dynamic_5_0 --save-temps -Os --report system -l --nk task_conv2_1x1_direct:1 --profile_kernel data:task_conv2_1x1_direct:all:all --nk task_matmul:1 --nk task_matops:1 --nk task_reducesum4d:1 --nk task_relu:1 --nk task_sqrt:1 --nk task_tile:1 --nk task_topk:1 --profile_kernel data:task_topk:all:all --nk task_transpose:1 --nk task_datamover_mod1_float:1 --nk task_datamover_mod1_int:1 --nk task_reducemax:1 --messageDb binary_container_1.mdb --xp misc:solution_name=_xocc_link_binary_container_1 --sp task_datamover_mod1_float_1.m_axi_gmem0:bank1 --sp task_datamover_mod1_float_1.m_axi_gmem1:bank2 --sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 --sp task_datamover_mod1_int_1.m_axi_gmemi1:bank2 --sp task_tile_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2 --remote_ip_cache /home/saleh/02_workspace/00_SDx2017.4/ip_cache -obinary_container_1.xclbin binary_container_1/task_conv2_1x1_direct.xo binary_container_1/task_matmul.xo binary_container_1/task_matops.xo binary_container_1/task_reducesum4d.xo binary_container_1/task_relu.xo binary_container_1/task_sqrt.xo binary_container_1/task_tile.xo binary_container_1/task_topk.xo binary_container_1/task_transpose.xo binary_container_1/task_datamover_mod1_float.xo binary_container_1/task_datamover_mod1_int.xo binary_container_1/task_reducemax.xo

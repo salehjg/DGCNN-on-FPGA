@@ -5,7 +5,7 @@ This repository contains the code base for Xilinx SDAccel FPGA implementation of
 As easy as it is to use SDx GUI, it is recommended to use provided cmake scripts to run synthesis and build the binaries for both FPGA and the host.
 
 # How to...
-## 1. Build Host
+## 1. Building The Host Program
 ```
 mkdir build
 cd build
@@ -13,7 +13,7 @@ cmake ..
 make DeepPointV1FPGA
 ```
 
-## 2. Compile FPGA Kernels
+## 2. Compiling FPGA Kernels
 Considering that step one is already done and current directory is `build`. This step generates `*.xo` files needed for the linking process.  
 For SW-Emulation:
 ```
@@ -28,7 +28,7 @@ For HW(system build for real FPGA):
 make compile_hw
 ```
 
-## 3. Link FPGA Kernels
+## 3. Linking FPGA Kernels
 Considering that steps one and two are already done and current directory is `build`. This step generates requested `*.xclbin` file needed for the host program.  
 For SW-Emulation:
 ```
@@ -43,7 +43,7 @@ For HW(system build for real FPGA):
 make link_hw
 ```
 
-## 4. Launch The Host Program
+## 4. Launching The Host Program
 Considering that steps one, two and three are already done, current directory is `build` and the default shell is `bash`. This command is the unified solution to launch the host program in `sw-emu`, `hw-emu` or `hw` modes.
 ```
 sh LaunchDeepPointV1FPGA.sh
