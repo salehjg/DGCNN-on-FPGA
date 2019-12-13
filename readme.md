@@ -4,6 +4,17 @@ This repository contains the code base for Xilinx SDAccel FPGA implementation of
 # Build System
 As easy as it is to use SDx GUI, it is recommended to use provided cmake scripts to run synthesis and build the binaries for both the selected FPGA platform and the host.
 
+# Dependencies
+This project relies on these software/libraries(These should be installed on the OS):
+```
+Xilinx SDAccel 2019.1(Tested), 2018.3 2018.2 2017.4(Not Tested)
+Xilinx XRT
+python2.7(Symlinked as `python`)
+PasteBin(Library for Python2.7, pip available)
+CMake3 (>3.0, Do **not** use default CMake package available on AWS-F1)
+Bash (>4.0, Dash and others are not tested)
+```
+
 # How to...
 ## 1. Building The Host Program
 ```
