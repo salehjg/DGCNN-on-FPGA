@@ -44,7 +44,7 @@ make link_hw
 ```
 
 ## 4. Automated Build
-The autobuild scripts are intended to make building process on an AWS instance easier. They compile and link the project consecutively and take log of each step in a text file. Finally, after finishing up, the instance would be powered off with the `sudo poweroff` command. (considering that the root user has no password)
+The autobuild scripts are intended to make building process on an AWS instance easier. They compile and link the project consecutively and take log of each step in a text file. Finally, after finishing up, the instance would be powered off with the `sudo poweroff` command. (considering that the root user has no password)  
 For SW-Emulation:
 ```
 bash autobuild_swemu
