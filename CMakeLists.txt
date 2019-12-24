@@ -23,8 +23,10 @@ set(HostExecutableName DeepPointV1FPGA)
 
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
+set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
+set(SYNTH_FLAGS "-I${CMAKE_SOURCE_DIR}/src/kernels/xilinx" CACHE STRING "CFlags for synthesis only.")
 set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
-set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
+#set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
 set(KERNEL_CLOCK "-1" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
@@ -62,13 +64,12 @@ endif()
 
 
 
-SET(hw_link_command "")
-SET(hwemu_link_command "")
-SET(swemu_link_command "")
-SET(hw_link "")
-SET(hwemu_link "")
-SET(swemu_link "")
-set(SYNTHESIS_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -O3")
+set(hw_link_command "")
+set(hwemu_link_command "")
+set(swemu_link_command "")
+set(hw_link "")
+set(hwemu_link "")
+set(swemu_link "")
 
 
 
@@ -77,7 +78,7 @@ set(SYNTHESIS_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -O3")
 
 
 function(floatexpr expr output)
-    SET(FLOAT_EXPR_SRC "
+    set(FLOAT_EXPR_SRC "
     #include <stdio.h>
     int main(int argc, char *argv[]){printf(\"%f\", ${expr})\; return 0\;}
     ")
@@ -101,12 +102,20 @@ function(synthesis_target
     KERNEL_FILE 
     KERNEL_NAME)
 
+    set(HLSLIB_PART_NAME "${SYNTH_PART_NAME}")
     set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
     set(HLSLIB_SRC_SYNTHESIS "${KERNEL_FILE}")
     set(HLSLIB_ENTRY_FUNCTION "${KERNEL_NAME}")
-    set(HLSLIB_TARGET_CLOCK "${KERNEL_CLOCK}")
     set(HLSLIB_TARGET_CLOCK_UNCERTAINTY "${KERNEL_CLOCK_UNCERTAINTY}")
-    set(HLSLIB_SYNTHESIS_FLAGS ${SYNTHESIS_FLAGS})
+    set(HLSLIB_SYNTHESIS_FLAGS ${SYNTH_FLAGS})
+
+    if(KERNEL_CLOCK GREATER 0)
+        set(CLK "${KERNEL_CLOCK}")
+    else()
+        set(CLK "250")
+    endif()
+    set(HLSLIB_TARGET_CLOCK "${CLK}")
+
     configure_file(scripts/Synthesis.tcl.in Synthesize${KERNEL_NAME}.tcl)
 
 endfunction()
@@ -126,9 +135,9 @@ function(sdaccel_target
     IS_MULTI_DDR_BANK
     MULTI_DDR_SP_TAG
     ADDITIONAL_FLAGS)
-    set(HLSLIB_SYNTHESIS_FLAGS "${SYNTHESIS_FLAGS} ${ADDITIONAL_FLAGS}")
+    set(HLSLIB_SYNTHESIS_FLAGS "${SYNTH_FLAGS} ${ADDITIONAL_FLAGS}")
     #string(REPLACE " " ";" XOCC_FLAGS "${XOCC_FLAGS}")
-    set(SYNTHESIS_FLAGS "") #should be ';' seperated
+    set(SYNTH_FLAGS "") #should be ';' seperated
     set(XOCC_COMMAND
         -s
         ${XOCC_FLAGS}
@@ -137,7 +146,7 @@ function(sdaccel_target
         -I${CMAKE_BINARY_DIR}
         --kernel ${KERNEL_NAME} 
         --platform ${DSA_NAME}
-        --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${SYNTHESIS_FLAGS}"
+        --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${SYNTH_FLAGS}"
         --xp misc:solution_name="${KERNEL_NAME}_solution" 
         --max_memory_ports all
     )
@@ -278,42 +287,42 @@ if(
 )
     # V2018.2 and before: old sp tag style
     message(FATAL_ERROR "OLD --SP STYLE IS NO LONGER SUPPORTED")
-    #SET(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.m_axi_gmem0:bank1 --sp task_datamover_mod1_float_1.m_axi_gmem1:bank2")
-    #SET(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 --sp task_datamover_mod1_int_1.m_axi_gmemi1:bank2")
-    #SET(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2")
-    #SET(SP_TAG_TILE             "--sp task_tile_1.m_axi_gmem1:bank2")
-    #SET(SP_TAG_CONCAT           "--sp task_concat_1.m_axi_gmem1:bank2 --sp task_concat_1.m_axi_gmem2:bank2")
-    #SET(SP_TAG_GATHER           "--sp task_gather_1.m_axi_gmem1:bank2 --sp task_gather_1.m_axi_gmem2:bank2")
-    #SET(SP_TAG_MATMUL           "--sp task_matmul_1.m_axi_gmem1:bank2 --sp task_matmul_1.m_axi_gmem2:bank2")
-    #SET(SP_TAG_MATOPS           "--sp task_matops_1.m_axi_gmem1:bank2 --sp task_matops_1.m_axi_gmem2:bank2")
-    #SET(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.m_axi_gmem1:bank1 --sp task_reducemax_1.m_axi_gmem2:bank1")
-    #SET(SP_TAG_REDUCESUM        "--sp task_reducesum_1.m_axi_gmem1:bank1 --sp task_reducesum_1.m_axi_gmem2:bank1")
-    #SET(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.m_axi_gmem1:bank1 --sp task_reducesum4d_1.m_axi_gmem2:bank1")
-    #SET(SP_TAG_RELU             "--sp task_relu_1.m_axi_gmem1:bank1")
-    #SET(SP_TAG_SQRT             "--sp task_sqrt_1.m_axi_gmem1:bank1")
-    #SET(SP_TAG_SQUARE           "--sp task_square_1.m_axi_gmem1:bank1")
-    #SET(SP_TAG_TOPK             "--sp task_topk_1.m_axi_gmem1:bank1 --sp task_topk_1.m_axi_gmem2:bank1")
-    #SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.m_axi_gmem1:bank1")
+    #set(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.m_axi_gmem0:bank1 --sp task_datamover_mod1_float_1.m_axi_gmem1:bank2")
+    #set(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 --sp task_datamover_mod1_int_1.m_axi_gmemi1:bank2")
+    #set(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2")
+    #set(SP_TAG_TILE             "--sp task_tile_1.m_axi_gmem1:bank2")
+    #set(SP_TAG_CONCAT           "--sp task_concat_1.m_axi_gmem1:bank2 --sp task_concat_1.m_axi_gmem2:bank2")
+    #set(SP_TAG_GATHER           "--sp task_gather_1.m_axi_gmem1:bank2 --sp task_gather_1.m_axi_gmem2:bank2")
+    #set(SP_TAG_MATMUL           "--sp task_matmul_1.m_axi_gmem1:bank2 --sp task_matmul_1.m_axi_gmem2:bank2")
+    #set(SP_TAG_MATOPS           "--sp task_matops_1.m_axi_gmem1:bank2 --sp task_matops_1.m_axi_gmem2:bank2")
+    #set(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.m_axi_gmem1:bank1 --sp task_reducemax_1.m_axi_gmem2:bank1")
+    #set(SP_TAG_REDUCESUM        "--sp task_reducesum_1.m_axi_gmem1:bank1 --sp task_reducesum_1.m_axi_gmem2:bank1")
+    #set(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.m_axi_gmem1:bank1 --sp task_reducesum4d_1.m_axi_gmem2:bank1")
+    #set(SP_TAG_RELU             "--sp task_relu_1.m_axi_gmem1:bank1")
+    #set(SP_TAG_SQRT             "--sp task_sqrt_1.m_axi_gmem1:bank1")
+    #set(SP_TAG_SQUARE           "--sp task_square_1.m_axi_gmem1:bank1")
+    #set(SP_TAG_TOPK             "--sp task_topk_1.m_axi_gmem1:bank1 --sp task_topk_1.m_axi_gmem2:bank1")
+    #set(SP_TAG_TRANSPOSE        "--sp task_transpose_1.m_axi_gmem1:bank1")
 else()
     # V2018.3 and on: new sp tag style
-    SET(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.srcBuff:bank1 --sp task_datamover_mod1_float_1.dstBuff:bank2")
-    SET(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.srcBuff:bank1 --sp task_datamover_mod1_int_1.dstBuff:bank2")
+    set(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.srcBuff:bank1 --sp task_datamover_mod1_float_1.dstBuff:bank2")
+    set(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.srcBuff:bank1 --sp task_datamover_mod1_int_1.dstBuff:bank2")
 
-    SET(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.inputTn:bank2 --sp task_conv2_1x1_direct_1.weightTn:bank2 --sp task_conv2_1x1_direct_1.biasTn:bank2 --sp task_conv2_1x1_direct_1.outputTn:bank2")
-    SET(SP_TAG_TILE             "--sp task_tile_1.inputTn:bank2 --sp task_tile_1.outputTn:bank2")
-    SET(SP_TAG_CONCAT           "--sp task_concat_1.inputTn1:bank2 --sp task_concat_1.inputTn2:bank2 --sp task_concat_1.outputTn:bank2")
-    SET(SP_TAG_GATHER           "--sp task_gather_1.inputTn:bank2 --sp task_gather_1.indicesTn:bank2 --sp task_gather_1.outputTn:bank2")
-    SET(SP_TAG_MATMUL           "--sp task_matmul_1.inputTn1:bank2 --sp task_matmul_1.inputTn2:bank2 --sp task_matmul_1.outputTn:bank2")
-    SET(SP_TAG_MATOPS           "--sp task_matops_1.inputTn1:bank2 --sp task_matops_1.inputTn2:bank2 --sp task_matops_1.outputTn:bank2")
+    set(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.inputTn:bank2 --sp task_conv2_1x1_direct_1.weightTn:bank2 --sp task_conv2_1x1_direct_1.biasTn:bank2 --sp task_conv2_1x1_direct_1.outputTn:bank2")
+    set(SP_TAG_TILE             "--sp task_tile_1.inputTn:bank2 --sp task_tile_1.outputTn:bank2")
+    set(SP_TAG_CONCAT           "--sp task_concat_1.inputTn1:bank2 --sp task_concat_1.inputTn2:bank2 --sp task_concat_1.outputTn:bank2")
+    set(SP_TAG_GATHER           "--sp task_gather_1.inputTn:bank2 --sp task_gather_1.indicesTn:bank2 --sp task_gather_1.outputTn:bank2")
+    set(SP_TAG_MATMUL           "--sp task_matmul_1.inputTn1:bank2 --sp task_matmul_1.inputTn2:bank2 --sp task_matmul_1.outputTn:bank2")
+    set(SP_TAG_MATOPS           "--sp task_matops_1.inputTn1:bank2 --sp task_matops_1.inputTn2:bank2 --sp task_matops_1.outputTn:bank2")
 
-    SET(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.inputTn:bank1 --sp task_reducemax_1.outputTn:bank1")
-    SET(SP_TAG_REDUCESUM        "--sp task_reducesum_1.inputTn:bank1 --sp task_reducesum_1.outputTn:bank1")
-    SET(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.inputTn:bank1 --sp task_reducesum4d_1.outputTn:bank1")
-    SET(SP_TAG_RELU             "--sp task_relu_1.inputTn:bank1 --sp task_relu_1.outputTn:bank1")
-    SET(SP_TAG_SQRT             "--sp task_sqrt_1.inputTn:bank1 --sp task_sqrt_1.outputTn:bank1")
-    SET(SP_TAG_SQUARE           "--sp task_square_1.inputTn:bank1 --sp task_square_1.outputTn:bank1")
-    SET(SP_TAG_TOPK             "--sp task_topk_1.inputTn:bank1 --sp task_topk_1.indicesSplitedTn:bank1")
-    SET(SP_TAG_TRANSPOSE        "--sp task_transpose_1.inputTn:bank1 --sp task_transpose_1.outputTn:bank1")
+    set(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.inputTn:bank1 --sp task_reducemax_1.outputTn:bank1")
+    set(SP_TAG_REDUCESUM        "--sp task_reducesum_1.inputTn:bank1 --sp task_reducesum_1.outputTn:bank1")
+    set(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.inputTn:bank1 --sp task_reducesum4d_1.outputTn:bank1")
+    set(SP_TAG_RELU             "--sp task_relu_1.inputTn:bank1 --sp task_relu_1.outputTn:bank1")
+    set(SP_TAG_SQRT             "--sp task_sqrt_1.inputTn:bank1 --sp task_sqrt_1.outputTn:bank1")
+    set(SP_TAG_SQUARE           "--sp task_square_1.inputTn:bank1 --sp task_square_1.outputTn:bank1")
+    set(SP_TAG_TOPK             "--sp task_topk_1.inputTn:bank1 --sp task_topk_1.indicesSplitedTn:bank1")
+    set(SP_TAG_TRANSPOSE        "--sp task_transpose_1.inputTn:bank1 --sp task_transpose_1.outputTn:bank1")
 endif()
 
 
