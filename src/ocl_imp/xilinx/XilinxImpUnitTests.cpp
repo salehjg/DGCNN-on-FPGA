@@ -112,18 +112,13 @@ ReportObject* XilinxImpUnitTests::TensorBankFloat(){
     
     int padded_len = tensorCpu->getLength();
     padded_len += (CONFIG_M_AXI_WIDTH - padded_len % CONFIG_M_AXI_WIDTH);
-
-    std::cout<<"Padded Len: "<<padded_len<<std::endl;
-
     bool rslt_padded_len = (tensorSrc_defaultBank->getLengthPadded(CONFIG_M_AXI_WIDTH) == padded_len);
-    std::cout<<"rslt_padded_len: "<< rslt_padded_len<<std::endl;
 
     bool rslt_before_changing_bank = platformSelector->CompareTensors(
         PLATFORMS::CPU,
         scheduler,
         tensorCpu,
         tensorSrc_defaultBank);
-    std::cout<<"rslt_before_changing_bank: "<< rslt_before_changing_bank<<std::endl;
     
     tensorSrc_defaultBank->ChangeDDRBank(
         platformSelector->openclPlatformClass->getProgram(),
@@ -132,7 +127,6 @@ ReportObject* XilinxImpUnitTests::TensorBankFloat(){
         DATAMOVER_KERNEL_BANK_B_INDEX);
     
     bool rslt_after_changing_bank = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
-    std::cout<<"rslt_after_changing_bank: "<< rslt_after_changing_bank<<std::endl;
     
 
     tensorSrc_defaultBank->ChangeDDRBank(
@@ -142,7 +136,6 @@ ReportObject* XilinxImpUnitTests::TensorBankFloat(){
         DATAMOVER_KERNEL_BANK_A_INDEX);
 
     bool rslt_after_changing_bank_reverse = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
-    std::cout<<"rslt_after_changing_bank_reverse: "<< rslt_after_changing_bank_reverse<<std::endl;
 
     
     ReportObject* obj = new ReportObject(__FUNCTION__, rslt_padded_len && rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
@@ -152,6 +145,10 @@ ReportObject* XilinxImpUnitTests::TensorBankFloat(){
 ReportObject* XilinxImpUnitTests::TensorBankInteger(){
     TensorI* tensorCpu = GenerateTensorInteger(7,{5,5,2});
     OclTensorI* tensorSrc_defaultBank = (OclTensorI*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
+
+    int padded_len = tensorCpu->getLength();
+    padded_len += (CONFIG_M_AXI_WIDTH - padded_len % CONFIG_M_AXI_WIDTH);
+    bool rslt_padded_len = (tensorSrc_defaultBank->getLengthPadded(CONFIG_M_AXI_WIDTH) == padded_len);
 
     bool rslt_before_changing_bank = platformSelector->CompareTensorsInteger(
         PLATFORMS::CPU,
@@ -177,7 +174,7 @@ ReportObject* XilinxImpUnitTests::TensorBankInteger(){
     bool rslt_after_changing_bank_reverse = platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
 
 
-    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_padded_len && rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
     return obj;
 }
 
