@@ -14,31 +14,32 @@
 
 using namespace std;
 
-OclTensorF::OclTensorF(){
+OclTensorF::OclTensorF(int vectorWords){
     initialized = false;
     platform = PLATFORMS::DEFAULT;
+    this->vectorWords = vectorWords;
 }
 
-OclTensorF::OclTensorF(cl_context context, std::vector<unsigned int> shape, int bank){
-    Init(context, shape, bank);
+OclTensorF::OclTensorF(cl_context context, std::vector<unsigned int> shape, int bank, int vectorWords){
+    Init(context, shape, bank, vectorWords);
 }
 
 OclTensorF::OclTensorF(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     Init(shape, clBuff, bank);
 }
 
-void OclTensorF::Init(cl_context context, std::vector<unsigned int> shape, int bank) {
+void OclTensorF::Init(cl_context context, std::vector<unsigned int> shape, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
-        //assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
-        delete(ocl_buff);
-        ///TODO: WFT is going on here? why delete(...) has been used?
+        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+        //delete(ocl_buff);
     }
+    this->vectorWords = vectorWords;
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-    unsigned long len = getLengthBytes();
+    unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
@@ -48,17 +49,17 @@ void OclTensorF::Init(cl_context context, std::vector<unsigned int> shape, int b
     memExt.obj = NULL;
     memExt.param = 0;
 
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, len, &memExt, &ocl_stat);
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenPadded, &memExt, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 }
 
 void OclTensorF::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     cl_int ocl_stat;
+    std::cout<<"--- OclTensorF: Warning: No padding\n";
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
-        //assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
-        delete(ocl_buff);
-        ///TODO: WFT is going on here? why delete(...) has been used?
+        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+        //delete(ocl_buff);
     }
     this->shape = shape;
     this->rank = (int)shape.size();
@@ -71,18 +72,19 @@ void OclTensorF::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     ocl_buff = clBuff;
 }
 
-void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, float *hostBuff, int bank) {
+void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, float *hostBuff, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
-        //assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
-        delete(ocl_buff);
-        ///TODO: WFT is going on here? why delete(...) has been used?
+        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+        //delete(ocl_buff);
     }
+    this->vectorWords = vectorWords;
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
     unsigned long len = getLengthBytes();
+    unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
@@ -92,7 +94,7 @@ void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, st
     memExt.obj = NULL;
     memExt.param = 0;
 
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, len, &memExt, &ocl_stat);
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenPadded, &memExt, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 
     // https://software.intel.com/en-us/forums/opencl/topic/731519
@@ -124,6 +126,7 @@ int OclTensorF::LaunchDataMover(
 
     if(!(srcBank>=DATAMOVER_KERNEL_BANK_A_INDEX && srcBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
     if(!(dstBank>=DATAMOVER_KERNEL_BANK_A_INDEX && dstBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
+    assert(this->vectorWords>0);
 
     cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover_mod1_float", &error);
     if (error != CL_SUCCESS) {
@@ -135,6 +138,7 @@ int OclTensorF::LaunchDataMover(
     //reverseSwitch=0 : Copy srcBuff(bank0) to dstBuff(bank1).
     //reverseSwitch=1 : Copy dstBuff(bank1) to srcBuff(bank0).
     int reverseSwitch = (srcBank==DATAMOVER_KERNEL_BANK_A_INDEX) ? 0 : 1;
+    unsigned long lenVec = len / ((unsigned long)this->vectorWords);
 
     int argcnt=0;
     if(reverseSwitch==0){
@@ -145,7 +149,7 @@ int OclTensorF::LaunchDataMover(
         error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff); 
     }
     error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_int), (void*)&reverseSwitch); 
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_ulong), (void*)&len);
+    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_ulong), (void*)&lenVec);
     
     if(error != CL_SUCCESS) cout<<"Failed to set internal data-mover kernel args, Err: "<< error <<endl;
     assert(error==CL_SUCCESS);
@@ -177,6 +181,7 @@ void OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_comman
         //We will run a kernel to read data from old bank and simelteneously write it to the new bank.
 
     	if(bank == dramBank){cout<<"Trying to change to the same bank (OclTensorF)."<<endl; std::exit(3);}
+        assert(this->vectorWords>0);
 
         //Forcing memory bank requirements using xilinx external memory extension to opencl.
         cl_mem_ext_ptr_t memExt;
@@ -184,12 +189,12 @@ void OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_comman
         memExt.obj = NULL;
         memExt.param = 0;
 
-        unsigned long lenBytes = getLengthBytes();
-        unsigned long lenWords = getLength();
+        unsigned long lenBytesPadded = getLengthBytesPadded(this->vectorWords);
+        unsigned long lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Creating new buffer within requested memory bank.
         cl_int ocl_stat;
-        cl_mem newBuff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenBytes, &memExt, &ocl_stat);
+        cl_mem newBuff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenBytesPadded, &memExt, &ocl_stat);
         assert(ocl_stat==CL_SUCCESS);
 
         //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
@@ -201,7 +206,7 @@ void OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_comman
             bank, 
             ocl_buff, 
             newBuff, 
-            lenWords);
+            lenWordsPadded);
 
         //Now we have to release the old buffer and replace it with the new one.
         cl_int error = clReleaseMemObject(ocl_buff);
@@ -230,7 +235,7 @@ TensorF* OclTensorF::CloneToDDRBank(cl_program program, cl_context context, cl_c
         //Creating new blank tensor within the required bank 
         OclTensorF* clonedTensor = new OclTensorF(context, shape, bank);
 
-        unsigned long lenWords = getLength();
+        unsigned long lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
         //Unsupported memory banks will be checked within 'LaunchDataMover' method.
@@ -241,7 +246,7 @@ TensorF* OclTensorF::CloneToDDRBank(cl_program program, cl_context context, cl_c
             bank, 
             ocl_buff, 
             clonedTensor->ocl_buff, 
-            lenWords);
+            lenWordsPadded);
 
         return clonedTensor;
         

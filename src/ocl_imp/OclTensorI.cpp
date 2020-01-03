@@ -16,13 +16,14 @@
 using namespace std;
 
 
-OclTensorI::OclTensorI(){
+OclTensorI::OclTensorI(int vectorWords){
     initialized = false;
     platform = PLATFORMS::DEFAULT;
+    this->vectorWords = vectorWords;
 }
 
-OclTensorI::OclTensorI(cl_context context, std::vector<unsigned int> shape, int bank){
-    Init(context, shape, bank);
+OclTensorI::OclTensorI(cl_context context, std::vector<unsigned int> shape, int bank, int vectorWords){
+    Init(context, shape, bank, vectorWords);
 }
 
 OclTensorI::OclTensorI( std::vector<unsigned int> shape, cl_mem clBuff, int bank){
@@ -30,16 +31,17 @@ OclTensorI::OclTensorI( std::vector<unsigned int> shape, cl_mem clBuff, int bank
 }
 
 
-void OclTensorI::Init(cl_context context, std::vector<unsigned int> shape, int bank) {
+void OclTensorI::Init(cl_context context, std::vector<unsigned int> shape, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
     }
+    this->vectorWords = vectorWords;
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-    unsigned long len = getLengthBytes();
+    unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
@@ -49,12 +51,13 @@ void OclTensorI::Init(cl_context context, std::vector<unsigned int> shape, int b
     memExt.obj = NULL;
     memExt.param = 0;
 
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, len, &memExt, &ocl_stat);
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenPadded, &memExt, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 }
 
 void OclTensorI::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     cl_int ocl_stat;
+    std::cout<<"--- OclTensorF: Warning: No padding\n";
     if(initialized){
         std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
@@ -70,16 +73,18 @@ void OclTensorI::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     ocl_buff = clBuff;
 }
 
-void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, int *hostBuff, int bank) {
+void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, int *hostBuff, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
     }
+    this->vectorWords = vectorWords;
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
     unsigned long len = getLengthBytes();
+    unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
@@ -89,7 +94,7 @@ void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, st
     memExt.obj = NULL;
     memExt.param = 0;
 
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, len, &memExt, &ocl_stat);
+    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenPadded, &memExt, &ocl_stat);
     assert(ocl_stat==CL_SUCCESS);
 
     // https://software.intel.com/en-us/forums/opencl/topic/731519
@@ -182,12 +187,12 @@ void OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_comman
         memExt.obj = NULL;
         memExt.param = 0;
 
-        unsigned long lenBytes = getLengthBytes();
-        unsigned long lenWords = getLength();
+        unsigned long lenBytesPadded = getLengthBytesPadded(this->vectorWords);
+        unsigned long lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Creating new buffer within requested memory bank.
         cl_int ocl_stat;
-        cl_mem newBuff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenBytes, &memExt, &ocl_stat);
+        cl_mem newBuff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenBytesPadded, &memExt, &ocl_stat);
         assert(ocl_stat==CL_SUCCESS);
 
         //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
@@ -199,7 +204,7 @@ void OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_comman
             bank, 
             ocl_buff, 
             newBuff, 
-            lenWords);
+            lenWordsPadded);
 
         //Now we have to release the old buffer and replace it with the new one.
         cl_int error = clReleaseMemObject(ocl_buff);
@@ -228,7 +233,7 @@ TensorI* OclTensorI::CloneToDDRBank(cl_program program, cl_context context, cl_c
         //Creating new blank tensor within the required bank 
         OclTensorI* clonedTensor = new OclTensorI(context, shape, bank);
 
-        unsigned long lenWords = getLength();
+        unsigned long lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
         //Unsupported memory banks will be checked within 'LaunchDataMover' method.
@@ -239,7 +244,7 @@ TensorI* OclTensorI::CloneToDDRBank(cl_program program, cl_context context, cl_c
             bank, 
             ocl_buff, 
             clonedTensor->ocl_buff, 
-            lenWords);
+            lenWordsPadded);
 
         return clonedTensor;
         
@@ -281,6 +286,7 @@ OclTensorI::~OclTensorI() {
     /* https://stackoverflow.com/questions/17923370/override-identifier-after-destructor-in-c11
      * Even though destructors are not inherited, a destructor in a derived class
      * overrides a base class destructor declared virtual; see 12.4 and 12.5. */
+    
     if(initialized){
         //std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);

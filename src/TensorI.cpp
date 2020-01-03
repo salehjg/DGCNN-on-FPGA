@@ -132,6 +132,19 @@ unsigned long TensorI::getLengthBytes() {
     }
 }
 
+unsigned long TensorI::getLengthPadded(int vectorWords){
+    assert(vectorWords>0);
+    unsigned long len = getLength();
+    int pad = len % vectorWords;
+    pad = vectorWords - pad;
+    return len + pad;
+}
+
+unsigned long TensorI::getLengthBytesPadded(int vectorWords){
+    assert(vectorWords>0);
+    return getLengthPadded(vectorWords) * sizeof(float);
+}
+
 TensorI::~TensorI() {
     if(platform == PLATFORMS::CPU){
         if(initialized){

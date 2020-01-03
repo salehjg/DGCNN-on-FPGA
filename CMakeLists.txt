@@ -24,7 +24,7 @@ set(HostExecutableName DeepPointV1FPGA)
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
-set(SYNTH_FLAGS "-I${CMAKE_SOURCE_DIR}/src/kernels/xilinx" CACHE STRING "CFlags for synthesis only.")
+set(SYNTH_FLAGS "-I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx/" CACHE STRING "CFlags for synthesis only.")
 set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
 #set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
@@ -135,9 +135,9 @@ function(sdaccel_target
     IS_MULTI_DDR_BANK
     MULTI_DDR_SP_TAG
     ADDITIONAL_FLAGS)
-    set(HLSLIB_SYNTHESIS_FLAGS "${SYNTH_FLAGS} ${ADDITIONAL_FLAGS}")
+    set(KERNEL_FLAGS "${SYNTH_FLAGS} ${ADDITIONAL_FLAGS}")
     #string(REPLACE " " ";" XOCC_FLAGS "${XOCC_FLAGS}")
-    set(SYNTH_FLAGS "") #should be ';' seperated
+    #set(SYNTH_FLAGS "") #should be ';' seperated
     set(XOCC_COMMAND
         -s
         ${XOCC_FLAGS}
@@ -146,7 +146,7 @@ function(sdaccel_target
         -I${CMAKE_BINARY_DIR}
         --kernel ${KERNEL_NAME} 
         --platform ${DSA_NAME}
-        --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${SYNTH_FLAGS}"
+        --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${KERNEL_FLAGS}"
         --xp misc:solution_name="${KERNEL_NAME}_solution" 
         --max_memory_ports all
     )

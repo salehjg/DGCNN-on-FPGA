@@ -26,6 +26,8 @@ public:
     PLATFORMS getPlatform();
     unsigned long getLength();
     unsigned long getLengthBytes();
+    unsigned long getLengthPadded(int vectorWords);
+    unsigned long getLengthBytesPadded(int vectorWords);
     virtual ~TensorI();
 
     int* _buff;

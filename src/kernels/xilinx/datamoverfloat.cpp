@@ -1,3 +1,5 @@
+#include "VectorizationHelper.h"
+#include "stdio.h"
 /*
 _task_datamover:
 Copies data of length 'len' :
@@ -6,25 +8,31 @@ Copies data of length 'len' :
 
 /!\ srcBuff should ALWAYS be on bankA.
 /!\ dstBuff should ALWAYS be on bankB.
+/!\ len is number of (VecDepth*sizeof(DType)-bytes)words 
 */
 
-template<typename DType>
+template<typename DType, int VecDepth>
 static void _task_datamover(
-        DType *srcBuff,
-        DType *dstBuff,
+        VectorizedArray<DType, VecDepth> *srcBuff,
+        VectorizedArray<DType, VecDepth> *dstBuff,
         int reverseSwitch,
         const unsigned long len){
 #pragma HLS inline
 
+    VectorizedArray<DType, VecDepth> buff;
+    
+
     if(reverseSwitch==0){
         for(unsigned long i=0;i<len;i++){
         #pragma HLS PIPELINE II=1
-            dstBuff[i] = srcBuff[i];
+            buff = srcBuff[i];
+            dstBuff[i] = buff;
         }
     }else{
         for(unsigned long i=0;i<len;i++){
         #pragma HLS PIPELINE II=1
-            srcBuff[i] = dstBuff[i];
+            buff = dstBuff[i];
+            srcBuff[i] = buff;
         }
     }
 
@@ -32,29 +40,12 @@ static void _task_datamover(
 }
 
 extern "C" {
-/*
-void task_datamover_b0_to_b1_integer(
-        int *srcBuff,
-        int *dstBuff,
-        int reverseSwitch,
-        const unsigned long len){
-#pragma HLS INTERFACE m_axi     port=srcBuff            offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=dstBuff            offset=slave bundle=gmem1
-#pragma HLS INTERFACE s_axilite port=srcBuff            bundle=control
-#pragma HLS INTERFACE s_axilite port=dstBuff            bundle=control
-#pragma HLS INTERFACE s_axilite port=reverseSwitch      bundle=control
-#pragma HLS INTERFACE s_axilite port=len                bundle=control
-#pragma HLS INTERFACE s_axilite port=return             bundle=control
-
-    _task_datamover_b0_to_b1<int>(srcBuff, dstBuff, reverseSwitch, len);
-}
-*/
 
 // The --sp option decides which bank is bankA and which is bankB
 // Currently, bankA is bank1 & bankB is bank2 and no SLR assignment is done.
 void task_datamover_mod1_float(
-        float *srcBuff,
-        float *dstBuff,
+        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *srcBuff,
+        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *dstBuff,
         int reverseSwitch,
         const unsigned long len){
 #pragma HLS INTERFACE m_axi     port=srcBuff            offset=slave bundle=gmem0
@@ -64,8 +55,9 @@ void task_datamover_mod1_float(
 #pragma HLS INTERFACE s_axilite port=reverseSwitch      bundle=control
 #pragma HLS INTERFACE s_axilite port=len                bundle=control
 #pragma HLS INTERFACE s_axilite port=return             bundle=control
-
-    _task_datamover<float>(srcBuff, dstBuff, reverseSwitch, len);
+#pragma HLS data_pack variable=srcBuff
+#pragma HLS data_pack variable=dstBuff
+    _task_datamover<float, CONFIG_M_AXI_WIDTH>(srcBuff, dstBuff, reverseSwitch, len);
 }
 
 }
