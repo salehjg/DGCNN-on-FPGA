@@ -54,113 +54,113 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 false/*,
                 DISABLED_KERNEL*/),
         /* IDX 1 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/sqrt.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_sqrt",
-                false),
-        /* IDX 2 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/reducemax.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_reducemax",
-                false),
-        /* IDX 3 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/reducesum4d.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_reducesum4d",
-                false),
-        /* IDX 4 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/reducesum.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_reducesum",
-                false/*,
-                DISABLED_KERNEL*/),
-        /* IDX 5 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/matops.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_matops",
-                false),
-        /* IDX 6 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/relu.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_relu",
-                false),
-        /* IDX 7 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/square.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_square",
-                false/*,
-                DISABLED_KERNEL*/),
-        /* IDX 8 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/tile.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_tile",
-                false),
-        /* IDX 9 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/matmul.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_matmul",
-                false),
-        /* IDX 10 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/transpose.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_transpose",
-                false),
-        /* IDX 11 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/gather.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_gather",
-                false/*,
-                DISABLED_KERNEL*/),
-
-        /* IDX 12 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/conv2_1x1_direct.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_conv2_1x1_direct",
-                false),
-        /* IDX 13 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/topk.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_topk",
-                false),
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/sqrt.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_sqrt",
+///                false),
+///        /* IDX 2 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/reducemax.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_reducemax",
+///                false),
+///        /* IDX 3 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/reducesum4d.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_reducesum4d",
+///                false),
+///        /* IDX 4 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/reducesum.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_reducesum",
+///                false/*,
+///                DISABLED_KERNEL*/),
+///        /* IDX 5 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/matops.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_matops",
+///                false),
+///        /* IDX 6 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/relu.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_relu",
+///                false),
+///        /* IDX 7 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/square.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_square",
+///                false/*,
+///                DISABLED_KERNEL*/),
+///        /* IDX 8 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/tile.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_tile",
+///                false),
+///        /* IDX 9 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/matmul.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_matmul",
+///                false),
+///        /* IDX 10 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/transpose.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_transpose",
+///                false),
+///        /* IDX 11 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/gather.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_gather",
+///                false/*,
+///                DISABLED_KERNEL*/),
+///
+///        /* IDX 12 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/conv2_1x1_direct.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_conv2_1x1_direct",
+///                false),
+///        /* IDX 13 :*/
+///        new OclKernelObject(
+///                KERNEL_DIR,
+///                "/xilinx/topk.cpp",
+///                "binary_container_1.xclbin",
+///                "",
+///                "task_topk",
+///                false),
 //      /* IDX 13 :*/
 //      new OclKernelObject(
 //              KERNEL_DIR,

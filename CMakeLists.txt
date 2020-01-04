@@ -24,7 +24,7 @@ set(HostExecutableName DeepPointV1FPGA)
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
-set(SYNTH_FLAGS "-I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx/" CACHE STRING "CFlags for synthesis only.")
+set(SYNTH_FLAGS "-I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx" CACHE STRING "CFlags for synthesis only.")
 set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
 #set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
@@ -135,7 +135,7 @@ function(sdaccel_target
     IS_MULTI_DDR_BANK
     MULTI_DDR_SP_TAG
     ADDITIONAL_FLAGS)
-    set(KERNEL_FLAGS "${SYNTH_FLAGS} ${ADDITIONAL_FLAGS}")
+    set(KERNEL_FLAGS "${SYNTH_FLAGS}")
     #string(REPLACE " " ";" XOCC_FLAGS "${XOCC_FLAGS}")
     #set(SYNTH_FLAGS "") #should be ';' seperated
     set(XOCC_COMMAND
@@ -177,9 +177,9 @@ function(sdaccel_target
     endif()
     string (REPLACE ";" " " XOCC_COMMAND "${XOCC_COMMAND}")
 
-    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw ${XOCC_COMMAND} -R2 ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
-    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t hw_emu ${XOCC_COMMAND} -Restimate ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
-    set(swemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -c -t sw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo") 
+    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -c -t hw ${XOCC_COMMAND} -R2 ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
+    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -c -t hw_emu ${XOCC_COMMAND} -Restimate ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
+    set(swemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -c -t sw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo") 
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${hw_compile}\n")
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${hwemu_compile}\n")
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "${swemu_compile}\n")
@@ -331,21 +331,21 @@ endif()
 
 
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 FALSE TRUE ${SP_TAG_RELU} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 FALSE TRUE ${SP_TAG_SQRT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"               FALSE TRUE ${SP_TAG_SQUARE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 FALSE TRUE ${SP_TAG_RELU} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 FALSE TRUE ${SP_TAG_SQRT} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"               FALSE TRUE ${SP_TAG_SQUARE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
 
 
 
@@ -361,15 +361,15 @@ add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh)
 
 # Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_SwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t sw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t sw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
 )
 add_custom_target(link_hw COMMAND sh Link_Hw_Batch.sh) 
 add_custom_target(link_hwemu COMMAND sh Link_HwEmu_Batch.sh ) 
@@ -377,7 +377,7 @@ add_custom_target(link_swemu COMMAND sh Link_SwEmu_Batch.sh )
 
 
 file(WRITE "${CMAKE_BINARY_DIR}/Interactrive_Hw_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin --interactive synth"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin --interactive synth"
 )
 add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh) 
 

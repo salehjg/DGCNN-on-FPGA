@@ -247,11 +247,13 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
 ReportObject* XilinxImpUnitTests::KernelConcat2(){
     //TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
     //TensorF* tensorSrc2 = GenerateTensor(3,{2,2,2,2});
-    TensorF* tensorSrc1 = GenerateTensor(3,{2,5,2,52});
-    TensorF* tensorSrc2 = GenerateTensor(3,{2,5,2,60});
+    TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
+    TensorF* tensorSrc2 = GenerateTensor(4,{2,2,2,3});
 
     TensorF* tensorCpu = platformSelector->Concat2(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,3);
+    std::cout<<"DDDDDDDDDDDDDDDDDDDDDDD\n";
     TensorF* tensorGpu = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,3);
+    std::cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAA\n";
 
     bool rslt = platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu, tensorGpu);
     ReportObject* obj = new ReportObject(__FUNCTION__, rslt);
@@ -747,11 +749,12 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
     PrintReport(TensorCloneBankInteger());
+    PrintReport(KernelConcat2());
 
     /*
     PrintReport(KernelTile() );          
     //PrintReport(KernelConv2Mlp());         
-    PrintReport(KernelConcat2());       
+           
     PrintReport(KernelGather()); 
     PrintReport(KernelMatops());
     PrintReport(KernelMatmul());
