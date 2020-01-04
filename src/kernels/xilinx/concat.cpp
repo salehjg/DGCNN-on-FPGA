@@ -26,9 +26,8 @@ void concat2(
     unsigned int dimB3){
 
     unsigned long cacheVecIdx1, cacheVecIdx2;
-    unsigned long lastCacheVecIdx1, lastCacheVecIdx2;
+    unsigned long lastCacheVecIdx1=-1, lastCacheVecIdx2=-1;
     unsigned long outputVecIdx, outputSubVecIdx;
-    unsigned long lastOutputVecIdx;
     unsigned long indxS1, indxS2, indxD;
     unsigned int  dimR0, dimR1, dimR2, dimR3;
     VectorizedArray<DType, VecDepth> cacheTn1;
@@ -53,12 +52,14 @@ void concat2(
                 Loop4R: for(int d3=0;d3<dimR3;d3++){
 #pragma HLS LOOP_TRIPCOUNT min=6 max=320
 #pragma HLS PIPELINE II=1
+
+                    //printf("d0:%d, d1:%d, d2:%d, d3:%d\n",d0,d1,d2,d3);
                     indxS1 =d0*dimA1*dimA2*dimA3 +
-                    d1*dimA2*dimA3+
-                    d2*dimA3;
+                            d1*dimA2*dimA3+
+                            d2*dimA3;
                     indxS2 =d0*dimB1*dimB2*dimB3 +
-                    d1*dimB2*dimB3+
-                    d2*dimB3;
+                            d1*dimB2*dimB3+
+                            d2*dimB3;
                     if(d3<dimA3){
                         indxS1 += d3;
                         indxS2 += 0;
@@ -72,16 +73,19 @@ void concat2(
                             (d2)*dimR3+
                             (d3);
 
+                    //printf("indxS1:%d, indxS2:%d, indxD:%d\n",(int)indxS1, (int)indxS2,(int)indxD);      
+
                     //1. Cache needed input elements without wasting bandwidth
                     cacheVecIdx1 = FlatIdx_to_VecIdx(VecDepth, indxS1);
                     cacheVecIdx2 = FlatIdx_to_VecIdx(VecDepth, indxS2);
+                    //printf("cacheVecIdx1:%d, cacheVecIdx2:%d\n",(int)cacheVecIdx1,(int)cacheVecIdx2);
                     if(cacheVecIdx1 != lastCacheVecIdx1){
                         cacheTn1 = inputTn1[cacheVecIdx1];
-                        printf("input1 read vId=%d\n", (int)cacheVecIdx1);
+                        //printf("****input1 read vId=%d\n", (int)cacheVecIdx1);
                     }
                     if(cacheVecIdx2 != lastCacheVecIdx2){
                         cacheTn2 = inputTn2[cacheVecIdx2];
-                        printf("input2 read vId=%d\n", (int)cacheVecIdx2);
+                        //printf("****input2 read vId=%d\n", (int)cacheVecIdx2);
                     }
                     lastCacheVecIdx1 = cacheVecIdx1;
                     lastCacheVecIdx2 = cacheVecIdx2;
@@ -89,6 +93,7 @@ void concat2(
                     //2. Use cached data to fill an output tensor vector consisting of 'VecDepth' number of 'DType' words
                     outputVecIdx = FlatIdx_to_VecIdx(VecDepth, indxD);
                     outputSubVecIdx = FlatIdx_to_VecSubIdx(VecDepth, indxD);
+                    //printf("outputVecIdx:%d, outputSubVecIdx:%d\n",(int)outputVecIdx,(int)outputSubVecIdx);
                     if(d3<dimA3){
                         buff.vec[outputSubVecIdx] = cacheTn1.vec[FlatIdx_to_VecSubIdx(VecDepth, indxS1)];
                     }else{
@@ -97,9 +102,9 @@ void concat2(
                     if(outputSubVecIdx==(VecDepth-1)){
                         //3. Write output buff when it's ready.
                         outputTn[FlatIdx_to_VecIdx(VecDepth, indxD)] = buff;
-                        printf("output write vId=%d\n", (int)FlatIdx_to_VecIdx(VecDepth, indxD));
+                        //printf("output write vId=%d\n", (int)FlatIdx_to_VecIdx(VecDepth, indxD));
                     }
-                    lastOutputVecIdx = outputVecIdx;
+                    //printf("\n\n");
                 }
 
 

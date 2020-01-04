@@ -247,8 +247,8 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
 ReportObject* XilinxImpUnitTests::KernelConcat2(){
     //TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
     //TensorF* tensorSrc2 = GenerateTensor(3,{2,2,2,2});
-    TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
-    TensorF* tensorSrc2 = GenerateTensor(4,{2,2,2,3});
+    TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,3});
+    TensorF* tensorSrc2 = GenerateTensor(0,{2,2,2,3});
 
     TensorF* tensorCpu = platformSelector->Concat2(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,3);
     std::cout<<"DDDDDDDDDDDDDDDDDDDDDDD\n";

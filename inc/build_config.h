@@ -5,7 +5,7 @@
 #ifndef DEEPPOINTV1_BUILD_CONFIG_H
 #define DEEPPOINTV1_BUILD_CONFIG_H
 
-#define REPO_DIR    "/home/saleh/01_workspace/00_SDx/DeepPoint-V1-FPGA/"
+#define REPO_DIR    "/run/media/saleh/NVME_DATA/01_workspace2/00_SDx2019/DeepPoint-V1-FPGA/"
 #define BIN_DIR     "??????????????"
 
 extern char* globalArgXclBin;
