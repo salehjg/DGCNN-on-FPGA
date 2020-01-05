@@ -33,6 +33,7 @@ public:
     unsigned long getLengthBytes();
     unsigned long getLengthPadded(int vectorWords);
     unsigned long getLengthBytesPadded(int vectorWords);
+    unsigned long getVectorCountPadded(int vectorWords);
     virtual ~TensorF();
 
     float* _buff;

@@ -13,6 +13,7 @@
 #include <ocl_imp/OclTensorF.h>
 #include <ocl_imp/OclTensorI.h>
 #include <cnpy.h>
+#include <ocl_imp/xilinx/VectorizationHelper.h>
 
 #define XILINX_BOTTLENCK_BLOCKSIZE 1024
 

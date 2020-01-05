@@ -150,6 +150,12 @@ unsigned long TensorF::getLengthBytesPadded(int vectorWords){
     return getLengthPadded(vectorWords) * sizeof(float);
 }
 
+unsigned long TensorF::getVectorCountPadded(int vectorWords){
+    assert(vectorWords>0);
+    unsigned long len = getLengthPadded(vectorWords);
+    return len / (unsigned long)vectorWords;
+}
+
 // https://stackoverflow.com/questions/9331561/why-does-my-classs-destructor-get-called-when-i-add-instances-to-a-vector
 TensorF::~TensorF() {
     if(platform == PLATFORMS::CPU){

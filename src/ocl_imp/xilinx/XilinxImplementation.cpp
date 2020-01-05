@@ -51,116 +51,122 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false/*,
-                DISABLED_KERNEL*/),
+                false),
         /* IDX 1 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/sqrt.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_sqrt",
-///                false),
-///        /* IDX 2 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/reducemax.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_reducemax",
-///                false),
-///        /* IDX 3 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/reducesum4d.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_reducesum4d",
-///                false),
-///        /* IDX 4 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/reducesum.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_reducesum",
-///                false/*,
-///                DISABLED_KERNEL*/),
-///        /* IDX 5 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/matops.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_matops",
-///                false),
-///        /* IDX 6 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/relu.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_relu",
-///                false),
-///        /* IDX 7 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/square.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_square",
-///                false/*,
-///                DISABLED_KERNEL*/),
-///        /* IDX 8 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/tile.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_tile",
-///                false),
-///        /* IDX 9 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/matmul.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_matmul",
-///                false),
-///        /* IDX 10 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/transpose.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_transpose",
-///                false),
-///        /* IDX 11 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/gather.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_gather",
-///                false/*,
-///                DISABLED_KERNEL*/),
-///
-///        /* IDX 12 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/conv2_1x1_direct.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_conv2_1x1_direct",
-///                false),
-///        /* IDX 13 :*/
-///        new OclKernelObject(
-///                KERNEL_DIR,
-///                "/xilinx/topk.cpp",
-///                "binary_container_1.xclbin",
-///                "",
-///                "task_topk",
-///                false),
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/sqrt.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_sqrt",
+                false),
+        /* IDX 2 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/reducemax.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_reducemax",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 3 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/reducesum4d.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_reducesum4d",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 4 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/reducesum.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_reducesum",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 5 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/matops.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_matops",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 6 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/relu.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_relu",
+                false),
+        /* IDX 7 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/square.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_square",
+                false),
+        /* IDX 8 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/tile.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_tile",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 9 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/matmul.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_matmul",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 10 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/transpose.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_transpose",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 11 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/gather.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_gather",
+                false,
+                DISABLED_KERNEL),
+
+        /* IDX 12 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/conv2_1x1_direct.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_conv2_1x1_direct",
+                false,
+                DISABLED_KERNEL),
+        /* IDX 13 :*/
+        new OclKernelObject(
+                KERNEL_DIR,
+                "/xilinx/topk.cpp",
+                "binary_container_1.xclbin",
+                "",
+                "task_topk",
+                false,
+                DISABLED_KERNEL),
 //      /* IDX 13 :*/
 //      new OclKernelObject(
 //              KERNEL_DIR,
@@ -466,7 +472,7 @@ TensorF* XilinxImplementation::Square(WorkScheduler scheduler, TensorF* batchedM
 
     }else{
         cl_int error;
-        cl_ulong len = batchedMat->getLength();
+        cl_ulong len = batchedMat->getVectorCountPadded(CONFIG_M_AXI_WIDTH);
         error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void*)&((OclTensorF*)batchedMat)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_ulong), (void*)&len);
@@ -1088,41 +1094,12 @@ TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
     OclKernelObject *kernelObject = oclKernels[1];
 
     if(kernelObject->use_ndrange_kernel){
-        cl_int error;
-        cl_ulong len = inputTn->getLength();
-        error =  clSetKernelArg(kernelObject->kernel_ndrange, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 2, sizeof(cl_ulong), (void*)&len);
-        if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
-        assert(error==0);
-
-        cl_event exeEvt;
-        //unsigned long localThreads[]  = {16, 16};
-        size_t globalThreads[] = {len};
-
-        error = clEnqueueNDRangeKernel(queue,
-                                       kernelObject->kernel_ndrange,
-                                       1, //two-dim
-                                       NULL,
-                                       globalThreads,
-                                       NULL, //localThreads,
-                                       0,
-                                       NULL,
-                                       &exeEvt);
-        if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
-
-        clWaitForEvents(1, &exeEvt);
-        ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-        if(error != CL_SUCCESS) {
-            printf("Kernel execution failure!\n");
-            exit(-22);
-        }
-        return rsltTn;
+        
     }
     else
     {
         cl_int error;
-        cl_ulong len = inputTn->getLength();
+        cl_ulong len = inputTn->getVectorCountPadded(CONFIG_M_AXI_WIDTH);
 
         error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
@@ -1539,7 +1516,8 @@ TensorF* XilinxImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
 
     }else{
         cl_int error;
-        cl_ulong len = inputTn->getLength();
+        cl_ulong len = inputTn->getVectorCountPadded(CONFIG_M_AXI_WIDTH);
+        std::cout<<len<<std::endl;
         error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_ulong), (void*)&len);
