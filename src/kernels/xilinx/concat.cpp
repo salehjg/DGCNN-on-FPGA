@@ -30,9 +30,14 @@ void concat2(
     unsigned long outputVecIdx, outputSubVecIdx;
     unsigned long indxS1, indxS2, indxD;
     unsigned int  dimR0, dimR1, dimR2, dimR3;
+
     VectorizedArray<DType, VecDepth> cacheTn1;
     VectorizedArray<DType, VecDepth> cacheTn2;
     VectorizedArray<DType, VecDepth> buff;
+#pragma HLS array_partition variable=cacheTn1 complete dim=0
+#pragma HLS array_partition variable=cacheTn2 complete dim=0
+#pragma HLS array_partition variable=buff complete dim=0
+
 
     dimR0 = dimA0;
     dimR1 = dimA1;
