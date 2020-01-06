@@ -29,35 +29,35 @@ void TileRank3Axis2(
     d1=0; lastElementCacheVecIdx=-1;
     d2=0;
 
-    printf("dim0:%u, dim1:%u, dim2:%u, tileCount:%u\n",dim0,dim1,dim2,tileCount);
+    //printf("dim0:%u, dim1:%u, dim2:%u, tileCount:%u\n",dim0,dim1,dim2,tileCount);
 
     for(unsigned long iter=0;iter<d0d1d2;iter++){
-        printf("d0:%d, d1:%d, d2:%d\n",d0,d1,d2);
+        //printf("d0:%d, d1:%d, d2:%d\n",d0,d1,d2);
         //------------------------------------------------------
         indxS = (d0)*dim1 + d1;
         indxD = (d0)*dim1*tileCount + (d1)*tileCount + (d2);
-        printf("indxS:%d, indxD:%d\n",(int)indxS,(int)indxD);
+        //printf("indxS:%d, indxD:%d\n",(int)indxS,(int)indxD);
 
         //------------------------------------------------------
         elementCacheVecIdx = FlatIdx_to_VecIdx(VecDepth, indxS);
-        printf("elementCacheVecIdx:%d, elementCacheVecSubIdx:%d\n",(int)elementCacheVecIdx,(int)FlatIdx_to_VecSubIdx(VecDepth, indxS));
+        //printf("elementCacheVecIdx:%d, elementCacheVecSubIdx:%d\n",(int)elementCacheVecIdx,(int)FlatIdx_to_VecSubIdx(VecDepth, indxS));
         if(elementCacheVecIdx!=lastElementCacheVecIdx){
             elementCache = inputTn[elementCacheVecIdx];
-            printf("****input1 read vId=%d\n", (int)elementCacheVecIdx);
+            //printf("****input1 read vId=%d\n", (int)elementCacheVecIdx);
         }
         lastElementCacheVecIdx = elementCacheVecIdx;
 
         //------------------------------------------------------
         outputVecIdx = FlatIdx_to_VecIdx(VecDepth, indxD);
         outputSubVecIdx = FlatIdx_to_VecSubIdx(VecDepth, indxD);
-        printf("outputVecIdx:%d, outputSubVecIdx:%d\n",(int)outputVecIdx,(int)outputSubVecIdx);
+        //printf("outputVecIdx:%d, outputSubVecIdx:%d\n",(int)outputVecIdx,(int)outputSubVecIdx);
         buff.vec[outputSubVecIdx] = elementCache.vec[FlatIdx_to_VecSubIdx(VecDepth, indxS)];
 
         //------------------------------------------------------
         if(outputSubVecIdx==(VecDepth-1)){
             // Write output buff when it's ready.
             outputTn[FlatIdx_to_VecIdx(VecDepth, indxD)] = buff;
-            printf("####output write vId=%d\n", (int)FlatIdx_to_VecIdx(VecDepth, indxD));
+            //printf("####output write vId=%d\n", (int)FlatIdx_to_VecIdx(VecDepth, indxD));
         }
 
         //=====================================================
