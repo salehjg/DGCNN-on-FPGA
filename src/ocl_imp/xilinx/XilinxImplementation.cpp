@@ -119,8 +119,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,

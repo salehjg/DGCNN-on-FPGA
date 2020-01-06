@@ -325,7 +325,7 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum(){
 
 ReportObject* XilinxImpUnitTests::KernelTile(){
     bool comparisonResult=true;
-    //TEST(Rank4_Axis2)
+    /*//TEST(Rank4_Axis2)
     {
         int tileCount = 8;
         int tileAxis  = 2;
@@ -333,19 +333,19 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }
+    }*/
 
     //TEST(Rank3_Axis2)
     {
         int tileCount = 8;
         int tileAxis  = 2;
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2,1});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,1});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
     }
     
-    //TEST(Rank3_Axis1)
+    /*//TEST(Rank3_Axis1)
     {
         int tileCount = 8;
         int tileAxis  = 1;
@@ -353,7 +353,7 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }
+    }*/
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -753,9 +753,9 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
+    PrintReport(KernelTile()); 
 
-    /*
-    PrintReport(KernelTile() );          
+    /*         
     //PrintReport(KernelConv2Mlp());            
     PrintReport(KernelGather()); 
     PrintReport(KernelMatops());
