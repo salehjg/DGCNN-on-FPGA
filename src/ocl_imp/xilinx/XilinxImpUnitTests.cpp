@@ -326,14 +326,14 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum(){
 ReportObject* XilinxImpUnitTests::KernelTile(){
     bool comparisonResult=true;
     //TEST(Rank4_Axis2)
-    /*{
+    {
         int tileCount = 8;
         int tileAxis  = 2;
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2,1,2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,1,17});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }*/
+    }
 
     //TEST(Rank3_Axis2)
     {

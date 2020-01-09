@@ -1553,7 +1553,7 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
 
     TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
 
-
+    int _tileAxis=tileAxis;
     int rank = inputTn->getRank();
     unsigned int _dim0,_dim1,_dim2,_dim3;
     _dim0 = inputTn->getShape()[0];
@@ -1572,6 +1572,15 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
       rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned int)tileCount},DATAMOVER_KERNEL_BANK_B_INDEX);
     }
 
+    if(rank==4 && tileAxis==2){
+        // Force to use rank3 axis1 kernel to save up resources
+        rank=3;
+        _tileAxis=1;
+        _dim0 = _dim0 * _dim1;
+        _dim1 = 1;
+        _dim2 = _dim3;
+    }
+
     OclKernelObject *kernelObject = oclKernels[8];
 
     if(kernelObject->use_ndrange_kernel){
@@ -1586,7 +1595,7 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
         error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&_dim2);
         error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_uint), (void*)&_dim3);
         error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_int),  (void*)&rank);
-        error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_int),  (void*)&tileAxis);
+        error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_int),  (void*)&_tileAxis);
         error |= clSetKernelArg(kernelObject->kernel_task, 8, sizeof(cl_int),  (void*)&tileCount);
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         assert(error==0);

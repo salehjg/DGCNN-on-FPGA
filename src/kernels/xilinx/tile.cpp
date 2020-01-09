@@ -184,44 +184,6 @@ void TileRank3Axis1(
 }
 
 /*
-void TileRank3Axis1(
-    const float *inputTn,
-    float *outputTn,
-    unsigned int dim0,
-    unsigned int dim1,
-    unsigned int dim2,
-    unsigned int tileCount){
-#pragma HLS INLINE
-
-    assert(dim1==1);
-    float buff[CONFIG_SLICE_SIZE];
-    unsigned long indxS,indxD;
-
-    for(int d0=0; d0<dim0; d0++){
-
-        LoopBurstReadSlice: for(int d2=0; d2<dim2; d2++){
-#pragma HLS PIPELINE II=1
-            indxS = d0*dim2 + d2;
-            buff[d2] = inputTn[indxS];
-        }
-        //-------------------------------------------
-
-        LoopTile: for(int k=0; k<tileCount; k++){
-            LoopBurstWriteSlice: for(int d2=0; d2<dim2; d2++){
-#pragma HLS PIPELINE II=1
-                indxD = (d0)*tileCount*dim2 + (k)*dim2 + (d2);
-                outputTn[indxD] = buff[d2];
-            }
-        }
-        //-------------------------------------------
-
-    }
-
-
-}
-*/
-
-/*
 void TileRank4Axis2(
     const float *inputTn,
     float *outputTn,
@@ -301,9 +263,11 @@ void task_tile(
 
 
     /*
+    For rank 4 tensors, we are going to use rank 3 axis 1 kernel with dim0'=dim0*dim1, dim1'=dim2 and dim2'=dim3 
     if(rank==4 && tileAxis==2) {
-        TileRank4Axis2(inputTn,outputTn,dim0,dim1,dim2,dim3,tileCount);
-    }*/
+        TileRank3Axis1<float, CONFIG_M_AXI_WIDTH>(inputTn, outputTn, dim0*dim1, dim2, dim3, tileCount);
+    }
+    */
 
     if(rank==3 && tileAxis==2) {
         TileRank3Axis2<float, CONFIG_M_AXI_WIDTH>(inputTn, outputTn, dim0, dim1, dim2, tileCount);
