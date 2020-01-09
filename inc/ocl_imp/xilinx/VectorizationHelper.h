@@ -10,6 +10,8 @@ struct VectorizedArray{
     DType vec[VectorizationDepth];
 };
 
+#define DO_PRAGMA(x) _Pragma ( #x )
+
 // Be careful with parenthesis in a preprocessor, especially when the expression has math ops!
 #define FlatIdx_to_VecIdx(vecDepth, flatIdx) (((unsigned long)flatIdx)/((unsigned long)vecDepth))
 #define FlatIdx_to_VecSubIdx(vecDepth, flatIdx) (((unsigned long)flatIdx)%((unsigned long)vecDepth))

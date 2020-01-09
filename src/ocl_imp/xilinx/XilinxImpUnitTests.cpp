@@ -325,8 +325,8 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum(){
 
 ReportObject* XilinxImpUnitTests::KernelTile(){
     bool comparisonResult=true;
-    /*//TEST(Rank4_Axis2)
-    {
+    //TEST(Rank4_Axis2)
+    /*{
         int tileCount = 8;
         int tileAxis  = 2;
         TensorF* tensorSrc1 = GenerateTensor(3,{2,2,1,2});
@@ -337,23 +337,32 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
 
     //TEST(Rank3_Axis2)
     {
-        int tileCount = 8;
+        int tileCount = 7;
         int tileAxis  = 2;
-        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,1});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,5,1});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
     }
     
-    /*//TEST(Rank3_Axis1)
+    //TEST(Rank3_Axis1)
     {
-        int tileCount = 8;
+        int tileCount = 3;
         int tileAxis  = 1;
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,1,2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,1,7});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }*/
+    }
+    //TEST(Rank3_Axis1)
+    {
+        int tileCount = 2;
+        int tileAxis  = 1;
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,1,18});
+        TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
+        TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -744,7 +753,7 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 
 void XilinxImpUnitTests::RunAll(){
     
-    PrintReport(TensorFloat());
+    /*PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
@@ -752,21 +761,23 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
-    PrintReport(KernelSquare());  
+    PrintReport(KernelSquare());  */
     PrintReport(KernelTile()); 
 
     /*         
-    //PrintReport(KernelConv2Mlp());            
-    PrintReport(KernelGather()); 
+    //PrintReport(KernelConv2Mlp());
+
+    PrintReport(KernelGather());
     PrintReport(KernelMatops());
     PrintReport(KernelMatmul());
+    PrintReport(KernelTranspose());
+    PrintReport(KernelTopK());   
+
     PrintReport(KernelReduceMax());
+    PrintReport(KernelReduceSum());  
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
-    PrintReport(KernelTranspose());
-    PrintReport(KernelTopK());
-    PrintReport(KernelReduceSum());     
     */
 }
 
