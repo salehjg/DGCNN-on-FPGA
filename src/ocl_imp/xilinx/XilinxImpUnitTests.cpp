@@ -273,7 +273,7 @@ ReportObject* XilinxImpUnitTests::KernelSqrt(){
 
 
 ReportObject* XilinxImpUnitTests::KernelReduceMax(){
-    TensorF* tensorSrc1 = GenerateTensor(0,{2,2,5,3});
+    TensorF* tensorSrc1 = GenerateTensor(0,{2,2,5,17});
     TensorF* tensorCpu1 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc1,2);
     TensorF* tensorGpu1 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,2);
     bool comparisonResult1 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
@@ -761,8 +761,9 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
-    PrintReport(KernelSquare());  */
-    PrintReport(KernelTile()); 
+    PrintReport(KernelSquare());  
+    PrintReport(KernelTile()); */
+    PrintReport(KernelReduceMax());
 
     /*         
     //PrintReport(KernelConv2Mlp());

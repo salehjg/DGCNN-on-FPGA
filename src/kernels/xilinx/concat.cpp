@@ -126,15 +126,15 @@ void task_concat(
     VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn2,
     VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
 
-        unsigned int dimA0,
-        unsigned int dimA1,
-        unsigned int dimA2,
-        unsigned int dimA3,
+    unsigned int dimA0,
+    unsigned int dimA1,
+    unsigned int dimA2,
+    unsigned int dimA3,
 
-        unsigned int dimB0,
-        unsigned int dimB1,
-        unsigned int dimB2,
-        unsigned int dimB3){
+    unsigned int dimB0,
+    unsigned int dimB1,
+    unsigned int dimB2,
+    unsigned int dimB3){
 
 #pragma HLS INTERFACE m_axi     port=inputTn1   offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi     port=inputTn2   offset=slave bundle=gmem1
