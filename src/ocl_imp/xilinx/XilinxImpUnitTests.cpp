@@ -672,16 +672,26 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelMean(){
-    TensorF* tensorSrc = GenerateTensor(1,{2,2,2,5});
-    TensorF* tensorCpu = platformSelector->Mean(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
-    TensorF* tensorGpu = platformSelector->Mean(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
-    bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    bool comparisonResult = true;
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{2,2,2,5});
+        TensorF* tensorCpu = platformSelector->Mean(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
+        TensorF* tensorGpu = platformSelector->Mean(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{2,2,2,17});
+        TensorF* tensorCpu = platformSelector->Mean(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
+        TensorF* tensorGpu = platformSelector->Mean(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
 
 ReportObject* XilinxImpUnitTests::KernelVariance(){
-    TensorF* tensorSrc = GenerateTensor(1,{2,2,2,5});
+    TensorF* tensorSrc = GenerateTensor(0,{2,2,2,5});
     TensorF* tensorCpu = platformSelector->Variance(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
     TensorF* tensorGpu = platformSelector->Variance(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
     bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -808,7 +818,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelReduceSum()); 
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMatops());
-
+    PrintReport(KernelMean());
+    PrintReport(KernelVariance());
     /*         
     //PrintReport(KernelConv2Mlp());
 
@@ -816,8 +827,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
     PrintReport(KernelTopK());   
-    PrintReport(KernelMean());
-    PrintReport(KernelVariance());
+
     */
 }
 
