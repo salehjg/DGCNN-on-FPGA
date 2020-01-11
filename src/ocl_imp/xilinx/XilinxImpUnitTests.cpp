@@ -409,12 +409,27 @@ ReportObject* XilinxImpUnitTests::KernelSquare(){
 ReportObject* XilinxImpUnitTests::KernelMatops(){
     bool comparisonResult=true;
     bool printLog=false;
+
     if(printLog) cout << "TEST(Rank_4_4)"<<endl;
     {
         //Ranks: 4,4
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(4,{2,2,2,2});
-        TensorF* tensorSrc2 = GenerateTensor(3,{2,2,2,2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,2});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2,2,2,2});
+
+        for(MAT_OPS op : ops){
+            TensorF* tensorCpu = platformSelector->MatOps(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,op);
+            TensorF* tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,op);
+            comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+        }
+    }
+
+    if(printLog) cout << "TEST(Rank_4_3)"<<endl;
+    {
+        //Ranks: 4,4
+        vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,17});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2,2,17});
 
         for(MAT_OPS op : ops){
             TensorF* tensorCpu = platformSelector->MatOps(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,op);
@@ -459,6 +474,20 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
             TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, tensorSrc2,op);
             TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1,tensorSrc2, op);
             comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu,tensorGpu);
+        }
+    }
+
+    if(printLog) cout << "TEST(Rank_4_1)"<<endl;
+    {
+        //Ranks: 4,4
+        vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,17});
+        TensorF* tensorSrc2 = GenerateTensor(0,{17});
+
+        for(MAT_OPS op : ops){
+            TensorF* tensorCpu = platformSelector->MatOps(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,op);
+            TensorF* tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,op);
+            comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
         }
     }
 
@@ -778,12 +807,12 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum()); 
     PrintReport(KernelReduceSum4D());
+    PrintReport(KernelMatops());
 
     /*         
     //PrintReport(KernelConv2Mlp());
 
     PrintReport(KernelGather());
-    PrintReport(KernelMatops());
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
     PrintReport(KernelTopK());   
