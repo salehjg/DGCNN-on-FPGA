@@ -313,7 +313,7 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum(){
     bool comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu2,tensorGpu2);
     */
     //TEST(Rank3_OverAxis2)
-    TensorF* tensorSrc3 = GenerateTensor(1,{2,2,2});
+    TensorF* tensorSrc3 = GenerateTensor(0,{2,3,17});
     TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
     TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
     bool comparisonResult3 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
@@ -764,6 +764,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelSquare());  
     PrintReport(KernelTile()); */
     PrintReport(KernelReduceMax());
+    PrintReport(KernelReduceSum()); 
 
     /*         
     //PrintReport(KernelConv2Mlp());
@@ -774,8 +775,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelTranspose());
     PrintReport(KernelTopK());   
 
-    PrintReport(KernelReduceMax());
-    PrintReport(KernelReduceSum());  
+    PrintReport(KernelReduceMax()); 
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
