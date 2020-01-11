@@ -288,12 +288,24 @@ ReportObject* XilinxImpUnitTests::KernelReduceMax(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelReduceSum4D(){
+    bool comparisonResult=true;
+
     //Rank4_TTTF
-    //TensorF* tensorSrc = GenerateTensor(1,{5,1024,20,256});
-    TensorF* tensorSrc = GenerateTensor(4,{2,2,2,5});
-    TensorF* tensorCpu = platformSelector->ReduceSum4D(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
-    TensorF* tensorGpu = platformSelector->ReduceSum4D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
-    bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{2,2,2,5});
+        TensorF* tensorCpu = platformSelector->ReduceSum4D(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
+        TensorF* tensorGpu = platformSelector->ReduceSum4D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+
+    //Rank4_TTTF
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{2,2,2,17});
+        TensorF* tensorCpu = platformSelector->ReduceSum4D(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
+        TensorF* tensorGpu = platformSelector->ReduceSum4D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -765,6 +777,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelTile()); */
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum()); 
+    PrintReport(KernelReduceSum4D());
 
     /*         
     //PrintReport(KernelConv2Mlp());
@@ -774,9 +787,6 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
     PrintReport(KernelTopK());   
-
-    PrintReport(KernelReduceMax()); 
-    PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
     */

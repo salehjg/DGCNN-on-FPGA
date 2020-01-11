@@ -75,8 +75,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
