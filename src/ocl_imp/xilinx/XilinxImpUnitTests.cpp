@@ -734,8 +734,10 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
-    cout<<"Please confirm that TOPK kernel is configured for K=3 and N=5, Press any key to continue..."<<endl; cin.get();
-    int kVal=3 , N=5 , B=2;
+    int kVal=20 , N=1024 , B=2;
+    cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
+        <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
+    
 
     TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
     TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
@@ -813,7 +815,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
-    PrintReport(KernelTile()); */
+    PrintReport(KernelTile()); 
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum()); 
     PrintReport(KernelReduceSum4D());
@@ -822,11 +824,12 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelVariance());
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
-    PrintReport(KernelGather());
+    PrintReport(KernelGather());*/
+    PrintReport(KernelTopK());   
 
     /*         
     //PrintReport(KernelConv2Mlp());
-    PrintReport(KernelTopK());   
+    
     */
 }
 

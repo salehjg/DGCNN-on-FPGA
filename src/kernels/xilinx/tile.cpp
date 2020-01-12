@@ -1,5 +1,5 @@
-#include <cassert>
 #include "VectorizationHelper.h"
+#include <cassert>
 #include <stdio.h>
 
 #define CONFIG_RANK3_AXIS1_MAX_SLICE_SIZE 1024
