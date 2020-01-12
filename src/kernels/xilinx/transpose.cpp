@@ -1,14 +1,14 @@
 // B=5, Dim1=1024, Dim2=1,3,64
 //Latency is for 5x1024x64 and CONFIG_W_H=(16,64)
 
-#include <iostream>
-using namespace std;
+#include "VectorizationHelper.h"
+#include <stdio.h>
 
 #define CONFIG_BLOCK_WIDTH  16
 #define CONFIG_BLOCK_HEIGHT 64
 
 template <typename DType>
-void BatchTranspose(
+void BatchTransposeAXI32(
     const DType* inputTn,
     DType* outputTn,
     int dim0,               //batch
@@ -18,12 +18,12 @@ void BatchTranspose(
     DType buff[CONFIG_BLOCK_HEIGHT][CONFIG_BLOCK_WIDTH];
     unsigned long indxS,indxD;
     int tmp1, tmp2;
-    /*******************************************
-     * inputTn must be row-major.
-     * dim0 = batch
-     * dim1 = rows
-     * dim2 = columns
-     *******************************************/
+    // *******************************************
+    // * inputTn must be row-major.
+    // * dim0 = batch
+    // * dim1 = rows
+    // * dim2 = columns
+    // *******************************************
     LoopBatch:for(int batch=0; batch<dim0; batch++){
 #pragma HLS LOOP_TRIPCOUNT min=5 max=5
         LoopTiles1:for(int d2=0; d2<dim2; d2+=CONFIG_BLOCK_WIDTH){
@@ -69,11 +69,11 @@ void BatchTranspose(
 
 extern "C"{
 void task_transpose(
-    const float* inputTn,
-    float* outputTn,
-    int dim0,
-    int dim1,
-    int dim2){
+        float *inputTn,
+        float *outputTn,
+        int dim0,
+        int dim1,
+        int dim2){
 #pragma HLS INTERFACE m_axi     port=inputTn   offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi     port=outputTn  offset=slave bundle=gmem1
 #pragma HLS INTERFACE s_axilite port=inputTn   bundle=control
@@ -85,6 +85,6 @@ void task_transpose(
 
 #pragma HLS INTERFACE s_axilite port=return     bundle=control
 
-    BatchTranspose<float>(inputTn,outputTn,dim0,dim1,dim2);
+    BatchTransposeAXI32<float>(inputTn,outputTn,dim0,dim1,dim2);
 }
 }

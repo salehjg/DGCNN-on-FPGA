@@ -123,8 +123,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -132,8 +131,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_transpose",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 11 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -141,8 +139,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false,
-                DISABLED_KERNEL),
+                false),
 
         /* IDX 12 :*/
         new OclKernelObject(

@@ -820,14 +820,13 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMatops());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
-    /*         
-    //PrintReport(KernelConv2Mlp());
-
-    PrintReport(KernelGather());
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
-    PrintReport(KernelTopK());   
+    PrintReport(KernelGather());
 
+    /*         
+    //PrintReport(KernelConv2Mlp());
+    PrintReport(KernelTopK());   
     */
 }
 

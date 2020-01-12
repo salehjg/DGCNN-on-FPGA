@@ -1,45 +1,82 @@
-#include <iostream>
+#include "VectorizationHelper.h"
+#include <stdio.h>
 #include <cassert>
 
 //The latency is reported for inputTn of shape 5x1024x64 and indicesTn of shape 5x1024x20
-
-template<typename DType>
+template<typename DType, int VecDepthInput, int VecDepthIndicesOutput>
 void Gather(
-    const DType* inputTn,
-    const int*   indicesTn,
-    DType* outputTn,
-    int indices_axis,
-    int inputDim0,
-    int inputDim1,
-    int inputDim2,
-    int indicesDim0,
-    int indicesDim1,
-    int indicesDim2){
-
+        VectorizedArray<DType, VecDepthInput> *inputTn,
+        VectorizedArray<int, VecDepthIndicesOutput> *indicesTn,
+        VectorizedArray<DType, VecDepthIndicesOutput> *outputTn,
+        int indices_axis,
+        int inputDim0,
+        int inputDim1,
+        int inputDim2,
+        int indicesDim0,
+        int indicesDim1,
+        int indicesDim2){
     assert(inputDim0 == indicesDim0);
     assert(inputDim1 == indicesDim1);
     assert(indices_axis == 1);
-
     unsigned long indxS1, indxS2, indxD;
     unsigned long BxNxKxD = indicesDim0 * indicesDim1 * indicesDim2 * inputDim2;
     int d0idx, d1idx, d2idx,d2input;
+
+    unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
+    VectorizedArray<DType, VecDepthInput> inputCache;
+#pragma HLS array_partition variable=inputCache complete dim=0
+
+    unsigned long indicesCacheVecIdx, indicesCacheVecSubIdx, lastIndicesCacheVecIdx;
+    VectorizedArray<int, VecDepthIndicesOutput> indicesCache;
+#pragma HLS array_partition variable=indicesCache complete dim=0
+
+    unsigned long outputCacheVecIdx, outputCacheVecSubIdx;
+    VectorizedArray<DType, VecDepthIndicesOutput> outputCache;
+#pragma HLS array_partition variable=outputCache complete dim=0
+
     d0idx = 0;
     d1idx = 0;
     d2idx = 0;
     d2input = 0;
-
+    lastInputCacheVecIdx=-1; lastIndicesCacheVecIdx=-1;
     //Nested loop for B,N,K,D
     LoopIter: for(unsigned long iter=0; iter<BxNxKxD; iter++){
 #pragma HLS LOOP_TRIPCOUNT min=6553600 max=6553600
-
         // Only calculate this on start of the loop D
         if(d2input==0){
             indxS1 = d0idx*indicesDim1*indicesDim2 + d1idx*indicesDim2 + d2idx;
         }
 
+        //----------------------------------------
+        indicesCacheVecIdx = FlatIdx_to_VecIdx(VecDepthIndicesOutput, indxS1);
+        indicesCacheVecSubIdx = FlatIdx_to_VecSubIdx(VecDepthIndicesOutput, indxS1);
+        if(indicesCacheVecIdx!=lastIndicesCacheVecIdx){
+            indicesCache = indicesTn[indicesCacheVecIdx];
+        }
+        lastIndicesCacheVecIdx = indicesCacheVecIdx;
+
+        //----------------------------------------
+        indxS2 = d0idx*indicesDim1*inputDim2 + indicesCache.vec[indicesCacheVecSubIdx]*inputDim2 + d2input;
+
+        //----------------------------------------
+        inputCacheVecIdx = FlatIdx_to_VecIdx(VecDepthInput, indxS2);
+        inputCacheVecSubIdx = FlatIdx_to_VecSubIdx(VecDepthInput, indxS2);
+        if(inputCacheVecIdx!=lastInputCacheVecIdx){
+            inputCache = inputTn[inputCacheVecIdx];
+        }
+        lastInputCacheVecIdx = inputCacheVecIdx;
+
+        //----------------------------------------
         indxD = d0idx*indicesDim1*indicesDim2*inputDim2 + d1idx*indicesDim2*inputDim2 + d2idx*inputDim2 + d2input;
-        indxS2 = d0idx*indicesDim1*inputDim2 + indicesTn[indxS1]*inputDim2 + d2input;
-        outputTn[indxD] = inputTn[indxS2];
+        outputCacheVecIdx = FlatIdx_to_VecIdx(VecDepthIndicesOutput, indxD);
+        outputCacheVecSubIdx = FlatIdx_to_VecSubIdx(VecDepthIndicesOutput, indxD);
+
+        //----------------------------------------
+        outputCache.vec[outputCacheVecSubIdx] = inputCache.vec[inputCacheVecSubIdx];
+        if(outputCacheVecSubIdx==(VecDepthIndicesOutput-1) || iter==(BxNxKxD-1)){
+            outputTn[outputCacheVecIdx] = outputCache;
+        }
+
         //========================================
         if(d2input==inputDim2-1){
             d2input = 0;
@@ -58,36 +95,13 @@ void Gather(
             d2input++;
         }
     }
-    /*
-    unsigned int
-        B = dimA0,
-        N = dimA1,
-        K = dimB2,
-        D = dimA2;
-
-    for(int b=0;b<B;b++){
-        for(int n=0;n<N;n++){
-            for(int k=0;k<K;k++){
-                indxS1 = b*N*K + n*K + k;
-                for(int d=0;d<D;d++)
-                {
-                    indxD = b*N*K*D + n*K*D + k*D + d;
-                    indxS2 = b*N*D +
-                             inputTn2[indxS1]*D +
-                             d;
-                    outputTn[indxD] = inputTn1[indxS2];
-                }
-            }
-        }
-    }
-    */
 }
 
 extern "C"{
 void task_gather(
-    const float* inputTn,
-    const int*   indicesTn,
-    float* outputTn,
+    VectorizedArray<float, CONFIG_GATHER_INPUTTN_M_AXI_WIDTH> *inputTn,
+    VectorizedArray<int, CONFIG_M_AXI_WIDTH> *indicesTn,
+    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
     int indices_axis,
     int inputDim0,
     int inputDim1,
@@ -113,6 +127,20 @@ void task_gather(
 
 #pragma HLS INTERFACE s_axilite port=return         bundle=control
 
-    Gather<float>(inputTn,indicesTn,outputTn,indices_axis,inputDim0,inputDim1,inputDim2,indicesDim0,indicesDim1,indicesDim2);
+#pragma HLS data_pack variable=inputTn
+#pragma HLS data_pack variable=indicesTn
+#pragma HLS data_pack variable=outputTn
+
+    Gather<float, CONFIG_GATHER_INPUTTN_M_AXI_WIDTH, CONFIG_M_AXI_WIDTH>(
+        inputTn,
+        indicesTn,
+        outputTn,
+        indices_axis,
+        inputDim0,
+        inputDim1,
+        inputDim2,
+        indicesDim0,
+        indicesDim1,
+        indicesDim2);
 }
 }

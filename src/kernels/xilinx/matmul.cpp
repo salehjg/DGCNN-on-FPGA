@@ -4,7 +4,7 @@
 #define CONFIG_MAX_COMMON_DIM       1024
 
 template <typename DType>
-void BatchMatMul(
+void BatchMatMulAXI32(
     DType *inputTn1, //Same as MatA
     DType *inputTn2, //Same as MatB
     DType *outputTn,
@@ -178,6 +178,6 @@ void task_matmul(
 
 #pragma HLS INTERFACE s_axilite port=return     bundle=control
 
-    BatchMatMul<float>(inputTn1, inputTn2, outputTn, dim0A, dim1A, dim2A, dim0B, dim1B, dim2B);
+    BatchMatMulAXI32<float>(inputTn1, inputTn2, outputTn, dim0A, dim1A, dim2A, dim0B, dim1B, dim2B);
 }
 }

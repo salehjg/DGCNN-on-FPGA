@@ -225,8 +225,8 @@ synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"            
 #synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float")
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"  )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"              )
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"           )
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"           )
@@ -236,7 +236,7 @@ synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"              
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"             "task_square"              )
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                )
 #synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"               "task_topk"                )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"           )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"           )
 
 
 
@@ -334,8 +334,8 @@ sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
@@ -345,7 +345,7 @@ sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"               FALSE TRUE ${SP_TAG_SQUARE} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
 
 
 
