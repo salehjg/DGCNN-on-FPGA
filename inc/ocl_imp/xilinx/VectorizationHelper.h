@@ -24,6 +24,6 @@ struct VectorizedArray{
 #define CONFIG_GATHER_INPUTTN_M_AXI_WIDTH 4
 
 // AXI bus width for indicesSplitedTn(only) of task_topk(kValue should be devidable to CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH).
-#define CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH 10
+#define CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH 4
 
 #endif //SDACCEL_CMAKE_SIMPLE_VECTORIZATIONHELPER_H

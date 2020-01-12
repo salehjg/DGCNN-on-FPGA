@@ -734,7 +734,7 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
-    int kVal=20 , N=1024 , B=2;
+    int kVal=20 , N=32 , B=1;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
         <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
     
