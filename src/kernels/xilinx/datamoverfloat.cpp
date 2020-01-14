@@ -1,5 +1,5 @@
 #include "VectorizationHelper.h"
-#include "stdio.h"
+#include <stdio.h>
 /*
 _task_datamover:
 Copies data of length 'len' :
@@ -20,8 +20,8 @@ static void _task_datamover(
 #pragma HLS inline
 
     VectorizedArray<DType, VecDepth> buff;
+#pragma HLS array_partition variable=buff complete dim=0
     
-
     if(reverseSwitch==0){
         for(unsigned long i=0;i<len;i++){
         #pragma HLS PIPELINE II=1
@@ -35,8 +35,6 @@ static void _task_datamover(
             srcBuff[i] = buff;
         }
     }
-
-
 }
 
 extern "C" {

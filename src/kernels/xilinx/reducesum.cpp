@@ -8,10 +8,8 @@
 #define CONFIG_SLICE_SIZE               64
 #define CONFIG_OUTPUT_BUFF_SIZE         32
 
-//=========================================================================================================
-//=========================================================================================================
 template <typename DType, int VecDepth>
-void SubfucSliceReadBurst(
+void SubfuncSliceReadBurst(
         VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
         hls::stream<DType> &inStream,
         unsigned int dim0,
@@ -46,9 +44,9 @@ void SubfucSliceReadBurst(
         inStream << inputCache.vec[inputCacheVecSubIdx];
 
         //=====================================================
-        if( d2 == ((unsigned long)dim2-1) ){
+        if( d2 == (dim2-1) ){
             d2=0;
-            if( d1 == ((unsigned long)dim1-1) ){
+            if( d1 == (dim1-1) ){
                 d0++;
                 d1=0;
             }else{
@@ -85,9 +83,9 @@ void SubfuncSliceReduceSum(
         if(d2==(dim2-1)) outStream<<sum;
 
         //=====================================================
-        if( d2 == ((unsigned long)dim2-1) ){
+        if( d2 == (dim2-1) ){
             d2=0;
-            if( d1 == ((unsigned long)dim1-1) ){
+            if( d1 == (dim1-1) ){
                 d0++;
                 d1=0;
             }else{
@@ -111,7 +109,7 @@ void SubfuncSliceWrite(
     VectorizedArray<DType, VecDepth> outputCache; 
 #pragma HLS array_partition variable=outputCache complete dim=0
 
-    unsigned int d0,d1;
+    int d0,d1;
     unsigned long d0d1 = dim0*dim1;
 
     d0=0;d1=0;
@@ -129,7 +127,7 @@ void SubfuncSliceWrite(
         }
 
         //=====================================================
-        if( d1 == ((unsigned long)dim1-1) ){
+        if( d1 == (dim1-1) ){
             d0++;
             d1=0;
         }else{
@@ -155,7 +153,7 @@ void ReduceSumRank3Axis2(
 #pragma HLS DATAFLOW
 
     // Read all slices of dim2 from input tensor(vectorized) into word stream(not vectorized)
-    SubfucSliceReadBurst<DType, VecDepth>(inputTn, datastream1, dim0, dim1, dim2);
+    SubfuncSliceReadBurst<DType, VecDepth>(inputTn, datastream1, dim0, dim1, dim2);
 
     // Simple for-loop reduction
     SubfuncSliceReduceSum<DType, VecDepth>(datastream1, datastream2, dim0, dim1, dim2);

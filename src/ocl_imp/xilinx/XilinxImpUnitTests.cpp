@@ -245,15 +245,11 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelConcat2(){
-    //TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,3});
-    //TensorF* tensorSrc2 = GenerateTensor(3,{2,2,2,2});
     TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,3});
     TensorF* tensorSrc2 = GenerateTensor(0,{2,2,2,3});
 
     TensorF* tensorCpu = platformSelector->Concat2(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,3);
-    std::cout<<"DDDDDDDDDDDDDDDDDDDDDDD\n";
     TensorF* tensorGpu = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,3);
-    std::cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAA\n";
 
     bool rslt = platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu, tensorGpu);
     ReportObject* obj = new ReportObject(__FUNCTION__, rslt);
@@ -817,16 +813,16 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 
 void XilinxImpUnitTests::RunAll(){
     
-    /*PrintReport(TensorFloat());
+    PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
-    PrintReport(TensorCloneBankInteger());
+    PrintReport(TensorCloneBankInteger());/*
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
-    PrintReport(KernelTile()); 
+    PrintReport(KernelTile());
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum()); 
     PrintReport(KernelReduceSum4D());
@@ -838,7 +834,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelGather());*/
     
     //PrintReport(KernelTopK());   
-    PrintReport(KernelConv2Mlp());
+    //PrintReport(KernelConv2Mlp());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

@@ -8,13 +8,13 @@ void Gather(
         VectorizedArray<DType, VecDepthInput> *inputTn,
         VectorizedArray<int, VecDepthIndicesOutput> *indicesTn,
         VectorizedArray<DType, VecDepthIndicesOutput> *outputTn,
-        int indices_axis,
-        int inputDim0,
-        int inputDim1,
-        int inputDim2,
-        int indicesDim0,
-        int indicesDim1,
-        int indicesDim2){
+        unsigned int indices_axis,
+        unsigned int inputDim0,
+        unsigned int inputDim1,
+        unsigned int inputDim2,
+        unsigned int indicesDim0,
+        unsigned int indicesDim1,
+        unsigned int indicesDim2){
     assert(inputDim0 == indicesDim0);
     assert(inputDim1 == indicesDim1);
     assert(indices_axis == 1);
@@ -78,11 +78,11 @@ void Gather(
         }
 
         //========================================
-        if(d2input==inputDim2-1){
+        if(d2input==(inputDim2-1)){
             d2input = 0;
-            if(d2idx==indicesDim2-1){
+            if(d2idx==(indicesDim2-1)){
                 d2idx = 0;
-                if(d1idx==indicesDim1-1){
+                if(d1idx==(indicesDim1-1)){
                     d1idx=0;
                     d0idx++;
                 }else{
@@ -102,13 +102,13 @@ void task_gather(
     VectorizedArray<float, CONFIG_GATHER_INPUTTN_M_AXI_WIDTH> *inputTn,
     VectorizedArray<int, CONFIG_M_AXI_WIDTH> *indicesTn,
     VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
-    int indices_axis,
-    int inputDim0,
-    int inputDim1,
-    int inputDim2,
-    int indicesDim0,
-    int indicesDim1,
-    int indicesDim2){
+    unsigned int indices_axis,
+    unsigned int inputDim0,
+    unsigned int inputDim1,
+    unsigned int inputDim2,
+    unsigned int indicesDim0,
+    unsigned int indicesDim1,
+    unsigned int indicesDim2){
 #pragma HLS INTERFACE m_axi     port=inputTn        offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi     port=indicesTn      offset=slave bundle=gmem2
 #pragma HLS INTERFACE m_axi     port=outputTn       offset=slave bundle=gmem1

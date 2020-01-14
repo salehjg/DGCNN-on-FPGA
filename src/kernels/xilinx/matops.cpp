@@ -93,11 +93,11 @@ void _task_matops(
 
         //=====================================================
         //House keeping if-statements for fused loops:
-        if(d3==((unsigned long)dim3-1)){
+        if(d3==(dim3-1)){
             d3=0;
-            if(d2==((unsigned long)dim2-1)){
+            if(d2==(dim2-1)){
                 d2=0;
-                if(d1==((unsigned long)dim1-1)){
+                if(d1==(dim1-1)){
                     d1=0;
                     d0++;
                 }else{

@@ -174,9 +174,9 @@ DO_PRAGMA(HLS UNROLL factor=UnrollFactor)
         }
 
         //==============================================================
-        if(k == ((unsigned long)dim2D-1)){
+        if(k == (dim2D-1)){
             k=0;
-            if(n == ((unsigned long)dim1D-1)){
+            if(n == (dim1D-1)){
                 n=0;
                 b++;
             }else{

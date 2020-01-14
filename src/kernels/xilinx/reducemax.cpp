@@ -7,7 +7,7 @@
 ** ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
 ** ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
 **
-** ReduceMax: reductionDim=1, DIM2 SHOULD BE EQUALS TO ONE, ARGS(0,1,2)=DIM0x(DIM1)xDIM3,
+** ReduceMax: reductionDim=1, DIM2 SHOULD BE ONE, ARGS(0,1,2)=DIM0x(DIM1)xDIM3,
 ** ReduceMax: reductionDim=2,                             , ARGS(0,1,2)=[DIM0*DIM1]x(DIM2)xDIM3
 */
 
@@ -88,9 +88,9 @@ void reducemax_rank3_ftf(
 
 
         //=====================================================
-        if( d2 == ((unsigned long)dim2-1) ){
+        if( d2 == (dim2-1) ){
             d2=0;
-            if( d1 == ((unsigned long)dim1-1) ){
+            if( d1 == (dim1-1) ){
                 d0++;
                 d1=0;
             }else{

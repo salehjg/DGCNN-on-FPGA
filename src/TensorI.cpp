@@ -37,6 +37,7 @@ TensorI::TensorI(std::vector<unsigned int> shape, int *buff) {
 
 void TensorI::Init(std::vector<unsigned int> shape) {
     if(initialized){
+        std::cout<<"--- TensorI: buffer deleted.\n";
         delete(_buff);
     }
     this->shape = shape;
@@ -48,6 +49,7 @@ void TensorI::Init(std::vector<unsigned int> shape) {
 
 void TensorI::Init(std::vector<unsigned int> shape, int* buff){
     if(initialized){
+        std::cout<<"--- TensorI: buffer deleted.\n";
         delete(_buff);
     }
     this->shape = shape;
@@ -73,6 +75,10 @@ void TensorI::ExpandDims(int axis) {
     this->rank++;
 }
 
+void TensorI::ExpandDimZero(){
+    ExpandDims(0);
+}
+
 void TensorI::SqueezeDims() {
     std::vector<unsigned int> shapeNew;
 
@@ -81,10 +87,6 @@ void TensorI::SqueezeDims() {
     }
     shape = shapeNew;
     rank = (int)shape.size();
-}
-
-void TensorI::ExpandDimZero(){
-    ExpandDims(0);
 }
 
 void TensorI::SqueezeDimZero(){
@@ -142,7 +144,7 @@ unsigned long TensorI::getLengthPadded(int vectorWords){
 
 unsigned long TensorI::getLengthBytesPadded(int vectorWords){
     assert(vectorWords>0);
-    return getLengthPadded(vectorWords) * sizeof(float);
+    return getLengthPadded(vectorWords) * sizeof(int);
 }
 
 unsigned long TensorI::getVectorCountPadded(int vectorWords){
@@ -154,10 +156,11 @@ unsigned long TensorI::getVectorCountPadded(int vectorWords){
 TensorI::~TensorI() {
     if(platform == PLATFORMS::CPU){
         if(initialized){
-            std::cout<<"--- TensorI: destructed.\n";
+            //std::cout<<"--- TensorI: destructed.\n";
             delete(_buff);
         }
     }/*else if(platform == PLATFORMS::GPU_CUDA){
+
 #ifdef USE_CUDA
         cudaError_t cuda_stat;
         if(initialized){
@@ -169,4 +172,5 @@ TensorI::~TensorI() {
 #endif
     }
     */
+        
 }

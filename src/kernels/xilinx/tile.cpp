@@ -64,9 +64,9 @@ void TileRank3Axis2(
         }
 
         //=====================================================
-        if( d2 == ((unsigned long)tileCount-1) ){
+        if( d2 == (tileCount-1) ){
             d2=0;
-            if( d1 == ((unsigned long)dim1-1) ){
+            if( d1 == (dim1-1) ){
                 d0++;
                 d1=0;
             }else{
@@ -165,9 +165,9 @@ void TileRank3Axis1(
             //printf("####output write vId=%d\n", (int)outputVecIdx);
         }
         //=====================================================
-        if( d2 == ((unsigned long)dim2-1) ){
+        if( d2 == (dim2-1) ){
             d2=0;
-            if( d1 == ((unsigned long)tileCount-1) ){
+            if( d1 == (tileCount-1) ){
                 d0++;
                 d1=0;
                 sliceBuffIndex=0;
@@ -182,55 +182,6 @@ void TileRank3Axis1(
     }
 
 }
-
-/*
-void TileRank4Axis2(
-    const float *inputTn,
-    float *outputTn,
-    unsigned int dim0,
-    unsigned int dim1,
-    unsigned int dim2,
-    unsigned int dim3,
-    unsigned int tileCount){
-#pragma HLS INLINE
-
-    assert(dim2==1);
-    float buff[CONFIG_SLICE_SIZE];
-    unsigned long indxS,indxD;
-    const unsigned long d0d1 = dim0*dim1;
-
-    int d0,d1;
-    d0=0;
-    d1=0;
-    //Fused loop for dim0 dim1 and dim3 (dim2 equals one).
-    for(unsigned long iter=0;iter<d0d1;iter++){
-
-        LoopBurstReadSlice: for(int d3=0; d3<dim3; d3++){
-#pragma HLS PIPELINE II=1
-            indxS = (d0)*dim1*dim3 + (d1)*dim3 + d3;
-            buff[d3] = inputTn[indxS];
-        }
-        //-------------------------------------------
-
-        LoopTile: for(int k=0; k<tileCount; k++){
-            LoopBurstWriteSlice: for(int d3=0; d3<dim3; d3++){
-#pragma HLS PIPELINE II=1
-                indxD = (d0)*dim1*tileCount*dim3 + (d1)*tileCount*dim3 + (k)*dim3 + d3;
-                outputTn[indxD] = buff[d3];
-            }
-        }
-
-        //=====================================
-        if(iter==dim1-1){
-            d1=0;
-            d0++;
-        }else{
-            d1++;
-        }
-    }
-}
-*/
-
 
 extern "C" {
 void task_tile(
@@ -260,14 +211,6 @@ void task_tile(
 
 #pragma HLS data_pack variable=inputTn
 #pragma HLS data_pack variable=outputTn
-
-
-    /*
-    For rank 4 tensors, we are going to use rank 3 axis 1 kernel with dim0'=dim0*dim1, dim1'=dim2 and dim2'=dim3 
-    if(rank==4 && tileAxis==2) {
-        TileRank3Axis1<float, CONFIG_M_AXI_WIDTH>(inputTn, outputTn, dim0*dim1, dim2, dim3, tileCount);
-    }
-    */
 
     if(rank==3 && tileAxis==2) {
         TileRank3Axis2<float, CONFIG_M_AXI_WIDTH>(inputTn, outputTn, dim0, dim1, dim2, tileCount);

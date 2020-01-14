@@ -23,6 +23,7 @@
         } while (0)
 #endif
 #endif
+        
 TensorF::TensorF() {
     initialized = false;
     platform = PLATFORMS::DEFAULT; //Till it's not initialized, keep it general

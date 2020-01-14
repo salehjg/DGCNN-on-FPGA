@@ -57,7 +57,7 @@ void OclTensorI::Init(cl_context context, std::vector<unsigned int> shape, int b
 
 void OclTensorI::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     cl_int ocl_stat;
-    std::cout<<"--- OclTensorF: Warning: No padding\n";
+    std::cout<<"--- OclTensorI: Warning: No padding\n";
     if(initialized){
         std::cout<<"--- OclTensorI: buffer deleted.\n";
         assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
@@ -127,7 +127,8 @@ int OclTensorI::LaunchDataMover(
 
     if(!(srcBank>=DATAMOVER_KERNEL_BANK_A_INDEX && srcBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported srcBank. (OclTensorI)" <<endl; std::exit(3);}
     if(!(dstBank>=DATAMOVER_KERNEL_BANK_A_INDEX && dstBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported dstBank. (OclTensorI)" <<endl; std::exit(3);}
-
+    assert(this->vectorWords>0);
+    
     cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover_mod1_int", &error);
     if (error != CL_SUCCESS) {
         cout<<  "Failed to create internal data-mover task kernel (OclTensorI), Err: " << error << endl;
@@ -138,6 +139,7 @@ int OclTensorI::LaunchDataMover(
     //reverseSwitch=0 : Copy srcBuff(bank0) to dstBuff(bank1).
     //reverseSwitch=1 : Copy dstBuff(bank1) to srcBuff(bank0).
     int reverseSwitch = (srcBank==DATAMOVER_KERNEL_BANK_A_INDEX) ? 0 : 1;
+    unsigned long lenVec = len / ((unsigned long)this->vectorWords);
 
     int argcnt=0;
     if(reverseSwitch==0){
@@ -148,7 +150,7 @@ int OclTensorI::LaunchDataMover(
         error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff); 
     }
     error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_int), (void*)&reverseSwitch); 
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_ulong), (void*)&len);
+    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_ulong), (void*)&lenVec);
     
     if(error != CL_SUCCESS) cout<<"Failed to set internal data-mover kernel args (OclTensorI), Err: "<< error <<endl;
     assert(error==CL_SUCCESS);
@@ -180,6 +182,7 @@ void OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_comman
         //We will run a kernel to read data from old bank and simelteneously write it to the new bank.
 
     	if(bank == dramBank){cout<<"Trying to change to the same bank (OclTensorI)."<<endl; std::exit(3);}
+        assert(this->vectorWords>0);
 
         //Forcing memory bank requirements using xilinx external memory extension to opencl.
         cl_mem_ext_ptr_t memExt;
