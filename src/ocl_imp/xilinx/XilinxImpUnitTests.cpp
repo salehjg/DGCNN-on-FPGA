@@ -723,12 +723,23 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
-    TensorF* tensorSrc = GenerateTensor(0,{2,2,3,3});
-    TensorF* tensorWeight = GenerateTensor(0,{1,1,3,4});
-    TensorF* tensorBiases = GenerateTensor(0,{4}); //THE SHAPE SHOULD BE 1D, NOT 4D LIKE {1,1,1,7}
-    TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
-    TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
-    bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    bool comparisonResult = true;
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{2,2,3,3});
+        TensorF* tensorWeight = GenerateTensor(0,{1,1,3,4});
+        TensorF* tensorBiases = GenerateTensor(0,{4}); //THE SHAPE SHOULD BE 1D LIKE {1,1,1,7}, NOT 4D
+        TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
+        TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu); 
+    }
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{2,2,3,17});
+        TensorF* tensorWeight = GenerateTensor(0,{1,1,17,2});
+        TensorF* tensorBiases = GenerateTensor(0,{2}); //THE SHAPE SHOULD BE 1D LIKE {1,1,1,7}, NOT 4D
+        TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
+        TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu); 
+    }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -825,12 +836,9 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
     PrintReport(KernelGather());*/
-    PrintReport(KernelTopK());   
-
-    /*         
-    //PrintReport(KernelConv2Mlp());
     
-    */
+    //PrintReport(KernelTopK());   
+    PrintReport(KernelConv2Mlp());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

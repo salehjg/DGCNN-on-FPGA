@@ -160,8 +160,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 13 :*/
         new OclKernelObject(
                 KERNEL_DIR,
