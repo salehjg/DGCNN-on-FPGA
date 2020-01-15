@@ -817,7 +817,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
-    PrintReport(TensorCloneBankInteger());/*
+    PrintReport(TensorCloneBankInteger());
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
@@ -831,10 +831,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelVariance());
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
-    PrintReport(KernelGather());*/
+    PrintReport(KernelGather());
     
-    //PrintReport(KernelTopK());   
-    //PrintReport(KernelConv2Mlp());
+    PrintReport(KernelTopK());   
+    PrintReport(KernelConv2Mlp());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
