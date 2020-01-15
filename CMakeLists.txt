@@ -15,6 +15,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(DeepPointV1FPGA)
 set(HostExecutableName DeepPointV1FPGA)
+if(NOT DEFINED ENV{AWS_PLATFORM})
+    message(FATAL_ERROR "You must set env variable AWS_PLATFORM to the path of the SDAccel platform file(*.xpfm)")
+endif()
 
 
 #==========================================================================================================================================

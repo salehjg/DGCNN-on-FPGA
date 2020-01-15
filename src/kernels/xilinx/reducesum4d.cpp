@@ -80,7 +80,7 @@ void task_reducesum4d(
                 LoopRead1:for(int i=0;i<dim3;i++){
 #pragma HLS PIPELINE
 #pragma HLS LOOP_TRIPCOUNT min=128 max=128
-                    buff_rslt[i] = inputTn[indxS+i];
+                    buff_rslt[i] = 0;
                     //std::cout<<"indxI="<<indxS+i << " ,buff_rslt="<< buff_rslt[i] <<std::endl;
                 }
             }else{
@@ -93,28 +93,27 @@ void task_reducesum4d(
                 }
             }
 
-            //Only compare if cached slice is not the first one.
-            if(!(d0==0 && d1==0 && d2==0)){
-                //Compare cached slice with reduced slice(buff_rslt)
-                LoopReduction:for(int i=0;i<CONFIG_SLICE_SIZE;i++){
+
+            //add cached slice to reduced slice(buff_rslt)
+            LoopReduction:for(int i=0;i<CONFIG_SLICE_SIZE;i++){
 //#pragma HLS UNROLL
 #pragma HLS PIPELINE
-                    if(i<dim3){
-                        //std::cout<<"**indxI="<<i << " ,buff_tmp= "<< buff_tmp[i] << " ,buff_rslt= "<< buff_rslt[i] <<std::endl;
-                        float pow_rslt = buff_tmp[i];
-                        LoopPow:for(int ipwr=0;ipwr<(MAX_POW_Y_MINUS_ONE);ipwr++){
+                if(i<dim3){
+                    //std::cout<<"**indxI="<<i << " ,buff_tmp= "<< buff_tmp[i] << " ,buff_rslt= "<< buff_rslt[i] <<std::endl;
+                    float pow_rslt = buff_tmp[i];
+                    LoopPow:for(int ipwr=0;ipwr<(MAX_POW_Y_MINUS_ONE);ipwr++){
 #pragma HLS UNROLL
-                            if(ipwr<pow_y_minus_one){
-                                pow_rslt = pow_rslt * pow_rslt;
-                            }
+                        if(ipwr<pow_y_minus_one){
+                            pow_rslt = pow_rslt * pow_rslt;
                         }
-                        //std::cout<<"**indxI="<<i << " ,pow_rslt= "<< pow_rslt <<std::endl;
-                        buff_rslt[i] = buff_rslt[i] + pow_rslt;
-                        //std::cout<<"**indxI="<<i << " ,Sum= "<< buff_rslt[i] <<std::endl;
-
                     }
+                    //std::cout<<"**indxI="<<i << " ,pow_rslt= "<< pow_rslt <<std::endl;
+                    buff_rslt[i] = buff_rslt[i] + pow_rslt;
+                    //std::cout<<"**indxI="<<i << " ,Sum= "<< buff_rslt[i] <<std::endl;
+
                 }
             }
+            
 
             //=====================================================
             //House keeping if-statements for fused loops:
