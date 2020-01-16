@@ -6,7 +6,7 @@
 #define DEEPPOINTV1_TENSORI_H
 
 #include <vector>
-#include "../inc/TensorF.h"
+#include "TensorF.h"
 #include <build_config.h>
 
 class TensorI {

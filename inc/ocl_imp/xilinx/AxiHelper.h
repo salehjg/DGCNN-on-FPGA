@@ -2,12 +2,12 @@
 // Created by saleh on 12/23/19.
 //
 
-#ifndef SDACCEL_CMAKE_SIMPLE_VECTORIZATIONHELPER_H
-#define SDACCEL_CMAKE_SIMPLE_VECTORIZATIONHELPER_H
+#ifndef AxiHelper_H
+#define AxiHelper_H
 
-template <typename DType, int VectorizationDepth>
-struct VectorizedArray{
-    DType vec[VectorizationDepth];
+template <typename DType, int Depth>
+struct PackedArray{
+    DType vec[Depth];
 };
 
 #define DO_PRAGMA(x) _Pragma ( #x )
@@ -33,4 +33,4 @@ struct VectorizedArray{
 // * Should be a power of two.
 #define CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH 4
 
-#endif //SDACCEL_CMAKE_SIMPLE_VECTORIZATIONHELPER_H
+#endif //AxiHelper_H

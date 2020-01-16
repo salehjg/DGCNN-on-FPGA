@@ -17,7 +17,7 @@
 ** ReduceSum4D: , Shape1=5x1024x1x1024x, ,  Combination=1-1-1-0-,
  */
 
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <stdio.h>
 
 #define CONFIG_SLICE_SIZE       1024
@@ -27,8 +27,8 @@
 
 template<typename DType, int VecDepth>
 void ReduceSumRank4Axes012(
-        VectorizedArray<DType, VecDepth> *inputTn,
-        VectorizedArray<DType, VecDepth> *outputTn,
+        PackedArray<DType, VecDepth> *inputTn,
+        PackedArray<DType, VecDepth> *outputTn,
         const int pow_y,
         const unsigned int dim0,
         const unsigned int dim1,
@@ -47,8 +47,8 @@ void ReduceSumRank4Axes012(
 
     unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
     unsigned long outputVecIdx, outputSubVecIdx;
-    VectorizedArray<DType, VecDepth> inputCache;
-    VectorizedArray<DType, VecDepth> outputCache;
+    PackedArray<DType, VecDepth> inputCache;
+    PackedArray<DType, VecDepth> outputCache;
 #pragma HLS array_partition variable=inputCache complete dim=0
 #pragma HLS array_partition variable=outputCache complete dim=0
 
@@ -124,8 +124,8 @@ void ReduceSumRank4Axes012(
 
 extern "C" {
 void task_reducesum4d(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
         const int pow_y,
         const unsigned int dim0,
         const unsigned int dim1,

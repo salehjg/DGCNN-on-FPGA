@@ -1,4 +1,4 @@
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <stdio.h>
 /*
 _task_datamover:
@@ -13,13 +13,13 @@ Copies data of length 'len' :
 
 template<typename DType, int VecDepth>
 static void _task_datamover(
-        VectorizedArray<DType, VecDepth> *srcBuff,
-        VectorizedArray<DType, VecDepth> *dstBuff,
+        PackedArray<DType, VecDepth> *srcBuff,
+        PackedArray<DType, VecDepth> *dstBuff,
         int reverseSwitch,
         const unsigned long len){
 #pragma HLS inline
 
-    VectorizedArray<DType, VecDepth> buff;
+    PackedArray<DType, VecDepth> buff;
 #pragma HLS array_partition variable=buff complete dim=0
 
     if(reverseSwitch==0){
@@ -42,8 +42,8 @@ extern "C" {
 // The --sp option decides which bank is bankA and which is bankB
 // Currently, bankA is bank1 & bankB is bank2 and no SLR assignment is done.
 void task_datamover_mod1_int(
-        VectorizedArray<int, CONFIG_M_AXI_WIDTH> *srcBuff,
-        VectorizedArray<int, CONFIG_M_AXI_WIDTH> *dstBuff,
+        PackedArray<int, CONFIG_M_AXI_WIDTH> *srcBuff,
+        PackedArray<int, CONFIG_M_AXI_WIDTH> *dstBuff,
         int reverseSwitch,
         const unsigned long len){
 #pragma HLS INTERFACE m_axi     port=srcBuff            offset=slave bundle=gmemi0

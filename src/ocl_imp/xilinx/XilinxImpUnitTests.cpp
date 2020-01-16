@@ -1,5 +1,5 @@
 #include <ocl_imp/xilinx/XilinxImpUnitTests.h>
-#include <ocl_imp/xilinx/VectorizationHelper.h>
+#include <ocl_imp/xilinx/AxiHelper.h>
 #include <cnpy.h>
 
 XilinxImpUnitTests::XilinxImpUnitTests(){

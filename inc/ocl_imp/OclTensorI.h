@@ -8,7 +8,7 @@
 #include "../../inc/TensorF.h" //for platforms enum!
 #include "../../inc/TensorI.h"
 #include <ocl_imp/xilinx/xcl.h>
-#include "../../inc/ocl_imp/xilinx/VectorizationHelper.h"
+#include "ocl_imp/xilinx/AxiHelper.h"
 
 // These two are defined in OclTensorF.h
 //#define DATAMOVER_KERNEL_BANK_A_INDEX 1

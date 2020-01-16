@@ -2,8 +2,8 @@
 // Created by saleh on 8/23/18.
 //
 
-#include "../../inc/ocl_imp/OclTensorF.h"
-#include "../../inc/ocl_imp/OclTensorI.h"
+#include "ocl_imp/OclTensorF.h"
+#include "ocl_imp/OclTensorI.h"
 
 #include <iostream>
 #include <cassert>

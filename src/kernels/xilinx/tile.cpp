@@ -1,4 +1,4 @@
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <cassert>
 #include <stdio.h>
 
@@ -6,8 +6,8 @@
 
 template<typename DType, int VecDepth>
 void TileRank3Axis2(
-    VectorizedArray<DType, VecDepth> *inputTn,
-    VectorizedArray<DType, VecDepth> *outputTn,
+    PackedArray<DType, VecDepth> *inputTn,
+    PackedArray<DType, VecDepth> *outputTn,
     unsigned int dim0,
     unsigned int dim1,
     unsigned int dim2,
@@ -20,8 +20,8 @@ void TileRank3Axis2(
     int d0,d1,d2;
 
     unsigned long elementCacheVecIdx, lastElementCacheVecIdx;
-    VectorizedArray<DType, VecDepth> elementCache;
-    VectorizedArray<DType, VecDepth> buff;
+    PackedArray<DType, VecDepth> elementCache;
+    PackedArray<DType, VecDepth> buff;
 #pragma HLS array_partition variable=elementCache complete dim=0
 #pragma HLS array_partition variable=buff complete dim=0
 
@@ -82,8 +82,8 @@ void TileRank3Axis2(
 
 template<typename DType, int VecDepth>
 void TileRank3Axis1(
-    VectorizedArray<DType, VecDepth> *inputTn,
-    VectorizedArray<DType, VecDepth> *outputTn,
+    PackedArray<DType, VecDepth> *inputTn,
+    PackedArray<DType, VecDepth> *outputTn,
     unsigned int dim0,
     unsigned int dim1,
     unsigned int dim2,
@@ -100,8 +100,8 @@ void TileRank3Axis1(
 
     unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
     unsigned long outputVecIdx, outputSubVecIdx;
-    VectorizedArray<DType, VecDepth> inputCache;
-    VectorizedArray<DType, VecDepth> outputCache;
+    PackedArray<DType, VecDepth> inputCache;
+    PackedArray<DType, VecDepth> outputCache;
 #pragma HLS array_partition variable=inputCache complete dim=0
 #pragma HLS array_partition variable=outputCache complete dim=0
 
@@ -185,8 +185,8 @@ void TileRank3Axis1(
 
 extern "C" {
 void task_tile(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
         unsigned int dim0,
         unsigned int dim1,
         unsigned int dim2,

@@ -1,7 +1,7 @@
 // B=5, Dim1=1024, Dim2=1,3,64
 //Latency is for 5x1024x64 and CONFIG_W_H=(16,64)
 
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <stdio.h>
 
 #define CONFIG_BLOCK_WIDTH  16

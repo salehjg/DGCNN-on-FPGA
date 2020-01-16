@@ -6,8 +6,8 @@
 #define DEEPPOINTV1_OCLTENSORF_H
 
 #include <ocl_imp/xilinx/xcl.h>
-#include "../../inc/TensorF.h"
-#include "../../inc/ocl_imp/xilinx/VectorizationHelper.h"
+#include "TensorF.h"
+#include "ocl_imp/xilinx/AxiHelper.h"
 
 #define DATAMOVER_KERNEL_BANK_A_INDEX   1
 #define DATAMOVER_KERNEL_BANK_B_INDEX   2

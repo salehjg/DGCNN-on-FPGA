@@ -1,13 +1,13 @@
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <stdio.h>
 #include <cassert>
 
 //The latency is reported for inputTn of shape 5x1024x64 and indicesTn of shape 5x1024x20
 template<typename DType, int VecDepthInput, int VecDepthIndicesOutput>
 void Gather(
-        VectorizedArray<DType, VecDepthInput> *inputTn,
-        VectorizedArray<int, VecDepthIndicesOutput> *indicesTn,
-        VectorizedArray<DType, VecDepthIndicesOutput> *outputTn,
+        PackedArray<DType, VecDepthInput> *inputTn,
+        PackedArray<int, VecDepthIndicesOutput> *indicesTn,
+        PackedArray<DType, VecDepthIndicesOutput> *outputTn,
         unsigned int indices_axis,
         unsigned int inputDim0,
         unsigned int inputDim1,
@@ -23,15 +23,15 @@ void Gather(
     int d0idx, d1idx, d2idx,d2input;
 
     unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
-    VectorizedArray<DType, VecDepthInput> inputCache;
+    PackedArray<DType, VecDepthInput> inputCache;
 #pragma HLS array_partition variable=inputCache complete dim=0
 
     unsigned long indicesCacheVecIdx, indicesCacheVecSubIdx, lastIndicesCacheVecIdx;
-    VectorizedArray<int, VecDepthIndicesOutput> indicesCache;
+    PackedArray<int, VecDepthIndicesOutput> indicesCache;
 #pragma HLS array_partition variable=indicesCache complete dim=0
 
     unsigned long outputCacheVecIdx, outputCacheVecSubIdx;
-    VectorizedArray<DType, VecDepthIndicesOutput> outputCache;
+    PackedArray<DType, VecDepthIndicesOutput> outputCache;
 #pragma HLS array_partition variable=outputCache complete dim=0
 
     d0idx = 0;
@@ -99,9 +99,9 @@ void Gather(
 
 extern "C"{
 void task_gather(
-    VectorizedArray<float, CONFIG_GATHER_INPUTTN_M_AXI_WIDTH> *inputTn,
-    VectorizedArray<int, CONFIG_M_AXI_WIDTH> *indicesTn,
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+    PackedArray<float, CONFIG_GATHER_INPUTTN_M_AXI_WIDTH> *inputTn,
+    PackedArray<int, CONFIG_M_AXI_WIDTH> *indicesTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
     unsigned int indices_axis,
     unsigned int inputDim0,
     unsigned int inputDim1,

@@ -1,4 +1,4 @@
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <cassert>
 #include <hls_stream.h>
 #include <stdio.h>
@@ -98,7 +98,7 @@ static void SortingUnit(
 
 template<typename DTypeData, int UnitCount, int VecDepth>
 static void ReadUnit(
-        VectorizedArray<DTypeData, VecDepth> *inputTn,
+        PackedArray<DTypeData, VecDepth> *inputTn,
         hls::stream<DTypeData> (&streamIn)[UnitCount], //https://stackoverflow.com/questions/5724171/passing-an-array-by-reference
         int dim0,
         int dim1,
@@ -115,7 +115,7 @@ static void ReadUnit(
             unsigned long indxS;
             int batchIndex;
             unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
-            VectorizedArray<DTypeData, VecDepth> inputCache;
+            PackedArray<DTypeData, VecDepth> inputCache;
 #pragma HLS array_partition variable=inputCache complete dim=0
             lastInputCacheVecIdx=-1;
             // Considering that dim2 slices are 1024 words long and VecDepth is 16 words long,
@@ -149,7 +149,7 @@ static void ReadUnit(
 
 template<typename DTypeIndices, int UnitCount, int VecDepth>
 static void WriteUnit(
-        VectorizedArray<DTypeIndices, VecDepth> *indicesSplitedTn,
+        PackedArray<DTypeIndices, VecDepth> *indicesSplitedTn,
         hls::stream<DTypeIndices> (&streamOut)[UnitCount], //https://stackoverflow.com/questions/5724171/passing-an-array-by-reference
         int dim0,
         int dim1,
@@ -167,7 +167,7 @@ static void WriteUnit(
             int batchIndex; 
             unsigned long indxD;
             unsigned long outputCacheVecIdx, outputCacheVecSubIdx;
-            VectorizedArray<DTypeIndices, VecDepth> outputCache;
+            PackedArray<DTypeIndices, VecDepth> outputCache;
 #pragma HLS array_partition variable=outputCache complete dim=0
 
             //-----------------------------------------------------------
@@ -197,8 +197,8 @@ static void WriteUnit(
 // Try04
 template<typename DTypeData, typename DTypeIndices, int UnitCount, int VecDepthIn, int VecDepthOut>
 void BatchSelectionSortTopK(
-        VectorizedArray<DTypeData, VecDepthIn> *inputTn,
-        VectorizedArray<DTypeIndices, VecDepthOut> *indicesSplitedTn,
+        PackedArray<DTypeData, VecDepthIn> *inputTn,
+        PackedArray<DTypeIndices, VecDepthOut> *indicesSplitedTn,
         int dim0,
         int dim1,
         int dim2,
@@ -225,8 +225,8 @@ void BatchSelectionSortTopK(
 
 extern "C"{
 void task_topk(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-        VectorizedArray<int, CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH> *indicesSplitedTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+        PackedArray<int, CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH> *indicesSplitedTn,
         int dim0,
         int dim1,
         int dim2,

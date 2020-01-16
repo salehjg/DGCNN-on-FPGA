@@ -9,15 +9,15 @@ Shape1=5x1024x20x3x,    , Shape2=5x1024x20x3x,
 Shape1=5x1024x20x3x,    , Shape2=5x1024x20x3x,
 */
 
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <stdio.h>
 
 // Latency is reported for outputshape of 5x1024x20x320
 template <typename DType, int VecDepth>
 void concat2(
-    VectorizedArray<DType, VecDepth> *inputTn1,
-    VectorizedArray<DType, VecDepth> *inputTn2,
-    VectorizedArray<DType, VecDepth> *outputTn,
+    PackedArray<DType, VecDepth> *inputTn1,
+    PackedArray<DType, VecDepth> *inputTn2,
+    PackedArray<DType, VecDepth> *outputTn,
     unsigned int dimA0,
     unsigned int dimA1,
     unsigned int dimA2,
@@ -33,9 +33,9 @@ void concat2(
     unsigned long indxS1, indxS2, indxD;
     unsigned int  dimR0, dimR1, dimR2, dimR3;
 
-    VectorizedArray<DType, VecDepth> cacheTn1;
-    VectorizedArray<DType, VecDepth> cacheTn2;
-    VectorizedArray<DType, VecDepth> buff;
+    PackedArray<DType, VecDepth> cacheTn1;
+    PackedArray<DType, VecDepth> cacheTn2;
+    PackedArray<DType, VecDepth> buff;
 #pragma HLS array_partition variable=cacheTn1 complete dim=0
 #pragma HLS array_partition variable=cacheTn2 complete dim=0
 #pragma HLS array_partition variable=buff complete dim=0
@@ -207,9 +207,9 @@ void concat2(
 
 extern "C" {
 void task_concat(
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn1,
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn2,
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn1,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn2,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
 
     unsigned int dimA0,
     unsigned int dimA1,

@@ -11,15 +11,15 @@
 ** ReduceMax: reductionDim=2,                             , ARGS(0,1,2)=[DIM0*DIM1]x(DIM2)xDIM3
 */
 
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <stdio.h>
 
 #define CONFIG_SLICE_SIZE       1024 
 
 template <typename DType, int VecDepth>
 void reducemax_rank3_ftf(        
-    VectorizedArray<DType, VecDepth> *inputTn,
-    VectorizedArray<DType, VecDepth> *outputTn,
+    PackedArray<DType, VecDepth> *inputTn,
+    PackedArray<DType, VecDepth> *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim2){
@@ -35,8 +35,8 @@ void reducemax_rank3_ftf(
 
     unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
     unsigned long outputVecIdx, outputSubVecIdx;
-    VectorizedArray<DType, VecDepth> inputCache;
-    VectorizedArray<DType, VecDepth> outputCache;
+    PackedArray<DType, VecDepth> inputCache;
+    PackedArray<DType, VecDepth> outputCache;
 #pragma HLS array_partition variable=inputCache complete dim=0
 #pragma HLS array_partition variable=outputCache complete dim=0
 
@@ -105,8 +105,8 @@ void reducemax_rank3_ftf(
 
 extern "C" {
 void task_reducemax(
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim2,

@@ -2,19 +2,19 @@
 * Shape=5x1024x3    FFT
 * Shape=5x1024x64   FFT
 */
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <hls_stream.h>
 
 template <typename DType, int VecDepth>
 void SubfuncSliceReadBurst(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
         hls::stream<DType> &inStream,
         unsigned int dim0,
         unsigned int dim1,
         unsigned int dim2){
 
     unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx, indxS;
-    VectorizedArray<DType, VecDepth> inputCache;
+    PackedArray<DType, VecDepth> inputCache;
 #pragma HLS array_partition variable=inputCache complete dim=0
 
     unsigned long d0d1d2 = dim0*dim1*dim2;
@@ -97,13 +97,13 @@ void SubfuncSliceReduceSum(
 
 template <typename DType, int VecDepth>
 void SubfuncSliceWrite(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
         hls::stream<DType> &inStream,
         unsigned int dim0,
         unsigned int dim1){
     
     unsigned long outputVecIdx, outputSubVecIdx, indxD; 
-    VectorizedArray<DType, VecDepth> outputCache; 
+    PackedArray<DType, VecDepth> outputCache; 
 #pragma HLS array_partition variable=outputCache complete dim=0
 
     int d0,d1;
@@ -137,8 +137,8 @@ void SubfuncSliceWrite(
 // Dataflow Version
 template <typename DType, int VecDepth>
 void ReduceSumRank3Axis2(
-        VectorizedArray<DType, VecDepth> *inputTn,
-        VectorizedArray<DType, VecDepth> *outputTn,
+        PackedArray<DType, VecDepth> *inputTn,
+        PackedArray<DType, VecDepth> *outputTn,
         const unsigned int dim0,
         const unsigned int dim1,
         const unsigned int dim2){
@@ -161,8 +161,8 @@ void ReduceSumRank3Axis2(
 
 extern "C" {
 void task_reducesum(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
         const unsigned int dim0,
         const unsigned int dim1,
         const unsigned int dim2,

@@ -3,7 +3,7 @@
 //
 
 #include <cassert>
-#include "../inc/TensorI.h"
+#include "TensorI.h"
 #include <iostream>
 #ifdef USE_CUDA
 #include <cuda_runtime.h>

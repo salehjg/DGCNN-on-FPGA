@@ -1,4 +1,4 @@
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <cassert>
 
 #define CONFIG_MAX_WEIGHT_BUF_D2    (328)
@@ -57,10 +57,10 @@ float ParallelReduction1D(
 // Latency report is for InputTn=5x1024x1x320 and WeightTn=1x1x320x1024
 template<typename DType, int VecDepth, int UnrollFactor, int ReductionLen>
 void conv2_1x1_direct(
-    VectorizedArray<DType, VecDepth> *inputTn,
-    VectorizedArray<DType, VecDepth> *weightTn,
-    VectorizedArray<DType, VecDepth> *biasTn,
-    VectorizedArray<DType, VecDepth> *outputTn,
+    PackedArray<DType, VecDepth> *inputTn,
+    PackedArray<DType, VecDepth> *weightTn,
+    PackedArray<DType, VecDepth> *biasTn,
+    PackedArray<DType, VecDepth> *outputTn,
     unsigned int dim0D,
     unsigned int dim1D,
     unsigned int dim2D,
@@ -122,7 +122,7 @@ void conv2_1x1_direct(
 #pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
 
         unsigned long outputCacheVecIdx, outputCacheVecSubIdx;
-        VectorizedArray<DType, VecDepth> outputCache;
+        PackedArray<DType, VecDepth> outputCache;
 #pragma HLS array_partition variable=outputCache complete dim=0
 
         For_ChOut:for(int ch=0;ch<CONFIG_MAX_WEIGHT_BUF_D3;ch++){
@@ -132,7 +132,7 @@ DO_PRAGMA(HLS UNROLL factor=UnrollFactor)
                 //DType sum=0;
 
                 unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
-                VectorizedArray<DType, VecDepth> inputCache;
+                PackedArray<DType, VecDepth> inputCache;
 #pragma HLS array_partition variable=inputCache complete dim=0
                 lastInputCacheVecIdx=-1;
 
@@ -195,10 +195,10 @@ DO_PRAGMA(HLS UNROLL factor=UnrollFactor)
 
 extern "C"{
 void task_conv2_1x1_direct(
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *weightTn,
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *biasTn,
-    VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *weightTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *biasTn,
+    PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
     unsigned int dim0D,
     unsigned int dim1D,
     unsigned int dim2D,

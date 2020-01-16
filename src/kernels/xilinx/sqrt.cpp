@@ -1,14 +1,14 @@
 #include <hls_math.h>
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 
 
 template<typename DType, int VecDepth>
 void _task_sqrt(
-        VectorizedArray<DType, VecDepth> *inputTn,
-        VectorizedArray<DType, VecDepth> *outputTn,
+        PackedArray<DType, VecDepth> *inputTn,
+        PackedArray<DType, VecDepth> *outputTn,
         unsigned long len){
 
-	VectorizedArray<DType, VecDepth> buff;
+	PackedArray<DType, VecDepth> buff;
 #pragma HLS array_partition variable=buff complete dim=0
 
     for(unsigned long i=0;i<len;i++){
@@ -27,8 +27,8 @@ void _task_sqrt(
 
 extern "C" {
 void task_sqrt(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
         unsigned long len){
 #pragma HLS INTERFACE m_axi     port=inputTn    offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi     port=outputTn   offset=slave bundle=gmem1

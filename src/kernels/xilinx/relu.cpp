@@ -1,12 +1,12 @@
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 
 template<typename DType, int VecDepth>
 static void _task_relu(
-        VectorizedArray<DType, VecDepth> *inputTn,
-        VectorizedArray<DType, VecDepth> *outputTn,
+        PackedArray<DType, VecDepth> *inputTn,
+        PackedArray<DType, VecDepth> *outputTn,
         unsigned long len){
 
-	VectorizedArray<DType, VecDepth> buff;
+	PackedArray<DType, VecDepth> buff;
 #pragma HLS array_partition variable=buff complete dim=0
 
     for(unsigned long i=0;i<len;i++){
@@ -24,8 +24,8 @@ static void _task_relu(
 
 extern "C" {
 void task_relu(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
         const unsigned long len){
 #pragma HLS INTERFACE m_axi     port=inputTn    offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi     port=outputTn   offset=slave bundle=gmem1

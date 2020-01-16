@@ -1,12 +1,12 @@
 //Latency is for 5x1024x20x64 and 5x1024x20x64 ??
-#include "VectorizationHelper.h"
+#include "AxiHelper.h"
 #include <stdio.h>
 
 template<typename DType, int VecDepth>
 void _task_matops(
-        VectorizedArray<DType, VecDepth> *inputTn1,
-        VectorizedArray<DType, VecDepth> *inputTn2,
-        VectorizedArray<DType, VecDepth> *outputTn,
+        PackedArray<DType, VecDepth> *inputTn1,
+        PackedArray<DType, VecDepth> *inputTn2,
+        PackedArray<DType, VecDepth> *outputTn,
         const unsigned int dim0,
         const unsigned int dim1,
         const unsigned int dim2,
@@ -28,11 +28,11 @@ void _task_matops(
 
     unsigned long inputCacheVecIdx1, inputCacheVecSubIdx1, lastInputCacheVecIdx1;
     unsigned long inputCacheVecIdx2, inputCacheVecSubIdx2, lastInputCacheVecIdx2;
-    VectorizedArray<DType, VecDepth> inputCache1;
+    PackedArray<DType, VecDepth> inputCache1;
 #pragma HLS array_partition variable=inputCache1 complete dim=0
-    VectorizedArray<DType, VecDepth> inputCache2;
+    PackedArray<DType, VecDepth> inputCache2;
 #pragma HLS array_partition variable=inputCache2 complete dim=0
-    VectorizedArray<DType, VecDepth> outputCache;
+    PackedArray<DType, VecDepth> outputCache;
 #pragma HLS array_partition variable=outputCache complete dim=0
 
     lastInputCacheVecIdx1=-1;lastInputCacheVecIdx2=-1;
@@ -117,9 +117,9 @@ void _task_matops(
 
 extern "C" {
 void task_matops(
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn1,
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn2,
-        VectorizedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn1,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn2,
+        PackedArray<float, CONFIG_M_AXI_WIDTH> *outputTn,
         const unsigned int dim0,
         const unsigned int dim1,
         const unsigned int dim2,

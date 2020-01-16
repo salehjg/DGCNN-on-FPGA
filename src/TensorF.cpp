@@ -3,7 +3,7 @@
 //
 
 #include <cassert>
-#include "../inc/TensorF.h"
+#include "TensorF.h"
 #include <vector>
 #include <iostream>
 
