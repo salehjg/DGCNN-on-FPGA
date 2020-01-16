@@ -61,7 +61,7 @@ Concat Over Dim: 3
 
 \subsection{Fixed Shape Instances}
 \begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
-\caption{Fixed Shaped Instances of Kernel Template}
+\caption{Fixed shaped instances of the kernel template}
 \label{tab:shapes_concat}
 	\begin{center}
 		\begin{tabular}{|r|c|} 
@@ -86,7 +86,7 @@ Concat Over Dim: 3
 
 \subsection{Technical Details}
 \begin{enumerate}
-\item sadasd
+\item -
 \end{enumerate}
 
 
@@ -115,7 +115,7 @@ None.
 
 \subsection{Technical Details}
 \begin{enumerate}
-\item sadasd
+\item -
 \end{enumerate}
 
 
@@ -199,7 +199,7 @@ None.
 
 \subsection{Technical Details}
 \begin{enumerate}
-\item sadasd
+\item \emph{CONFIG\_SLICE\_SIZE}: The maximum length of a inputTn's dim2 slice.
 \end{enumerate}
 
 
@@ -298,6 +298,9 @@ for(int ipwr=0;ipwr<(MAX_POW_Y_MINUS_ONE);ipwr++){
 
 \item It might be a good idea to apply dataflow pragma in this kernel.
 
+\item \emph{CONFIG\_SLICE\_SIZE}: The maximum length of a inputTn's dim3 slice.
+
+\item \emph{CONFIG\_MAX\_POW\_Y}: The maximum value for parameter \emph{pow\_y}.
 \end{enumerate}
 
 
@@ -777,7 +780,9 @@ None.
 
 \subsection{Technical Details}
 \begin{enumerate}
-\item Outermost for-loops are fused together.
+\item We use the kernel for Rank3-Axis1 to compute the results for Rank4-Axis2.
+
+\item \emph{CONFIG\_RANK3\_AXIS1\_MAX\_SLICE\_SIZE}: The maximum length of inputTn's dim2 slice.
 \end{enumerate}
 
 
@@ -1252,7 +1257,14 @@ None.
 
 \subsection{Technical Details}
 \begin{enumerate}
-\item Not documented yet.
+\item A parallel reduction sub-function is used to compute elements of the output tensor.
+
+\item \emph{CONFIG\_MAX\_WEIGHT\_BUF\_D2} and \emph{CONFIG\_MAX\_WEIGHT\_BUF\_D3}: The maximum values of the weightTn's respective dimensions.
+
+\item \emph{CONFIG\_UNROLL\_FACTOR}: This parameter replicates the multiplication and reduction subsections of the kernel. For example a value of 2 will result in two sets of multiplication and reduction blocks.
+
+\item \emph{CONFIG\_REDUCTION\_LEN}: This parameter is the length of each data chunk of the main array, that gets reduced in parallel. Greater values for this parameter leads to a better performance with the cost of higher resource usage.
+
 \end{enumerate}
 
 
@@ -1335,7 +1347,7 @@ void task_topk(
 
 \subsection{Fixed Shape Instances}
 \begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
-\caption{Fixed Shaped Instances of Kernel Template}
+\caption{Fixed shaped instances of the kernel template}
 \label{tab:shapes_concat}
 	\begin{center}
 		\begin{tabular}{|r|c|} 
@@ -1360,5 +1372,6 @@ void task_topk(
 
 \subsection{Technical Details}
 \begin{enumerate}
-\item Not documented yet.
+\item \emph{CONFIG\_N}: The fixed value for N which is parameter dim1.
+\item \emph{CONFIG\_N}: The fixed value for K which is parameter kValue.
 \end{enumerate}

@@ -5,9 +5,6 @@
 #include "VectorizationHelper.h"
 #include <hls_stream.h>
 
-#define CONFIG_SLICE_SIZE               64
-#define CONFIG_OUTPUT_BUFF_SIZE         32
-
 template <typename DType, int VecDepth>
 void SubfuncSliceReadBurst(
         VectorizedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
