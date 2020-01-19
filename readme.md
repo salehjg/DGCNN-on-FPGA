@@ -16,7 +16,7 @@ Bash (>4.0, Dash and others are not tested)
 ```
 
 # Configuration
-To make it easier to explore the design space and try different configurations, all of the parameters that effects the output performance of the task kernels are gatheredd in a seperate submodule repository at directory `config`. 
+To make it easier to explore the design space and try different configurations, all of the parameters that affect the output performance of the task kernels are gathered in a separate submodule repository at directory `config`. 
 
 # How to...
 ## 1. Building The Host Program
