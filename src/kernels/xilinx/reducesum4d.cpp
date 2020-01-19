@@ -18,6 +18,7 @@
  */
 
 #include "AxiHelper.h"
+#include "xilinx/config.h"
 #include <stdio.h>
 
 #define CONFIG_SLICE_SIZE       1024

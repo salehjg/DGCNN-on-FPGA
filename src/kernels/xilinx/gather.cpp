@@ -1,4 +1,5 @@
 #include "AxiHelper.h"
+#include "xilinx/config.h"
 #include <stdio.h>
 #include <cassert>
 

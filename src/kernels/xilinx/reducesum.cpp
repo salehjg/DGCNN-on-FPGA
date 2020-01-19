@@ -3,6 +3,7 @@
 * Shape=5x1024x64   FFT
 */
 #include "AxiHelper.h"
+#include "xilinx/config.h"
 #include <hls_stream.h>
 
 template <typename DType, int VecDepth>

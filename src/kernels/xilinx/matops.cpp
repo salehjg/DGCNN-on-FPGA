@@ -1,7 +1,8 @@
-//Latency is for 5x1024x20x64 and 5x1024x20x64 ??
 #include "AxiHelper.h"
+#include "xilinx/config.h"
 #include <stdio.h>
 
+//Latency is for 5x1024x20x64 and 5x1024x20x64 ??
 template<typename DType, int VecDepth>
 void _task_matops(
         PackedArray<DType, VecDepth> *inputTn1,

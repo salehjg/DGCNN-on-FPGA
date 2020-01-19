@@ -9,6 +9,7 @@
 #include "../../inc/TensorI.h"
 #include <ocl_imp/xilinx/xcl.h>
 #include "ocl_imp/xilinx/AxiHelper.h"
+#include "xilinx/config.h"
 
 // These two are defined in OclTensorF.h
 //#define DATAMOVER_KERNEL_BANK_A_INDEX 1

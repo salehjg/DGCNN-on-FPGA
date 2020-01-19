@@ -10,6 +10,7 @@ Shape1=5x1024x20x3x,    , Shape2=5x1024x20x3x,
 */
 
 #include "AxiHelper.h"
+#include "xilinx/config.h"
 #include <stdio.h>
 
 // Latency is reported for outputshape of 5x1024x20x320

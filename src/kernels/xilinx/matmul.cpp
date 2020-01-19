@@ -1,3 +1,4 @@
+#include "xilinx/config.h"
 #include <cassert>
 
 #define CONFIG_BUFF_DEPTH           2

@@ -8,6 +8,7 @@
 #include <ocl_imp/xilinx/xcl.h>
 #include "TensorF.h"
 #include "ocl_imp/xilinx/AxiHelper.h"
+#include "xilinx/config.h"
 
 #define DATAMOVER_KERNEL_BANK_A_INDEX   1
 #define DATAMOVER_KERNEL_BANK_B_INDEX   2

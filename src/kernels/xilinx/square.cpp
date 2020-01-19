@@ -1,4 +1,5 @@
 #include "AxiHelper.h"
+#include "xilinx/config.h"
 
 template<typename DType, int VecDepth>
 void _task_square(

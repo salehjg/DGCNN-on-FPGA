@@ -1,6 +1,6 @@
-#include <hls_math.h>
 #include "AxiHelper.h"
-
+#include "xilinx/config.h"
+#include <hls_math.h>
 
 template<typename DType, int VecDepth>
 void _task_sqrt(

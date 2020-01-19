@@ -1,4 +1,5 @@
 #include "AxiHelper.h"
+#include "xilinx/config.h"
 #include <cassert>
 
 #define CONFIG_MAX_WEIGHT_BUF_D2    (328)
