@@ -4,11 +4,8 @@
 #include "xilinx/config.h"
 #include <stdio.h>
 
-#define CONFIG_BLOCK_WIDTH  16
-#define CONFIG_BLOCK_HEIGHT 64
-
 //Latency is for 5x1024x64 and CONFIG_W_H=(16,64)
-template <typename DType>
+template <typename DType, int BlockWidth, int BlockHeight>
 void BatchTransposeAXI32(
     const DType* inputTn,
     DType* outputTn,
@@ -16,7 +13,7 @@ void BatchTransposeAXI32(
     int dim1,               //rows
     int dim2                //columns
 ){
-    DType buff[CONFIG_BLOCK_HEIGHT][CONFIG_BLOCK_WIDTH];
+    DType buff[BlockHeight][BlockWidth];
     unsigned long indxS,indxD;
     int tmp1, tmp2;
     // *******************************************
@@ -27,14 +24,14 @@ void BatchTransposeAXI32(
     // *******************************************
     LoopBatch:for(int batch=0; batch<dim0; batch++){
 #pragma HLS LOOP_TRIPCOUNT min=5 max=5
-        LoopTiles1:for(int d2=0; d2<dim2; d2+=CONFIG_BLOCK_WIDTH){
+        LoopTiles1:for(int d2=0; d2<dim2; d2+=BlockWidth){
 #pragma HLS LOOP_TRIPCOUNT min=4 max=4
-            LoopTiles2:for(int d1=0; d1<dim1; d1+=CONFIG_BLOCK_HEIGHT){
+            LoopTiles2:for(int d1=0; d1<dim1; d1+=BlockHeight){
 #pragma HLS LOOP_TRIPCOUNT min=16 max=16
                 //=====================================================
                 //Sec.1: Read current block into local buffer
-                LoopReadJ:for(int j=0; j<CONFIG_BLOCK_HEIGHT; j++){
-                    LoopReadI:for(int i=0; i<CONFIG_BLOCK_WIDTH; i++){
+                LoopReadJ:for(int j=0; j<BlockHeight; j++){
+                    LoopReadI:for(int i=0; i<BlockWidth; i++){
                         tmp1 = d1+j;
                         tmp2 = d2+i;
                         if(tmp1<dim1 && tmp2<dim2){
@@ -48,8 +45,8 @@ void BatchTransposeAXI32(
 
                 //=====================================================
                 //Sec.2: Write current block's data into output tensor
-                LoopWriteI:for(int i=0; i<CONFIG_BLOCK_WIDTH; i++){
-                    LoopWriteJ:for(int j=0; j<CONFIG_BLOCK_HEIGHT; j++){
+                LoopWriteI:for(int i=0; i<BlockWidth; i++){
+                    LoopWriteJ:for(int j=0; j<BlockHeight; j++){
                         tmp1 = d2+i;
                         tmp2 = d1+j;
                         if(tmp1<dim2 && tmp2<dim1){
@@ -86,6 +83,6 @@ void task_transpose(
 
 #pragma HLS INTERFACE s_axilite port=return     bundle=control
 
-    BatchTransposeAXI32<float>(inputTn,outputTn,dim0,dim1,dim2);
+    BatchTransposeAXI32<float, CONFIG_TRANSPOSE_BLOCK_WIDTH, CONFIG_TRANSPOSE_BLOCK_HEIGHT>(inputTn,outputTn,dim0,dim1,dim2);
 }
 }

@@ -5,9 +5,6 @@
 #define CONFIG_MAX_WEIGHT_BUF_D2    (328)
 #define CONFIG_MAX_WEIGHT_BUF_D3    (1024)
 #define CONFIG_MAX_WEIGHT_BUF_SIZE  (CONFIG_MAX_WEIGHT_BUF_D2*CONFIG_MAX_WEIGHT_BUF_D3)
-#define CONFIG_UNROLL_FACTOR        2
-#define CONFIG_REDUCTION_LEN        64
-
 
 template<typename DType, int ReductionLen>
 float ParallelReduction1D(
@@ -238,7 +235,7 @@ void task_conv2_1x1_direct(
 #pragma HLS data_pack variable=biasTn
 #pragma HLS data_pack variable=outputTn
 
-    conv2_1x1_direct<float, CONFIG_M_AXI_WIDTH, CONFIG_UNROLL_FACTOR, CONFIG_REDUCTION_LEN>(
+    conv2_1x1_direct<float, CONFIG_M_AXI_WIDTH, CONFIG_CONV2_1x1_DIRECT_UNROLL_FACTOR, CONFIG_CONV2_1x1_DIRECT_REDUCTION_LEN>(
         inputTn, 
         weightTn, 
         biasTn, 
