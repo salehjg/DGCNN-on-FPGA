@@ -52,7 +52,7 @@ private:
     TensorF* GenerateTensor(int pattern, vector<unsigned int> shape);
     TensorI* GenerateTensorInteger(int pattern, vector<unsigned int> shape);
     float float_rand(float min, float max);
-    TensorI* GenerateTensor(int intMin, int intMax, vector<unsigned int> shape);
+    TensorI* GenerateTensorInteger(int intMin, int intMax, vector<unsigned int> shape);
     void PrintReport(ReportObject *reportObj);
 
 

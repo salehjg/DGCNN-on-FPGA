@@ -51,7 +51,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -59,7 +60,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_sqrt",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 2 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -67,7 +69,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducemax",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -75,7 +78,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -83,7 +87,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -99,7 +104,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_relu",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 7 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -107,7 +113,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_square",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 8 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -115,7 +122,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -123,7 +131,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -131,7 +140,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_transpose",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 11 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -139,7 +149,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false),
+                false,
+                DISABLED_KERNEL),
 
         /* IDX 12 :*/
         new OclKernelObject(
@@ -148,7 +159,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 13 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -156,7 +168,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false),
+                false,
+                DISABLED_KERNEL),
 //      /* IDX 13 :*/
 //      new OclKernelObject(
 //              KERNEL_DIR,
@@ -409,17 +422,14 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
 
         return rsltTn;
     }else{
-        cl_int error; int argcnt=0;
+        cl_int error; int argcnt=0; 
         error  = clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)_batchedMat1)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)_batchedMat2)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&(rsltTn->ocl_buff));
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim0A);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1A);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2A);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim0B);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1B);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2B);
-
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2A);
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         assert(error==0);
 
@@ -926,6 +936,9 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
 
 
     int rankDiff;
+    int rank1, rank2;
+    rank1 = inputTn1->getRank();
+    rank2 = inputTn2->getRank();
 
     if(!(inputTn1->getRank()<=4 && inputTn1->getRank()>=1 && inputTn2->getRank()<=4 && inputTn2->getRank()>=1 )){
         cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E1"<<endl;
@@ -934,7 +947,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
 
     if(inputTn1->getRank() < inputTn2->getRank()){
         cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E2"<<endl;
-    return nullptr;
+        return nullptr;
     }
 
     //forcing inputTn1 to be of rank 4. (always)
@@ -943,8 +956,6 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
         inputTn1->ExpandDimZero();
     }
 
-    unsigned long indxS1;
-    unsigned long indxS2;
     unsigned int dim0, dim1, dim2, dim3;
     unsigned int dim0B, dim1B, dim2B, dim3B;
     int dim0B_IsNotZero, dim1B_IsNotZero, dim2B_IsNotZero, dim3B_IsNotZero;
@@ -976,6 +987,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
         dim2B=inputTn2->getShape()[0];
         dim3B=inputTn2->getShape()[1];
     }
+    /*
     if(inputTn2->getRank()==1 && inputTn2->getShape()[0]!=1){
         dim0B=0;
         dim1B=0;
@@ -987,8 +999,13 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
         dim1B=0;
         dim2B=0;
         dim3B=1; //and rank should be 1 which already is
+    }*/
+    if(inputTn2->getRank()==1){
+        dim0B=0;
+        dim1B=0;
+        dim2B=0;
+        dim3B=inputTn2->getShape()[0];
     }
-
 
     int tmp =15>>(4-inputTn2->getRank());
     dim0B_IsNotZero = (tmp >> 3) & 1;
@@ -1032,6 +1049,8 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim1B_IsNotZero);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim2B_IsNotZero);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim3B_IsNotZero);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&rank1);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&rank2);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&operationMode);
 
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;

@@ -26,7 +26,7 @@ endif()
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
-set(SYNTH_FLAGS "-I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config" CACHE STRING "CFlags for synthesis only.")
+set(SYNTH_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
 set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
 #set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
@@ -39,12 +39,13 @@ set(PASTEBIN_USERNAME "" CACHE STRING "PasteBin Account's Username")
 set(PASTEBIN_PASSWORD "" CACHE STRING "PasteBin Account's Password") 
 set(PASTEBIN_API_KEY  "" CACHE STRING "PasteBin Account's API Key") 
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
-    ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/hlslib/cmake)
+set(CMAKE_MODULE_PATH 
+    ${CMAKE_MODULE_PATH} 
+    ${CMAKE_SOURCE_DIR}/hlslib/cmake
+    )
 
 find_package(SDAccel REQUIRED)
 find_package(Threads REQUIRED)
-
 
 
 #==========================================================================================================================================
@@ -226,22 +227,22 @@ configure_file(scripts/SynthesisScriptLauncherBatch.sh.in SynthesisScriptLaunche
 add_custom_target(synthesis COMMAND sh SynthesisScriptLauncherBatch.sh) 
 
 # Creating required tcl scripts to run hls synthesis
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"              )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"              )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float")
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"  )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
 synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"              )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"           )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"           )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"        "task_reducesum4d"         )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"               "task_relu"                )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"               "task_sqrt"                )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"             "task_square"              )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"               "task_topk"                )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"           )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"           )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"           )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"        "task_reducesum4d"         )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"               "task_relu"                )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"               "task_sqrt"                )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"             "task_square"              )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"               "task_topk"                )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"           )
 
 
 
@@ -335,22 +336,22 @@ endif()
 
 
 
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 FALSE TRUE ${SP_TAG_RELU} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 FALSE TRUE ${SP_TAG_SQRT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"               FALSE TRUE ${SP_TAG_SQUARE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu.cpp"                "relu"              "task_relu"                 FALSE TRUE ${SP_TAG_RELU} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/sqrt.cpp"                "sqrt"              "task_sqrt"                 FALSE TRUE ${SP_TAG_SQRT} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/square.cpp"              "square"            "task_square"               FALSE TRUE ${SP_TAG_SQUARE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk.cpp"                "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
 
 
 
@@ -393,12 +394,11 @@ add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh)
 
 
 
-# Host code to launch kernel
 set(HOSTSIDE_SRC
-    src/ClassifierMultiPlatform.cpp
+    #src/ClassifierMultiPlatform.cpp
     src/cnpy.cpp
-    src/MainExecutable.cpp
-    src/ModelArchTop05.cpp
+    #src/MainExecutable.cpp
+    #src/ModelArchTop05.cpp
     src/PlatformImplementation.cpp
     src/PlatformSelector.cpp
     src/TensorF.cpp
@@ -410,11 +410,21 @@ set(HOSTSIDE_SRC
     src/ocl_imp/OclTensorI.cpp
     src/ocl_imp/xilinx/xcl.cpp
     src/ocl_imp/xilinx/XilinxImplementation.cpp
+    #src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
+)
+
+set(HOSTSIDE_MAIN_SRC
+    ${HOSTSIDE_SRC}
+    src/ClassifierMultiPlatform.cpp
+    src/MainExecutable.cpp
+    src/ModelArchTop05.cpp
     src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
-add_executable(${HostExecutableName} ${HOSTSIDE_SRC})
+add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
 target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
+
+
 
 set(xcl_path_swemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_sw_emu.xclbin")
 set(xcl_path_hwemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw_emu.xclbin")
@@ -428,7 +438,3 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hwemu.sh ${CMAKE_BINARY_DIR
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hw.sh ${CMAKE_BINARY_DIR}/autobuild_hw.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/PasteBinAgentForAutoBuilds.py ${CMAKE_BINARY_DIR}/PasteBinAgentForAutoBuilds.py @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/sdaccel.ini ${CMAKE_BINARY_DIR}/sdaccel.ini COPYONLY)
-
-
-#-t hw --platform xilinx_kcu1500_dynamic_5_0 --save-temps -Os --report system -l --nk task_conv2_1x1_direct:1 --profile_kernel data:task_conv2_1x1_direct:all:all --nk task_matmul:1 --nk task_matops:1 --nk task_reducesum4d:1 --nk task_relu:1 --nk task_sqrt:1 --nk task_tile:1 --nk task_topk:1 --profile_kernel data:task_topk:all:all --nk task_transpose:1 --nk task_datamover_mod1_float:1 --nk task_datamover_mod1_int:1 --nk task_reducemax:1 --messageDb binary_container_1.mdb --xp misc:solution_name=_xocc_link_binary_container_1 --sp task_datamover_mod1_float_1.m_axi_gmem0:bank1 --sp task_datamover_mod1_float_1.m_axi_gmem1:bank2 --sp task_datamover_mod1_int_1.m_axi_gmemi0:bank1 --sp task_datamover_mod1_int_1.m_axi_gmemi1:bank2 --sp task_tile_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem1:bank2 --sp task_conv2_1x1_direct_1.m_axi_gmem2:bank2 --remote_ip_cache /home/saleh/02_workspace/00_SDx2017.4/ip_cache -obinary_container_1.xclbin binary_container_1/task_conv2_1x1_direct.xo binary_container_1/task_matmul.xo binary_container_1/task_matops.xo binary_container_1/task_reducesum4d.xo binary_container_1/task_relu.xo binary_container_1/task_sqrt.xo binary_container_1/task_tile.xo binary_container_1/task_topk.xo binary_container_1/task_transpose.xo binary_container_1/task_datamover_mod1_float.xo binary_container_1/task_datamover_mod1_int.xo binary_container_1/task_reducemax.xo
-# --interactive synth
