@@ -48,38 +48,38 @@ void matops_nd_nd(
     assert(rank1>=1 && rank1<=4);
     //assert(dim0==dim0B && dim1==dim1B && dim2==dim2B && dim3==dim3B);
 
-    const unsigned long d0d1d2d3 = rank1==4 ? dim0*dim1*dim2*dim3 :
+    const unsigned int d0d1d2d3 = rank1==4 ? dim0*dim1*dim2*dim3 :
                                    rank1==3 ? dim1*dim2*dim3 :
                                    rank1==2 ? dim2*dim3 :
                                    dim3;
 
-    const unsigned long packCount = DivCeil<unsigned long>(d0d1d2d3, CONFIG_M_AXI_WIDTH);
+    const unsigned int packCount = DivCeil<unsigned int>(d0d1d2d3, CONFIG_M_AXI_WIDTH);
 
-    MemoryPackK_t outputCache;
+    MemoryPackK_t outputBuff;
 
-    LoopMain: for(unsigned long iter=0; iter<packCount; iter++){
+    LoopMain: for(unsigned int iter=0; iter<packCount; iter++){
 #pragma HLS PIPELINE II=1
 #pragma HLS LOOP_TRIPCOUNT min=327680 max=327680
 
         if(mode==0)//Add
         {
-            outputCache = inputTn1[iter] + inputTn2[iter];
+            outputBuff = inputTn1[iter] + inputTn2[iter];
         }
         else if(mode==1)//Sub
         {
-            outputCache = inputTn1[iter] - inputTn2[iter];
+            outputBuff = inputTn1[iter] - inputTn2[iter];
         }
         else if(mode==2)//Mul (element wise)
         {
-            outputCache = inputTn1[iter] * inputTn2[iter];
+            outputBuff = inputTn1[iter] * inputTn2[iter];
         }
         else if(mode==3)//Div (element wise)
         {
-            outputCache = inputTn1[iter] / inputTn2[iter];
+            outputBuff = inputTn1[iter] / inputTn2[iter];
         }
 
         //-----------------------------------------------------
-        outputTn[iter] = outputCache;
+        outputTn[iter] = outputBuff;
     }
 }
 
@@ -123,16 +123,16 @@ void matops_nd_1d(
     assert(rank2==1);
     assert(dim3 == dim3B);
 
-    const unsigned long d0d1d2d3 = rank1==4 ? dim0*dim1*dim2*dim3 :
+    const unsigned int d0d1d2d3 = rank1==4 ? dim0*dim1*dim2*dim3 :
                                    rank1==3 ? dim1*dim2*dim3 :
                                    rank1==2 ? dim2*dim3 :
                                    dim3;
 
-    const unsigned long packCount = DivCeil<unsigned long>(d0d1d2d3, CONFIG_M_AXI_WIDTH);
+    const unsigned int packCount = DivCeil<unsigned int>(d0d1d2d3, CONFIG_M_AXI_WIDTH);
 
-    unsigned long indxS1;
+    unsigned int indxS1;
     unsigned int d3, buff_d3;
-    MemoryPackK_t outputCache, tempBuff, tempBuff2;
+    MemoryPackK_t outputBuff, tempBuff, tempBuff2;
 
     CONFIG_DTYPE buff[CONFIG_ND_1D_MAX_SLICE];
 #pragma HLS array_partition variable=buff complete dim=0
@@ -148,7 +148,7 @@ void matops_nd_1d(
         
     }
 
-    LoopMain: for(unsigned long iter=0; iter<packCount; iter++){
+    LoopMain: for(unsigned int iter=0; iter<packCount; iter++){
 #pragma HLS PIPELINE II=1
 #pragma HLS LOOP_TRIPCOUNT min=327680 max=327680
 
@@ -163,23 +163,23 @@ void matops_nd_1d(
 
         if(mode==0)//Add
         {
-            outputCache = inputTn1[iter] + tempBuff2;
+            outputBuff = inputTn1[iter] + tempBuff2;
         }
         else if(mode==1)//Sub
         {
-            outputCache = inputTn1[iter] - tempBuff2;
+            outputBuff = inputTn1[iter] - tempBuff2;
         }
         else if(mode==2)//Mul (element wise)
         {
-            outputCache = inputTn1[iter] * tempBuff2;
+            outputBuff = inputTn1[iter] * tempBuff2;
         }
         else if(mode==3)//Div (element wise)
         {
-            outputCache = inputTn1[iter] / tempBuff2;
+            outputBuff = inputTn1[iter] / tempBuff2;
         }
 
         //-----------------------------------------------------
-        outputTn[iter] = outputCache;
+        outputTn[iter] = outputBuff;
     }
 }
 
@@ -222,43 +222,43 @@ void matops_nd_1d_constant(
     assert(rank2==1);
     assert(dim3B == 1);
 
-    const unsigned long d0d1d2d3 = rank1==4 ? dim0*dim1*dim2*dim3 :
+    const unsigned int d0d1d2d3 = rank1==4 ? dim0*dim1*dim2*dim3 :
                                    rank1==3 ? dim1*dim2*dim3 :
                                    rank1==2 ? dim2*dim3 :
                                    dim3;
 
-    const unsigned long packCount = DivCeil<unsigned long>(d0d1d2d3, CONFIG_M_AXI_WIDTH);
+    const unsigned int packCount = DivCeil<unsigned int>(d0d1d2d3, CONFIG_M_AXI_WIDTH);
 
-    unsigned long indxS1;
+    unsigned int indxS1;
     unsigned int d3, buff_d3;
-    MemoryPackK_t outputCache;
+    MemoryPackK_t outputBuff;
     
     CONFIG_DTYPE cte = (inputTn2[0])[0];
     MemoryPackK_t tempBuff(cte);
 
-    LoopMain: for(unsigned long iter=0; iter<packCount; iter++){
+    LoopMain: for(unsigned int iter=0; iter<packCount; iter++){
 #pragma HLS PIPELINE II=1
 #pragma HLS LOOP_TRIPCOUNT min=327680 max=327680
 
         if(mode==0)//Add
         {
-            outputCache = inputTn1[iter] + tempBuff;
+            outputBuff = inputTn1[iter] + tempBuff;
         }
         else if(mode==1)//Sub
         {
-            outputCache = inputTn1[iter] - tempBuff;
+            outputBuff = inputTn1[iter] - tempBuff;
         }
         else if(mode==2)//Mul (element wise)
         {
-            outputCache = inputTn1[iter] * tempBuff;
+            outputBuff = inputTn1[iter] * tempBuff;
         }
         else if(mode==3)//Div (element wise)
         {
-            outputCache = inputTn1[iter] / tempBuff;
+            outputBuff = inputTn1[iter] / tempBuff;
         }
 
         //-----------------------------------------------------
-        outputTn[iter] = outputCache;
+        outputTn[iter] = outputBuff;
     }
 }
 

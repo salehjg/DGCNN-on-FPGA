@@ -13,5 +13,4 @@ T DivCeil(T a, T b){
 	return ((T)(a-1)/(T)b)+1;
 }
 
-
 #endif //AxiHelper_H
