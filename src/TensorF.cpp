@@ -139,11 +139,26 @@ unsigned long TensorF::getLengthBytes() {
 }
 
 unsigned long TensorF::getLengthPadded(int vectorWords){
-    assert(vectorWords>0);
-    unsigned long len = getLength();
-    int pad = len % vectorWords;
-    pad = vectorWords - pad;
-    return len + pad;
+    if(initialized) {
+        unsigned long len = 1;
+        std::vector<unsigned int> paddedShape = PadShape(shape, vectorWords);
+        for (int i = 0; i < paddedShape.size(); i++) {
+            len = len * paddedShape[i];
+        }
+
+        return len;
+    }else{
+        return 0;
+    }
+}
+
+std::vector<unsigned int> TensorF::PadShape(std::vector<unsigned int> actualShape, int vectorWords){
+    std::vector<unsigned int> paddedShape = actualShape;
+    // always pad the last dimension.
+    int lastDim = paddedShape[paddedShape.size()-1];
+    paddedShape[paddedShape.size()-1] = ( lastDim + (vectorWords - (lastDim % vectorWords)) );
+
+    return paddedShape;
 }
 
 unsigned long TensorF::getLengthBytesPadded(int vectorWords){

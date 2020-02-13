@@ -83,7 +83,6 @@ void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, st
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-    unsigned long len = getLengthBytes();
     unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
@@ -105,8 +104,12 @@ void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, st
     //      the application after the clEnqueueWriteBuffer call returns.
     //
 
-    ocl_stat = clEnqueueWriteBuffer(queue, ocl_buff, CL_TRUE, 0, len, hostBuff, 0, NULL, NULL);
+    float *paddedBuff = PadHostBuffer(shape, hostBuff, vectorWords);
+
+    ocl_stat = clEnqueueWriteBuffer(queue, ocl_buff, CL_TRUE, 0, lenPadded, paddedBuff, 0, NULL, NULL);
     assert(ocl_stat==CL_SUCCESS);
+
+    delete(paddedBuff);
 }
 
 int OclTensorF::getDramBank(){
@@ -171,7 +174,7 @@ int OclTensorF::LaunchDataMover(
     assert(error==CL_SUCCESS);
 }
 
-// The idea is to hide FPGA specific memory bank related stuff from the top ModelArch.
+// The idea is to hide FPGA specific memory bank related stuff from top ModelArch.
 // The only planned access to this method should be through 'XilinxImplementation' class.
 // Because of this, XilinxImpUnitTests wont be able to access cl_program directely.
 // It should be accessed through platformSelector.openclPlatformClass(They are public)
@@ -260,10 +263,12 @@ TensorF* OclTensorF::CloneToDDRBank(cl_program program, cl_context context, cl_c
 TensorF* OclTensorF::TransferToHost(cl_command_queue queue) {
     TensorF* rsltTn;
     cl_int ocl_stat;
-    float* hostBuff = new float[getLength()];
-    ocl_stat = clEnqueueReadBuffer(queue, ocl_buff, CL_TRUE, 0, getLengthBytes(), hostBuff, 0, NULL, NULL);
+    float* hostBuffPadded = new float[getLengthPadded(vectorWords)];
+    ocl_stat = clEnqueueReadBuffer(queue, ocl_buff, CL_TRUE, 0, getLengthBytesPadded(vectorWords), hostBuffPadded, 0, NULL, NULL);
     assert(ocl_stat==CL_SUCCESS);
+    float* hostBuff = UnPadHostBuffer(shape, hostBuffPadded, vectorWords);
     rsltTn = new TensorF(getShape(),hostBuff);
+    delete(hostBuffPadded);
     return rsltTn;
 }
 
@@ -282,6 +287,48 @@ int OclTensorF::TranslateBankIndex(int bankIndex){
             return XCL_MEM_DDR_BANK3;
         }break;
     };
+}
+
+float* OclTensorF::PadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords){
+    std::vector<unsigned int> paddedShape = PadShape(actualShape, vectorWords);
+    unsigned long paddedLen = 1;
+    for(int i=0; i<paddedShape.size(); i++){
+        paddedLen = paddedLen * paddedShape[i];
+    }
+
+    const unsigned long sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
+    const int actualSliceLen = actualShape[actualShape.size()-1];
+    const int paddedSliceLen = paddedShape[actualShape.size()-1];
+    float *paddedBuff = new float[paddedLen];
+
+    for(unsigned long slice=0; slice<sliceCount; slice++){
+        for(int i=0; i<paddedSliceLen; i++){
+            paddedBuff[slice*paddedSliceLen + i] = (i<actualSliceLen)? hostSrcBuff[slice*actualSliceLen + i] : 0;
+        }
+    }
+
+    return paddedBuff;
+}
+
+float* OclTensorF::UnPadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords){
+    std::vector<unsigned int> paddedShape = PadShape(actualShape, vectorWords);
+    unsigned long paddedLen = 1;
+    for(int i=0; i<paddedShape.size(); i++){
+        paddedLen = paddedLen * paddedShape[i];
+    }
+
+    const unsigned long sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
+    const int actualSliceLen = actualShape[actualShape.size()-1];
+    const int paddedSliceLen = paddedShape[actualShape.size()-1];
+    float *unpaddedBuff = new float[paddedLen];
+
+    for(unsigned long slice=0; slice<sliceCount; slice++){
+        for(int i=0; i<actualSliceLen; i++){
+            unpaddedBuff[slice*actualSliceLen + i] = hostSrcBuff[slice*paddedSliceLen + i];
+        }
+    }
+
+    return unpaddedBuff;
 }
 
 OclTensorF::~OclTensorF() {

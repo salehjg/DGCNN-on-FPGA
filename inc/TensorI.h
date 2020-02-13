@@ -27,6 +27,7 @@ public:
     unsigned long getLength();
     unsigned long getLengthBytes();
     unsigned long getLengthPadded(int vectorWords);
+    static std::vector<unsigned int> PadShape(std::vector<unsigned int> actualShape, int vectorWords);
     unsigned long getLengthBytesPadded(int vectorWords);
     unsigned long getVectorCountPadded(int vectorWords);
     virtual ~TensorI();

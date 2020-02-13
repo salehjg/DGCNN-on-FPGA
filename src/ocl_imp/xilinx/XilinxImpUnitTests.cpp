@@ -109,10 +109,6 @@ ReportObject* XilinxImpUnitTests::TensorFloat(){
 ReportObject* XilinxImpUnitTests::TensorBankFloat(){
     TensorF* tensorCpu = GenerateTensor(7,{5,5,2});
     OclTensorF* tensorSrc_defaultBank = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
-    
-    int padded_len = tensorCpu->getLength();
-    padded_len += (CONFIG_M_AXI_WIDTH - padded_len % CONFIG_M_AXI_WIDTH);
-    bool rslt_padded_len = (tensorSrc_defaultBank->getLengthPadded(CONFIG_M_AXI_WIDTH) == padded_len);
 
     bool rslt_before_changing_bank = platformSelector->CompareTensors(
         PLATFORMS::CPU,
@@ -138,17 +134,13 @@ ReportObject* XilinxImpUnitTests::TensorBankFloat(){
     bool rslt_after_changing_bank_reverse = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
 
     
-    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_padded_len && rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
     return obj;
 }
 
 ReportObject* XilinxImpUnitTests::TensorBankInteger(){
     TensorI* tensorCpu = GenerateTensorInteger(7,{5,5,2});
     OclTensorI* tensorSrc_defaultBank = (OclTensorI*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
-
-    int padded_len = tensorCpu->getLength();
-    padded_len += (CONFIG_M_AXI_WIDTH - padded_len % CONFIG_M_AXI_WIDTH);
-    bool rslt_padded_len = (tensorSrc_defaultBank->getLengthPadded(CONFIG_M_AXI_WIDTH) == padded_len);
 
     bool rslt_before_changing_bank = platformSelector->CompareTensorsInteger(
         PLATFORMS::CPU,
@@ -174,7 +166,7 @@ ReportObject* XilinxImpUnitTests::TensorBankInteger(){
     bool rslt_after_changing_bank_reverse = platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorSrc_defaultBank);
 
 
-    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_padded_len && rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_changing_bank && rslt_after_changing_bank && rslt_after_changing_bank_reverse);
     return obj;
 }
 
@@ -241,6 +233,47 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
 
 
     ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_cloning_bank && rslt_after_cloning_bank && rslt_after_cloning_bank_reverse);
+    return obj;
+}
+
+ReportObject* XilinxImpUnitTests::TensorPadUnpadFloat(){
+    TensorF* tensorCpu = GenerateTensor(0,{5,5,2});
+    OclTensorF* tensorPadded_defaultBank = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
+    TensorF* tensorCpu2 = platformSelector->CrossThePlatform(tensorPadded_defaultBank, PLATFORMS::CPU);
+    bool rslt = platformSelector->CompareTensors(
+        PLATFORMS::CPU,
+        scheduler,
+        tensorCpu,
+        tensorCpu2);
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt);
+    return obj;
+}
+
+ReportObject* XilinxImpUnitTests::TensorPadUnpadInteger(){
+    TensorI* tensorCpu = GenerateTensorInteger(0,{5,5,2});
+    OclTensorI* tensorPadded_defaultBank = (OclTensorI*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
+    TensorI* tensorCpu2 = platformSelector->CrossThePlatform(tensorPadded_defaultBank, PLATFORMS::CPU);
+
+
+    bool comparisonResult = true;
+    if (tensorCpu->getShape() != tensorCpu2->getShape()){
+        comparisonResult = false;
+    }
+    else{
+
+        for(unsigned long i=0; i<tensorCpu->getLength(); i++){
+            int rCpu = tensorCpu->_buff[i];
+            int rGpu = tensorCpu2->_buff[i];
+            if(rCpu != rGpu){
+                comparisonResult=false;
+            }
+
+        }
+
+    }
+
+
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
 
@@ -829,30 +862,29 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    //PrintReport(KernelMatops());              // DONE
-    //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
-    PrintReport(KernelReduceMax());
-
-    /*PrintReport(TensorFloat());
+    PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
-    PrintReport(TensorCloneBankInteger());*/
-    /*
-    PrintReport(KernelRelu());
+    PrintReport(TensorCloneBankInteger());
+    PrintReport(TensorPadUnpadFloat());
+    PrintReport(TensorPadUnpadInteger());
+
+    //PrintReport(KernelMatops());              // DONE
+    //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
+    //PrintReport(KernelReduceMax());           // DONE, NEEDS TO BE NERFED TO SAVE RESOURCES
+
+    /*PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
     PrintReport(KernelTile());
-    
     PrintReport(KernelReduceSum()); 
-    PrintReport(KernelReduceSum4D());*/
-    
-    /*PrintReport(KernelMean());
+    PrintReport(KernelReduceSum4D());
+    PrintReport(KernelMean());
     PrintReport(KernelVariance());
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
     PrintReport(KernelGather());
-    
     PrintReport(KernelTopK());   
     PrintReport(KernelConv2Mlp());*/
 }

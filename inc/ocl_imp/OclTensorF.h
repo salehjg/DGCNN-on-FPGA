@@ -25,11 +25,15 @@ public:
     void ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
     TensorF* CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
     TensorF* TransferToHost(cl_command_queue queue);
+    static float* PadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords);
+    static float* UnPadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords);
     virtual ~OclTensorF();
     cl_mem ocl_buff;
 private:
     int LaunchDataMover(cl_program program, cl_command_queue queue, int srcBank, int dstBank, cl_mem srcBuff, cl_mem dstBuff, unsigned long len);
     int TranslateBankIndex(int bankIndex);
+
+
 
     //If bank arg were not specified, tensor would be allocated
     //on default bank which is default value of 'dramBank'

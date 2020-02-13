@@ -83,7 +83,7 @@ void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, st
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-    unsigned long len = getLengthBytes();
+
     unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
@@ -105,8 +105,12 @@ void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, st
     //      the application after the clEnqueueWriteBuffer call returns.
     //
 
-    ocl_stat = clEnqueueWriteBuffer(queue, ocl_buff, CL_TRUE, 0, len, hostBuff, 0, NULL, NULL);
+    int *paddedBuff = PadHostBuffer(shape, hostBuff, vectorWords);
+
+    ocl_stat = clEnqueueWriteBuffer(queue, ocl_buff, CL_TRUE, 0, lenPadded, paddedBuff, 0, NULL, NULL);
     assert(ocl_stat==CL_SUCCESS);
+
+    delete(paddedBuff);
 }
 
 int OclTensorI::getDramBank(){
@@ -261,10 +265,12 @@ TensorI* OclTensorI::CloneToDDRBank(cl_program program, cl_context context, cl_c
 TensorI* OclTensorI::TransferToHost(cl_command_queue queue) {
     TensorI* rsltTn;
     cl_int ocl_stat;
-    int* hostBuff = new int[getLength()];
-    ocl_stat = clEnqueueReadBuffer(queue, ocl_buff, CL_TRUE, 0, getLengthBytes(), hostBuff, 0, NULL, NULL);
+    int* hostBuffPadded = new int[getLengthPadded(vectorWords)];
+    ocl_stat = clEnqueueReadBuffer(queue, ocl_buff, CL_TRUE, 0, getLengthBytesPadded(vectorWords), hostBuffPadded, 0, NULL, NULL);
     assert(ocl_stat==CL_SUCCESS);
+    int* hostBuff = UnPadHostBuffer(shape, hostBuffPadded, vectorWords);
     rsltTn = new TensorI(getShape(),hostBuff);
+    delete(hostBuffPadded);
     return rsltTn;
 }
 
@@ -283,6 +289,48 @@ int OclTensorI::TranslateBankIndex(int bankIndex){
             return XCL_MEM_DDR_BANK3;
         }break;
     };
+}
+
+int* OclTensorI::PadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords){
+    std::vector<unsigned int> paddedShape = PadShape(actualShape, vectorWords);
+    unsigned long paddedLen = 1;
+    for(int i=0; i<paddedShape.size(); i++){
+        paddedLen = paddedLen * paddedShape[i];
+    }
+
+    const unsigned long sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
+    const int actualSliceLen = actualShape[actualShape.size()-1];
+    const int paddedSliceLen = paddedShape[actualShape.size()-1];
+    int *paddedBuff = new int[paddedLen];
+
+    for(unsigned long slice=0; slice<sliceCount; slice++){
+        for(int i=0; i<paddedSliceLen; i++){
+            paddedBuff[slice*paddedSliceLen + i] = (i<actualSliceLen)? hostSrcBuff[slice*actualSliceLen + i] : 0;
+        }
+    }
+
+    return paddedBuff;
+}
+
+int* OclTensorI::UnPadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords){
+    std::vector<unsigned int> paddedShape = PadShape(actualShape, vectorWords);
+    unsigned long paddedLen = 1;
+    for(int i=0; i<paddedShape.size(); i++){
+        paddedLen = paddedLen * paddedShape[i];
+    }
+
+    const unsigned long sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
+    const int actualSliceLen = actualShape[actualShape.size()-1];
+    const int paddedSliceLen = paddedShape[actualShape.size()-1];
+    int *unpaddedBuff = new int[paddedLen];
+
+    for(unsigned long slice=0; slice<sliceCount; slice++){
+        for(int i=0; i<actualSliceLen; i++){
+            unpaddedBuff[slice*actualSliceLen + i] = hostSrcBuff[slice*paddedSliceLen + i];
+        }
+    }
+
+    return unpaddedBuff;
 }
 
 OclTensorI::~OclTensorI() {

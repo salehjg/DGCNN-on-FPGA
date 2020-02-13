@@ -34,6 +34,7 @@ public:
     unsigned long getLengthPadded(int vectorWords);
     unsigned long getLengthBytesPadded(int vectorWords);
     unsigned long getVectorCountPadded(int vectorWords);
+    static std::vector<unsigned int> PadShape(std::vector<unsigned int> actualShape, int vectorWords);
     virtual ~TensorF();
 
     float* _buff;

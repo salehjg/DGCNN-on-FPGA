@@ -27,6 +27,8 @@ public:
     void ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
     TensorI* CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
     TensorI* TransferToHost(cl_command_queue queue);
+    static int* PadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords);
+    static int* UnPadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords);
     virtual ~OclTensorI();
     cl_mem ocl_buff;
 private:
