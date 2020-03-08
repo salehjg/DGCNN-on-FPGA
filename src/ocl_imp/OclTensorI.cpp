@@ -333,6 +333,15 @@ int* OclTensorI::UnPadHostBuffer(std::vector<unsigned int> actualShape, int *hos
     return unpaddedBuff;
 }
 
+unsigned int OclTensorI::getPaddedLastDim(){
+    if(initialized){
+        std::vector<unsigned int> paddedShape = PadShape(shape, vectorWords);
+        return paddedShape[paddedShape.size()-1];
+    }else{
+        return 0;
+    }
+}
+
 OclTensorI::~OclTensorI() {
     /* https://stackoverflow.com/questions/17923370/override-identifier-after-destructor-in-c11
      * Even though destructors are not inherited, a destructor in a derived class

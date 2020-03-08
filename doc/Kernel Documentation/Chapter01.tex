@@ -1,5 +1,5 @@
 
-\chapter{Detailed Kernel Descriptions}
+\chapter{Detailed Kernel Descriptions for Official DGCNN Model}
 
 \section{Intro}
 In this chapter, architecture of each kernel is described in details, neglecting implementation aspect of it, like SLR or DDR bank assignments.
@@ -7,23 +7,25 @@ In this chapter, architecture of each kernel is described in details, neglecting
 \pagebreak
 
 \section{Concat2}
-Concatenates two tensors of rank four into one over a dimension.
+Concatenates two tensors of rank four over a dimension.
 \subsection{Top Function}
 \begin{lstlisting}
 void task_concat(
-		float* inputTn1,
-	    float* inputTn2,
-	    float* outputTn,
-
+		MemoryPackK_t *inputTn1,
+		MemoryPackK_t *inputTn2,
+		MemoryPackK_t *outputTn,
+		
 		unsigned int dimA0,
 		unsigned int dimA1,
 		unsigned int dimA2,
 		unsigned int dimA3,
-
+		
 		unsigned int dimB0,
 		unsigned int dimB1,
 		unsigned int dimB2,
-		unsigned int dimB3)
+		unsigned int dimB3,
+		
+		int concatDim)
 \end{lstlisting}
 
 \subsection{Usage}
@@ -59,35 +61,61 @@ Concat Over Dim: 3
 	\end{center}
 \end{table}
 
-\subsection{Fixed Shape Instances}
-\begin{table}[htbp] % put table at (h:here, t:top, b:bottom, p:seperated page)
-\caption{Fixed shaped instances of the kernel template}
-\label{tab:shapes_concat}
-	\begin{center}
-		\begin{tabular}{|r|c|} 
-		\hline	
-		  & Instance 1\\ 
-		\hline	
-		DimA0 &
-			5 \\ 
-		\hline
-		DimA1 & 
-			1024\\
-		\hline
-		DimB0 & 
-			5\\
-		\hline
-		DimB1 & 
-			1024\\
-		\hline
-		\end{tabular}
-	\end{center}
-\end{table}
-
 \subsection{Technical Details}
 \begin{enumerate}
-\item -
+\item Vivado HLS somehow requires presence of the unrolled loop's variable in the index of stream array as it is shown below.
+\begin{lstlisting}
+// This example works fine
+LoopVec: for(int i=0; i<CONFIG_M_AXI_WIDTH; i++){
+#pragma HLS UNROLL
+	idx = iter * CONFIG_M_AXI_WIDTH + i;
+	r3 = idx % dimR3;
+	if(r3<dimA3){
+		// Note that 'i' is peresent in the index expression.
+		tempBuff[i] = inStreams1[streamIdx1+i].Pop();
+	}else{
+		// Note that 'i' is peresent in the index expression.
+		tempBuff[i] = inStreams2[streamIdx2+i].Pop();
+	}
+}
+streamIdx1 += CONFIG_M_AXI_WIDTH;
+streamIdx2 += CONFIG_M_AXI_WIDTH;
+\end{lstlisting}
+\begin{lstlisting}
+// This does not work. Vivado hls thinks there is a carried dependency between the FIFO reads of a stream.
+LoopVec: for(int i=0; i<CONFIG_M_AXI_WIDTH; i++){
+#pragma HLS UNROLL
+	idx = iter * CONFIG_M_AXI_WIDTH + i;
+	r3 = idx % dimR3;
+	if(r3<dimA3){
+		streamIdx1 = (((unsigned int)(idx/(unsigned long)dimR3))*dimA3 + r3) % CONFIG_M_AXI_WIDTH;
+		// Note that streamIdx1 does not contain 'i' directry.
+		tempBuff[i] = inStreams1[streamIdx1].Pop();
+	}else{
+		streamIdx2 = (((unsigned int)(idx/(unsigned long)dimR3))*dimB3 + r3-dimA3) % CONFIG_M_AXI_WIDTH;
+		// Note that streamIdx1 does not contain 'i' directry.
+		tempBuff[i] = inStreams2[streamIdx2].Pop();
+	}
+}
+\end{lstlisting}
+
+\item To implement SIMD like scheme, the outer most loop's trip-count should be equal to the number of data-packs in the input tensor. This loop should be pipelined while any inner loops are fully unrolled. 
+\begin{lstlisting}
+const unsigned long packCount = DivCeil<unsigned int>(dimA0*dimA1*dimA2*dimR3, CONFIG_M_AXI_WIDTH);
+LoopRead: for(unsigned int iter=0; iter<packCount; iter++){
+	// ...
+}
+\end{lstlisting}
+
+\item To define depth of an \emph{hlslib::Stream} instance, one should explicitly enter \emph{HLS STREAM} pragma.
+\begin{lstlisting}
+// Note that providing 'Depth' as it's shown below DOES NOT affect synthesized circuit.
+Stream<float, Depth> outStreams;
+\end{lstlisting}
+
+\item This kernel uses data-pack to implement wide m\_axi bus.
 \end{enumerate}
+
 
 
 \pagebreak
@@ -451,13 +479,13 @@ LoopDim0: for(int d0=0; d0<dim0; d0++){
 
 
 \section{MatOps}
-Takes two input tensor and implements addition, subtraction, multiplication and division in a auto-tiling manner.
+Takes two input tensor and implements addition, subtraction, multiplication and division in a auto-tiling manner. Only three used inputs' ranks are implemented as three separate sub-functions, \emph{matops\_nd\_nd}, \emph{matops\_nd\_1d}, and \emph{matops\_nd\_0d} which are n-dimension n-dimension, n-dimension 1-dimension, and n-dimension constant value respectively.
 \subsection{Top Function}
 \begin{lstlisting}
 void task_matops(
-		const float *inputTn1,
-		const float *inputTn2,
-		float * outputTn,
+		MemoryPackK_t *inputTn1,
+		MemoryPackK_t *inputTn2,
+		MemoryPackK_t *outputTn,
 		const unsigned int dim0,
 		const unsigned int dim1,
 		const unsigned int dim2,
@@ -470,6 +498,8 @@ void task_matops(
 		const int dim1B_IsNotZero,
 		const int dim2B_IsNotZero,
 		const int dim3B_IsNotZero,
+		const int rank1,
+		const int rank2,
 		const int mode)
 \end{lstlisting}
 
@@ -478,7 +508,7 @@ void task_matops(
 
 \begin{table}[h]
 \caption{Usage Instances and Tensor Shapes(Mode=0, Addition)}
-\label{tab:shapes_matops}
+\label{tab:shapes_matops0}
 	\begin{center}
 		\begin{tabular}{|r|c|c|c|c|} 
 		\hline	
@@ -505,7 +535,7 @@ void task_matops(
 
 \begin{table}[h]
 \caption{Usage Instances and Tensor Shapes(Mode=1, Subtraction)}
-\label{tab:shapes_matops}
+\label{tab:shapes_matops1}
 	\begin{center}
 		\begin{tabular}{|r|c|c|c|c|} 
 		\hline	
@@ -532,7 +562,7 @@ void task_matops(
 
 \begin{table}[h]
 \caption{Usage Instances and Tensor Shapes(Mode=2, Multiplication)}
-\label{tab:shapes_matops}
+\label{tab:shapes_matops2}
 	\begin{center}
 		\begin{tabular}{|r|c|c|c|c|} 
 		\hline	
@@ -559,7 +589,7 @@ void task_matops(
 
 \begin{table}[htbp]
 \caption{Usage Instances and Tensor Shapes(Mode=3, Division)}
-\label{tab:shapes_matops}
+\label{tab:shapes_matops3}
 	\begin{center}
 		\begin{tabular}{|r|c|c|c|c|} 
 		\hline	
@@ -583,14 +613,36 @@ void task_matops(
 		\end{tabular}
 	\end{center}
 \end{table}
+
+\begin{table}[htbp]
+	\caption{Used Inputs' Ranks. Note that a constant value has a rank of one and a strict shape of one.}
+	\label{tab:ransk_matops}
+	\begin{center}
+		\begin{tabular}{|r|c|c|} 
+			\hline	
+			Sub-function  & Description & Inputs' Ranks\\ 
+			\hline	
+			\emph{matops\_nd\_nd} &
+			InputTn1 of rank N and inputTn2 of rank N&
+			(4,4)(3,3)(2,2)(1,1)\\
+			\hline
+			\emph{matops\_nd\_1d} &
+			InputTn1 of rank N and inputTn2 of rank one&
+			(4,1)(3,1)(2,1)\\
+			\hline
+			\emph{matops\_nd\_0d} &
+			InputTn1 of rank N and a constant value&
+			(4,1\textsuperscript{*})(3,1\textsuperscript{*})(2,1\textsuperscript{*})(1,1\textsuperscript{*})\\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
 \vspace{2 cm}
-\subsection{Fixed Shape Instances}
-None.
 
 \subsection{Technical Details}
 \begin{enumerate}
-\item All four of the for-loops are fused together as a single loop to avoid unnecessary delays.
-\item Fused loop is pipelined with II=1.
+\item This kernel uses data-pack to implement wide m\_axi bus.
+\item The kernel uses SIMD scheme meaning that the main loop's trip-count is equal to the number of data-packs in the tensor.
 \end{enumerate}
 
 

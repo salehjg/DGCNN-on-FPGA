@@ -862,13 +862,15 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    PrintReport(TensorFloat());
-    PrintReport(TensorBankFloat());
-    PrintReport(TensorBankInteger());
-    PrintReport(TensorCloneBankFloat());
-    PrintReport(TensorCloneBankInteger());
-    PrintReport(TensorPadUnpadFloat());
-    PrintReport(TensorPadUnpadInteger());
+    //PrintReport(TensorFloat());
+    //PrintReport(TensorBankFloat());
+    //PrintReport(TensorBankInteger());
+    //PrintReport(TensorCloneBankFloat());
+    //PrintReport(TensorCloneBankInteger());
+    //PrintReport(TensorPadUnpadFloat());
+    //PrintReport(TensorPadUnpadInteger());
+
+    PrintReport(KernelConv2Mlp());
 
     //PrintReport(KernelMatops());              // DONE
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
@@ -886,7 +888,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelTranspose());
     PrintReport(KernelGather());
     PrintReport(KernelTopK());   
-    PrintReport(KernelConv2Mlp());*/
+    */
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

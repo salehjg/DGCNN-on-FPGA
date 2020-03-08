@@ -29,6 +29,7 @@ public:
     TensorI* TransferToHost(cl_command_queue queue);
     static int* PadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords);
     static int* UnPadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords);
+    unsigned int getPaddedLastDim();
     virtual ~OclTensorI();
     cl_mem ocl_buff;
 private:

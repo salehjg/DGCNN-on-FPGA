@@ -69,7 +69,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducemax",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -159,8 +160,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 13 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -1148,13 +1148,21 @@ TensorF* XilinxImplementation::Concat2(
     TensorF* _inputTn2 = ((OclTensorF*)inputTn2)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
 
 
-    unsigned int dimA0,dimA1,dimA2,dimA3;
-    unsigned int dimB0,dimB1,dimB2,dimB3;
-    dimA0 = inputTn1->getShape()[0]; dimB0 = inputTn2->getShape()[0];
-    dimA1 = inputTn1->getShape()[1]; dimB1 = inputTn2->getShape()[1];
-    dimA2 = inputTn1->getShape()[2]; dimB2 = inputTn2->getShape()[2];
-    dimA3 = inputTn1->getShape()[3]; dimB3 = inputTn2->getShape()[3];
-    OclTensorF* rsltTn = new OclTensorF(context, {dimA0,dimA1,dimA2,dimA3+dimB3},DATAMOVER_KERNEL_BANK_B_INDEX);
+    unsigned int dim0,dim1,dim2,dimR3,dimR3Padded;
+    unsigned int dimA3,dimA3Padded,dimB3,dimB3Padded;
+
+    dim0 = inputTn1->getShape()[0]; 
+    dim1 = inputTn1->getShape()[1]; 
+    dim2 = inputTn1->getShape()[2];
+    dimA3 = inputTn1->getShape()[3]; 
+    dimA3Padded = ((OclTensorF*)inputTn1)->getPaddedLastDim();
+    dimB3 = inputTn2->getShape()[3];
+    dimB3Padded = ((OclTensorF*)inputTn2)->getPaddedLastDim();
+    dimR3 = dimA3 + dimB3;
+
+    OclTensorF* rsltTn = new OclTensorF(context, {dim0,dim1,dim2,dimR3},DATAMOVER_KERNEL_BANK_B_INDEX);
+
+    dimR3Padded = rsltTn->getPaddedLastDim();
 
     OclKernelObject *kernelObject = oclKernels[0];
 
@@ -1163,22 +1171,20 @@ TensorF* XilinxImplementation::Concat2(
     }
     else
     {
-        cl_int error;
-        error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem) , (void*)&((OclTensorF*)_inputTn1)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem) , (void*)&((OclTensorF*)_inputTn2)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
-
-        error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void*)&dimA0);
-        error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&dimA1);
-        error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_uint), (void*)&dimA2);
-        error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_uint), (void*)&dimA3);
-
-        error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_uint), (void*)&dimB0);
-        error |= clSetKernelArg(kernelObject->kernel_task, 8, sizeof(cl_uint), (void*)&dimB1);
-        error |= clSetKernelArg(kernelObject->kernel_task, 9, sizeof(cl_uint), (void*)&dimB2);
-        error |= clSetKernelArg(kernelObject->kernel_task, 10,sizeof(cl_uint), (void*)&dimB3); 
-
-        error |= clSetKernelArg(kernelObject->kernel_task, 11,sizeof(cl_int), (void*)&concatDim); 
+        cl_int error; int argcnt=0;
+        error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)_inputTn1)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)_inputTn2)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim0);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimA3);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimA3Padded);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimB3); 
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimB3Padded); 
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimR3); 
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimR3Padded); 
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int),  (void*)&concatDim); 
 
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         assert(error==0);
