@@ -26,7 +26,7 @@ endif()
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
-set(SYNTH_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
+set(SYNTH_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
 set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
 #set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
@@ -52,10 +52,10 @@ find_package(Threads REQUIRED)
 
 
 
-include_directories(config inc hlslib/include ${CMAKE_BINARY_DIR} ${SDAccel_INCLUDE_DIRS})
+include_directories(config/output inc hlslib/include ${CMAKE_BINARY_DIR} ${SDAccel_INCLUDE_DIRS})
 add_definitions(-DREPO_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_definitions(-DBIN_DIR=\"${CMAKE_BINARY_DIR}\")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 #add_definitions("-DHLSLIB_STREAM_TIMEOUT=16")
 if(((${SDAccel_MAJOR_VERSION} LESS 2018) AND (${SDAccel_MINOR_VERSION} LESS 3)) OR ${SDAccel_MAJOR_VERSION} LESS 2017)
@@ -228,9 +228,10 @@ add_custom_target(synthesis COMMAND sh SynthesisScriptLauncherBatch.sh)
 
 # Creating required tcl scripts to run hls synthesis
 #synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"              )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
-###synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float")
-###synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"  )
+#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float")
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"  )
+synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"            "task_pad_last_dim"  )
 #synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
 #synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
 ###synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"              )
@@ -271,6 +272,9 @@ if(KERNEL_CLOCK GREATER 0)
     	message("Overriding default kernel clock frequency normally with the kernel_frequency option...")
     	set(hw_link_command "${hw_link_command} --kernel_frequency ${KERNEL_CLOCK}")
     endif()
+    set(KERNEL_CLOCK_RESOLVED ${KERNEL_CLOCK})
+else()
+    set(KERNEL_CLOCK_RESOLVED 250)
 endif()
 
 
@@ -313,6 +317,7 @@ else()
     # V2018.3 and on: new sp tag style
     set(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.srcBuff:bank1 --sp task_datamover_mod1_float_1.dstBuff:bank2")
     set(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.srcBuff:bank1 --sp task_datamover_mod1_int_1.dstBuff:bank2")
+    set(SP_TAG_PADDING          "--sp task_pad_last_dim_1.srcBuff:bank1 --sp task_datamover_mod1_int_1.dstBuff:bank2")
 
     set(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.inputTn:bank2 --sp task_conv2_1x1_direct_1.weightTn:bank2 --sp task_conv2_1x1_direct_1.biasTn:bank2 --sp task_conv2_1x1_direct_1.outputTn:bank2")
     set(SP_TAG_TILE             "--sp task_tile_1.inputTn:bank2 --sp task_tile_1.outputTn:bank2")
@@ -337,9 +342,10 @@ endif()
 
 
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"             "paddingsub"        "task_pad_last_dim"         FALSE TRUE ${SP_TAG_PADDING} "")
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
 ###sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
@@ -388,10 +394,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/Interactrive_Hw_Batch.sh"
 add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh) 
 
 
-
 #==========================================================================================================================================
-
-
 
 
 set(HOSTSIDE_SRC
@@ -438,3 +441,6 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hwemu.sh ${CMAKE_BINARY_DIR
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hw.sh ${CMAKE_BINARY_DIR}/autobuild_hw.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/PasteBinAgentForAutoBuilds.py ${CMAKE_BINARY_DIR}/PasteBinAgentForAutoBuilds.py @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/sdaccel.ini ${CMAKE_BINARY_DIR}/sdaccel.ini COPYONLY)
+
+add_subdirectory("test")
+add_subdirectory("config")
