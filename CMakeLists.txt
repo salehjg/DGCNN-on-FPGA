@@ -26,7 +26,7 @@ endif()
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
-set(SYNTH_FLAGS "-DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
+set(SYNTH_FLAGS "-DSYNTHESIS_MODE -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
 set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
 #set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
@@ -281,9 +281,9 @@ endif()
 
 
 
-file(WRITE "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "")
-file(WRITE "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "")
-file(WRITE "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "")
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
 
 
 
@@ -317,7 +317,6 @@ else()
     # V2018.3 and on: new sp tag style
     set(SP_TAG_DATAMOVER_FLOAT  "--sp task_datamover_mod1_float_1.srcBuff:bank1 --sp task_datamover_mod1_float_1.dstBuff:bank2")
     set(SP_TAG_DATAMOVER_INT    "--sp task_datamover_mod1_int_1.srcBuff:bank1 --sp task_datamover_mod1_int_1.dstBuff:bank2")
-    set(SP_TAG_PADDING          "--sp task_pad_last_dim_1.srcBuff:bank1 --sp task_datamover_mod1_int_1.dstBuff:bank2")
 
     set(SP_TAG_CONV2D           "--sp task_conv2_1x1_direct_1.inputTn:bank2 --sp task_conv2_1x1_direct_1.weightTn:bank2 --sp task_conv2_1x1_direct_1.biasTn:bank2 --sp task_conv2_1x1_direct_1.outputTn:bank2")
     set(SP_TAG_TILE             "--sp task_tile_1.inputTn:bank2 --sp task_tile_1.outputTn:bank2")
@@ -326,6 +325,7 @@ else()
     set(SP_TAG_MATMUL           "--sp task_matmul_1.inputTn1:bank2 --sp task_matmul_1.inputTn2:bank2 --sp task_matmul_1.outputTn:bank2")
     set(SP_TAG_MATOPS           "--sp task_matops_1.inputTn1:bank2 --sp task_matops_1.inputTn2:bank2 --sp task_matops_1.outputTn:bank2")
 
+    set(SP_TAG_PADDING          "--sp task_pad_last_dim_1.inputTn:bank1 --sp task_pad_last_dim_1.outputTn:bank1")
     set(SP_TAG_REDUCEMAX        "--sp task_reducemax_1.inputTn:bank1 --sp task_reducemax_1.outputTn:bank1")
     set(SP_TAG_REDUCESUM        "--sp task_reducesum_1.inputTn:bank1 --sp task_reducesum_1.outputTn:bank1")
     set(SP_TAG_REDUCESUM4D      "--sp task_reducesum4d_1.inputTn:bank1 --sp task_reducesum4d_1.outputTn:bank1")
@@ -343,12 +343,12 @@ endif()
 
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"             "paddingsub"        "task_pad_last_dim"         FALSE TRUE ${SP_TAG_PADDING} "")
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"             "padding"           "task_pad_last_dim"         FALSE TRUE ${SP_TAG_PADDING} "")
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
-###sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
 ###sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )

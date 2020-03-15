@@ -21,7 +21,7 @@ void task_pad_last_dim(
 
 int main(int argc, char **argv) {
 
-    const unsigned int dim0 = 1024;
+    const unsigned int dim0 = 32;
     const unsigned int dim1 = 6;
     const unsigned int dim1Padded = 16;
     const unsigned int vecSize = 16;

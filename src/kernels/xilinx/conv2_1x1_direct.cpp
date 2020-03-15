@@ -487,7 +487,7 @@ void WriteC(Stream<MemoryPackM_t, 2 * kOuterTileSizeMMemory> &pipe,
                     memory[IndexC(n0, n1, m0, m1m, size_n, size_k, size_m)] = pipe.Pop();
                 }
             }
-#ifndef MM_SYNTHESIS
+#ifndef SYNTHESIS_MODE
             std::cout << "Finished tile (" << n0 << ", " << m0 << ") of ("
                     << OuterTilesN(size_n) - 1 << ", " << OuterTilesM(size_m) - 1 << ")\n"
                     << std::flush;
