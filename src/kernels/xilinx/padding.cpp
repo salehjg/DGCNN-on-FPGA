@@ -7,13 +7,60 @@
 #include "xilinx/config.h"
 
 #define LOCAL_BUFF_LEN 64
-
 using namespace std;
 
-void PadLastDimSubWord(
+void PadLastDimSuperVec(
     MemoryPack_t const inputTn[],
     MemoryPack_t outputTn[],
-    const int reverseSwitch,
+    const unsigned int dim0,
+    const unsigned int dim1,
+    const unsigned int dim1Padded){
+
+#ifndef SYNTHESIS_MODE
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+
+    assert(dim1>=CONFIG_M_AXI_WIDTH);
+    assert(dim1%CONFIG_M_AXI_WIDTH==0);
+    
+    assert(dim1Padded>=CONFIG_M_AXI_WIDTH);
+    assert(dim1Padded%CONFIG_M_AXI_WIDTH==0);
+    assert(dim1Padded>dim1);
+
+    assert(inputTn->kWidth==CONFIG_M_AXI_WIDTH);
+    assert(outputTn->kWidth==CONFIG_M_AXI_WIDTH);
+
+    const auto idim1 = dim1/CONFIG_M_AXI_WIDTH;
+    const auto idim1Padded = dim1Padded/CONFIG_M_AXI_WIDTH;
+    unsigned int indxS, indxD;
+
+
+#ifndef SYNTHESIS_MODE
+    cout<<"idim1: "<<idim1<<endl;
+    cout<<"idim1Padded: "<<idim1Padded<<endl;
+#endif
+
+    LoopD0:
+    for(unsigned int d0=0; d0<dim0; d0++){
+        LoopD1:
+        for(unsigned int id1=0; id1<idim1; id1++){
+            #pragma HLS PIPELINE II=1
+            indxS = d0*idim1+id1;
+            indxD = d0*idim1Padded+id1;
+#ifndef SYNTHESIS_MODE
+            cout<<"## d0: "<<d0<<" id1: "<<id1<<" indxS: "<<indxS<<" indxD: "<<indxD<<endl;
+#endif
+            MemoryPack_t tmpVec1 = inputTn[indxS];
+            outputTn[indxD] = tmpVec1;
+        }
+    }
+
+
+}
+
+void PadLastDimSubVec(
+    MemoryPack_t const inputTn[],
+    MemoryPack_t outputTn[],
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Padded,
@@ -42,7 +89,7 @@ void PadLastDimSubWord(
     unsigned int indxS, indxD, indxL1, indxL2;
 
     CONFIG_DTYPE buff[LOCAL_BUFF_LEN];
-#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=16 dim=1
+    DO_PRAGMA(HLS ARRAY_PARTITION variable=buff cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
 
     MemoryPack_t tmpVec1, tmpVec2;
     const auto bunchCount = DivCeil<unsigned int>(dim0*dim1, lcm);
@@ -146,7 +193,6 @@ extern "C" {
 void task_pad_last_dim(
     MemoryPack_t const inputTn[],
     MemoryPack_t outputTn[],
-    const int reverseSwitch,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Padded,
@@ -156,22 +202,28 @@ void task_pad_last_dim(
 #pragma HLS INTERFACE s_axilite port=inputTn        bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn       bundle=control
 
-#pragma HLS INTERFACE s_axilite port=reverseSwitch  bundle=control
-
 #pragma HLS INTERFACE s_axilite port=dim0           bundle=control
 #pragma HLS INTERFACE s_axilite port=dim1           bundle=control
 #pragma HLS INTERFACE s_axilite port=dim1Padded     bundle=control
 #pragma HLS INTERFACE s_axilite port=lcm            bundle=control
 #pragma HLS INTERFACE s_axilite port=return         bundle=control
 
-
-    PadLastDimSubWord(
-        inputTn,
-        outputTn,
-        reverseSwitch,
-        dim0,
-        dim1,
-        dim1Padded,
-        lcm);
+    if(dim1<CONFIG_M_AXI_WIDTH){
+        PadLastDimSubVec(
+            inputTn,
+            outputTn,
+            dim0,
+            dim1,
+            dim1Padded,
+            lcm);
+    }else{
+        PadLastDimSuperVec(
+            inputTn,
+            outputTn,
+            dim0,
+            dim1,
+            dim1Padded);
+    }
+    
 }
 }

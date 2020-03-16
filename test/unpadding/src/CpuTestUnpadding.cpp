@@ -11,43 +11,37 @@
 
 using namespace std;
 
-extern "C"
-void task_pad_last_dim(
-    const MemoryPack_t *inputTn,
-    MemoryPack_t *outputTn,
+extern "C" 
+void task_unpad_last_dim(
+    MemoryPack_t const inputTn[],
+    MemoryPack_t outputTn[],
     const unsigned int dim0,
     const unsigned int dim1,
-    const unsigned int dim1Padded,
-    const unsigned int lcm);
+    const unsigned int dim1Unpadded);
 
 template<unsigned int vecSize>
-int TestPadding(
+int TestUnpadding(
     const string testName, 
     const unsigned int dim0, 
     const unsigned int dim1, 
-    const unsigned int dim1Padded){
+    const unsigned int dim1Unpadded){
 
-    assert(dim1<dim1Padded);
-    assert(dim1Padded%vecSize==0);
+    assert(dim1>dim1Unpadded);
+    assert(dim1%vecSize==0);
+    assert(dim1Unpadded%vecSize==0);
 
     bool isSubVec = (dim1<vecSize);
     unsigned int lenInput  = dim0*dim1 + (vecSize - (dim0*dim1)%vecSize);
-    unsigned int lenOutput = dim0*dim1Padded + (vecSize - (dim0*dim1Padded)%vecSize);
-
-    const unsigned int gcd = __gcd(dim1, vecSize);
-    const unsigned int lcm = (dim1*vecSize)/(gcd);
+    unsigned int lenOutput = dim0*dim1Unpadded + (vecSize - (dim0*dim1Unpadded)%vecSize);
 
     cout<<"=================================================="<<endl;
     cout<<"TestName: "<< testName <<endl;
     cout<<"InputShape: "<<dim0<<"x"<<dim1<<endl;
-    cout<<"Padding Dimension: "<<"1"<<endl;
-    cout<<"The Dimension Before Padding: "<<dim1<<endl;
-    cout<<"The Dimension After Padding: "<<dim1Padded<<endl;
+    cout<<"Unpadding Dimension: "<<"1"<<endl;
+    cout<<"The Dimension Before Unpadding: "<<dim1<<endl;
+    cout<<"The Dimension After Unpadding: "<<dim1Unpadded<<endl;
     cout<<"Vector Size: "<<vecSize<<endl;
-    if(isSubVec){
-        cout<<"GCD(dim1,vecSize): "<<gcd<<endl;
-        cout<<"LCM(dim1,vecSize): "<<lcm<<endl;
-    }
+
 
     std::vector<CONFIG_DTYPE> hostInputTn(lenInput); 
     std::vector<CONFIG_DTYPE> hostGold(lenOutput);
@@ -63,15 +57,15 @@ int TestPadding(
     const auto deviceInputTn = Pack<vecSize>(hostInputTn);
     auto deviceOutputTn = Pack<vecSize>(hostGold);
 
-    task_pad_last_dim(deviceInputTn.data(), deviceOutputTn.data(), dim0, dim1, dim1Padded, lcm);
-    PadTensor<CONFIG_DTYPE>(hostInputTn, hostGold, dim0, dim1, dim1Padded);
+    task_unpad_last_dim(deviceInputTn.data(), deviceOutputTn.data(), dim0, dim1, dim1Unpadded);
+    UnpadTensor<CONFIG_DTYPE>(hostInputTn, hostGold, dim0, dim1, dim1Unpadded);
 
     const auto hostOutputTn = Unpack<vecSize>(deviceOutputTn);
     bool rslt = true;
 
     for(int d0=0; d0<dim0; d0++){
-        for(int d1=0; d1<dim1; d1++){ // this loop should be over dim1 instead of dim1Padded.
-            unsigned int indx = d0*dim1Padded+d1;
+        for(int d1=0; d1<dim1Unpadded; d1++){ 
+            unsigned int indx = d0*dim1Unpadded+d1;
             CONFIG_DTYPE diff = (hostOutputTn[indx] - hostGold[indx]);
             diff = diff>=0? diff: -1*diff;
             if(diff>1e-03){
@@ -92,8 +86,7 @@ int TestPadding(
     return (rslt)? 0 : 1;
 }
 
-int main(int argc, char **argv) {
-    int rsltSubVec = TestPadding<16>("SubVecPadding", 32, 6, 16);
-    int rsltSuperVec = TestPadding<16>("SuperVecPadding", 32, 64, 128);
-    return rsltSubVec+rsltSuperVec;
+int main(int argc, char **argv) { 
+    int rsltSuperVec = TestUnpadding<16>("SuperVecUnpadding", 32, 128, 64);
+    return rsltSuperVec;
 }
