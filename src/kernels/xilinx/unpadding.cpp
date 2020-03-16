@@ -6,7 +6,6 @@
 #include "AxiHelper.h"
 #include "xilinx/config.h"
 
-#define LOCAL_BUFF_LEN 64
 using namespace std;
 
 void UnpadLastDimSuperVec(
@@ -20,7 +19,7 @@ void UnpadLastDimSuperVec(
     cout<<"Simulation mode is enabled."<<endl;
 #endif
     
-    assert(dim1>=CONFIG_M_AXI_WIDTH);
+    //assert(dim1>=CONFIG_M_AXI_WIDTH); //XOCC crashes when this line is uncommented.
     assert(dim1%CONFIG_M_AXI_WIDTH==0);
     
     assert(dim1Unpadded>=CONFIG_M_AXI_WIDTH);

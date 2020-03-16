@@ -73,7 +73,6 @@ void PadLastDimSubVec(
 #endif
 
     //assert(dim1<CONFIG_M_AXI_WIDTH); //XOCC crashes when this line is uncommented.
-	//if(!(dim1<CONFIG_M_AXI_WIDTH)){assert(0);}
 
     assert(dim1Padded%CONFIG_M_AXI_WIDTH==0);
     assert(dim1Padded>dim1);
@@ -150,23 +149,23 @@ void PadLastDimSubVec(
             // for a "for-loop" of:
             // for(d1=0; d1<dim1Padded/CONFIG_M_AXI_WIDTH; d1++) 
             // and just put the slice in the first index(d1=0)
-        	//for(unsigned int d1=0; d1<dim1Padded/CONFIG_M_AXI_WIDTH; d1++)
-        	unsigned int d1=0;
+            //for(unsigned int d1=0; d1<dim1Padded/CONFIG_M_AXI_WIDTH; d1++)
+            unsigned int d1=0;
             {
                 if(d1==0){
-                	LoopUnrol1:
-					for(unsigned int i=0; i<CONFIG_M_AXI_WIDTH; i++){
-						#pragma HLS UNROLL
-						if(i<dim1){
-						    indxL2=iter1*dim1+i;
+                    LoopUnrol1:
+                    for(unsigned int i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                        #pragma HLS UNROLL
+                        if(i<dim1){
+                            indxL2=iter1*dim1+i;
 #ifndef SYNTHESIS_MODE
-						    cout<<"==indxL2: "<<indxL2<<endl;
+                            cout<<"==indxL2: "<<indxL2<<endl;
 #endif
-							tmpVec2[i] = buff[indxL2];
-						}else{
-						    tmpVec2[i] = 0;
-						}
-					}
+                            tmpVec2[i] = buff[indxL2];
+                        }else{
+                            tmpVec2[i] = 0;
+                        }
+                    }
                 }
 
                 indxD = iter*(bunchSliceCount*vecPerOutputSlice)+
@@ -176,7 +175,7 @@ void PadLastDimSubVec(
 #ifndef SYNTHESIS_MODE
                     cout<<"**indxD: "<<indxD<<endl;
 #endif
-                	outputTn[indxD] = tmpVec2;
+                    outputTn[indxD] = tmpVec2;
                 }else{
 #ifndef SYNTHESIS_MODE
                     cout<<"limitD is hit **indxD: "<<indxD<<endl;
