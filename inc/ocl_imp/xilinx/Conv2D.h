@@ -12,6 +12,7 @@
 #include "hlslib/xilinx/Stream.h"
 
 using hlslib::Stream;
+using namespace ConfigTaskConv2;
 
 constexpr int kSeed = 5; // For initializing matrices for testing
 constexpr unsigned kPipeDepth = 4;

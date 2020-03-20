@@ -8,6 +8,10 @@
 #include "hlslib/xilinx/Stream.h"
 #include "hlslib/xilinx/Simulation.h"
 #include "hlslib/xilinx/Utility.h"
+#include <cassert>
+#include <iostream>
+
+using namespace ConfigTaskConv2;
 
 void ProcessingElement( Stream<ComputePackN_t, kPipeDepth> &aIn,
                         Stream<ComputePackN_t, kPipeDepth> &aOut,
@@ -487,7 +491,7 @@ void WriteC(Stream<MemoryPackM_t, 2 * kOuterTileSizeMMemory> &pipe,
                     memory[IndexC(n0, n1, m0, m1m, size_n, size_k, size_m)] = pipe.Pop();
                 }
             }
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
             std::cout << "Finished tile (" << n0 << ", " << m0 << ") of ("
                     << OuterTilesN(size_n) - 1 << ", " << OuterTilesM(size_m) - 1 << ")\n"
                     << std::flush;

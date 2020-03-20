@@ -11,10 +11,6 @@
 #include "ocl_imp/xilinx/AxiHelper.h"
 #include "xilinx/config.h"
 
-// These two are defined in OclTensorF.h
-//#define DATAMOVER_KERNEL_BANK_A_INDEX 1
-//#define DATAMOVER_KERNEL_BANK_B_INDEX 2
-
 class OclTensorI: public TensorI {
 public:
     OclTensorI(int vectorWords = CONFIG_M_AXI_WIDTH);
@@ -26,6 +22,7 @@ public:
     int getDramBank();
     void ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
     TensorI* CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
+    TensorI* CloneIfNeededToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
     TensorI* TransferToHost(cl_command_queue queue);
     static int* PadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords);
     static int* UnPadHostBuffer(std::vector<unsigned int> actualShape, int *hostSrcBuff, int vectorWords);
@@ -38,7 +35,7 @@ private:
 
     //If bank arg were not specified, tensor would be allocated
     //on default bank which is default value of 'dramBank'
-    int dramBank = DATAMOVER_KERNEL_BANK_A_INDEX;
+    int dramBank = 1;
     int vectorWords = -1;
 };
 

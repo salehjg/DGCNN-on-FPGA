@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include "TensorI.h"
+#include "ocl_imp/xilinx/AxiHelper.h"
 #include <iostream>
 #ifdef USE_CUDA
 #include <cuda_runtime.h>
@@ -151,8 +152,8 @@ unsigned long TensorI::getLengthPadded(int vectorWords){
 std::vector<unsigned int> TensorI::PadShape(std::vector<unsigned int> actualShape, int vectorWords){
     std::vector<unsigned int> paddedShape = actualShape;
     // always pad the last dimension.
-    int lastDim = paddedShape[paddedShape.size()-1];
-    paddedShape[paddedShape.size()-1] = ( lastDim + (vectorWords - (lastDim % vectorWords)) );
+    unsigned int lastDim = paddedShape[paddedShape.size()-1];
+    paddedShape[paddedShape.size()-1] = MakeDivisible<unsigned int>(lastDim, vectorWords);
 
     return paddedShape;
 }

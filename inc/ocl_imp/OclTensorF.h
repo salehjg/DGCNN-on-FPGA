@@ -5,13 +5,20 @@
 #ifndef DEEPPOINTV1_OCLTENSORF_H
 #define DEEPPOINTV1_OCLTENSORF_H
 
+#include <exception>
 #include <ocl_imp/xilinx/xcl.h>
 #include "TensorF.h"
 #include "ocl_imp/xilinx/AxiHelper.h"
 #include "xilinx/config.h"
 
-#define DATAMOVER_KERNEL_BANK_A_INDEX   1
-#define DATAMOVER_KERNEL_BANK_B_INDEX   2
+struct SameBankException : public std::exception {
+   const char * what () const throw () {
+      return "Requested to clone to the same memory bank.";
+   }
+};
+
+constexpr int DATAMOVER_KERNEL_BANK_A_INDEX = 1;
+constexpr int DATAMOVER_KERNEL_BANK_B_INDEX = 2;
 
 class OclTensorF: public TensorF {
 public:
@@ -24,6 +31,7 @@ public:
     int getDramBank();
     void ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank=-1);
     TensorF* CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
+    TensorF* CloneIfNeededToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank);
     TensorF* TransferToHost(cl_command_queue queue);
     static float* PadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords);
     static float* UnPadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords);
@@ -38,7 +46,7 @@ private:
 
     //If bank arg were not specified, tensor would be allocated
     //on default bank which is default value of 'dramBank'
-    int dramBank = DATAMOVER_KERNEL_BANK_A_INDEX;
+    int dramBank = 1;
     int vectorWords = -1;
 };
 

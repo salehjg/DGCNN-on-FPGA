@@ -233,7 +233,9 @@ void OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_comman
 //The content and the bank of the current tensor will be remained untouched. 
 TensorF* OclTensorF::CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
     if(initialized){
-    	if(bank == dramBank){cout<<"Trying to clone to the same bank (OclTensorF)."<<endl; std::exit(3);}
+        if(bank == dramBank){
+            throw SameBankException();
+        }
 
         //Creating new blank tensor within the required bank 
         OclTensorF* clonedTensor = new OclTensorF(context, shape, bank);
@@ -257,6 +259,15 @@ TensorF* OclTensorF::CloneToDDRBank(cl_program program, cl_context context, cl_c
         //The tensor has not yet been initialized!
         cout<<"Trying to clone an uninitialized tensor(OclTensorF)" << endl;
         assert(false);
+    }
+}
+
+TensorF* OclTensorF::CloneIfNeededToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
+    try{
+        return CloneToDDRBank(program, context, queue, bank);
+    } catch(SameBankException& e) {
+        std::cout<<"CloneIfNeededToDDRBank: same banks detected, returning the original tensor."<< std::endl;
+        return this;
     }
 }
 

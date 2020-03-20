@@ -13,8 +13,8 @@ using namespace std;
 
 extern "C" 
 void task_unpad_last_dim(
-    MemoryPack_t const inputTn[],
-    MemoryPack_t outputTn[],
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Unpadded);

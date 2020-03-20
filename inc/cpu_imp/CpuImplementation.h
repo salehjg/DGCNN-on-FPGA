@@ -10,6 +10,8 @@
 #include "../PlatformImplementation.h"
 #include "../../inc/TensorF.h"
 #include "../../inc/TensorI.h"
+#include "xilinx/config.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -57,7 +59,8 @@ public:
     void     DumpMatrix(WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir);
     bool     CompareTensors(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
     bool     CompareTensorsInteger(WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
-
+    TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded);
+    TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded);
 
 private:
     void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,

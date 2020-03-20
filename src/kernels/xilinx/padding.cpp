@@ -6,19 +6,21 @@
 #include "AxiHelper.h"
 #include "xilinx/config.h"
 
-#define LOCAL_BUFF_LEN 64
+#define LOCAL_BUFF_LEN 48
 using namespace std;
+using namespace ConfigTaskPadding;
 
 void PadLastDimSuperVec(
-    MemoryPack_t const inputTn[],
-    MemoryPack_t outputTn[],
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Padded){
 
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
 #endif
+
 
     assert(dim1>=CONFIG_M_AXI_WIDTH);
     assert(dim1%CONFIG_M_AXI_WIDTH==0);
@@ -35,7 +37,7 @@ void PadLastDimSuperVec(
     unsigned int indxS, indxD;
 
 
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
     cout<<"idim1: "<<idim1<<endl;
     cout<<"idim1Padded: "<<idim1Padded<<endl;
 #endif
@@ -47,10 +49,10 @@ void PadLastDimSuperVec(
             #pragma HLS PIPELINE II=1
             indxS = d0*idim1+id1;
             indxD = d0*idim1Padded+id1;
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
             cout<<"## d0: "<<d0<<" id1: "<<id1<<" indxS: "<<indxS<<" indxD: "<<indxD<<endl;
 #endif
-            MemoryPack_t tmpVec1 = inputTn[indxS];
+            MemoryPackF_t tmpVec1 = inputTn[indxS];
             outputTn[indxD] = tmpVec1;
         }
     }
@@ -58,9 +60,14 @@ void PadLastDimSuperVec(
 
 }
 
+/*
+// Tested Kernel - Works Perfectly
+// DISABLED, Reason: Cpu last dim padding is enabled and all of
+//                   the kernels should consider reading and writing in 
+//                   a last dim padded manner. 
 void PadLastDimSubVec(
-    MemoryPack_t const inputTn[],
-    MemoryPack_t outputTn[],
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Padded,
@@ -68,7 +75,7 @@ void PadLastDimSubVec(
 
     // Sub Vec Padding Kernel
 
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
 #endif
 
@@ -90,9 +97,9 @@ void PadLastDimSubVec(
     CONFIG_DTYPE buff[LOCAL_BUFF_LEN];
     DO_PRAGMA(HLS ARRAY_PARTITION variable=buff cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
 
-    MemoryPack_t tmpVec1, tmpVec2;
+    MemoryPackF_t tmpVec1, tmpVec2;
     const auto bunchCount = DivCeil<unsigned int>(dim0*dim1, lcm);
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
     cout<<"limitS: "<<limitS<<endl;
     cout<<"limitD: "<<limitD<<endl;
 #endif
@@ -103,7 +110,7 @@ void PadLastDimSubVec(
         LoopDim0Init:
         for(unsigned int id0=0; id0<bunchVecCount; id0++){
             #pragma HLS PIPELINE II=1
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
             cout<<"## iter: " << iter << " id0: "<<id0<<endl;
 #endif       
             // id0 is the local index of vector, NOT the index of slice in dim0.
@@ -111,7 +118,7 @@ void PadLastDimSubVec(
             ///TODO: check limits for indxS 
             indxS = iter*bunchVecCount+id0;
             if(indxS<limitS){
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
                 cout<<"*indxS: "<<indxS<<endl;
 #endif
                 tmpVec1 = inputTn[indxS];
@@ -120,7 +127,7 @@ void PadLastDimSubVec(
                     #pragma HLS UNROLL
                     tmpVec1[i]=0;
                 }
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
                 cout<<"limitS is hit *indxS: "<<indxS<<endl;
 #endif
             }
@@ -129,7 +136,7 @@ void PadLastDimSubVec(
             for(unsigned int i=0; i<CONFIG_M_AXI_WIDTH; i++){
                 #pragma HLS UNROLL
                 indxL1=id0*CONFIG_M_AXI_WIDTH+i;
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
                 cout<<"--indxL1: "<<indxL1<<endl;
 #endif
                 buff[indxL1] = tmpVec1[i];
@@ -142,7 +149,7 @@ void PadLastDimSubVec(
             iter1<bunchSliceCount;
             iter1++){
             #pragma HLS PIPELINE II=1
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
             cout<<"## iter: " << iter << " iter1: "<<iter1<<endl;
 #endif
             // Because we have "dim1<CONFIG_M_AXI_WIDTH", we can ignore the need 
@@ -158,7 +165,7 @@ void PadLastDimSubVec(
                         #pragma HLS UNROLL
                         if(i<dim1){
                             indxL2=iter1*dim1+i;
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
                             cout<<"==indxL2: "<<indxL2<<endl;
 #endif
                             tmpVec2[i] = buff[indxL2];
@@ -172,12 +179,12 @@ void PadLastDimSubVec(
                         iter1*vecPerOutputSlice+
                         d1;
                 if(indxD<limitD){
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
                     cout<<"**indxD: "<<indxD<<endl;
 #endif
                     outputTn[indxD] = tmpVec2;
                 }else{
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
                     cout<<"limitD is hit **indxD: "<<indxD<<endl;
 #endif
                 }
@@ -186,12 +193,25 @@ void PadLastDimSubVec(
 
     }
 }
-
+*/
 
 extern "C" {
+
+/**
+ * @brief      Pads the last dimension of the given tensor of rank two to the given value(dim1Padded) 
+ *             Tensor of higher ranks should be flattened into two virtual dimensions for this kernel to be usable.
+ *             Sub-vec padding is disabled, as Cpu last dim padding is decided to be enabled.
+ *
+ * @param      inputTn     The input tensor
+ * @param      outputTn    The output tensor
+ * @param[in]  dim0        The dim 0
+ * @param[in]  dim1        The dim 1 (original shape)
+ * @param[in]  dim1Padded  The target value for dim 1 after padding
+ * @param[in]  lcm         The least common multiple of dim1 and m_axi width(in words for ex 16 or so)(don't care for dim1>=m_axi_width)
+ */
 void task_pad_last_dim(
-    MemoryPack_t const inputTn[],
-    MemoryPack_t outputTn[],
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Padded,
@@ -207,7 +227,9 @@ void task_pad_last_dim(
 #pragma HLS INTERFACE s_axilite port=lcm            bundle=control
 #pragma HLS INTERFACE s_axilite port=return         bundle=control
 
-    if(dim1<CONFIG_M_AXI_WIDTH){
+
+    if(dim1*2/2<CONFIG_M_AXI_WIDTH){ // Without "*2/2", XOCC crashes in internal "RangeAnalysis" method.
+        /*
         PadLastDimSubVec(
             inputTn,
             outputTn,
@@ -215,6 +237,7 @@ void task_pad_last_dim(
             dim1,
             dim1Padded,
             lcm);
+            */
     }else{
         PadLastDimSuperVec(
             inputTn,

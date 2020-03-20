@@ -27,8 +27,10 @@ public:
     ReportObject* TensorBankInteger();
     ReportObject* TensorCloneBankFloat();
     ReportObject* TensorCloneBankInteger();
-    ReportObject* TensorPadUnpadFloat();
-    ReportObject* TensorPadUnpadInteger();
+    ReportObject* TensorPadUnpadCpuFloat();
+    ReportObject* TensorPadUnpadCpuInteger();
+    ReportObject* KernelPadLastDimFloat();
+    ReportObject* KernelUnpadLastDimFloat();
     ReportObject* KernelConcat2();
     ReportObject* KernelSqrt();
     ReportObject* KernelReduceMax();

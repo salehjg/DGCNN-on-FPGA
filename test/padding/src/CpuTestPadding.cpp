@@ -1,5 +1,6 @@
 #include "PaddingCpu.h"
 #include "Utility.h"
+#include "AxiHelper.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -13,8 +14,8 @@ using namespace std;
 
 extern "C"
 void task_pad_last_dim(
-    const MemoryPack_t *inputTn,
-    MemoryPack_t *outputTn,
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Padded,
@@ -31,8 +32,8 @@ int TestPadding(
     assert(dim1Padded%vecSize==0);
 
     bool isSubVec = (dim1<vecSize);
-    unsigned int lenInput  = dim0*dim1 + (vecSize - (dim0*dim1)%vecSize);
-    unsigned int lenOutput = dim0*dim1Padded + (vecSize - (dim0*dim1Padded)%vecSize);
+    unsigned int lenInput  = MakeDivisible<unsigned int>(dim0*dim1, vecSize);
+    unsigned int lenOutput = MakeDivisible<unsigned int>(dim0*dim1Padded, vecSize);
 
     const unsigned int gcd = __gcd(dim1, vecSize);
     const unsigned int lcm = (dim1*vecSize)/(gcd);
@@ -93,7 +94,10 @@ int TestPadding(
 }
 
 int main(int argc, char **argv) {
-    int rsltSubVec = TestPadding<16>("SubVecPadding", 32, 6, 16);
+
+    //Sub-vec padding is disabled in the kernel, as Cpu last dim padding is enabled.
+    //int rsltSubVec = TestPadding<16>("SubVecPadding", 32, 6, 16);
+
     int rsltSuperVec = TestPadding<16>("SuperVecPadding", 32, 64, 128);
-    return rsltSubVec+rsltSuperVec;
+    return /*rsltSubVec+*/rsltSuperVec;
 }

@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include "TensorF.h"
+#include "ocl_imp/xilinx/AxiHelper.h"
 #include <vector>
 #include <iostream>
 
@@ -155,8 +156,8 @@ unsigned long TensorF::getLengthPadded(int vectorWords){
 std::vector<unsigned int> TensorF::PadShape(std::vector<unsigned int> actualShape, int vectorWords){
     std::vector<unsigned int> paddedShape = actualShape;
     // always pad the last dimension.
-    int lastDim = paddedShape[paddedShape.size()-1];
-    paddedShape[paddedShape.size()-1] = ( lastDim + (vectorWords - (lastDim % vectorWords)) );
+    unsigned int lastDim = paddedShape[paddedShape.size()-1];
+    paddedShape[paddedShape.size()-1] = MakeDivisible<unsigned int>(lastDim, vectorWords);
 
     return paddedShape;
 }

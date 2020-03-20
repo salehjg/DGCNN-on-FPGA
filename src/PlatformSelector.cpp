@@ -724,3 +724,49 @@ bool PlatformSelector::CompareTensorsInteger(PLATFORMS platform, WorkScheduler s
     }
     return false;
 }
+
+TensorF* PlatformSelector::PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded){
+    TensorF* __inputTn = CrossThePlatform(inputTn, platform);
+    switch(platform){
+        case PLATFORMS::CPU :{
+            return cpuPlatformClass->PadLastDim(scheduler, __inputTn, lastDimPadded);
+            break;
+        }
+#ifdef USE_CUDA
+        case PLATFORMS::GPU_CUDA :{
+            throw "Not Implement.";
+            break;
+        }
+#endif
+#ifdef USE_OCL
+        case PLATFORMS::GPU_OCL :{
+            return openclPlatformClass->PadLastDim(scheduler, __inputTn, lastDimPadded);
+            break;
+        }
+#endif
+    }
+    return nullptr;
+}
+
+TensorF* PlatformSelector::UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded){
+    TensorF* __inputTn = CrossThePlatform(inputTn, platform);
+    switch(platform){
+        case PLATFORMS::CPU :{
+            return cpuPlatformClass->UnpadLastDim(scheduler, __inputTn, lastDimUnpadded);
+            break;
+        }
+#ifdef USE_CUDA
+        case PLATFORMS::GPU_CUDA :{
+            throw "Not Implement.";
+            break;
+        }
+#endif
+#ifdef USE_OCL
+        case PLATFORMS::GPU_OCL :{
+            return openclPlatformClass->UnpadLastDim(scheduler, __inputTn, lastDimUnpadded);
+            break;
+        }
+#endif
+    }
+    return nullptr;
+}

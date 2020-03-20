@@ -95,7 +95,10 @@ TensorI* XilinxImpUnitTests::GenerateTensorInteger(int intMin, int intMax, vecto
 }
 
 void XilinxImpUnitTests::PrintReport(ReportObject *reportObj){
-    cout << "TEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") <<endl;
+    if(reportObj->passed)
+        cout << "\033[1;36mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
+    else
+        cout << "\033[1;31mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
 }
 
 ReportObject* XilinxImpUnitTests::TensorFloat(){
@@ -236,7 +239,8 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
     return obj;
 }
 
-ReportObject* XilinxImpUnitTests::TensorPadUnpadFloat(){
+ReportObject* XilinxImpUnitTests::TensorPadUnpadCpuFloat(){
+    //Tests Cpu last dim padding/unpadding
     TensorF* tensorCpu = GenerateTensor(0,{5,5,2});
     OclTensorF* tensorPadded_defaultBank = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
     TensorF* tensorCpu2 = platformSelector->CrossThePlatform(tensorPadded_defaultBank, PLATFORMS::CPU);
@@ -249,7 +253,8 @@ ReportObject* XilinxImpUnitTests::TensorPadUnpadFloat(){
     return obj;
 }
 
-ReportObject* XilinxImpUnitTests::TensorPadUnpadInteger(){
+ReportObject* XilinxImpUnitTests::TensorPadUnpadCpuInteger(){
+    //Tests Cpu last dim padding/unpadding
     TensorI* tensorCpu = GenerateTensorInteger(0,{5,5,2});
     OclTensorI* tensorPadded_defaultBank = (OclTensorI*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
     TensorI* tensorCpu2 = platformSelector->CrossThePlatform(tensorPadded_defaultBank, PLATFORMS::CPU);
@@ -274,6 +279,51 @@ ReportObject* XilinxImpUnitTests::TensorPadUnpadInteger(){
 
 
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
+    return obj;
+}
+
+ReportObject* XilinxImpUnitTests::KernelPadLastDimFloat(){
+    bool rslt = true;
+    /*{ //Sub-vec Padding
+        const unsigned int lastDimPadded = 16;
+        TensorF* tensorCpu = GenerateTensor(0,{16,16,6});
+        TensorF* tensorPaddedGold = platformSelector->PadLastDim(PLATFORMS::CPU,scheduler,tensorCpu,lastDimPadded);
+        TensorF* tensorPaddedTest = platformSelector->PadLastDim(PLATFORMS::GPU_OCL,scheduler,tensorCpu,lastDimPadded);
+        rslt &= platformSelector->CompareTensors(
+            PLATFORMS::CPU,
+            scheduler,
+            tensorPaddedGold,
+            tensorPaddedTest);
+    }*/
+    { //Super-vec Padding
+        const unsigned int lastDimPadded = 32;
+        TensorF* tensorCpu = GenerateTensor(0,{8,16});
+        TensorF* tensorPaddedGold = platformSelector->PadLastDim(PLATFORMS::CPU,scheduler,tensorCpu,lastDimPadded);
+        TensorF* tensorPaddedTest = platformSelector->PadLastDim(PLATFORMS::GPU_OCL,scheduler,tensorCpu,lastDimPadded);
+        rslt &= platformSelector->CompareTensors(
+            PLATFORMS::CPU,
+            scheduler,
+            tensorPaddedGold,
+            tensorPaddedTest);
+    }
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt);
+    return obj;
+}
+
+ReportObject* XilinxImpUnitTests::KernelUnpadLastDimFloat(){
+    bool rslt = true;
+    { //Super-vec Unadding
+        const unsigned int lastDimUnpadded = 32;
+        TensorF* tensorCpu = GenerateTensor(0,{2,8,128});
+        TensorF* tensorPaddedGold = platformSelector->UnpadLastDim(PLATFORMS::CPU,scheduler,tensorCpu,lastDimUnpadded);
+        TensorF* tensorPaddedTest = platformSelector->UnpadLastDim(PLATFORMS::GPU_OCL,scheduler,tensorCpu,lastDimUnpadded);
+        rslt &= platformSelector->CompareTensors(
+            PLATFORMS::CPU,
+            scheduler,
+            tensorPaddedGold,
+            tensorPaddedTest);
+    }
+    ReportObject* obj = new ReportObject(__FUNCTION__, rslt);
     return obj;
 }
 
@@ -771,17 +821,9 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
 ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
     bool comparisonResult = true;
     {
-        TensorF* tensorSrc = GenerateTensor(0,{2,2,3,3});
-        TensorF* tensorWeight = GenerateTensor(0,{1,1,3,4});
-        TensorF* tensorBiases = GenerateTensor(0,{4}); //THE SHAPE SHOULD BE 1D LIKE {1,1,1,7}, NOT 4D
-        TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
-        TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
-        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu); 
-    }
-    {
-        TensorF* tensorSrc = GenerateTensor(0,{2,2,3,17});
-        TensorF* tensorWeight = GenerateTensor(0,{1,1,17,2});
-        TensorF* tensorBiases = GenerateTensor(0,{2}); //THE SHAPE SHOULD BE 1D LIKE {1,1,1,7}, NOT 4D
+        TensorF* tensorSrc = GenerateTensor(0,{1,256,1,6});
+        TensorF* tensorWeight = GenerateTensor(0,{1,1,6,16});
+        TensorF* tensorBiases = GenerateTensor(-1,{16});
         TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
         TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu); 
@@ -862,15 +904,16 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    //PrintReport(TensorFloat());
-    //PrintReport(TensorBankFloat());
-    //PrintReport(TensorBankInteger());
-    //PrintReport(TensorCloneBankFloat());
-    //PrintReport(TensorCloneBankInteger());
-    //PrintReport(TensorPadUnpadFloat());
-    //PrintReport(TensorPadUnpadInteger());
-
-    PrintReport(KernelConv2Mlp());
+    PrintReport(TensorFloat());
+    PrintReport(TensorBankFloat());
+    PrintReport(TensorBankInteger());
+    PrintReport(TensorCloneBankFloat());
+    PrintReport(TensorCloneBankInteger());
+    PrintReport(TensorPadUnpadCpuFloat());
+    PrintReport(TensorPadUnpadCpuInteger());
+    PrintReport(KernelPadLastDimFloat());
+    PrintReport(KernelUnpadLastDimFloat());
+    PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
 
     //PrintReport(KernelMatops());              // DONE
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL

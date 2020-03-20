@@ -1618,3 +1618,73 @@ bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *
     }
     return false;
 }
+
+TensorF* CpuImplementation::PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded){
+    PrintInfo("PadLastDim","lastDimPadded",lastDimPadded,"",0,"",0,inputTn->getShape(),{},{});
+    if(lastDimPadded<=inputTn->getShape()[inputTn->getRank()-1]){cout<<"PadLastDim: ERROR_BAD_PARAM"<<endl;return nullptr;}
+    
+    unsigned int dim0, dim1, lcm, _gcd, argcnt;
+    std::vector<unsigned int> shape = inputTn->getShape();
+    const unsigned int rank = inputTn->getRank();
+
+    if(rank!=1){
+        dim0=1;
+        for(int i=0; i<rank-1; i++){
+            dim0*=shape[i];
+        }
+        dim1=shape[rank-1];
+    }else{
+        dim0 = 1;
+        dim1 = shape[0];
+    }
+
+    if(shape[rank-1]<CONFIG_M_AXI_WIDTH){
+        //sub-vector padding
+        _gcd = __gcd(dim1, CONFIG_M_AXI_WIDTH);
+        lcm = (dim1*CONFIG_M_AXI_WIDTH)/(_gcd);
+    }else{
+        lcm=0;
+    }
+    
+    shape[rank-1] = lastDimPadded;
+    TensorF* rsltTn = new TensorF(shape);
+
+    for(unsigned d0=0; d0<dim0; d0++){
+        for(unsigned d1=0; d1<lastDimPadded; d1++){
+            rsltTn->_buff[d0*lastDimPadded+d1] = (d1<dim1) ? inputTn->_buff[d0*dim1+d1] : 0;
+        }
+    }
+
+    return rsltTn;
+}
+
+TensorF* CpuImplementation::UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded){
+    PrintInfo("UnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
+    if(lastDimUnpadded>=inputTn->getShape()[inputTn->getRank()-1]){cout<<"UnpadLastDim: ERROR_BAD_PARAM"<<endl;return nullptr;}
+
+    unsigned int dim0, dim1, argcnt;
+    std::vector<unsigned int> shape = inputTn->getShape();
+    const unsigned int rank = inputTn->getRank();
+
+    if(rank!=1){
+        dim0=1;
+        for(int i=0; i<rank-1; i++){
+            dim0*=shape[i];
+        }
+        dim1=shape[rank-1];
+    }else{
+        dim0 = 1;
+        dim1 = shape[0];
+    }
+    
+    shape[rank-1] = lastDimUnpadded;
+    TensorF* rsltTn = new TensorF(shape);
+
+    for(unsigned d0=0; d0<dim0; d0++){
+        for(unsigned d1=0; d1<lastDimUnpadded; d1++){
+            rsltTn->_buff[d0*lastDimUnpadded+d1] = inputTn->_buff[d0*dim1+d1];
+        }
+    }
+
+    return rsltTn;
+}

@@ -7,15 +7,16 @@
 #include "xilinx/config.h"
 
 using namespace std;
+using namespace ConfigTaskUnpadding;
 
 void UnpadLastDimSuperVec(
-    MemoryPack_t const inputTn[],
-    MemoryPack_t outputTn[],
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Unpadded){
 
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
 #endif
     
@@ -33,7 +34,7 @@ void UnpadLastDimSuperVec(
     const auto idim1Unpadded = dim1Unpadded/CONFIG_M_AXI_WIDTH;
     unsigned int indxS, indxD;
 
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
     cout<<"idim1: "<<idim1<<endl;
     cout<<"idim1Unpadded: "<<idim1Unpadded<<endl;
 #endif
@@ -45,10 +46,10 @@ void UnpadLastDimSuperVec(
             #pragma HLS PIPELINE II=1
             indxS = d0*idim1+id1;
             indxD = d0*idim1Unpadded+id1;
-#ifndef SYNTHESIS_MODE
+#ifdef KERNEL_LOGS
             cout<<"## d0: "<<d0<<" id1: "<<id1<<" indxS: "<<indxS<<" indxD: "<<indxD<<endl;
 #endif
-            MemoryPack_t tmpVec1 = inputTn[indxS];
+            MemoryPackF_t tmpVec1 = inputTn[indxS];
             outputTn[indxD] = tmpVec1;
         }
     }
@@ -56,8 +57,8 @@ void UnpadLastDimSuperVec(
 
 extern "C" {
 void task_unpad_last_dim(
-    MemoryPack_t const inputTn[],
-    MemoryPack_t outputTn[],
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Unpadded){

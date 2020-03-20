@@ -6,7 +6,7 @@
 #include "AxiHelper.h"
 #include "xilinx/config.h"
 
-using MemoryPackK_t = hlslib::DataPack<CONFIG_DTYPE, CONFIG_M_AXI_WIDTH>;
+using namespace ConfigTaskDataMoverFloat;
 
 /**
  * @brief      Data mover task kernel that
@@ -20,13 +20,13 @@ using MemoryPackK_t = hlslib::DataPack<CONFIG_DTYPE, CONFIG_M_AXI_WIDTH>;
  * @param[in]  len            len is number of (VecDepth*sizeof(DType)-bytes)words
  */
 void _task_datamover(
-        MemoryPackK_t *srcBuff,
-        MemoryPackK_t *dstBuff,
+        MemoryPackF_t *srcBuff,
+        MemoryPackF_t *dstBuff,
         int reverseSwitch,
         const unsigned long len){
 #pragma HLS inline
 
-    MemoryPackK_t buff;
+    MemoryPackF_t buff;
     
     if(reverseSwitch==0){
         for(unsigned long i=0;i<len;i++){
@@ -48,8 +48,8 @@ extern "C" {
 // The --sp option decides which bank is bankA and which is bankB
 // Currently, bankA is bank1 & bankB is bank2 and no SLR assignment is done.
 void task_datamover_mod1_float(
-        MemoryPackK_t *srcBuff,
-        MemoryPackK_t *dstBuff,
+        MemoryPackF_t *srcBuff,
+        MemoryPackF_t *dstBuff,
         int reverseSwitch,
         const unsigned long len){
 #pragma HLS INTERFACE m_axi     port=srcBuff            offset=slave bundle=gmem0

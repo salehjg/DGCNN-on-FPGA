@@ -86,6 +86,9 @@ public:
     void     DumpMatrix(WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir);
     bool     CompareTensors(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
     bool     CompareTensorsInteger(WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
+    TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded);
+    TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded);
+
     const char * getErrorString(cl_int error);
 
     cl_context          getContext();
@@ -130,12 +133,12 @@ private:
             int pow_y);
 
     TensorF* _ReduceSum4D(WorkScheduler scheduler,
-                                            TensorF* inputTn,
-                                            bool over_axis0,
-                                            bool over_axis1,
-                                            bool over_axis2,
-                                            bool over_axis3,
-                                            int pow_y);
+            TensorF* inputTn,
+            bool over_axis0,
+            bool over_axis1,
+            bool over_axis2,
+            bool over_axis3,
+            int pow_y);
 
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
 
