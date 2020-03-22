@@ -472,11 +472,38 @@ void ConvertWidthC(Stream<ComputePackM_t> &narrow,
 }
 
 void WriteC(Stream<MemoryPackM_t, 2 * kOuterTileSizeMMemory> &pipe,
+                MemoryPackM_t const bias[],
                 MemoryPackM_t memory[], const unsigned size_n,
                 const unsigned size_k, const unsigned size_m) {
 
+
+
     assert((OuterTilesN(size_n) * OuterTilesM(size_m) * kOuterTileSizeN *
     kOuterTileSizeMMemory * MemoryPackM_t::kWidth) == size_n * size_m);
+
+    //------------Additional Code for BiasTn Addition-------------------
+    constexpr unsigned MaxSizeM = 1024;
+    assert(size_m % kMemoryWidthM==0);
+    assert(MaxSizeM>=size_m);
+    MemoryPackM_t biasBuff[MaxSizeM/kMemoryWidthM];
+    const auto vecCount = size_m/kMemoryWidthM;
+    WriteC_LoadBiasTn_Iter:
+    for(unsigned iter=0; iter<vecCount; iter++){
+#pragma HLS PIPELINE II=1
+        biasBuff[iter] = bias[iter];
+#ifdef KERNEL_LOGS
+                    std::cout << "WriteC: Index Init Bias = " << iter << "\n";
+#endif
+    }
+    WriteC_LoadBiasTn_Init:
+    for(unsigned iter=vecCount; iter<MaxSizeM/kMemoryWidthM; iter++){
+#pragma HLS PIPELINE II=1
+        biasBuff[iter] = MemoryPackM_t(0.);
+    }
+    unsigned indxB;
+
+    //------------------------------------------------------------------
+    unsigned indxC;
 
     WriteC_OuterTile_N:
     for (unsigned n0 = 0; n0 < OuterTilesN(size_n); ++n0) {
@@ -488,7 +515,12 @@ void WriteC(Stream<MemoryPackM_t, 2 * kOuterTileSizeMMemory> &pipe,
                 for (unsigned m1m = 0; m1m < kOuterTileSizeMMemory; ++m1m) {
 #pragma HLS PIPELINE II=1
 #pragma HLS LOOP_FLATTEN
-                    memory[IndexC(n0, n1, m0, m1m, size_n, size_k, size_m)] = pipe.Pop();
+                    indxB = m0*kOuterTileSizeMMemory+m1m; //biasBuff's index
+                    indxC = IndexC(n0, n1, m0, m1m, size_n, size_k, size_m);
+                    memory[indxC] = pipe.Pop() + biasBuff[indxB];
+#ifdef KERNEL_LOGS
+                    std::cout << "WriteC: IndexC = " << indxC << ", indxB:" << indxB << "\n";
+#endif
                 }
             }
 #ifdef KERNEL_LOGS
@@ -543,18 +575,21 @@ void FeedB(Stream<ComputePackM_t> &fromMemory,
 
 extern "C" {
 void task_conv2_1x1_direct(
-                MemoryPackK_t const a[],
-                MemoryPackM_t const b[], 
-                MemoryPackM_t c[],
+                MemoryPackK_t const a[], //inputTn
+                MemoryPackM_t const b[], //weightTn
+                MemoryPackM_t const e[], //biasTn
+                MemoryPackM_t c[], //outputTn
                 const unsigned size_n, 
                 const unsigned size_k,
                 const unsigned size_m) {
 
 #pragma HLS INTERFACE m_axi port=a offset=slave bundle=gmem0
 #pragma HLS INTERFACE m_axi port=b offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi port=c offset=slave bundle=gmem2
+#pragma HLS INTERFACE m_axi port=e offset=slave bundle=gmem2
+#pragma HLS INTERFACE m_axi port=c offset=slave bundle=gmem3
 #pragma HLS INTERFACE s_axilite port=a bundle=control
 #pragma HLS INTERFACE s_axilite port=b bundle=control
+#pragma HLS INTERFACE s_axilite port=e bundle=control
 #pragma HLS INTERFACE s_axilite port=c bundle=control
 #pragma HLS INTERFACE s_axilite port=size_n bundle=control
 #pragma HLS INTERFACE s_axilite port=size_k bundle=control
@@ -618,7 +653,7 @@ void task_conv2_1x1_direct(
 
     Stream<MemoryPackM_t, 2 * kOuterTileSizeMMemory> cMemory("cMemory");
     HLSLIB_DATAFLOW_FUNCTION(ConvertWidthC, cPipes[0], cMemory, size_n, size_k, size_m);
-    HLSLIB_DATAFLOW_FUNCTION(WriteC, cMemory, c, size_n, size_k, size_m);
+    HLSLIB_DATAFLOW_FUNCTION(WriteC, cMemory, e, c, size_n, size_k, size_m);
 
     HLSLIB_DATAFLOW_FINALIZE();
 }

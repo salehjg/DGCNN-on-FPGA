@@ -1694,6 +1694,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         cl_int error; int argcnt=0;
         error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)_inputTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)_weights)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)_biases)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)rsltTnPadded)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&size_n);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&size_k);

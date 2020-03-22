@@ -8,6 +8,7 @@ template< typename T>
 void Conv2Kernel1x1CPU(
         const T* inputData,
         const T* weightData,
+        const T* biasData,
         T* outputData,
         const unsigned shape_b,
         unsigned shape_n,
@@ -33,7 +34,7 @@ void Conv2Kernel1x1CPU(
                             n*shape_k*shape_chOut +
                             k*shape_chOut +
                             ch;
-                    outputData[indxD] = sum;// + biasData[ch];
+                    outputData[indxD] = sum + biasData[ch];
                 }
             }
         }

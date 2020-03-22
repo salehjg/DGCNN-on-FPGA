@@ -294,6 +294,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "find . -name \"*.xo\" -
 set(SP_TAG_CONV2D           
 "--sp task_conv2_1x1_direct_1.a:bank${CFG1_Conv2_DDRBANK_inputTn}\
  --sp task_conv2_1x1_direct_1.b:bank${CFG1_Conv2_DDRBANK_weightTn}\
+ --sp task_conv2_1x1_direct_1.e:bank${CFG1_Conv2_DDRBANK_biasTn}\
  --sp task_conv2_1x1_direct_1.c:bank${CFG1_Conv2_DDRBANK_outputTn}")
 
 set(SP_TAG_TOPK             

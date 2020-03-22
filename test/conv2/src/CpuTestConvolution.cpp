@@ -16,7 +16,8 @@
 extern "C"
 void task_conv2_1x1_direct(
                 MemoryPackK_t const a[],
-                MemoryPackM_t const b[], 
+                MemoryPackM_t const b[],
+                MemoryPackM_t const e[],
                 MemoryPackM_t c[],
                 const unsigned size_n, 
                 const unsigned size_k,
@@ -65,8 +66,9 @@ int main(int argc, char **argv) {
 
   const auto size_k_padded = DivCeil<unsigned>(size_k, kTransposeWidth)*kTransposeWidth;
 
-  std::vector<CONFIG_DTYPE> a(size_n * size_k);
-  std::vector<CONFIG_DTYPE> b(size_k * size_m);
+  std::vector<CONFIG_DTYPE> a(size_n * size_k); //input
+  std::vector<CONFIG_DTYPE> b(size_k * size_m); //weight
+  std::vector<CONFIG_DTYPE> e(size_m); //bias
   std::vector<CONFIG_DTYPE> cReference(size_n * size_m, 0);
   std::vector<CONFIG_DTYPE> cReferenceConv2(size_n * size_m, 0);
 
@@ -79,22 +81,25 @@ int main(int argc, char **argv) {
                 [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
   std::for_each(b.begin(), b.end(),
                 [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
+  std::for_each(e.begin(), e.end(),
+                [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
 
   std::vector<CONFIG_DTYPE> aPadded(size_n * size_k_padded);
   PadTensor<CONFIG_DTYPE>(a, aPadded, size_n, size_k, DivCeil<unsigned>(size_k, kTransposeWidth)*kTransposeWidth);
 
   const auto aKernel = Pack<kMemoryWidthA>(aPadded);
   const auto bKernel = Pack<kMemoryWidthM>(b);
+  const auto eKernel = Pack<kMemoryWidthM>(e);
   auto cKernel = Pack<kMemoryWidthM>(cReference);
 
   ReferenceImplementation(a.data(), b.data(), cReference.data(), size_n, size_k,
                           size_m);
 
-  Conv2Kernel1x1CPU<CONFIG_DTYPE >(a.data(), b.data(), cReferenceConv2.data(), conv_b, conv_n, conv_k, conv_din, conv_dout);
+  Conv2Kernel1x1CPU<CONFIG_DTYPE >(a.data(), b.data(), e.data(), cReferenceConv2.data(), conv_b, conv_n, conv_k, conv_din, conv_dout);
 
   std::cout << "Running simulation...\n" << std::flush;
 
-  task_conv2_1x1_direct(aKernel.data(), bKernel.data(), cKernel.data(),
+  task_conv2_1x1_direct(aKernel.data(), bKernel.data(), eKernel.data(), cKernel.data(),
                              size_n, size_k, size_m);
   std::cout << "Verifying results...\n" << std::flush;
 
@@ -107,19 +112,19 @@ int main(int argc, char **argv) {
       const auto refValConv2 = make_signed<CONFIG_DTYPE>(cReferenceConv2[i * size_m + j]);
       const CONFIG_DTYPE diff = std::abs(testVal - refVal);
       const CONFIG_DTYPE diff2 = std::abs(testVal - refValConv2);
-      if (diff / refVal > static_cast<CONFIG_DTYPE>(1e-3)) {
+      /*if (diff > static_cast<CONFIG_DTYPE>(1e-3)) {
         std::cerr << "Mismatch detected(Kernel vs. CPU MM) at (" << i << ", " << j
                   << "): " << testVal << " vs. " << refVal << "\n";
         return 1;
-      }
-      if (diff2 / refValConv2 > static_cast<CONFIG_DTYPE>(1e-3)) {
+      }*/
+      if (diff2 /*/ refValConv2*/ > static_cast<CONFIG_DTYPE>(1e-3)) {
         std::cerr << "Mismatch detected(Kernel vs. CPU Conv2) at (" << i << ", " << j
                   << "): " << testVal << " vs. " << refValConv2 << "\n";
         return 2;
       }
     }
   }
-  std::cout << "Matrix-matrix multiplication successfully verified.\n";
+  //std::cout << "Matrix-matrix multiplication successfully verified.\n";
   std::cout << "Conv2D 1x1 successfully verified.\n";
 
   return 0;

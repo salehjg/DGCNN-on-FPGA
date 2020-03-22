@@ -823,7 +823,7 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
     {
         TensorF* tensorSrc = GenerateTensor(0,{1,256,1,6});
         TensorF* tensorWeight = GenerateTensor(0,{1,1,6,16});
-        TensorF* tensorBiases = GenerateTensor(-1,{16});
+        TensorF* tensorBiases = GenerateTensor(0,{16});
         TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
         TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu); 
