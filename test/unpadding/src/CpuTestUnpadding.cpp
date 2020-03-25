@@ -54,13 +54,13 @@ int TestUnpadding(
     std::for_each(hostInputTn.begin(), hostInputTn.end(),
         [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
 
-    const auto deviceInputTn = Pack<vecSize>(hostInputTn);
-    auto deviceOutputTn = Pack<vecSize>(hostGold);
+    const auto deviceInputTn = Pack<vecSize, float>(hostInputTn);
+    auto deviceOutputTn = Pack<vecSize, float>(hostGold);
 
     task_unpad_last_dim(deviceInputTn.data(), deviceOutputTn.data(), dim0, dim1, dim1Unpadded);
     UnpadTensor<CONFIG_DTYPE>(hostInputTn, hostGold, dim0, dim1, dim1Unpadded);
 
-    const auto hostOutputTn = Unpack<vecSize>(deviceOutputTn);
+    const auto hostOutputTn = Unpack<vecSize, float>(deviceOutputTn);
     bool rslt = true;
 
     for(int d0=0; d0<dim0; d0++){

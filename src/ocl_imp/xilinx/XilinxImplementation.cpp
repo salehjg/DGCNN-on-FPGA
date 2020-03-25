@@ -1488,60 +1488,50 @@ TensorF* XilinxImplementation::ReduceMax(
 
 TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){
     PrintInfo("TopK","axis",axis,"k",k,"",0,batchedMat->getShape(),{},{});
-/*
     assert(batchedMat->getRank()==3);
-    unsigned int b,m,n;
-    b = batchedMat->getShape()[0];
-    m = batchedMat->getShape()[1];
-    n = batchedMat->getShape()[2];
+    assert(axis==2);
 
-    assert(m==n); //current kernel supports square distance matrices as input
+    auto outputShape = batchedMat->getShape();
+    outputShape[2] = k;
 
-    OclTensorI *rsltIndicesSlicedTn = new OclTensorI(context,{
-           b,
-           m,
-           (unsigned int)k
-    },-1);
+    TensorF* _batchedMat = 
+        ((OclTensorF*)batchedMat)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskTopK::BankIndex_indicesSplitedTn);
+    OclTensorI* rsltIndicesSplitedTn = new OclTensorI(context, outputShape, ConfigTaskTopK::BankIndex_indicesSplitedTn);
+    OclKernelObject *kernelObject = oclKernels[13];
+    
+    if(kernelObject->use_ndrange_kernel){
+        return nullptr;
+    }else{
+        cl_int error; int argcnt=0; 
+        const unsigned batchSize = outputShape[0]*outputShape[1];
+        const unsigned vecsPerSlice = DivCeil<unsigned>(outputShape[2], CONFIG_M_AXI_WIDTH);
+        const unsigned vecsPerOutputSlice = DivCeil<unsigned>(k, CONFIG_M_AXI_WIDTH);;
 
-    //==================================================================================================================
-    {//1.topk.cl.cc
- 
-        OclKernelObject *kernelObject = oclKernels[13];
+        error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)_batchedMat)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorI*)rsltIndicesSplitedTn)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&batchSize);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&outputShape[2]);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&k);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&vecsPerSlice);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&vecsPerOutputSlice);
 
-        if(kernelObject->use_ndrange_kernel){
+        if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+        assert(error==0);
 
-        }else{
-            cl_int error;
+        cl_event exeEvt;
+        
+        error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
+        if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
 
-            error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)batchedMat)->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 1 , sizeof(cl_mem) , (void*)&((OclTensorI*)rsltIndicesSlicedTn)->ocl_buff);
-            error |= clSetKernelArg(kernelObject->kernel_task, 2 , sizeof(cl_int) , (void*)&b);
-            error |= clSetKernelArg(kernelObject->kernel_task, 3 , sizeof(cl_int) , (void*)&m);
-            error |= clSetKernelArg(kernelObject->kernel_task, 4 , sizeof(cl_int) , (void*)&n);
-            error |= clSetKernelArg(kernelObject->kernel_task, 5 , sizeof(cl_int) , (void*)&k);
+        clWaitForEvents(1, &exeEvt);
+        ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
-            if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
-            assert(error==0);
-
-            cl_event exeEvt;
-            error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
-            if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
-            clWaitForEvents(1, &exeEvt);
-            ReportDuration(std::string() +__func__ + "_topk",kernelObject->use_ndrange_kernel,exeEvt);
-
-            if(error != CL_SUCCESS) {
-                printf("Kernel execution failure!\n");
-                exit(-22);
-            }
+        if(error != CL_SUCCESS) {
+            printf("Kernel execution failure!\n");
+            exit(-22);
         }
-
     }
-
-    //==================================================================================================================
-
-    return rsltIndicesSlicedTn;
-*/
-    return nullptr;
+    return rsltIndicesSplitedTn;
 }
 
 TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, TensorI* indices, int indices_axis){
@@ -1708,11 +1698,10 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         std::cout << "Launching Conv2 gemmHLS\n";
         std::cout << "[N K M] = ["<< size_n << " " << size_k << " " << size_m <<"]\n";
 
-
         error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         clWaitForEvents(1, &exeEvt);
-
+        ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
         std::cout << "Launching Conv2 gemmHLS...DONE\n";
 

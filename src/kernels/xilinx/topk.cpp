@@ -1,261 +1,275 @@
+#include <cassert>
+#include <iostream>
+#include "hlslib/xilinx/Stream.h"
+#include "hlslib/xilinx/Simulation.h"
+#include "hlslib/xilinx/Utility.h"
+#include "hlslib/xilinx/DataPack.h"
 #include "AxiHelper.h"
 #include "xilinx/config.h"
-#include <cassert>
-#include <hls_stream.h>
-#include <stdio.h>
 
-#define CONFIG_N 1024
-#define CONFIG_K 20
+using namespace std;
+using namespace ConfigTaskTopK;
+using hlslib::Stream;
 
-// Inline Sub-function
-template<typename DTypeData, typename DTypeIndices, int UnitCount>
-static void SortingUnit(
-        hls::stream<DTypeData> &streamIn,
-        hls::stream<DTypeIndices> &streamOut,
-        int dim0,
-        int dim1,
-        int dim2,
-        int kValue,
-        int unitIndex){
-//#pragma HLS INLINE
+void UnitReadInput(
+    const MemoryPackF_t *inputTn,
+    Stream<MemoryPackF_t, PipeDepth> &streamInputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned vecsPerSlice){
 
-    int min_idx;
-    unsigned long indxS,indxD;
-    DTypeData sliceData[CONFIG_N];
-    DTypeIndices sliceIndices[CONFIG_N];
+    assert(inputTn->kWidth==CONFIG_M_AXI_WIDTH);
+    assert(dim1%CONFIG_M_AXI_WIDTH==0);
 
-    const int _len = dim0*dim1;
-    const int _tripMain = dim0 * dim1 / UnitCount;
-    For_Main: for(int batch=0; batch<_len; batch+=UnitCount){
-#pragma HLS LOOP_TRIPCOUNT min=_tripMain max=_tripMain
-        if(unitIndex+batch<_len){
-            //--------------------------------------------------
-            // 1. Read current slice and indices into local memory.
-            For_Read: for(int idx=0; idx<dim2; idx++){
-        #pragma HLS PIPELINE II=1
-        #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-                sliceData[idx] = streamIn.read();
-                sliceIndices[idx] = idx;
+    unsigned indxS;
+
+    For_Main: 
+    for(unsigned batch=0; batch<dim0; batch+=UnitCount){
+        LoopVecsPerPE:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            LoopPEs:
+            for(unsigned iPE=0; iPE<UnitCount; iPE++){
+                indxS = (batch+iPE)*vecsPerSlice + iVec;
+                streamInputTn.Push(inputTn[indxS]);
             }
+        }
+    }
 
-            //--------------------------------------------------
-            // 2. Run sorting algorithm on the local memory.
+}
 
-            int i,j;
+void UnitWriteOutput(
+    MemoryPackI_t *indicesSplitedTn,
+    Stream<MemoryPackI_t, PipeDepth> &streamIndices,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned vecsPerOutputSlice){
 
-            const int _len = ((CONFIG_K)*( (CONFIG_N-1) + (CONFIG_N-CONFIG_K) ))/2;
+    // FIFO depth should be greater or equal to 'vecsPerOutputSlice' for PE's not to stall.
+    assert(PipeDepth>=vecsPerOutputSlice);
 
-            i = 0;
-            j = 1;
-            min_idx = 0;
-            FusedLoopSort:for(int iter=0; iter<_len;iter++){
+    unsigned indxD;
 
-                if (sliceData[j] < sliceData[min_idx]){
-                    min_idx = j;
-                }
+    For_Main: 
+    for(unsigned batch=0; batch<dim0; batch+=UnitCount){
+        LoopPEs:
+        for(unsigned iPE=0; iPE<UnitCount; iPE++){
+            LoopVecsPerPE:
+            for(unsigned iVec=0; iVec<vecsPerOutputSlice; iVec++){
+                indxD = (batch+iPE)*vecsPerOutputSlice + iVec;
+                indicesSplitedTn[indxD] = streamIndices.Pop();
+            }
+        }
+    }
+}
 
-                //------------------------------
-                //Fused loop's house keeping stuff
-                if(j==CONFIG_N-1){
-                    //if(min_idx != i)
-                    {
-                        //Commented lines are for avoid unnecessary memory accesses.
-                        //They don't affect the REQUIRED output of this compute unit.
+//latency reported for [5x1024]x1024, k=20, unitcount=8, m_axi_width=16, pipe_depth=2
+void UnitProcessingElement(
+    Stream<MemoryPackF_t, PipeDepth> &streamDataIn,
+    Stream<MemoryPackF_t, PipeDepth> &streamDataOut,
+    Stream<MemoryPackI_t, PipeDepth> &streamIndicesIn,
+    Stream<MemoryPackI_t, PipeDepth> &streamIndicesOut,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned vecsPerSlice,
+    const unsigned vecsPerOutputSlice,
+    const unsigned kValue,
+    const unsigned unitIndex){
+    
+    // Only divisible 'dim1' by maxi width is supported so far.
+    assert(dim1%CONFIG_M_AXI_WIDTH==0);
 
-                        //float tmp = sliceData[min_idx];
-                        sliceData[min_idx] = sliceData[i];
-                        //sliceData[i] = tmp;
-                        //--------------------------------
-                        int tmp2 = sliceIndices[min_idx];
-                        sliceIndices[min_idx] = sliceIndices[i];
-                        sliceIndices[i] = tmp2;
-                        streamOut<<tmp2;
+    // Length of the PE's local buffers('MaxSliceLen') should be greater or equal to 'dim1'.
+    assert(dim1<=MaxSliceLen);
+
+    // FIFO depth should be greater or equal to 'vecsPerOutputSlice' for PE's not to stall.
+    assert(PipeDepth>=vecsPerOutputSlice);
+
+    unsigned min_idx;
+    unsigned indxS,indxD;
+
+    CONFIG_DTYPE sliceData[MaxSliceLen];
+    DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceData cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
+    //DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceData complete dim=1)
+
+    unsigned sliceIndices[MaxSliceLen];
+    DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceIndices cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
+    //DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceIndices complete dim=1)
+
+    MemoryPackF_t sliceSubVec;
+    MemoryPackI_t outputCache;
+    unsigned outputCacheVecSubIdx;
+
+    LoopMain: for(unsigned batch=0; batch<dim0; batch+=UnitCount){
+#pragma HLS LOOP_TRIPCOUNT min=640 max=640
+        ///TODO: Check for out of bound batch index 
+        //--------------------------------------------------
+        // 1. Read current slice and indices into local memory.
+        LoopReadSlice: for(unsigned idx=0; idx<vecsPerSlice; idx++){
+            #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+            
+            LoopInputPass01:
+            for(unsigned iPE=0; iPE<UnitCount-unitIndex; iPE++){
+                #pragma HLS PIPELINE II=1
+                MemoryPackF_t vec = streamDataIn.Pop();
+                if(iPE>0){
+                    // Pass the data to other PEs and just keep the last one for this PE
+                    if(unitIndex<(UnitCount-1)){
+                        streamDataOut.Push(vec);
                     }
-                    //--------------------------
-                    i++;
-                    j=i+1;
-                    //--------------------------
-                    min_idx = i;
                 }else{
-                    j++;
+                    sliceSubVec = vec;
                 }
             }
-
-            //--------------------------------------------------
-            /*
-            // 3. Write back the results of the current slice into the global memory
-            ///TODO: It might be faster to directly write results to global memory inside FusedLoopSort.
-            For_Write: for(i = 0; i < kValue; i++){
-        #pragma HLS LOOP_TRIPCOUNT min=20 max=20
-        #pragma HLS PIPELINE II=1
-                indxD = batchIndex*kValue + i;
-
-                indicesSplitedTn[indxD] = sliceIndices[i];
+            
+            const unsigned offsetLocal = idx*CONFIG_M_AXI_WIDTH;
+            LoopReadUnroll1:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+                const unsigned indxLocal = offsetLocal+i; 
+                sliceData[indxLocal] = sliceSubVec[i];
+                sliceIndices[indxLocal] = indxLocal;
             }
-            */
+        }
+
+        //--------------------------------------------------
+        // 2. Run sorting algorithm on the local memory.
+        const unsigned _len = ( kValue*( (dim1-1) + (dim1-kValue) ) )/2;
+        unsigned i,j; i = 0; j = 1;
+        min_idx = 0;
+
+        LoopFusedSort0:
+        for(unsigned iter=0; iter<_len;iter++){
+            #pragma HLS PIPELINE II=1
+			#pragma HLS LOOP_TRIPCOUNT min=20270 max=20270
+
+            if(sliceData[j] < sliceData[min_idx]){
+                min_idx = j;
+            }
+
+            //------------------------------
+            //Fused loop's house keeping stuff
+            if(j==dim1-1){
+                //if(min_idx != i)
+                {
+                    //Commented lines are to avoid unnecessary memory accesses.
+                    //They don't affect the REQUIRED output of this PE.
+
+                    //float tmp = sliceData[min_idx];
+                    sliceData[min_idx] = sliceData[i];
+                    //sliceData[i] = tmp;
+                    //--------------------------------
+                    unsigned tmp2 = sliceIndices[min_idx];
+                    sliceIndices[min_idx] = sliceIndices[i];
+                    sliceIndices[i] = tmp2;
+
+                    //--------------------------------
+                    outputCacheVecSubIdx = i%CONFIG_M_AXI_WIDTH;
+                    outputCache[outputCacheVecSubIdx] = tmp2;
+                    if(outputCacheVecSubIdx==(CONFIG_M_AXI_WIDTH-1) || i==(kValue-1) ){
+                        streamIndicesOut.Push(outputCache);
+#ifdef KERNEL_LOGS
+                        cout<<"PE"<<unitIndex<<": "<<" Sorted Vec i="<<i<<endl;
+#endif
+                    }
+                }
+                //--------------------------
+                i++;
+                j=i+1;
+                //--------------------------
+                min_idx = i;
+            }else{
+                j++;
+            }
+        }
+
+        //--------------------------------------------------
+        
+        // 3. Handle incoming data of streamIndicesIn from other PEs.
+        const unsigned _len2 = UnitCount-unitIndex-1;
+        LoopHandleOtherPEsOutput:
+        for(unsigned iPE=0; iPE<_len2; iPE++){
+			#pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            ForOutputVecsPerPEs:
+            for(unsigned iVec=0; iVec<vecsPerOutputSlice; iVec++){
+                if(unitIndex<(UnitCount-1)){
+                    streamIndicesOut.Push(streamIndicesIn.Pop());
+                }
+#ifdef KERNEL_LOGS
+                cout<<"*PE"<<unitIndex<<": "<<"Handling Other PE Results, "<<"Pop'ed streamIndicesIn"<<endl;
+#endif
+            }
         }
     }
-}
-
-template<typename DTypeData, int UnitCount, int VecDepth>
-static void ReadUnit(
-        PackedArray<DTypeData, VecDepth> *inputTn,
-        hls::stream<DTypeData> (&streamIn)[UnitCount], //https://stackoverflow.com/questions/5724171/passing-an-array-by-reference
-        int dim0,
-        int dim1,
-        int dim2){
-
-    const int _len = dim0 * dim1;
-    const int _tripMain = dim0 * dim1 / UnitCount;
-
-    For_Main: for(int batch=0; batch<_len; batch+=UnitCount){
-#pragma HLS LOOP_TRIPCOUNT min=_tripMain max=_tripMain
-        For_Units: for(int uc=0; uc<UnitCount; uc++){
-#pragma HLS UNROLL
-            //-----------------------------------------------------------
-            unsigned long indxS;
-            int batchIndex;
-            unsigned long inputCacheVecIdx, inputCacheVecSubIdx, lastInputCacheVecIdx;
-            PackedArray<DTypeData, VecDepth> inputCache;
-#pragma HLS array_partition variable=inputCache complete dim=0
-            lastInputCacheVecIdx=-1;
-            // Considering that dim2 slices are 1024 words long and VecDepth is 16 words long,
-            // there won't be any wasted words in vectorized memory access.
-
-            //-----------------------------------------------------------
-            For_BurstRead: for(int d2=0; d2<dim2; d2++){
-#pragma HLS PIPELINE II=1
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-
-                batchIndex = batch+uc;
-                indxS = batchIndex*dim2+d2;
-
-                inputCacheVecIdx = FlatIdx_to_VecIdx(VecDepth, indxS);
-                inputCacheVecSubIdx = FlatIdx_to_VecSubIdx(VecDepth, indxS);
-                if(inputCacheVecIdx!=lastInputCacheVecIdx){
-                    inputCache = inputTn[inputCacheVecIdx];
-                }
-                lastInputCacheVecIdx = inputCacheVecIdx;
-
-                if(batchIndex<_len){
-                    streamIn[uc] << inputCache.vec[inputCacheVecSubIdx];
-                }
-            }
-
-            //-----------------------------------------------------------
-        }
-    }
-}
-
-
-template<typename DTypeIndices, int UnitCount, int VecDepth>
-static void WriteUnit(
-        PackedArray<DTypeIndices, VecDepth> *indicesSplitedTn,
-        hls::stream<DTypeIndices> (&streamOut)[UnitCount], //https://stackoverflow.com/questions/5724171/passing-an-array-by-reference
-        int dim0,
-        int dim1,
-        int dim2,
-        int kValue){
-
-    const int _len = dim0 * dim1;
-    const int _tripMain = dim0 * dim1 / UnitCount;
-
-    For_Main: for(int batch=0; batch<_len; batch+=UnitCount){
-#pragma HLS LOOP_TRIPCOUNT min=_tripMain max=_tripMain
-        For_Units: for(int uc=0; uc<UnitCount; uc++){
-#pragma HLS UNROLL
-            //-----------------------------------------------------------
-            int batchIndex; 
-            unsigned long indxD;
-            unsigned long outputCacheVecIdx, outputCacheVecSubIdx;
-            PackedArray<DTypeIndices, VecDepth> outputCache;
-#pragma HLS array_partition variable=outputCache complete dim=0
-
-            //-----------------------------------------------------------
-            For_BurstRead: for(int d2=0; d2<kValue; d2++){
-#pragma HLS PIPELINE II=1
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-                batchIndex = batch+uc;
-                indxD = batchIndex * kValue + d2;
-                outputCacheVecIdx = FlatIdx_to_VecIdx(VecDepth, indxD);
-                outputCacheVecSubIdx = FlatIdx_to_VecSubIdx(VecDepth, indxD);
-                if(batchIndex<_len){
-                    outputCache.vec[outputCacheVecSubIdx] = streamOut[uc].read();
-                }
-
-                // To avoid loss of data by half-full vectors, kValue should be devidable to VecDepth.
-                if(outputCacheVecSubIdx == (VecDepth-1) ){
-                    indicesSplitedTn[outputCacheVecIdx] = outputCache;
-                }
-            }
-
-            //-----------------------------------------------------------
-        }
-    }
-}
-
-// Fused loop version, parallel batch processing
-// Try04
-template<typename DTypeData, typename DTypeIndices, int UnitCount, int VecDepthIn, int VecDepthOut>
-void BatchSelectionSortTopK(
-        PackedArray<DTypeData, VecDepthIn> *inputTn,
-        PackedArray<DTypeIndices, VecDepthOut> *indicesSplitedTn,
-        int dim0,
-        int dim1,
-        int dim2,
-        int kValue){
-
-    hls::stream<DTypeData>   streamIn[UnitCount];
-    hls::stream<DTypeIndices> streamOut[UnitCount];
-#pragma HLS STREAM variable=streamIn depth=10
-#pragma HLS STREAM variable=streamOut depth=6
-
-#pragma HLS dataflow
-
-    ReadUnit<DTypeData,UnitCount,VecDepthIn>(inputTn, streamIn, dim0, dim1, dim2);
-
-    For_Compute: for(int uc=0; uc<UnitCount; uc++){
-#pragma HLS UNROLL
-
-        SortingUnit<DTypeData,DTypeIndices,UnitCount>(streamIn[uc], streamOut[uc], dim0, dim1, dim2, kValue, uc);
-    }
-
-    WriteUnit<DTypeIndices,UnitCount,VecDepthOut>(indicesSplitedTn, streamOut, dim0, dim1, dim2, kValue);
-
+#ifdef KERNEL_LOGS
+    cout<<"==PE"<<unitIndex<<": "<<"FINISHED"<<endl;
+#endif
 }
 
 extern "C"{
 void task_topk(
-        PackedArray<float, CONFIG_M_AXI_WIDTH> *inputTn,
-        PackedArray<int, CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH> *indicesSplitedTn,
-        int dim0,
-        int dim1,
-        int dim2,
-        int kValue){
+        const MemoryPackF_t *inputTn,
+        MemoryPackI_t *indicesSplitedTn,
+        const unsigned dim0,
+        const unsigned dim1,
+        const unsigned kValue,
+        const unsigned vecsPerSlice,
+        const unsigned vecsPerOutputSlice){
 
-#pragma HLS INTERFACE m_axi     port=inputTn                offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=indicesSplitedTn       offset=slave bundle=gmem2
+#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi port=indicesSplitedTn offset=slave bundle=gmem2
+#pragma HLS INTERFACE s_axilite port=inputTn bundle=control
+#pragma HLS INTERFACE s_axilite port=indicesSplitedTn bundle=control
+#pragma HLS INTERFACE s_axilite port=dim0 bundle=control
+#pragma HLS INTERFACE s_axilite port=dim1 bundle=control
+#pragma HLS INTERFACE s_axilite port=kValue bundle=control
+#pragma HLS INTERFACE s_axilite port=vecsPerSlice bundle=control
+#pragma HLS INTERFACE s_axilite port=vecsPerOutputSlice bundle=control
+#pragma HLS INTERFACE s_axilite port=return bundle=control
 
-#pragma HLS INTERFACE s_axilite port=inputTn            bundle=control
-#pragma HLS INTERFACE s_axilite port=indicesSplitedTn   bundle=control
+#pragma HLS DATAFLOW
 
-#pragma HLS INTERFACE s_axilite port=dim0       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim1       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim2       bundle=control
+    Stream<MemoryPackF_t, PipeDepth> streamsData[UnitCount+1];
+#pragma HLS STREAM variable=streamsData depth=PipeDepth
 
-#pragma HLS INTERFACE s_axilite port=kValue     bundle=control
-#pragma HLS INTERFACE s_axilite port=return     bundle=control
+    Stream<MemoryPackI_t, PipeDepth> streamsIndices[UnitCount+1];
+#pragma HLS STREAM variable=streamsIndices depth=PipeDepth
 
-#pragma HLS data_pack variable=inputTn
-#pragma HLS data_pack variable=indicesSplitedTn
+#ifndef HLSLIB_SYNTHESIS
+    // Name the arrays of channels for debugging purposes
+    for (unsigned i = 0; i < UnitCount; i++) {
+        streamsData[i].set_name(("streamsData[" + std::to_string(i) + "]").c_str());
+    }
+    for (unsigned n = 0; n < UnitCount; n++) {
+        streamsIndices[n].set_name(("streamsIndices[" + std::to_string(n) + "]").c_str());
+    }
+#endif
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
 
-    BatchSelectionSortTopK<float, int, 4, CONFIG_M_AXI_WIDTH, CONFIG_TOPK_OUTPUTTN_M_AXI_WIDTH>(
-        inputTn, 
-        indicesSplitedTn, 
-        dim0, 
-        dim1, 
-        dim2, 
-        kValue);
+    HLSLIB_DATAFLOW_INIT();
+
+    HLSLIB_DATAFLOW_FUNCTION(UnitReadInput, inputTn, streamsData[0], dim0, dim1, vecsPerSlice);
+    
+    for (unsigned iPE = 0; iPE < UnitCount; iPE++) {
+#pragma HLS UNROLL
+        HLSLIB_DATAFLOW_FUNCTION(UnitProcessingElement,
+            streamsData[iPE],
+            streamsData[iPE+1],
+            streamsIndices[iPE+1],
+            streamsIndices[iPE],
+            dim0,
+            dim1,
+            vecsPerSlice,
+            vecsPerOutputSlice,
+            kValue,
+            iPE);
+    }
+    
+    HLSLIB_DATAFLOW_FUNCTION(UnitWriteOutput, indicesSplitedTn, streamsIndices[0], dim0, dim1, vecsPerOutputSlice);
+
+    HLSLIB_DATAFLOW_FINALIZE();
+    
 
 }
 }

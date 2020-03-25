@@ -625,6 +625,9 @@ void task_conv2_1x1_direct(
         cPipes[n].set_name(("cPipes[" + std::to_string(n) + "]").c_str());
     }
 #endif
+#ifdef KERNEL_LOGS
+    std::cout<<"Simulation mode is enabled."<<std::endl;
+#endif
 
     HLSLIB_DATAFLOW_INIT();
 

@@ -61,13 +61,13 @@ int TestPadding(
     std::for_each(hostInputTn.begin(), hostInputTn.end(),
         [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
 
-    const auto deviceInputTn = Pack<vecSize>(hostInputTn);
-    auto deviceOutputTn = Pack<vecSize>(hostGold);
+    const auto deviceInputTn = Pack<vecSize, float>(hostInputTn);
+    auto deviceOutputTn = Pack<vecSize, float>(hostGold);
 
     task_pad_last_dim(deviceInputTn.data(), deviceOutputTn.data(), dim0, dim1, dim1Padded, lcm);
     PadTensor<CONFIG_DTYPE>(hostInputTn, hostGold, dim0, dim1, dim1Padded);
 
-    const auto hostOutputTn = Unpack<vecSize>(deviceOutputTn);
+    const auto hostOutputTn = Unpack<vecSize, float>(deviceOutputTn);
     bool rslt = true;
 
     for(int d0=0; d0<dim0; d0++){

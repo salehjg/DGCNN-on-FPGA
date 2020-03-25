@@ -42,11 +42,11 @@ void Naive(IteratorRead aBegin, IteratorRead bBegin, IteratorWrite cBegin,
   }
 }
 
-template <int width, class Container>
+template <int width, typename DType, class Container>
 inline auto Pack(Container const &in) {
   std::vector<
-      hlslib::DataPack<CONFIG_DTYPE, width>,
-      hlslib::ocl::AlignedAllocator<hlslib::DataPack<CONFIG_DTYPE, width>, 4096>>
+      hlslib::DataPack<DType, width>,
+      hlslib::ocl::AlignedAllocator<hlslib::DataPack<DType, width>, 4096>>
       result(in.size() / width);
   for (int i = 0, iMax = in.size() / width; i < iMax; ++i) {
     result[i].Pack(&in[i * width]);
@@ -54,9 +54,9 @@ inline auto Pack(Container const &in) {
   return result;
 }
 
-template <int width, class Container>
+template <int width, typename DType, class Container>
 inline auto Unpack(Container const &in) {
-  std::vector<CONFIG_DTYPE> result(in.size() * width);
+  std::vector<DType> result(in.size() * width);
   for (int i = 0, iMax = in.size(); i < iMax; ++i) {
     in[i].Unpack(&result[i * width]);
   }

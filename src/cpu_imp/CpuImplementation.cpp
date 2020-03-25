@@ -1325,6 +1325,9 @@ TensorF* CpuImplementation::ReduceMax(
 }
 
 TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){
+    
+    ///TODO: VALIDATE THIS KERNEL!!!
+
     PrintInfo("TopK","axis",axis,"k",k,"",0,batchedMat->getShape(),{},{});
     if(batchedMat->getRank() != 3){cout<<"TopK: ERROR_UNIMPLEMENTED_TENSOR_RANK"<<endl;return nullptr;}
     if(axis != 2){cout<<"TopK: ERROR_UNIMPLEMENTED_AXIS"<<endl;return nullptr;}
@@ -1333,32 +1336,25 @@ TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, i
 
     //batchedMat is considered as BxNxN
     //we will use std::sort in ascending order.
-    unsigned long indxS=0;
+    unsigned int indxS=0;
     unsigned int B = batchedMat->getShape()[0], N = batchedMat->getShape()[1], K = (unsigned int)k;
 
     TensorI* rslt = new TensorI({B,N,K});
 
     float tmp_array[N];
-    int indices[N];
+    unsigned indices[N];
 
-
-    for(int b=0;b<B;b++){
-        for(int i = 0 ;i<N;i++)
+    for(unsigned b=0;b<B*N;b++){
+        for(unsigned i = 0 ;i<N;i++){
             indices[i]=i;
-
-        for(int n=0;n<N;n++){
-            indxS = b*N*N + n*N + 0;
-            //start of dim2
-            std::copy(batchedMat->_buff +indxS, batchedMat->_buff+indxS+N, tmp_array);
-            //std::sort(tmp_array,tmp_array+N);
-
-
-            std::sort(  indices,
-                        indices+N,
-                        [&](int i1, int i2) { return tmp_array[i1] < tmp_array[i2]; } );
-
-            std::copy(indices, indices+K, rslt->_buff +(b*N*K + n*K + 0));
         }
+        indxS = b*N + 0;
+        std::copy(batchedMat->_buff +indxS, batchedMat->_buff+indxS+N, tmp_array);
+        std::sort(  indices,
+                    indices+N,
+                    [&](int i1, int i2) { return tmp_array[i1] < tmp_array[i2]; } );
+
+        std::copy(indices, indices+K, rslt->_buff+(b*K));
     }
 
     return rslt;

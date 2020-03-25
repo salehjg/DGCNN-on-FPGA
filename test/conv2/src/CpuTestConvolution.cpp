@@ -87,10 +87,10 @@ int main(int argc, char **argv) {
   std::vector<CONFIG_DTYPE> aPadded(size_n * size_k_padded);
   PadTensor<CONFIG_DTYPE>(a, aPadded, size_n, size_k, DivCeil<unsigned>(size_k, kTransposeWidth)*kTransposeWidth);
 
-  const auto aKernel = Pack<kMemoryWidthA>(aPadded);
-  const auto bKernel = Pack<kMemoryWidthM>(b);
-  const auto eKernel = Pack<kMemoryWidthM>(e);
-  auto cKernel = Pack<kMemoryWidthM>(cReference);
+  const auto aKernel = Pack<kMemoryWidthA, float>(aPadded);
+  const auto bKernel = Pack<kMemoryWidthM, float>(b);
+  const auto eKernel = Pack<kMemoryWidthM, float>(e);
+  auto cKernel = Pack<kMemoryWidthM, float>(cReference);
 
   ReferenceImplementation(a.data(), b.data(), cReference.data(), size_n, size_k,
                           size_m);
@@ -103,14 +103,14 @@ int main(int argc, char **argv) {
                              size_n, size_k, size_m);
   std::cout << "Verifying results...\n" << std::flush;
 
-  const auto cTest = Unpack<kMemoryWidthM>(cKernel);
+  const auto cTest = Unpack<kMemoryWidthM, float>(cKernel);
 
   for (unsigned i = 0; i < size_n; ++i) {
     for (unsigned j = 0; j < size_m; ++j) {
       const auto testVal = make_signed<CONFIG_DTYPE>(cTest[i * size_m + j]);
       const auto refVal = make_signed<CONFIG_DTYPE>(cReference[i * size_m + j]);
       const auto refValConv2 = make_signed<CONFIG_DTYPE>(cReferenceConv2[i * size_m + j]);
-      const CONFIG_DTYPE diff = std::abs(testVal - refVal);
+      //const CONFIG_DTYPE diff = std::abs(testVal - refVal);
       const CONFIG_DTYPE diff2 = std::abs(testVal - refValConv2);
       /*if (diff > static_cast<CONFIG_DTYPE>(1e-3)) {
         std::cerr << "Mismatch detected(Kernel vs. CPU MM) at (" << i << ", " << j

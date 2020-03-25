@@ -904,7 +904,7 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    PrintReport(TensorFloat());
+    /*PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
@@ -914,11 +914,12 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
     PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
+    */
+    PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU 
 
     //PrintReport(KernelMatops());              // DONE
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
     //PrintReport(KernelReduceMax());           // DONE, NEEDS TO BE NERFED TO SAVE RESOURCES
-
     /*PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
@@ -930,7 +931,6 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
     PrintReport(KernelGather());
-    PrintReport(KernelTopK());   
     */
 }
 

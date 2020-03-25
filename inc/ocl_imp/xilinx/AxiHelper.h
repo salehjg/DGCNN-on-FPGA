@@ -2,6 +2,10 @@
 
 #define DO_PRAGMA(x) _Pragma ( #x )
 
+constexpr unsigned ConstexperDivCeil(unsigned a, unsigned b){
+    return  (a-1)/b +1;
+}
+
 template<typename T>
 inline T DivCeil(T a, T b){
 #pragma HLS INLINE
