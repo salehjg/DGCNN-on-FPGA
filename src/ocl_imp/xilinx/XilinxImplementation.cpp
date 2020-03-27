@@ -163,7 +163,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 13 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -171,8 +172,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 14 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -1486,6 +1486,26 @@ TensorF* XilinxImplementation::ReduceMax(
     return nullptr;
 }
 
+
+/**
+ * @brief      Finds top k or least k elements of a tensor in the given axis and returns indices of those elements in the axis.
+ *             Currently, only axis=2, tensors of rank=3, and least k mode are supported.
+ *             There are three kernels for this layer: selection sort based, insertion sort based, and merge sort based.
+ *             1- The kernel with selection sort uses less BRAM/URAM, instead it has higher latency.
+ *             2- The kernel with insertion sort uses huge amount of resources and only applicable for tensors with small slices(less than 128 or so), 
+ *                instead it has a very high throughput.
+ *             3- The kernel with merge sort offers medium throughput while it uses large amounts of BRAM/URAM. 
+ *                This is the preferred kernel for tensors with large slices(larger than 512 or so) 
+ *             Kernels 1 and 3 have multiple PEs arranged in a systolic array alike structure.
+ *             
+ *
+ * @param[in]  scheduler   The scheduler
+ * @param      batchedMat  The input tensor
+ * @param[in]  axis        
+ * @param[in]  k           
+ *
+ * @return     The tensor with top k / least k elements' indices as its data.
+ */
 TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){
     PrintInfo("TopK","axis",axis,"k",k,"",0,batchedMat->getShape(),{},{});
     assert(batchedMat->getRank()==3);
@@ -1495,7 +1515,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
     outputShape[2] = k;
 
     TensorF* _batchedMat = 
-        ((OclTensorF*)batchedMat)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskTopK::BankIndex_indicesSplitedTn);
+        ((OclTensorF*)batchedMat)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskTopK::BankIndex_inputTn);
     OclTensorI* rsltIndicesSplitedTn = new OclTensorI(context, outputShape, ConfigTaskTopK::BankIndex_indicesSplitedTn);
     OclKernelObject *kernelObject = oclKernels[13];
     

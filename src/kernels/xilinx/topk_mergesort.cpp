@@ -11,14 +11,24 @@ using namespace std;
 using namespace ConfigTaskTopK;
 using hlslib::Stream;
 
-// https://github.com/KastnerRG/pp4fpgas/blob/master/examples/merge_sort_loop_merged.cpp
+/**
+ * @brief      2-way merge sorting algorithm with additional logic to provide indices. 
+ *             The code is adapted from the open-source book "Parallel Programming for FPGAs" with minor changes.
+ *
+ * @param      inLocalBuff     pointer to a local buffer that contains slice data to be sorted in place.
+ * @param      inLocalIndices  pointer to a local buffer that indices of sorted data will be stored in.
+ */
 void MergeSortWithIndices(
     CONFIG_DTYPE *inLocalBuff,
     unsigned *inLocalIndices){
 #pragma HLS INLINE
 
     CONFIG_DTYPE temp[MaxSliceLen];
+#pragma HLS RESOURCE variable=temp core=RAM_2P_URAM
+
+    ///TODO: Try implementing the algorithm without the need for indicesTemp.
     unsigned indicesTemp[MaxSliceLen];
+//#pragma HLS RESOURCE variable=indicesTemp core=RAM_2P_URAM
 
     LoopStage:
     for (int width = 1; width < MaxSliceLen; width = 2 * width) {
@@ -32,6 +42,7 @@ void MergeSortWithIndices(
         LoopMergeArrays:
         for (int i = 0; i < MaxSliceLen; i++) {
             #pragma HLS pipeline II=1
+            ///TODO: Try to fix the II-violation(currently II=2)
 
             CONFIG_DTYPE t1 = inLocalBuff[f1];
             CONFIG_DTYPE t2 = (f2 == i3) ? 0 : inLocalBuff[f2];
@@ -59,25 +70,27 @@ void MergeSortWithIndices(
             }
         }
 
-        copy:
+        LoopCopy:
         for(int i = 0; i < MaxSliceLen; i++) {
             #pragma HLS pipeline II=1
 
             inLocalBuff[i] = temp[i];
             inLocalIndices[i] = indicesTemp[i];
         }
-
     }
-
-    /*for(unsigned k=0; k<kVal; k++){
-        std::cout<< "UDT.val"<<A[k]<<std::endl;
-        std::cout<< "UDT.indices["<<k<<"]="<< indices[k]<<std::endl;
-    }
-    std::cout<< "==========================\n";*/
 }
 
 
 
+/**
+ * @brief      The sub-function to feed data from global memory into the PEs.
+ *
+ * @param[in]  inputTn        The input tn
+ * @param      streamInputTn  The stream connected to the first PE
+ * @param[in]  dim0           The dim 0
+ * @param[in]  dim1           The dim 1
+ * @param[in]  vecsPerSlice   The number of vectors(of length of m_axi_width) per input slice
+ */
 void UnitReadInput(
     const MemoryPackF_t *inputTn,
     Stream<MemoryPackF_t, PipeDepth> &streamInputTn,
@@ -104,6 +117,15 @@ void UnitReadInput(
 
 }
 
+/**
+ * @brief      The sub-function to handle the data produced by PEs.
+ *
+ * @param      indicesSplitedTn    The indices splited tn (batchsize x K)
+ * @param      streamIndices       The stream connected to the first PE that outputs results produced by all the PEs.
+ * @param[in]  dim0                The dim 0
+ * @param[in]  dim1                The dim 1
+ * @param[in]  vecsPerOutputSlice  The number of vectors(of length of m_axi_width) per output slice
+ */
 void UnitWriteOutput(
     MemoryPackI_t *indicesSplitedTn,
     Stream<MemoryPackI_t, PipeDepth> &streamIndices,
@@ -130,6 +152,22 @@ void UnitWriteOutput(
 }
 
 //latency reported for [5x1024]x1024, k=20, unitcount=8, m_axi_width=16, pipe_depth=2
+
+/**
+ * @brief      The sub-function for PEs.
+ *             Each PE handles a single input slice that is streamed into its local buffer through other PEs.
+ *
+ * @param      streamDataIn        The data input stream that is connected to UnitReadInput or the previous PE's data output stream.
+ * @param      streamDataOut       The data output stream that is connected to nowhere or the next PE's data input stream.
+ * @param      streamIndicesIn     The indices input stream that is connected to nowhere or the next PE's indices output stream.
+ * @param      streamIndicesOut    The indices output stream that is connected to UnitWriteOutput or the previous PE's indices input stream.
+ * @param[in]  dim0                The dim 0
+ * @param[in]  dim1                The dim 1
+ * @param[in]  vecsPerSlice        The number of vectors(of length of m_axi_width) per input slice
+ * @param[in]  vecsPerOutputSlice  The number of vectors(of length of m_axi_width) per output slice
+ * @param[in]  kValue              The k value
+ * @param[in]  unitIndex           The unit index
+ */
 void UnitProcessingElement(
     Stream<MemoryPackF_t, PipeDepth> &streamDataIn,
     Stream<MemoryPackF_t, PipeDepth> &streamDataOut,
@@ -155,12 +193,13 @@ void UnitProcessingElement(
     unsigned indxS,indxD;
 
     CONFIG_DTYPE sliceData[MaxSliceLen];
+#pragma HLS RESOURCE variable=sliceData core=RAM_2P_URAM
     DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceData cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
-    //DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceData complete dim=1)
 
+    ///TODO: Change the type to a 10-bit ap_uint to reduce resource usage.
     unsigned sliceIndices[MaxSliceLen];
+//#pragma HLS RESOURCE variable=sliceIndices core=RAM_2P_URAM
     DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceIndices cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
-    //DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceIndices complete dim=1)
 
     MemoryPackF_t sliceSubVec;
     MemoryPackI_t outputCache;
@@ -239,6 +278,18 @@ void UnitProcessingElement(
 }
 
 extern "C"{
+
+/**
+ * @brief      The top-function of the kernel.
+ *
+ * @param[in]  inputTn             The input tn
+ * @param[out] indicesSplitedTn    The indices splited tn (the tensor with a buffer of length of batchsize x kValue)
+ * @param[in]  dim0                The dim 0
+ * @param[in]  dim1                The dim 1
+ * @param[in]  kValue              The k value
+ * @param[in]  vecsPerSlice        The number of vectors(of length of m_axi_width) per input slice
+ * @param[in]  vecsPerOutputSlice  The number of vectors(of length of m_axi_width) per output slice
+ */
 void task_topk(
         const MemoryPackF_t *inputTn,
         MemoryPackI_t *indicesSplitedTn,
