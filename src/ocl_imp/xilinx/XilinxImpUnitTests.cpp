@@ -1,6 +1,7 @@
 #include <ocl_imp/xilinx/XilinxImpUnitTests.h>
 #include <ocl_imp/xilinx/AxiHelper.h>
 #include <cnpy.h>
+#include "xilinx/config.h"
 
 XilinxImpUnitTests::XilinxImpUnitTests(){
     // GPU_OCL is FPGA now, because there is no reason to run code both on FPGA and GPU at same executable!
@@ -833,10 +834,10 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
-    int kVal=20 , N=32 , B=1;
+    int kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
         <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
-    
+    assert(N==ConfigTaskTopK::MaxSliceLen);
 
     TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
     TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
@@ -854,14 +855,19 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
                 for(int kk=0;kk<kVal;kk++){
                     unsigned int i = b*N*kVal + n1*kVal + kk;
                     int rCpu = tensorCpu->_buff[i];
-                    int rGpu = tensorGpuTransfered->_buff[i];
-                    cout <<
+                    int rUdt = tensorGpuTransfered->_buff[i];
+                    printf("Index(B,N,K)= (%02d, %02d, %02d)\t\trCPU=%04d, rUDT=%04d\t\tValue[rCPU]:%f\tValue[rUDT]:%f\n",
+                       b, n1, kk,
+                       rCpu,rUdt,
+                       tensorSrc->_buff[b*N*N+ n1*N+ rCpu], tensorSrc->_buff[b*N*N+ n1*N+ rUdt]);
+
+                    /*cout <<
                             "Index(B,N,K)= ("<< b <<", "<<n1<<", "<<kk<<")   " <<
                             " ,iCPU= "<<rCpu<<" ,iGPU= " <<rGpu<< ",   "
                             "Value[iCPU]= " << tensorSrc->_buff[b*N*N+ n1*N+ rCpu] << ", "
                             "Value[iGPU]= " << tensorSrc->_buff[b*N*N+ n1*N+ rGpu] <<
-                            endl;
-                    if(rCpu != rGpu){
+                            endl;*/
+                    if(rCpu != rUdt){
                         comparisonResult=false;
                     }
                 }

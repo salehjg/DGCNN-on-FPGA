@@ -184,7 +184,7 @@ void UnitProcessingElement(
     assert(dim1%CONFIG_M_AXI_WIDTH==0);
 
     // Length of the PE's local buffers('MaxSliceLen') should be greater or equal to 'dim1'.
-    assert(dim1<=MaxSliceLen);
+    assert(dim1==MaxSliceLen);
 
     // FIFO depth should be greater or equal to 'vecsPerOutputSlice' for PE's not to stall.
     assert(PipeDepth>=vecsPerOutputSlice);
