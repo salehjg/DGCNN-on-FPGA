@@ -11,6 +11,73 @@ using namespace std;
 using namespace ConfigTaskTopK;
 using hlslib::Stream;
 
+// https://github.com/KastnerRG/pp4fpgas/blob/master/examples/merge_sort_loop_merged.cpp
+void MergeSortWithIndices(
+    CONFIG_DTYPE *inLocalBuff,
+    unsigned *inLocalIndices){
+#pragma HLS INLINE
+
+    CONFIG_DTYPE temp[MaxSliceLen];
+    unsigned indicesTemp[MaxSliceLen];
+
+    LoopStage:
+    for (int width = 1; width < MaxSliceLen; width = 2 * width) {
+        int f1 = 0;
+        int f2 = width;
+        int i2 = width;
+        int i3 = 2*width;
+        if(i2 >= MaxSliceLen) i2 = MaxSliceLen;
+        if(i3 >= MaxSliceLen) i3 = MaxSliceLen;
+
+        LoopMergeArrays:
+        for (int i = 0; i < MaxSliceLen; i++) {
+            #pragma HLS pipeline II=1
+
+            CONFIG_DTYPE t1 = inLocalBuff[f1];
+            CONFIG_DTYPE t2 = (f2 == i3) ? 0 : inLocalBuff[f2];
+
+            if(f2 == i3 || (f1 < i2 && t1 <= t2)) {
+                //if(f2 != i3)
+                //{
+                    indicesTemp[i] = inLocalIndices[f1];
+                //}
+                temp[i] = t1;
+                f1++;
+            } else {
+                indicesTemp[i] = inLocalIndices[f2];
+                assert(f2 < i3);
+                temp[i] = t2;
+                f2++;
+            }
+            if(f1 == i2 && f2 == i3) {
+                f1 = i3;
+                i2 += 2*width;
+                i3 += 2*width;
+                if(i2 >= MaxSliceLen) i2 = MaxSliceLen;
+                if(i3 >= MaxSliceLen) i3 = MaxSliceLen;
+                f2 = i2;
+            }
+        }
+
+        copy:
+        for(int i = 0; i < MaxSliceLen; i++) {
+            #pragma HLS pipeline II=1
+
+            inLocalBuff[i] = temp[i];
+            inLocalIndices[i] = indicesTemp[i];
+        }
+
+    }
+
+    /*for(unsigned k=0; k<kVal; k++){
+        std::cout<< "UDT.val"<<A[k]<<std::endl;
+        std::cout<< "UDT.indices["<<k<<"]="<< indices[k]<<std::endl;
+    }
+    std::cout<< "==========================\n";*/
+}
+
+
+
 void UnitReadInput(
     const MemoryPackF_t *inputTn,
     Stream<MemoryPackF_t, PipeDepth> &streamInputTn,
@@ -133,62 +200,28 @@ void UnitProcessingElement(
 
         //--------------------------------------------------
         // 2. Run sorting algorithm on the local memory.
-        const unsigned _len = ( kValue*( (dim1-1) + (dim1-kValue) ) )/2;
-        unsigned i,j; i = 0; j = 1;
-        min_idx = 0;
+        MergeSortWithIndices(sliceData, sliceIndices);
 
-        LoopFusedSort0:
-        for(unsigned iter=0; iter<_len;iter++){
-            #pragma HLS PIPELINE II=1
-			#pragma HLS LOOP_TRIPCOUNT min=20270 max=20270
-
-            if(sliceData[j] < sliceData[min_idx]){
-                min_idx = j;
-            }
-
-            //------------------------------
-            //Fused loop's house keeping stuff
-            if(j==dim1-1){
-                //if(min_idx != i)
-                {
-                    //Commented lines are to avoid unnecessary memory accesses.
-                    //They don't affect the REQUIRED output of this PE.
-
-                    //float tmp = sliceData[min_idx];
-                    sliceData[min_idx] = sliceData[i];
-                    //sliceData[i] = tmp;
-                    //--------------------------------
-                    unsigned tmp2 = sliceIndices[min_idx];
-                    sliceIndices[min_idx] = sliceIndices[i];
-                    sliceIndices[i] = tmp2;
-
-                    //--------------------------------
-                    outputCacheVecSubIdx = i%CONFIG_M_AXI_WIDTH;
-                    outputCache[outputCacheVecSubIdx] = tmp2;
-                    if(outputCacheVecSubIdx==(CONFIG_M_AXI_WIDTH-1) || i==(kValue-1) ){
-                        streamIndicesOut.Push(outputCache);
+        LoopPushTheResults:
+        for(unsigned i=0; i<kValue; i++) {
+            #pragma HLS LOOP_TRIPCOUNT min=20 max=20
+            outputCacheVecSubIdx = i % CONFIG_M_AXI_WIDTH;
+            outputCache[outputCacheVecSubIdx] = sliceIndices[i];
+            if (outputCacheVecSubIdx == (CONFIG_M_AXI_WIDTH - 1) || i == (kValue - 1)) {
+                streamIndicesOut.Push(outputCache);
 #ifdef KERNEL_LOGS
-                        cout<<"PE"<<unitIndex<<": "<<" Sorted Vec i="<<i<<endl;
+                cout << "PE" << unitIndex << ": " << " Sorted Vec i=" << i << endl;
 #endif
-                    }
-                }
-                //--------------------------
-                i++;
-                j=i+1;
-                //--------------------------
-                min_idx = i;
-            }else{
-                j++;
             }
         }
-
+        
         //--------------------------------------------------
         
         // 3. Handle incoming data of streamIndicesIn from other PEs.
         const unsigned _len2 = UnitCount-unitIndex-1;
         LoopHandleOtherPEsOutput:
         for(unsigned iPE=0; iPE<_len2; iPE++){
-			#pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
             ForOutputVecsPerPEs:
             for(unsigned iVec=0; iVec<vecsPerOutputSlice; iVec++){
                 if(unitIndex<(UnitCount-1)){
@@ -236,10 +269,10 @@ void task_topk(
 
 #ifndef HLSLIB_SYNTHESIS
     // Name the arrays of channels for debugging purposes
-    for (unsigned i = 0; i < UnitCount; i++) {
+    for (unsigned i = 0; i < UnitCount+1; i++) {
         streamsData[i].set_name(("streamsData[" + std::to_string(i) + "]").c_str());
     }
-    for (unsigned n = 0; n < UnitCount; n++) {
+    for (unsigned n = 0; n < UnitCount+1; n++) {
         streamsIndices[n].set_name(("streamsIndices[" + std::to_string(n) + "]").c_str());
     }
 #endif
