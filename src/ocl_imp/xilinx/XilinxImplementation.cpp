@@ -1497,6 +1497,7 @@ TensorF* XilinxImplementation::ReduceMax(
  *             3- The kernel with merge sort offers medium throughput while it uses large amounts of BRAM/URAM. 
  *                This is the preferred kernel for tensors with large slices(larger than 512 or so) 
  *             Kernels 1 and 3 have multiple PEs arranged in a systolic array alike structure.
+ *             This layer is configured to comply with "last dim padded" policy.
  *             
  *
  * @param[in]  scheduler   The scheduler

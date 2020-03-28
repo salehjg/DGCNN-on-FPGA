@@ -119,6 +119,7 @@ void UnitReadInput(
 
 /**
  * @brief      The sub-function to handle the data produced by PEs.
+ *             The output tensor should be padded in the last dimnesion such that shape[-1]%m_axi_width=0
  *
  * @param      indicesSplitedTn    The indices splited tn (batchsize x K)
  * @param      streamIndices       The stream connected to the first PE that outputs results produced by all the PEs.
