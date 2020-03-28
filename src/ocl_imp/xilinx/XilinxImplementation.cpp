@@ -99,8 +99,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -172,7 +171,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 14 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -1097,7 +1097,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
                       mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
                       3),
               "",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
-/*
+
 
     int rankDiff;
     int rank1, rank2;
@@ -1124,9 +1124,9 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
     unsigned int dim0B, dim1B, dim2B, dim3B;
     int dim0B_IsNotZero, dim1B_IsNotZero, dim2B_IsNotZero, dim3B_IsNotZero;
 
-    TensorF* _inputTn1 = ((OclTensorF*)inputTn1)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
-    TensorF* _inputTn2 = ((OclTensorF*)inputTn2)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
-    OclTensorF* rsltTn = new OclTensorF(context, inputTn1->getShape(), DATAMOVER_KERNEL_BANK_B_INDEX);
+    TensorF* _inputTn1 = ((OclTensorF*)inputTn1)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskMatOps::BankIndex_inputTn1);
+    TensorF* _inputTn2 = ((OclTensorF*)inputTn2)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskMatOps::BankIndex_inputTn2);
+    OclTensorF* rsltTn = new OclTensorF(context, inputTn1->getShape(), ConfigTaskMatOps::BankIndex_outputTn);
     
     dim0 = inputTn1->getShape()[0];
     dim1 = inputTn1->getShape()[1];
@@ -1158,15 +1158,6 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
         dim3B=inputTn2->getShape()[0];
     }
 
-    int tmp =15>>(4-inputTn2->getRank());
-    dim0B_IsNotZero = (tmp >> 3) & 1;
-    dim1B_IsNotZero = (tmp >> 2) & 1;
-    dim2B_IsNotZero = (tmp >> 1) & 1;
-    dim3B_IsNotZero = (tmp >> 0) & 1;
-
-    if(inputTn2->getRank()==1 && dim0B==0&&dim1B==0&&dim2B==0&&dim3B==1){//scalar value
-        dim3B_IsNotZero=0; //force it to be zero, so in the kernel, indxS2 would be zero;
-    }
     int operationMode = mode==MAT_OPS::ADD ? 0 :
                         mode==MAT_OPS::SUB ? 1 :
                         mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
@@ -1179,9 +1170,8 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
 
         for(int i =0;i<rankDiff;i++){
             inputTn1->SqueezeDimZero();
-            rsltTn->SqueezeDimZero();
         }
-        return rsltTn;
+        return nullptr;
     }else{
         int argcnt=0;
         cl_int error;
@@ -1195,11 +1185,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim0B);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1B);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2B);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim3B);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim0B_IsNotZero);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim1B_IsNotZero);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim2B_IsNotZero);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&dim3B_IsNotZero);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim3B); 
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&rank1);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&rank2);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&operationMode);
@@ -1223,11 +1209,8 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
             rsltTn->SqueezeDimZero();
         }
 
-        rsltTn->ChangeDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_A_INDEX);
         return rsltTn;
     }
-*/
-    return nullptr;
 }
 
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, float scalar, MAT_OPS mode){

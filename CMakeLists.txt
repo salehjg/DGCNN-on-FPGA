@@ -370,12 +370,11 @@ set(SP_TAG_UNPADDING
  --sp task_unpad_last_dim_1.outputTn:bank${CFG18_Unpadding_DDRBANK_outputTn}")
 
 ###sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+###sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
 
-###sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-###sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )

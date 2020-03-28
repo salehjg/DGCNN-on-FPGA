@@ -16,8 +16,8 @@ using namespace ConfigTaskMatOps;
 
 extern "C"
 void task_matops(
-        const MemoryPackF_t *inputTn1, //is always of rank4 (forced)
-        const MemoryPackF_t *inputTn2, //rank4 or less
+        const MemoryPackF_t *inputTn1,
+        const MemoryPackF_t *inputTn2,
         MemoryPackF_t *outputTn,
         const unsigned dim0,
         const unsigned dim1,

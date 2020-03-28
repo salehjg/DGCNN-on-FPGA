@@ -920,10 +920,9 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
     PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
-    */
     PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU 
-
-    //PrintReport(KernelMatops());              // DONE
+*/
+    PrintReport(KernelMatops());
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
     //PrintReport(KernelReduceMax());           // DONE, NEEDS TO BE NERFED TO SAVE RESOURCES
     /*PrintReport(KernelRelu());
