@@ -98,8 +98,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -808,7 +807,7 @@ TensorF* XilinxImplementation::Mean(
         bool mean_axis2,
         bool mean_axis3){
     PrintInfo("Mean","",0,"",0,"",0,inputTn->getShape(),{},{mean_axis0,mean_axis1,mean_axis2,mean_axis3});
-/*
+
     assert(inputTn->getRank()==2 || inputTn->getRank()==4);
     assert(
             (mean_axis0 && mean_axis1 && mean_axis2 && !mean_axis3 && inputTn->getRank()==4) ||
@@ -843,8 +842,6 @@ TensorF* XilinxImplementation::Mean(
     }
 
     return rsltTn;
-*/
-    return nullptr;
 }
 
 TensorF* XilinxImplementation::Variance(
@@ -855,7 +852,7 @@ TensorF* XilinxImplementation::Variance(
         bool variance_axis2,
         bool variance_axis3){
     PrintInfo("Variance","",0,"",0,"",0,inputTn->getShape(),{},{variance_axis0,variance_axis1,variance_axis2,variance_axis3});
-/*
+
     assert(inputTn->getRank()==2 || inputTn->getRank()==4);
     assert(
             (variance_axis0 && variance_axis1 && variance_axis2 && !variance_axis3 && inputTn->getRank()==4) ||
@@ -900,8 +897,6 @@ TensorF* XilinxImplementation::Variance(
     delete(varianceXi2Tn);
     delete(meanTn);
     return rsltTn;
-*/
-    return nullptr;
 }
 
 /**

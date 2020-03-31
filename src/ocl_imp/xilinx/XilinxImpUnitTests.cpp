@@ -925,6 +925,9 @@ void XilinxImpUnitTests::RunAll(){
     */
 
     PrintReport(KernelReduceSum4D());
+    PrintReport(KernelMean());
+    PrintReport(KernelVariance());
+
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
     //PrintReport(KernelReduceMax());           // DONE, NEEDS TO BE NERFED TO SAVE RESOURCES
     /*PrintReport(KernelRelu());
@@ -932,8 +935,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelSquare());  
     PrintReport(KernelTile());
     PrintReport(KernelReduceSum()); 
-    PrintReport(KernelMean());
-    PrintReport(KernelVariance());
+
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());
     PrintReport(KernelGather());
