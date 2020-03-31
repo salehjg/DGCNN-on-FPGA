@@ -7,7 +7,7 @@
 #include "xilinx/config.h"
 
 using namespace std;
-using namespace ReduceSum4D;
+using namespace ConfigTaskReduceSum4D;
 using hlslib::Stream;
 
 // for dataflow version only:
@@ -85,10 +85,10 @@ void ReduceSumRank4Axes012_V1(
         }
 
         LoopOutput:
-        MemoryPackF_t outVec = outputTn[iVec];
+        MemoryPackF_t outVec;
         for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
             #pragma HLS UNROLL
-            outVec[i]=outVec[i]+buffResult1[i];
+            outVec[i]=buffResult1[i];
         }
         outputTn[iVec] = outVec;
     }

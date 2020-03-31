@@ -1,25 +1,92 @@
 /*
-** ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
-** ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
-** ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
-** ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
-** ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
-** ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
-** ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
-**
-** ReduceMax: reductionDim=1, DIM2 SHOULD BE ONE, ARGS(0,1,2)=DIM0x(DIM1)xDIM3,
-** ReduceMax: reductionDim=2,                             , ARGS(0,1,2)=[DIM0*DIM1]x(DIM2)xDIM3
+ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
+ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
+ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
+ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
+
+ReduceMax: reductionDim=1, DIM2 SHOULD BE ONE, ARGS(0,1,2)=DIM0x(DIM1)xDIM3,
+ReduceMax: reductionDim=2, ARGS(0,1,2)=[DIM0*DIM1]x(DIM2)xDIM3
 */
 
 #include <cassert>
-#include <stdio.h> 
-#include <math.h>
-#include "hlslib/xilinx/DataPack.h"
-#include "hlslib/xilinx/Simulation.h"
+#include <iostream>
+#include <limits>
 #include "hlslib/xilinx/Stream.h"
+#include "hlslib/xilinx/Simulation.h"
+#include "hlslib/xilinx/Utility.h"
+#include "hlslib/xilinx/DataPack.h"
 #include "AxiHelper.h"
 #include "xilinx/config.h"
 
+using namespace std;
+using namespace ConfigTaskReduceMax;
+using hlslib::Stream;
+
+CONFIG_DTYPE _Max(CONFIG_DTYPE val1, CONFIG_DTYPE val2){
+#pragma HLS INLINE
+    return (val2>val1) ? val2 : val1;
+}
+
+void ReduceMax3Axis1_V1(
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2){
+    //FTF
+
+    const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSlice = dim2Padded/CONFIG_M_AXI_WIDTH;
+
+    CONFIG_DTYPE buffResult1[CONFIG_M_AXI_WIDTH];
+#pragma HLS ARRAY_PARTITION variable=buffResult1 complete dim=1
+
+    LoopD0:
+    for(unsigned d0=0; d0<dim0; d0++){
+        LoopSlice0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            
+            LoopClear:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+                buffResult1[i]=numeric_limits<CONFIG_DTYPE>::min();
+            }
+
+            LoopD1:
+            for(unsigned d1=0; d1<dim1; d1++){
+                #pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
+                #pragma HLS PIPELINE II=1
+                const unsigned indxS = d0*dim1*vecsPerSlice + d1*vecsPerSlice + iVec;
+                MemoryPackF_t vec = inputTn[indxS];
+                LoopCompute:
+                for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                    #pragma HLS UNROLL
+                    const CONFIG_DTYPE rslt = vec[i];
+                    buffResult1[i] = _Max(buffResult1[i], rslt);
+                }
+            }
+
+            const unsigned indxD = d0*vecsPerSlice + iVec;
+
+            LoopOutput:
+            MemoryPackF_t outVec;
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+                outVec[i] = buffResult1[i];
+            }
+            outputTn[indxD] = outVec;
+        }
+    }
+}
+
+
+
+
+/*
 #define CONFIG_SLICE_SIZE       1024 
 #define CONFIG_SHIFT_SIZE       3
 
@@ -27,11 +94,11 @@ using MemoryPack_t = hlslib::DataPack<CONFIG_DTYPE, CONFIG_M_AXI_WIDTH>;
 using hlslib::Stream;
 
 void reducemax_rank3_ftf_shiftreg_scheme(
-    MemoryPack_t *inputTn,
-    MemoryPack_t *outputTn,
-    const unsigned int dim0,
-    const unsigned int dim1,
-    const unsigned int dim2){
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2){
 
     MemoryPack_t buff[CONFIG_SHIFT_SIZE+1][CONFIG_SLICE_SIZE/CONFIG_M_AXI_WIDTH];
 #pragma HLS ARRAY_PARTITION variable=buff complete dim=1
@@ -93,210 +160,38 @@ void reducemax_rank3_ftf_shiftreg_scheme(
         }
     }
 }
-
-extern "C" {
-void task_reducemax(
-    MemoryPack_t *inputTn,
-    MemoryPack_t *outputTn,
-    const unsigned int dim0,
-    const unsigned int dim1,
-    const unsigned int dim2,
-    const int overaxis0,
-    const int overaxis1,
-    const int overaxis2){
-#pragma HLS INTERFACE m_axi     port=inputTn    offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=outputTn   offset=slave bundle=gmem2
-#pragma HLS INTERFACE s_axilite port=inputTn    bundle=control
-#pragma HLS INTERFACE s_axilite port=outputTn   bundle=control
-
-#pragma HLS INTERFACE s_axilite port=dim0       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim1       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim2       bundle=control
-
-#pragma HLS INTERFACE s_axilite port=overaxis0  bundle=control
-#pragma HLS INTERFACE s_axilite port=overaxis1  bundle=control
-#pragma HLS INTERFACE s_axilite port=overaxis2  bundle=control
-
-#pragma HLS INTERFACE s_axilite port=return     bundle=control
-
-    if(!overaxis0 && overaxis1 && !overaxis2){
-        assert(dim2%CONFIG_M_AXI_WIDTH==0);
-        reducemax_rank3_ftf_shiftreg_scheme(inputTn, outputTn, dim0, dim1, dim2);
-    }
-
-}
-
-}
-
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-
-
-/*
-void reducemax_rank3_ftf(        
-    MemoryPack_t *inputTn,
-    MemoryPack_t *outputTn,
-    const unsigned int dim0,
-    const unsigned int dim1,
-    const unsigned int dim2){
-
-    CONFIG_DTYPE buff_rslt[CONFIG_SLICE_SIZE];
-#pragma HLS ARRAY_PARTITION variable=buff_rslt cyclic factor=16 dim=0
-
-    unsigned int d0d1d2 = dim0 * dim1 * dim2;
-    unsigned int outputIdx;
-    unsigned int packCount = DivCeil<unsigned int>(dim0*dim1*dim2, CONFIG_M_AXI_WIDTH);
-
-    MemoryPack_t tmpBuff;
-    MemoryPack_t outBuff;
-
-    outputIdx = 0;
-
-
-    LoopMain: for(unsigned int iter=0; iter<packCount; iter++){
-#pragma HLS LOOP_TRIPCOUNT min=1048576 max=1048576
-#pragma HLS PIPELINE II=1
-
-        const unsigned int idx = iter*CONFIG_M_AXI_WIDTH;
-        const unsigned int d1 = idx / dim2;
-        const unsigned int d2 = idx % dim2;
-        tmpBuff = inputTn[iter];
-
-        LoopCompare: for(unsigned int i =0; i<CONFIG_M_AXI_WIDTH; i++){
-#pragma HLS DEPENDENCE variable=buff_rslt inter false
-#pragma HLS UNROLL
-            if(d1==0){
-                buff_rslt[d2+i] = -1*INFINITY;
-            }
-
-            const CONFIG_DTYPE tVal = tmpBuff[i];
-            if(buff_rslt[d2+i] < tVal){
-                buff_rslt[d2+i] = tVal;
-            }
-
-            if(d1==(dim1-1)){
-                outBuff[i] = buff_rslt[d2 + i];
-            }
-        }
-
-        if(d1==(dim1-1)){
-            outputTn[outputIdx++] = outBuff;
-        }
-
-    }
-
-}
+*/
 
 
 extern "C" {
 void task_reducemax(
-    MemoryPack_t *inputTn,
-    MemoryPack_t *outputTn,
-    const unsigned int dim0,
-    const unsigned int dim1,
-    const unsigned int dim2,
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2,
     const int overaxis0,
     const int overaxis1,
     const int overaxis2){
-#pragma HLS INTERFACE m_axi     port=inputTn    offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=outputTn   offset=slave bundle=gmem2
-#pragma HLS INTERFACE s_axilite port=inputTn    bundle=control
-#pragma HLS INTERFACE s_axilite port=outputTn   bundle=control
-
-#pragma HLS INTERFACE s_axilite port=dim0       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim1       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim2       bundle=control
-
-#pragma HLS INTERFACE s_axilite port=overaxis0  bundle=control
-#pragma HLS INTERFACE s_axilite port=overaxis1  bundle=control
-#pragma HLS INTERFACE s_axilite port=overaxis2  bundle=control
-
-#pragma HLS INTERFACE s_axilite port=return     bundle=control
+#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem2
+#pragma HLS INTERFACE s_axilite port=inputTn bundle=control
+#pragma HLS INTERFACE s_axilite port=outputTn bundle=control
+#pragma HLS INTERFACE s_axilite port=dim0 bundle=control
+#pragma HLS INTERFACE s_axilite port=dim1 bundle=control
+#pragma HLS INTERFACE s_axilite port=dim2 bundle=control
+#pragma HLS INTERFACE s_axilite port=overaxis0 bundle=control
+#pragma HLS INTERFACE s_axilite port=overaxis1 bundle=control
+#pragma HLS INTERFACE s_axilite port=overaxis2 bundle=control
+#pragma HLS INTERFACE s_axilite port=return bundle=control
 
     if(!overaxis0 && overaxis1 && !overaxis2){
-        assert(dim2%CONFIG_M_AXI_WIDTH==0);
-        reducemax_rank3_ftf(inputTn, outputTn, dim0, dim1, dim2);
+        //assert(dim2%CONFIG_M_AXI_WIDTH==0);
+        //reducemax_rank3_ftf_shiftreg_scheme(inputTn, outputTn, dim0, dim1, dim2);
+
+        ReduceMax3Axis1_V1(inputTn, outputTn, dim0, dim1, dim2);
     }
 
 }
 
 }
-
-*/
-
-
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-//=================================================================================================================================================
-
-
-/*
-#define N 16
-#define M 16
-
-
-void Stencil2D(float const memory_in[N * M], float memory_out[N * M]) {
-
-  float aboveee[M];
-  float center[M];
-
-  // The first two rows are buffered in separate pipelines
-
-  LoopInit0: for (int i = 0; i < M; ++i) {
-    #pragma HLS PIPELINE
-    aboveee[i] = memory_in[i];
-  }
-
-  LoopInit1: for (int i = 0; i < M; ++i) {
-    #pragma HLS PIPELINE
-    center[i] = memory_in[M + i];
-  }
-
-  // The remaining rows can be streamed
-
-  LoopMain1: for (int i = 1; i < N - 1; ++i) {
-      LoopMain2: for (int j = 0; j < M; ++j) {
-      #pragma HLS PIPELINE II=1
-
-      const auto below = memory_in[(i + 1) * M + j];
-
-      constexpr float factor = 0.3333;
-      const auto average = factor * (aboveee[j] + center[j] + below);
-
-      aboveee[j] = center[j];
-      center[j] = below;
-      #pragma HLS DEPENDENCE variable=aboveee false
-      #pragma HLS DEPENDENCE variable=center false
-      #pragma HLS DEPENDENCE variable=aboveee intra RAW true
-
-      memory_out[i * M + j] = average;
-    }
-  }
-}
-
-extern "C" {
-// Top-level entry function, not relevant for this example
-void task_reducemax(float const *in, float *out) {
-  #pragma HLS INTERFACE m_axi port=in bundle=gmem0 offset=slave
-  #pragma HLS INTERFACE m_axi port=out bundle=gmem1 offset=slave
-  #pragma HLS INTERFACE s_axilite port=in
-  #pragma HLS INTERFACE s_axilite port=out
-  #pragma HLS INTERFACE s_axilite port=return
-    Stencil2D(in, out);
-}
-}
-
-*/

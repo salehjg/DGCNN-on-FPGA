@@ -10,7 +10,7 @@
 #include "PaddingCpu.h"
 
 using namespace std;
-using namespace ReduceSum4D;
+using namespace ConfigTaskReduceSum4D;
 
 extern "C"
 void task_reducesum4d(
@@ -138,5 +138,7 @@ int TestReduceSum4D(
 
 int main(int argc, char **argv) {
     int rslt0 = TestReduceSum4D<16>("ReduceSum4D_TTTF", {2,2,2,17}, 1);
+    rslt0 += TestReduceSum4D<16>("ReduceSum4D_TTTF", {2,2,2,64}, 1);
+    rslt0 += TestReduceSum4D<16>("ReduceSum4D_TTTF", {2,2,2,119}, 1);
     return rslt0;
 }
