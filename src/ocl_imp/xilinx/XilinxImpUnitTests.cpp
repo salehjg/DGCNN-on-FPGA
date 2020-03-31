@@ -372,7 +372,7 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum4D(){
 
     //Rank4_TTTF
     {
-        TensorF* tensorSrc = GenerateTensor(0,{2,2,2,5});
+        TensorF* tensorSrc = GenerateTensor(3,{2,2,16,64});
         TensorF* tensorCpu = platformSelector->ReduceSum4D(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
         TensorF* tensorGpu = platformSelector->ReduceSum4D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -380,7 +380,7 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum4D(){
 
     //Rank4_TTTF
     {
-        TensorF* tensorSrc = GenerateTensor(0,{2,2,2,17});
+        TensorF* tensorSrc = GenerateTensor(4,{2,2,2,16});
         TensorF* tensorCpu = platformSelector->ReduceSum4D(PLATFORMS::CPU,scheduler,tensorSrc,true,true,true,false);
         TensorF* tensorGpu = platformSelector->ReduceSum4D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,true,true,true,false);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -921,8 +921,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelUnpadLastDimFloat());
     PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
     PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU 
-*/
     PrintReport(KernelMatops());
+    */
+
+    PrintReport(KernelReduceSum4D());
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
     //PrintReport(KernelReduceMax());           // DONE, NEEDS TO BE NERFED TO SAVE RESOURCES
     /*PrintReport(KernelRelu());
@@ -930,7 +932,6 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelSquare());  
     PrintReport(KernelTile());
     PrintReport(KernelReduceSum()); 
-    PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
     PrintReport(KernelMatmul());

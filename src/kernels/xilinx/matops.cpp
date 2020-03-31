@@ -9,6 +9,31 @@
 using namespace std;
 using namespace ConfigTaskMatOps;
 
+/**
+ * @brief      Performs Addition, Subtraction, Multiplication, and Division on two tensors.
+ *             The first tensor could be of rank r1 where 1<=r1<=4
+ *             The second tensor should be of rank r2 where 1<=r2<=r1
+ *             This kernel complies with the padded last dim policy.
+ *             The shape of the first tensor should be aligned by the last dimension like:
+ *               rank=2 tensor 2x3: dim0=1, dim1=1, dim2=2, dim3=3
+ *             The shape of the second tensor should also be aligned by the last dimension like:
+ *               rank=2 tensor 2x3: dim0B=0, dim1B=0, dim2B=2, dim3B=3
+ *
+ * @param[in]  inputTn1  The input tn 1
+ * @param[in]  inputTn2  The input tn 2
+ * @param      outputTn  The output tn of the same shape as inputTn1
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  dim2      The dim 2
+ * @param[in]  dim3      The dim 3
+ * @param[in]  dim0B     The dim 0 b
+ * @param[in]  dim1B     The dim 1 b
+ * @param[in]  dim2B     The dim 2 b
+ * @param[in]  dim3B     The dim 3 b
+ * @param[in]  rankA     The rank a
+ * @param[in]  rankB     The rank b
+ * @param[in]  mode      The mode
+ */
 void MatOpsRank4Rankx(
         const MemoryPackF_t *inputTn1, //is always of rank4 (forced)
         const MemoryPackF_t *inputTn2, //rank4 or less
@@ -36,6 +61,10 @@ void MatOpsRank4Rankx(
     assert(rankA>=rankB);
     assert(vecsPerLastDimB<=vecsPerLastDim);
 
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+    
     if(isConstantB){
         MemoryPackF_t tmp = inputTn2[0];
         LoopInitConstant:

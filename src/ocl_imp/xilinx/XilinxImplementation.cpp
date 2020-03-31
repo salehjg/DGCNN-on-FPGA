@@ -81,8 +81,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -99,7 +98,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -577,195 +577,48 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
     return nullptr;
 }
 
-int XilinxImplementation::_ReduceSum4D_Try05_NDRange_Find_Kernel_Launches_Needed(int sliceCount, int SPT, int TGPB){
-/*
-    int i=0, sliceLeft=sliceCount,p=sliceCount,q=SPT*TGPB;
-    int LIMIT=50;
-    for(i=0;i<LIMIT;i++){
-        if(i==0){
-            sliceLeft = ( p + (q-1) ) / q;
-        }else{
-            sliceLeft = ( sliceLeft + (q-1) ) / q;
-        }
-        if(sliceLeft==1){
-            return i;
-        }
-    }
-*/
-    return -1;
-}
-
-
-//NDRange
-void XilinxImplementation::_ReduceSum4D_Try05_NDRange(
-        TensorF* inputTn,
-        TensorF* outputTn,
-        unsigned int dim0,
-        unsigned int dim1,
-        unsigned int dim2,
-        unsigned int dim3,
-        bool overaxis0,
-        bool overaxis1,
-        bool overaxis2,
-        bool overaxis3,
-        int pow_y){
-/*
-    //assert(over_axis0&&over_axis1&&over_axis2&&!over_axis3); // TTTF ONLY
-
-    //OclTensorF* rsltTn = new OclTensorF(context, {_dim3}); // TTTF
-    OclKernelObject *kernelObject = oclKernels[3];
-
-    unsigned long SPT,TGC,TGO,TGPB,TPG;
-    unsigned int BLOCK_SIZE = XILINX_BOTTLENCK_BLOCKSIZE;
-
-    //Dim3 slice per thread
-    SPT = 2048; //cte
-
-    //thread group offset
-    TGO = dim3 * SPT;
-
-    //thread group count
-    TGC = (unsigned long)((dim0*dim1*dim2+(SPT-1))/SPT);
-
-    //thread group per block
-    TGPB = (unsigned long)((BLOCK_SIZE)/ dim3);
-    if(TGPB%2 && TGPB > 1) TGPB--;
-
-    TPG = (unsigned long)dim3; //threads per group
-
-    unsigned long grid = ( TGC+(TGPB-1) ) / TGPB;
-    size_t global_work_size[] = {grid*(BLOCK_SIZE)};
-    size_t global_padded_work_size[1];
-    size_t local_block_size[] = {BLOCK_SIZE};
-    unsigned long shared_mem_size = (TGPB*TPG)*sizeof(cl_float);
-    GetPaddedWorkSize(1, local_block_size, global_work_size, global_padded_work_size);
-
-
-    cout<< "LOCAL:      " << local_block_size[0] << "\n";
-    cout<< "GLOBAL:     " << global_work_size[0] << "\n";
-    cout<< "GLOBAL_PAD: " << global_padded_work_size[0] << "\n";
-
-
-    OclTensorF* g_buffer1, *g_buffer2;
-    g_buffer1 = new OclTensorF(context, {grid * dim3});
-    g_buffer2 = new OclTensorF(context, {grid * dim3});
-
-    cl_int error;
-    cl_int _overAxis0,_overAxis1,_overAxis2,_overAxis3;
-    _overAxis0 = overaxis0;
-    _overAxis1 = overaxis1;
-    _overAxis2 = overaxis2;
-    _overAxis3 = overaxis3;
-
-    long iLast = _ReduceSum4D_Try05_NDRange_Find_Kernel_Launches_Needed(dim0*dim1*dim2,SPT,TGPB) ;
-    int grid_old=0,_pow_y=pow_y;
-    cl_event exeEvt;
-    long _limit = dim0*dim1*dim2;
-
-    for(long i=0;i<=(iLast);i++){
-        printf("i=%d of %d\n",i,iLast);
-        printf("launching kernel_reduce_sum_4d_try05...\n");
-        if(i>0){
-            _pow_y=1;
-            _limit=grid_old;
-        }
-        error  = clSetKernelArg(kernelObject->kernel_ndrange, 0, sizeof(cl_mem), (void *) &((i==0)    ? (OclTensorF *)inputTn : (i%2)?g_buffer1:g_buffer2)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 1, sizeof(cl_mem), (void *) &((i==iLast)? (OclTensorF *)outputTn: (i%2)?g_buffer2:g_buffer1)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 2, shared_mem_size, NULL);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 3, sizeof(cl_int), (void *) &_pow_y);
-
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 4, sizeof(cl_ulong), (void *) &_limit);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 5, sizeof(cl_ulong), (void *) &(dim3));
-
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 6, sizeof(cl_int), (void *) &_overAxis0);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 7, sizeof(cl_int), (void *) &_overAxis1);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 8, sizeof(cl_int), (void *) &_overAxis2);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 9, sizeof(cl_int), (void *) &_overAxis3);
-
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 10, sizeof(cl_ulong), (void *) &TGC);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 11, sizeof(cl_ulong), (void *) &TGPB);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 12, sizeof(cl_ulong), (void *) &SPT);
-        error |= clSetKernelArg(kernelObject->kernel_ndrange, 13, sizeof(cl_ulong), (void *) &TGO);
-
-
-        if (error != CL_SUCCESS) cout << getErrorString(error) << endl;
-        assert(error == 0);
-
-        error = clEnqueueNDRangeKernel(queue,
-                                       kernelObject->kernel_ndrange,
-                                       1,
-                                       NULL,
-                                       global_padded_work_size,
-                                       local_block_size,
-                                       0,
-                                       NULL,
-                                       &exeEvt);
-
-        if (error != CL_SUCCESS) cout << getErrorString(error) << endl;
-
-        TGC = (unsigned long)((TGC+(SPT-1))/SPT);
-        grid_old = grid;
-        grid = ( TGC+(TGPB-1) ) / TGPB;
-        global_work_size[0] = grid*(BLOCK_SIZE);
-        GetPaddedWorkSize(1, local_block_size, global_work_size, global_padded_work_size);
-        printf("========================\n");
-        printf("KERNEL_TGC_NEXT   :   %ld\n", TGC);
-        printf("KERNEL_GRID_NEXT  :   %ld\n", grid);
-    }
-
-
-    clWaitForEvents(1, &exeEvt);
-    ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
-    if(error != CL_SUCCESS) {
-        printf("Kernel execution failure!\n");
-        exit(-22);
-    }
-    delete(g_buffer1);
-    delete(g_buffer2);
-*/
-}
-
 //Task
-void XilinxImplementation::_ReduceSum4D_Task(
+TensorF* XilinxImplementation::_ReduceSum4D_Task(
         TensorF* inputTn,
-        TensorF* outputTn,
-        unsigned int dim0,
-        unsigned int dim1,
-        unsigned int dim2,
-        unsigned int dim3,
         bool overaxis0,
         bool overaxis1,
         bool overaxis2,
         bool overaxis3,
         int pow_y){
-/*
+
+    assert(inputTn->getRank()==4);
+    assert(pow_y<=ReduceSum4D::MaxPowY);
+
     OclKernelObject *kernelObject = oclKernels[3];
 
-    cl_event exeEvt;
-    cl_int error;
-    cl_int _overAxis0,_overAxis1,_overAxis2,_overAxis3;
+    unsigned _dim0,_dim1,_dim2,_dim3;
+    _dim0 = inputTn->getShape()[0];
+    _dim1 = inputTn->getShape()[1];
+    _dim2 = inputTn->getShape()[2];
+    _dim3 = inputTn->getShape()[3];
 
+    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ReduceSum4D::BankIndex_inputTn);
+    OclTensorF* rsltTn = new OclTensorF(context, {_dim3}, ReduceSum4D::BankIndex_outputTn);
+
+    cl_int error;int argcnt=0;cl_event exeEvt;
+    
+    cl_int _overAxis0,_overAxis1,_overAxis2,_overAxis3;
     _overAxis0 = overaxis0;
     _overAxis1 = overaxis1;
     _overAxis2 = overaxis2;
     _overAxis3 = overaxis3;
 
-    error  = clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void *) &((OclTensorF*)inputTn)->ocl_buff);
-    error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void *) &((OclTensorF*)outputTn)->ocl_buff);
-    error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_int), (void *) &pow_y);
-
-    error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void *) &dim0);
-    error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void *) &dim1);
-    error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_uint), (void *) &dim2);
-    error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_uint), (void *) &dim3);
-
-    error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_int), (void *) &_overAxis0);
-    error |= clSetKernelArg(kernelObject->kernel_task, 8, sizeof(cl_int), (void *) &_overAxis1);
-    error |= clSetKernelArg(kernelObject->kernel_task, 9, sizeof(cl_int), (void *) &_overAxis2);
-    error |= clSetKernelArg(kernelObject->kernel_task, 10, sizeof(cl_int), (void *) &_overAxis3);
-
-
+    error  = clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void *) &((OclTensorF*)_inputTn)->ocl_buff);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void *) &((OclTensorF*)rsltTn)->ocl_buff);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void *) &pow_y);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void *) &_dim0);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void *) &_dim1);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void *) &_dim2);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void *) &_dim3);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void *) &_overAxis0);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void *) &_overAxis1);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void *) &_overAxis2);
+    error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void *) &_overAxis3);
 
     if (error != CL_SUCCESS) cout << getErrorString(error) << endl;
     assert(error == 0);
@@ -780,7 +633,8 @@ void XilinxImplementation::_ReduceSum4D_Task(
         printf("Kernel execution failure!\n");
         exit(-22);
     } 
-*/
+
+    return rsltTn;
 }
 
 ///[axis0,axis1,axis2,axis3] //No batch op, uses data as is
@@ -791,28 +645,7 @@ TensorF* XilinxImplementation::ReduceSum4D(WorkScheduler scheduler,
                                         bool over_axis2,
                                         bool over_axis3){
     PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
-/*
-    assert(over_axis0&&over_axis1&&over_axis2&&!over_axis3); // TTTF ONLY
-
-    OclKernelObject *kernelObject = oclKernels[3];
-
-    unsigned int _dim0,_dim1,_dim2,_dim3;
-    _dim0 = inputTn->getShape()[0];
-    _dim1 = inputTn->getShape()[1];
-    _dim2 = inputTn->getShape()[2];
-    _dim3 = inputTn->getShape()[3];
-
-    OclTensorF* rsltTn = new OclTensorF(context, {_dim3}); // TTTF
-
-    if(kernelObject->use_ndrange_kernel){
-        _ReduceSum4D_Try05_NDRange(inputTn,rsltTn,_dim0,_dim1,_dim2,_dim3,over_axis0,over_axis1,over_axis2,over_axis3,1);
-        return rsltTn;
-    }else{
-        _ReduceSum4D_Task(inputTn,rsltTn,_dim0,_dim1,_dim2,_dim3,over_axis0,over_axis1,over_axis2,over_axis3,1);
-        return rsltTn;
-    }
-*/
-    return nullptr;
+    return _ReduceSum4D(scheduler, inputTn, over_axis0, over_axis1, over_axis2, over_axis3, 1);
 }
 
 TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
@@ -823,28 +656,9 @@ TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
                                         bool over_axis3,
                                         int pow_y){
     PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
-/*
     assert(over_axis0&&over_axis1&&over_axis2&&!over_axis3); // TTTF ONLY
 
-    OclKernelObject *kernelObject = oclKernels[3];
-
-    unsigned int _dim0,_dim1,_dim2,_dim3;
-    _dim0 = inputTn->getShape()[0];
-    _dim1 = inputTn->getShape()[1];
-    _dim2 = inputTn->getShape()[2];
-    _dim3 = inputTn->getShape()[3];
-
-    OclTensorF* rsltTn = new OclTensorF(context, {_dim3}); // TTTF
-
-    if(kernelObject->use_ndrange_kernel){
-        _ReduceSum4D_Try05_NDRange(inputTn,rsltTn,_dim0,_dim1,_dim2,_dim3,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
-        return rsltTn;
-    }else{
-        _ReduceSum4D_Task(inputTn,rsltTn,_dim0,_dim1,_dim2,_dim3,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
-        return rsltTn;
-    }
-*/
-    return nullptr;
+    return _ReduceSum4D_Task(inputTn,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
 }
 
 
@@ -1090,6 +904,19 @@ TensorF* XilinxImplementation::Variance(
     return nullptr;
 }
 
+/**
+ * @brief      Performs Addition, Subtraction, Multiplication, and Division on two tensors.
+ *             The first tensor could be of rank r1 where 1<=r1<=4
+ *             The second tensor should be of rank r2 where 1<=r2<=r1
+ *             This kernel complies with the padded last dim policy. 
+ *
+ * @param[in]  scheduler  The scheduler
+ * @param      inputTn1   The input tn 1
+ * @param      inputTn2   The input tn 2
+ * @param[in]  mode       The mode
+ *
+ * @return     Returns the results which is a tensor with the same shape and rank of inputTn1.
+ */
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, TensorF *inputTn2, MAT_OPS mode){
     PrintInfo("MatOps",
               "mode",(mode==MAT_OPS::ADD ? 0 :
@@ -1222,7 +1049,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
               "",0,"",0,inputTn1->getShape(),{},{});
     float* val = new float[1]; val[0] = scalar;
     OclTensorF* tmpTn = new OclTensorF();
-    tmpTn->InitWithHostData(context, queue, {1}, val);
+    tmpTn->InitWithHostData(context, queue, {1}, val, ConfigTaskMatOps::BankIndex_outputTn);
     return MatOps(scheduler,inputTn1,tmpTn,mode);
 }
 

@@ -9,6 +9,20 @@
 using namespace std;
 using namespace ConfigTaskUnpadding;
 
+
+/**
+ * @brief      Unpads the padded input tensor on the last dimension.
+ *             Currently 
+ *                1)The input tensor's last dimension should be greater than m_axi_width and
+ *                  should be divisible by m_axi_width.
+ *                2)The same conditions as (1) are applied to 'dim1Unpadded'
+ *
+ * @param[in]  inputTn       The input tn
+ * @param      outputTn      The output tn
+ * @param[in]  dim0          The dim 0
+ * @param[in]  dim1          The dim 1
+ * @param[in]  dim1Unpadded  The dim 1 unpadded
+ */
 void UnpadLastDimSuperVec(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
