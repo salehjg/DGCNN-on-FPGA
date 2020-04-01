@@ -922,11 +922,11 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
     PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU 
     PrintReport(KernelMatops());
-    */
-
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
+    */
+
     PrintReport(KernelReduceMax());
 
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL

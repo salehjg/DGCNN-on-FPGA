@@ -25,12 +25,26 @@ using namespace std;
 using namespace ConfigTaskReduceMax;
 using hlslib::Stream;
 
+constexpr unsigned CONFIG_MAX_SLICE_SIZE = 1024;
+
 CONFIG_DTYPE _Max(CONFIG_DTYPE val1, CONFIG_DTYPE val2){
 #pragma HLS INLINE
     return (val2>val1) ? val2 : val1;
 }
 
-void ReduceMax3Axis1_V1(
+
+/**
+ * @brief      Reduces the input tensor of rank 3 in the middle axis(FTF) with the max op.
+ *             Currently, 'LoopSlice0' achieves II=3.
+ *             The latency will be reported for 5x1024x20x128.
+ *
+ * @param[in]  inputTn   The input tn
+ * @param      outputTn  The output tn
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  dim2      The dim 2
+ */
+void ReduceMax3Axis1_V2(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
     const unsigned dim0,
@@ -40,25 +54,33 @@ void ReduceMax3Axis1_V1(
 
     const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSlice = dim2Padded/CONFIG_M_AXI_WIDTH;
+    constexpr unsigned buffVecCount = CONFIG_MAX_SLICE_SIZE/CONFIG_M_AXI_WIDTH;
 
-    CONFIG_DTYPE buffResult1[CONFIG_M_AXI_WIDTH];
-#pragma HLS ARRAY_PARTITION variable=buffResult1 complete dim=1
+    CONFIG_DTYPE buffResult1[CONFIG_MAX_SLICE_SIZE/CONFIG_M_AXI_WIDTH][CONFIG_M_AXI_WIDTH];
+#pragma HLS ARRAY_PARTITION variable=buffResult1 complete dim=2
 
     LoopD0:
     for(unsigned d0=0; d0<dim0; d0++){
-        LoopSlice0:
+        #pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+
+        LoopClear0:
         for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
-            
-            LoopClear:
+			#pragma HLS LOOP_TRIPCOUNT min=buffVecCount max=buffVecCount
+            #pragma HLS PIPELINE II=1
+            LoopClear1:
             for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
                 #pragma HLS UNROLL
-                buffResult1[i]=numeric_limits<CONFIG_DTYPE>::min();
+                buffResult1[iVec][i] = numeric_limits<CONFIG_DTYPE>::min();
             }
+        }
 
-            LoopD1:
-            for(unsigned d1=0; d1<dim1; d1++){
-                #pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
+        LoopD1:
+        for(unsigned d1=0; d1<dim1; d1++){
+            #pragma HLS LOOP_TRIPCOUNT min=20 max=20
+
+            LoopSlice0:
+            for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+                #pragma HLS LOOP_TRIPCOUNT min=8 max=8
                 #pragma HLS PIPELINE II=1
                 const unsigned indxS = d0*dim1*vecsPerSlice + d1*vecsPerSlice + iVec;
                 MemoryPackF_t vec = inputTn[indxS];
@@ -66,25 +88,28 @@ void ReduceMax3Axis1_V1(
                 for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
                     #pragma HLS UNROLL
                     const CONFIG_DTYPE rslt = vec[i];
-                    buffResult1[i] = _Max(buffResult1[i], rslt);
+                    buffResult1[iVec][i] = _Max(buffResult1[iVec][i], rslt);
                 }
             }
+        }
 
+        LoopOutput0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+			#pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
             const unsigned indxD = d0*vecsPerSlice + iVec;
-
-            LoopOutput:
             MemoryPackF_t outVec;
+
+            LoopOutput1:
             for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
                 #pragma HLS UNROLL
-                outVec[i] = buffResult1[i];
+                outVec[i] = buffResult1[iVec][i];
             }
+
             outputTn[indxD] = outVec;
         }
     }
 }
-
-
-
 
 /*
 #define CONFIG_SLICE_SIZE       1024 
@@ -189,7 +214,7 @@ void task_reducemax(
         //assert(dim2%CONFIG_M_AXI_WIDTH==0);
         //reducemax_rank3_ftf_shiftreg_scheme(inputTn, outputTn, dim0, dim1, dim2);
 
-        ReduceMax3Axis1_V1(inputTn, outputTn, dim0, dim1, dim2);
+        ReduceMax3Axis1_V2(inputTn, outputTn, dim0, dim1, dim2);
     }
 
 }
