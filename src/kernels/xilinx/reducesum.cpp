@@ -17,6 +17,19 @@
 
 constexpr unsigned CONFIG_MAX_SLICE_SIZE = 64;
 
+/**
+ * @brief      Reduces the input tensor of rank 3 over the axis 2.(FFT) 
+ *             This kernel complies with the padded last dim policy:
+ *                  1) For the input tensor, last dimension should be padded to be divisible by m_axi_width
+ *                  2) For the output tensor which should be rank 2 of shape dim0xdim1Padded, the allocated 
+ *                     memory should cover the padded elements(dim1 to dim1Padded).
+ *
+ * @param[in]  inputTn   The input tn
+ * @param      outputTn  The output tn
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  dim2      The dim 2
+ */
 void ReduceSum3Axis2_V1(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
