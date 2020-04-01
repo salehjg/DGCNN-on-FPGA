@@ -391,26 +391,31 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum4D(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelReduceSum(){
-    /*
-    //TEST(Rank3_OverAxis0)
-    TensorF* tensorSrc1 = GenerateTensor(1,{2,2,2});
-    TensorF* tensorCpu1 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc1,true,false,false);
-    TensorF* tensorGpu1 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,true,false,false);
-    bool comparisonResult1 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
+    bool comparisonResult1,comparisonResult2,comparisonResult3;
 
-    //TEST(Rank3_OverAxis1)
-    TensorF* tensorSrc2 = GenerateTensor(1,{2,2,2});
-    TensorF* tensorCpu2 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc2,false,true,false);
-    TensorF* tensorGpu2 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc2,false,true,false);
-    bool comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu2,tensorGpu2);
-    */
-    //TEST(Rank3_OverAxis2)
-    TensorF* tensorSrc3 = GenerateTensor(0,{2,3,17});
-    TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
-    TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
-    bool comparisonResult3 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
+    {
+        //TEST(Rank3_OverAxis2)
+        TensorF* tensorSrc3 = GenerateTensor(0,{2,3,17});
+        TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
+        TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
+        comparisonResult1 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
+    }
+    {
+        //TEST(Rank3_OverAxis2)
+        TensorF* tensorSrc3 = GenerateTensor(0,{2,16,60});
+        TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
+        TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
+        comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
+    }
+    {
+        //TEST(Rank3_OverAxis2)
+        TensorF* tensorSrc3 = GenerateTensor(0,{2,17,16});
+        TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
+        TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
+        comparisonResult3 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
+    }
 
-    bool comparisonResult = /*comparisonResult1 && comparisonResult2 &&*/ comparisonResult3;
+    bool comparisonResult = comparisonResult1 && comparisonResult2 && comparisonResult3;
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -925,9 +930,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
+    PrintReport(KernelReduceMax());
     */
 
-    PrintReport(KernelReduceMax());
+    PrintReport(KernelReduceSum()); 
 
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
     
@@ -935,7 +941,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
     PrintReport(KernelTile());
-    PrintReport(KernelReduceSum()); 
+    
 
     PrintReport(KernelMatmul());
     PrintReport(KernelTranspose());

@@ -72,7 +72,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducemax",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -80,7 +81,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -88,8 +90,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -97,7 +98,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -521,8 +523,11 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
                                       bool over_axis1,
                                       bool over_axis2){
     PrintInfo("ReduceSum","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2});
-/*
-    unsigned int _dim0,_dim1,_dim2;
+
+    assert(inputTn->getRank()==3);
+    assert(!over_axis0 && !over_axis1 && over_axis2);
+
+    unsigned _dim0,_dim1,_dim2;
     int _overAxis0, _overAxis1, _overAxis2;
 
     _dim0 = inputTn->getShape()[0];
@@ -533,28 +538,23 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
     _overAxis1 = over_axis1;
     _overAxis2 = over_axis2;
 
-    OclTensorF* rsltTn ;
-    if(inputTn->getRank()==3 &&  !over_axis0 && !over_axis1 && over_axis2)rsltTn= new OclTensorF(context, {_dim0,_dim1});
-    if(inputTn->getRank()==3 &&  !over_axis0 && over_axis1 && !over_axis2)rsltTn= new OclTensorF(context, {_dim0,_dim2});
-    if(inputTn->getRank()==3 &&  over_axis0 && !over_axis1 && !over_axis2)rsltTn= new OclTensorF(context, {_dim1,_dim2});
-
-
-    if(inputTn->getRank()==2 &&  !over_axis0 && over_axis1 )rsltTn= new OclTensorF(context, {_dim0});
-
+    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskReduceSum::BankIndex_inputTn);
+    OclTensorF* rsltTn = new OclTensorF(context, {_dim0,_dim1}, ConfigTaskReduceSum::BankIndex_outputTn);
+    
     OclKernelObject *kernelObject = oclKernels[4];
 
     if(kernelObject->use_ndrange_kernel){
 
     }else{
-        cl_int error;
-        error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem), (void*)&((OclTensorF*)inputTn)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_uint), (void*)&_dim0);
-        error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void*)&_dim1);
-        error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&_dim2);
-        error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_int), (void*)&_overAxis0);
-        error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_int), (void*)&_overAxis1);
-        error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_int), (void*)&_overAxis2);
+        cl_int error; int argcnt=0;
+        error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)_inputTn)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&_dim0);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&_dim1);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&_dim2);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&_overAxis0);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&_overAxis1);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int), (void*)&_overAxis2);
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         assert(error==0);
 
@@ -571,8 +571,6 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
 
         return rsltTn;
     }
-*/
-    return nullptr;
 }
 
 //Task

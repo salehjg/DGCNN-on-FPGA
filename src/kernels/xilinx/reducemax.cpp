@@ -56,7 +56,7 @@ void ReduceMax3Axis1_V2(
     const unsigned vecsPerSlice = dim2Padded/CONFIG_M_AXI_WIDTH;
     constexpr unsigned buffVecCount = CONFIG_MAX_SLICE_SIZE/CONFIG_M_AXI_WIDTH;
 
-    CONFIG_DTYPE buffResult1[CONFIG_MAX_SLICE_SIZE/CONFIG_M_AXI_WIDTH][CONFIG_M_AXI_WIDTH];
+    CONFIG_DTYPE buffResult1[buffVecCount][CONFIG_M_AXI_WIDTH];
 #pragma HLS ARRAY_PARTITION variable=buffResult1 complete dim=2
 
     LoopD0:
