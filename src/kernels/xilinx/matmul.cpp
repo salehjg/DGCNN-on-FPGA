@@ -48,7 +48,7 @@ void MatmulReorderedVectorized_V1(
         LoopN:
         for (unsigned n = 0; n < boundLoopN; n++) {
             MemoryPackF_t acc[D][CONFIG_MAX_M / CONFIG_M_AXI_WIDTH];
-#pragma HLS ARRAY_PARTITION variable=acc dim=1 complete
+            #pragma HLS ARRAY_PARTITION variable=acc dim=1 complete
 
             LoopK:
             for (unsigned k = 0; k < sizeK; k++) {
@@ -56,22 +56,22 @@ void MatmulReorderedVectorized_V1(
                 CONFIG_DTYPE a_buffer[D];
                 LoopReadA:
                 for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); nd++) {
-#pragma HLS PIPELINE II=1
+                    #pragma HLS PIPELINE II=1
                     // matrix A is padded on the last dimension but it is accessed by axi-32bits.
                     const unsigned indxS1 = (batch)*sizeN*lastDimPaddedA + (n*D+nd)*lastDimPaddedA + (k);
                     a_buffer[nd] = A[indxS1];
                 }
                 LoopM:
                 for (unsigned m = 0; m < vecsPerSliceB; m++) {
-#pragma HLS PIPELINE II=1
+                    #pragma HLS PIPELINE II=1
                     const unsigned indxS2 = (batch)*sizeK*vecsPerSliceB + k*vecsPerSliceB + m;
                     const auto b_val = B[indxS2];
                     LoopUnrolled:
                     for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
-#pragma HLS UNROLL
+                        #pragma HLS UNROLL
                         const auto prev = (k > 0) ? acc[nd][m] : MemoryPackF_t(0.);
                         acc[nd][m] = prev + a_buffer[nd] * b_val;
-#pragma HLS DEPENDENCE variable=acc inter false
+                        #pragma HLS DEPENDENCE variable=acc inter false
                     }
                 }
             }
@@ -79,8 +79,8 @@ void MatmulReorderedVectorized_V1(
             for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
                 LoopWriteM:
                 for (unsigned m = 0; m < vecsPerSliceB; ++m) {
-#pragma HLS LOOP_FLATTEN
-#pragma HLS PIPELINE II=1
+                    #pragma HLS LOOP_FLATTEN
+                    #pragma HLS PIPELINE II=1
                     const unsigned indxD = (batch)*sizeN*vecsPerSliceC + (n*D+nd)*vecsPerSliceC + m;
                     C[indxD] = acc[nd][m];
                 }
