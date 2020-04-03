@@ -15,6 +15,8 @@
 #include "AxiHelper.h"
 #include "xilinx/config.h"
 
+using namespace std;
+using namespace ConfigTaskReduceSum;
 constexpr unsigned CONFIG_MAX_SLICE_SIZE = 64;
 
 /**
