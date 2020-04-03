@@ -50,18 +50,15 @@ void MatmulReorderedVectorized_V1(
             MemoryPackF_t acc[D][CONFIG_MAX_M / CONFIG_M_AXI_WIDTH];
 #pragma HLS ARRAY_PARTITION variable=acc dim=1 complete
 
-            const unsigned remD = (sizeN) % D;
-            const unsigned _D = (remD == 0) ? D :
-                    ((n + 1) * D - 1 < sizeN) ? D : remD;
             LoopK:
             for (unsigned k = 0; k < sizeK; k++) {
                 const unsigned kVecIndex = k / CONFIG_M_AXI_WIDTH;
                 CONFIG_DTYPE a_buffer[D];
                 LoopReadA:
-                for (unsigned nd = 0; nd < _D; nd++) {
+                for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); nd++) {
 #pragma HLS PIPELINE II=1
                     // matrix A is padded on the last dimension but it is accessed by axi-32bits.
-                    const unsigned indxS1 = (batch)*sizeN*lastDimPaddedA + (n * D + nd) * lastDimPaddedA + (k);
+                    const unsigned indxS1 = (batch)*sizeN*lastDimPaddedA + (n*D+nd)*lastDimPaddedA + (k);
                     a_buffer[nd] = A[indxS1];
                 }
                 LoopM:
@@ -70,7 +67,7 @@ void MatmulReorderedVectorized_V1(
                     const unsigned indxS2 = (batch)*sizeK*vecsPerSliceB + k*vecsPerSliceB + m;
                     const auto b_val = B[indxS2];
                     LoopUnrolled:
-                    for (unsigned nd = 0; nd < _D; ++nd) {
+                    for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
 #pragma HLS UNROLL
                         const auto prev = (k > 0) ? acc[nd][m] : MemoryPackF_t(0.);
                         acc[nd][m] = prev + a_buffer[nd] * b_val;
@@ -79,7 +76,7 @@ void MatmulReorderedVectorized_V1(
                 }
             }
             LoopWriteD:
-            for (unsigned nd = 0; nd < _D; ++nd) {
+            for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
                 LoopWriteM:
                 for (unsigned m = 0; m < vecsPerSliceB; ++m) {
 #pragma HLS LOOP_FLATTEN
@@ -103,7 +100,7 @@ void task_matmul(
         const unsigned sizeM){
 #pragma HLS INTERFACE m_axi port=inputTn1 offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi port=inputTn2 offset=slave bundle=gmem2
-#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem3
 #pragma HLS INTERFACE s_axilite port=inputTn1 bundle=control
 #pragma HLS INTERFACE s_axilite port=inputTn2 bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn bundle=control

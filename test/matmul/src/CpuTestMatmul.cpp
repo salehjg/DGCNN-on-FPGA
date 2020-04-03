@@ -195,6 +195,10 @@ int main(int argc, char **argv) {
     int result = 0;
 
     {
+        unsigned B=1, N=5, K=2, M=5;
+        result += TestMatmul<16>("Matmul:3D,3D", {B, N, K}, {B, K, M});
+    }
+    {
         unsigned B=1, N=5, K=1024, M=512;
         result += TestMatmul<16>("Matmul:3D,3D", {B, N, K}, {B, K, M});
     }

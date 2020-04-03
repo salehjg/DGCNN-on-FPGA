@@ -90,7 +90,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -134,8 +135,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -399,12 +399,12 @@ TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batch
 TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
                                    TensorF* batchedMat1, TensorF* batchedMat2){
     PrintInfo("MatMul","",0,"",0,"",0,batchedMat1->getShape(),batchedMat2->getShape());
-/*
+
     assert(batchedMat1->getRank()==3 || batchedMat1->getRank()==2);
     assert(batchedMat2->getRank()==3 || batchedMat2->getRank()==2);
     assert(batchedMat2->getRank()==batchedMat2->getRank());
 
-    unsigned int dim0A,dim1A,dim2A,dim0B,dim1B,dim2B;
+    unsigned dim0A,dim1A,dim2A,dim0B,dim1B,dim2B;
     int rankDiff;
 
     rankDiff = 3 - batchedMat1->getRank();
@@ -414,48 +414,44 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
     }
 
     dim0A = batchedMat1->getShape()[0]; // batch size
-    dim1A = batchedMat1->getShape()[1]; // height of matrix
-    dim2A = batchedMat1->getShape()[2]; // width of matrix
+    dim1A = batchedMat1->getShape()[1]; // height of matrix ,N
+    dim2A = batchedMat1->getShape()[2]; // width of matrix  ,K
 
     dim0B = batchedMat2->getShape()[0]; // batch size
-    dim1B = batchedMat2->getShape()[1]; // height of matrix
-    dim2B = batchedMat2->getShape()[2]; // width of matrix
+    dim1B = batchedMat2->getShape()[1]; // height of matrix ,K
+    dim2B = batchedMat2->getShape()[2]; // width of matrix  ,M
 
-    //Width of A should be equal to the Height of B. (dim2A = dim1B)
+    // Width of A should be equal to the Height of B. (dim2A = dim1B)
     assert(dim0A == dim0B);
     assert(dim2A == dim1B);
 
-    TensorF* _batchedMat1 = ((OclTensorF*)batchedMat1)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
-    TensorF* _batchedMat2 = ((OclTensorF*)batchedMat2)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
+    TensorF* _batchedMat1 = ((OclTensorF*)batchedMat1)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskMatMul::BankIndex_inputTn1);
+    TensorF* _batchedMat2 = ((OclTensorF*)batchedMat2)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskMatMul::BankIndex_inputTn2);
 
-    OclTensorF*rsltTn = new OclTensorF(context,{dim0A,dim1A, dim2B}, DATAMOVER_KERNEL_BANK_B_INDEX);
+    OclTensorF* rsltTn = new OclTensorF(context,{dim0A,dim1A,dim2B}, ConfigTaskMatMul::BankIndex_outputTn);
     OclKernelObject *kernelObject = oclKernels[9];
 
     if(kernelObject->use_ndrange_kernel){
-
-        //NOT IMPLEMENTED YET.
-
         for(int i=0;i<rankDiff;i++){
             batchedMat1->SqueezeDimZero();
             batchedMat2->SqueezeDimZero();
             rsltTn->SqueezeDimZero();
         }
-
-        return rsltTn;
+        return nullptr;
     }else{
+        //printf("KERNEL PARAMS: B N K M = %d %d %d %d\n",dim0A,dim1A,dim2A,dim2B);
         cl_int error; int argcnt=0; 
         error  = clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)_batchedMat1)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&((OclTensorF*)_batchedMat2)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem), (void*)&(rsltTn->ocl_buff));
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim0A);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1A);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2B);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2A);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2B);
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         assert(error==0);
 
         cl_event exeEvt;
-
         error = clEnqueueTask( queue,
                                kernelObject->kernel_task,
                                0,
@@ -476,10 +472,8 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
             rsltTn->SqueezeDimZero();
         }
 
-        rsltTn->ChangeDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_A_INDEX);
         return rsltTn;
     }
-*/
 }
 
 TensorF* XilinxImplementation::Square(WorkScheduler scheduler, TensorF* batchedMat){

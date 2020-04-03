@@ -793,8 +793,8 @@ ReportObject* XilinxImpUnitTests::KernelVariance(){
 ReportObject* XilinxImpUnitTests::KernelMatmul(){
     bool comparisonResult = true;
     {
-        TensorF* tensorSrc1 = GenerateTensor(0,{1,5,2});
-        TensorF* tensorSrc2 = GenerateTensor(0,{1,2,5});
+        TensorF* tensorSrc1 = GenerateTensor(0,{1,4,16});
+        TensorF* tensorSrc2 = GenerateTensor(0,{1,16,16});
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
         TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -805,7 +805,7 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
         TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }
+    }/*
     {
         TensorF* tensorSrc1 = GenerateTensor(0,{5,3,64});
         TensorF* tensorSrc2 = GenerateTensor(0,{5,64,5});
@@ -819,7 +819,7 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
         TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }
+    }*/
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -931,9 +931,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
     PrintReport(KernelReduceMax());
-    */
-
     PrintReport(KernelReduceSum()); 
+    */
+    PrintReport(KernelMatmul());
+    
 
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
     
@@ -943,7 +944,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelTile());
     
 
-    PrintReport(KernelMatmul());
+    
     PrintReport(KernelTranspose());
     PrintReport(KernelGather());
     */
