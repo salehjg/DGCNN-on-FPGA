@@ -13,11 +13,23 @@
 using namespace std;
 using namespace ConfigTaskMatMul;
 
-constexpr unsigned CONFIG_MAX_N = 1024;
-constexpr unsigned CONFIG_MAX_K = 1024;
-constexpr unsigned CONFIG_MAX_M = 1024;
-
 // Architecture adopted from https://github.com/spcl/hls_tutorial_examples
+
+/**
+ * @brief      Computes batch-matmul operation of C=AB
+ *             The inputs should be of rank three and be padded in the last dimension.
+ *             This kernel complies with the padded last dim policy.
+ *
+ * @param[in]  A          The Input Matrix A (Rank3, RowMajor, Batch*N*K)
+ * @param[in]  B          The Input Matrix B (Rank3, RowMajor, Batch*K*M)
+ * @param      C          The output Matrix C(Rank3, RowMajor, Batch*N*M)
+ * @param[in]  sizeBatch  Batch Size
+ * @param[in]  sizeN      N 
+ * @param[in]  sizeK      K
+ * @param[in]  sizeM      M
+ *
+ * @tparam     D          Row-tile Size(in C)
+ */
 template<unsigned D>
 void MatmulReorderedVectorized_V1(
     const CONFIG_DTYPE* A,
@@ -47,7 +59,7 @@ void MatmulReorderedVectorized_V1(
     for(unsigned batch=0; batch<sizeBatch; batch++) {
         LoopN:
         for (unsigned n = 0; n < boundLoopN; n++) {
-            MemoryPackF_t acc[D][CONFIG_MAX_M / CONFIG_M_AXI_WIDTH];
+            MemoryPackF_t acc[D][MaxM / CONFIG_M_AXI_WIDTH];
             #pragma HLS ARRAY_PARTITION variable=acc dim=1 complete
 
             LoopK:
@@ -110,7 +122,7 @@ void task_matmul(
 #pragma HLS INTERFACE s_axilite port=sizeM bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-    MatmulReorderedVectorized_V1<4>(
+    MatmulReorderedVectorized_V1<RowTileSizeD>(
         inputTn1, inputTn2, outputTn, 
         sizeBatch, sizeN, sizeK, sizeM);
 

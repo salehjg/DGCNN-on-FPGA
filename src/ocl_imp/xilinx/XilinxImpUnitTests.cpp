@@ -805,7 +805,7 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
         TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }/*
+    }
     {
         TensorF* tensorSrc1 = GenerateTensor(0,{5,3,64});
         TensorF* tensorSrc2 = GenerateTensor(0,{5,64,5});
@@ -819,7 +819,7 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
         TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }*/
+    }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
