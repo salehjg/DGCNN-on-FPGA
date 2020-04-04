@@ -11,8 +11,7 @@
 #include "xilinx/config.h"
 
 using namespace std;
-using namespace ConfigTaskTile;
-constexpr unsigned CONFIG_MAX_SLICE_SIZE = 1024; 
+using namespace ConfigTaskTile; 
 
 // Latency 5x1024x1 --> 5x1024x1024 , axi512
 
@@ -37,7 +36,7 @@ void TileRank2Axis2(
     const unsigned tileSize){
     // input: BxN, tileAxis=2 ===> output: BxNxT ===> lastDim: T,(tileSize)
 
-    CONFIG_DTYPE buff[CONFIG_MAX_SLICE_SIZE];
+    CONFIG_DTYPE buff[MaxSliceLen];
 #pragma HLS ARRAY_PARTITION variable=buff cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 
     const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
@@ -117,7 +116,7 @@ void TileRank2Axis1(
         const unsigned tileSize){
     // input: BxN, tileAxis=1 ===> output: BxTxN ===> lastDim: N,(dim1)
 
-    CONFIG_DTYPE buff[CONFIG_MAX_SLICE_SIZE];
+    CONFIG_DTYPE buff[MaxSliceLen];
 #pragma HLS ARRAY_PARTITION variable=buff cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 
     const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
