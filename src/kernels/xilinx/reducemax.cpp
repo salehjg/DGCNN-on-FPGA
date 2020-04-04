@@ -52,6 +52,10 @@ void ReduceMax3Axis1_V2(
     const unsigned dim2){
     //FTF
 
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+    
     const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSlice = dim2Padded/CONFIG_M_AXI_WIDTH;
     constexpr unsigned buffVecCount = CONFIG_MAX_SLICE_SIZE/CONFIG_M_AXI_WIDTH;

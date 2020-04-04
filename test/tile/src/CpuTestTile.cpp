@@ -273,9 +273,9 @@ int TestTile(
 
 int main(int argc, char **argv) {
     int rslt = 0;
-    //rslt += TestTile<16>("TileRank2Axis2(BxN to BxNxT)", {2,2}, 2, 3);
+    rslt += TestTile<16>("TileRank2Axis2(BxN to BxNxT)", {2,2}, 2, 3);
     rslt += TestTile<16>("TileRank2Axis2(BxN to BxNxT)", {2,5}, 2, 7);
-    //rslt += TestTile<16>("TileRank2Axis1(BxN to BxTxN)", {2,2}, 1, 3);
-    //rslt += TestTile<16>("TileRank3Axis2(BxNxD to BxNxTxD)", {2,2,2}, 2, 3);
+    rslt += TestTile<16>("TileRank2Axis1(BxN to BxTxN)", {2,2}, 1, 3);
+    rslt += TestTile<16>("TileRank3Axis2(BxNxD to BxNxTxD)", {2,2,2}, 2, 3);
     return rslt;
 }

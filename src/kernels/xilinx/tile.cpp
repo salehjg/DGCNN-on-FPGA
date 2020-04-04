@@ -14,6 +14,21 @@ using namespace std;
 using namespace ConfigTaskTile;
 constexpr unsigned CONFIG_MAX_SLICE_SIZE = 1024; 
 
+// Latency 5x1024x1 --> 5x1024x1024 , axi512
+
+/**
+ * @brief      Performs tile operation on the input tensor of rank 2 over the last axis 2.
+ *             This kernel complies with the padded last dim policy:
+ *               1) The input tensor of rank 2 should be padded over the last dimension(dim1).
+ *               2) The output tensor of rank 3 will be padded over the last dimension(tileSize).
+ *             The latency will be reported for an input tensor of shape 5x1024 and tileSize of 1024 with axi512.
+ *
+ * @param[in]  inputTn   The input tn of shape dim0*dim1
+ * @param      outputTn  The output tn of shape dim0*dim1*tileSize
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  tileSize  The tile size
+ */
 void TileRank2Axis2(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
@@ -23,7 +38,7 @@ void TileRank2Axis2(
     // input: BxN, tileAxis=2 ===> output: BxNxT ===> lastDim: T,(tileSize)
 
     CONFIG_DTYPE buff[CONFIG_MAX_SLICE_SIZE];
-#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=16 dim=1
+#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 
     const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSliceIn = dim1Padded/CONFIG_M_AXI_WIDTH;
@@ -43,9 +58,11 @@ void TileRank2Axis2(
 
     LoopDim0:
     for(unsigned d0=0; d0<dim0; d0++){
+		#pragma HLS LOOP_TRIPCOUNT min=5 max=5
 
         LoopDim1:
         for(unsigned id1=0; id1<vecsPerSliceIn; id1++){
+			#pragma HLS LOOP_TRIPCOUNT min=64 max=64
             #pragma HLS PIPELINE II=1
             const unsigned indxS = d0*vecsPerSliceIn + id1;
             MemoryPackF_t vec = inputTn[indxS];
@@ -54,31 +71,24 @@ void TileRank2Axis2(
                 #pragma HLS UNROLL
                 const unsigned indxL = id1*CONFIG_M_AXI_WIDTH + i;
                 buff[indxL] = vec[i];
-#ifdef KERNEL_LOGS
-                cout<<"valR1: "<<vec[i]<<endl;
-#endif
             }
         }
 
         LoopDim1O:
         for(unsigned d1=0; d1<dim1; d1++){
+			#pragma HLS LOOP_TRIPCOUNT min=64 max=64
             LoopTile:
             for(unsigned id2=0; id2<vecsPerSliceOut; id2++) {
+				#pragma HLS LOOP_TRIPCOUNT min=64 max=64
                 #pragma HLS PIPELINE II=1
                 MemoryPackF_t vec;
                 const CONFIG_DTYPE val = buff[d1];
-#ifdef KERNEL_LOGS
-                cout<<"valR2: "<<val<<endl;
-#endif
                 LoopFill2Unrolled:
                 for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; i++) {
                     #pragma HLS UNROLL
                     vec[i] = ((i < tileSize) ? val : 0);
                 }
                 const unsigned indxD = d0*dim1*vecsPerSliceOut + d1*vecsPerSliceOut + id2;
-#ifdef KERNEL_LOGS
-                cout<<"indxD: "<<indxD<<endl;
-#endif
                 outputTn[indxD] = vec;
             }
         }
@@ -86,6 +96,19 @@ void TileRank2Axis2(
     }
 }
 
+/**
+ * @brief      Performs tile operation on the input tensor of rank 2 over the last axis 1.
+ *             This kernel complies with the padded last dim policy.
+ *               1) The input tensor of rank 2 should be padded over the last dimension(dim1).
+ *               2) The output tensor of rank 3 will be padded over the last dimension(dim1).
+ *             The latency will be reported for an input tensor of shape 5x1024 and tileSize of 1024 with axi512.
+ *
+ * @param[in]  inputTn   The input tn of shape dim0*dim1
+ * @param      outputTn  The output tn of shape dim0*tileSize*dim1
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  tileSize  The tile size
+ */
 void TileRank2Axis1(
         const MemoryPackF_t *inputTn,
         MemoryPackF_t *outputTn,
@@ -95,17 +118,27 @@ void TileRank2Axis1(
     // input: BxN, tileAxis=1 ===> output: BxTxN ===> lastDim: N,(dim1)
 
     CONFIG_DTYPE buff[CONFIG_MAX_SLICE_SIZE];
-#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=16 dim=1
+#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 
     const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSliceIn = dim1Padded/CONFIG_M_AXI_WIDTH;
     const unsigned vecsPerSliceOut = vecsPerSliceIn;
 
+#ifdef KERNEL_LOGS
+    cout<<"dim0: "<<dim0<<endl;
+    cout<<"dim1: "<<dim1<<endl;
+    cout<<"tileSize: "<<tileSize<<endl;
+    cout<<"dim1Padded: "<<dim1Padded<<endl;
+    cout<<"vecsPerSliceIn: "<<vecsPerSliceIn<<endl;
+    cout<<"vecsPerSliceOut: "<<vecsPerSliceOut<<endl;
+#endif
+
     LoopDim0:
     for(unsigned d0=0; d0<dim0; d0++){
-
+		#pragma HLS LOOP_TRIPCOUNT min=5 max=5
         LoopDim1:
         for(unsigned id1=0; id1<vecsPerSliceIn; id1++){
+			#pragma HLS LOOP_TRIPCOUNT min=64 max=64
             #pragma HLS PIPELINE II=1
             const unsigned indxS = d0*vecsPerSliceIn + id1;
             MemoryPackF_t vec = inputTn[indxS];
@@ -116,26 +149,24 @@ void TileRank2Axis1(
                 buff[indxL] = vec[i];
             }
         }
-
         LoopDim1O:
-        for(unsigned d1=0; d1<tileSize; d1++){
-            LoopTile:
-            for(unsigned id2=0; id2<vecsPerSliceOut; id2++) {
-                #pragma HLS PIPELINE II=1
-                MemoryPackF_t vec;
-                LoopFill2Unrolled:
-                for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; i++) {
-                    #pragma HLS UNROLL
-                    const unsigned _indxL = id2*CONFIG_M_AXI_WIDTH + i;
-                    const bool isSafe = (_indxL<CONFIG_MAX_SLICE_SIZE);
-                    const unsigned indxL = isSafe ? _indxL : CONFIG_MAX_SLICE_SIZE;
-                    vec[i] = (isSafe) ? buff[indxL] : 0;
-                }
-                const unsigned indxD = d0*tileSize*vecsPerSliceOut + d1*vecsPerSliceOut + id2;
-                outputTn[indxD] = vec;
-            }
-        }
-
+		for(unsigned d1=0; d1<tileSize; d1++){
+			#pragma HLS LOOP_TRIPCOUNT min=64 max=64
+			LoopTile:
+			for(unsigned id2=0; id2<vecsPerSliceOut; id2++) {
+				#pragma HLS LOOP_TRIPCOUNT min=64 max=64
+				#pragma HLS PIPELINE II=1
+				MemoryPackF_t vec;
+				LoopFill2Unrolled:
+				for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; i++) {
+					#pragma HLS UNROLL
+					const unsigned indxL = id2*CONFIG_M_AXI_WIDTH + i;
+					vec[i] = buff[indxL];
+				}
+				const unsigned indxD = d0*tileSize*vecsPerSliceOut + d1*vecsPerSliceOut + id2;
+				outputTn[indxD] = vec;
+			}
+		}
     }
 }
 

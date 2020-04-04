@@ -41,6 +41,10 @@ void ReduceSumRank4Axes012_V1(
         const unsigned dim2,
         const unsigned dim3){
 
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+    
     assert(pow_y>=1 && pow_y<=MaxPowY);
 
     CONFIG_DTYPE buffResult1[CONFIG_M_AXI_WIDTH];

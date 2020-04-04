@@ -43,7 +43,11 @@ void MatmulReorderedVectorized_V1(
     // MatA's  shape = [dim0, dim1, dim2] = [batchSize, sizeN, sizeK] = [Batch, Height, Width]; Row-major
     // MatB's  shape = [dim0, dim1, dim2] = [batchSize, sizeK, sizeM] = [Batch, Height, Width]; Row-major
     // MatC=AB shape = [dim0, dim1, dim2] = [batchSize, sizeN, sizeM] = [Batch, Height, Width]; Row-major
-    
+ 
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+
     const unsigned lastDimPaddedA = MakeDivisible<unsigned>(sizeK, CONFIG_M_AXI_WIDTH);
     const unsigned lastDimPaddedB = MakeDivisible<unsigned>(sizeM, CONFIG_M_AXI_WIDTH);
     const unsigned lastDimPaddedC = lastDimPaddedB;

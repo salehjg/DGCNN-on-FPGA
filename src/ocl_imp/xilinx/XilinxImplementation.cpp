@@ -1624,11 +1624,6 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
         return nullptr;
     }else{
         cl_int error; int argcnt=0; cl_event exeEvt; 
-
-        printf("KERNEL ARGS:\ndim0..2:%d,%d,%d ; rank:%d ; tileAxis:%d ; tileCount:%d\n",
-            _dim0,_dim1,_dim2,
-            rank,tileAxis,tileCount);
-
         error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem),  (void*)&((OclTensorF*)_inputTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem),  (void*)&((OclTensorF*)rsltTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&_dim0);
