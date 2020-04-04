@@ -17,6 +17,17 @@ XilinxImplementation::XilinxImplementation(int aa) {
     a = aa;
     //======================================================================================================================
     {
+        char *XCL_MODE;
+        XCL_MODE = getenv("XCL_EMULATION_MODE");
+        if (XCL_MODE == NULL) {
+            fprintf(stderr, "XCL_MODE env. var is not set yet, falling back into the default mode(sw-emu).\n");
+            if (setenv("XCL_EMULATION_MODE", "sw_emu", 1) < 0) {
+                fprintf(stderr, "Error setting XCL_MODE env. var.\n");
+            }
+        }
+    }
+    //======================================================================================================================
+    {
         err = clGetPlatformIDs(1, &cpPlatform, NULL);
         assert(err == CL_SUCCESS);
         err = clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_ACCELERATOR, 1, &device_id, NULL);
@@ -126,8 +137,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -135,7 +145,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -212,11 +223,11 @@ XilinxImplementation::XilinxImplementation(int aa) {
     //Using signle binary container for all of the kernels for now!
     char *_xcl_mode = getenv("XCL_EMULATION_MODE");
     string xcl_mode = string(_xcl_mode);
-    xcl_mode =  xcl_mode=="sw_emu" ? "Emulation-SW/" :
-                xcl_mode=="hw_emu" ? "Emulation-HW/" :
-                xcl_mode=="system" ? "System/" : "UNDEF" ;
+    xcl_mode =  xcl_mode=="sw_emu" ? "Emulation-SW" :
+                xcl_mode=="hw_emu" ? "Emulation-HW" :
+                xcl_mode=="system" ? "System" : "UNDEF" ;
 
-    //cout<<xcl_mode<<endl;
+    cout<<"Running "<<xcl_mode<<endl;
 
     cout<<"*Using first kernel's container as default container.\n*Multiple container scenario is not supported yet."<<endl;
     size_t binary_content_length = load_file_to_memory(globalArgXclBin, &binary_content);
@@ -1543,73 +1554,95 @@ TensorF* XilinxImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
     return nullptr;
 }
 
+
+/**
+ * @brief      Performs tiling operation on the input tensor.
+ *             Currently, only the combinations below are supported(T=tileCount):
+ *                  1) Input(Expanded, Rank=2, Shape=BxN),   tileAxis=1, Output(Shape=BxTxN)
+ *                  2) Input(Expanded, Rank=2, Shape=BxN),   tileAxis=2, Output(Shape=BxNxT)
+ *                  3) Input(Expanded, Rank=3, Shape=BxNxD), tileAxis=2, Output(Shape=BxNxTxD)
+ *
+ * @param[in]  scheduler  The scheduler
+ * @param      inputTn    The input tn
+ * @param[in]  tileAxis   The tile axis
+ * @param[in]  tileCount  The tile count
+ *
+ * @return     
+ */
 TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int tileAxis, int tileCount) {
-    //Makes new tensor with same rank as inputTn's with tileAxis, tileCount times multiplied
-    //tileAxis is in respect to the input tensor's axes.
-    //----------------------------------------------------------------------------------------
-    // inputTn       rsltTn         tileAxis        inputTn's Rank
-    // BxNx1xD ----> BxNxKxD        2               4
-    // BxNx1   ----> BxNxK          2               3
-    // Bx1xN   ----> BxKxN          1               3
-    // 1xD     ----> KxD            0               2
-
     PrintInfo("Tile","tileAxis",tileAxis,"tileCount",tileCount,"",0,inputTn->getShape(),{},{});
-/*
-    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
 
-    int _tileAxis=tileAxis;
-    int rank = inputTn->getRank();
-    unsigned int _dim0,_dim1,_dim2,_dim3;
-    _dim0 = inputTn->getShape()[0];
-    _dim1 = inputTn->getShape()[1];
-    _dim2 = inputTn->getShape()[2];
-    _dim3 = inputTn->getShape()[3];
+    unsigned rank = inputTn->getRank();
+   
+    assert(
+        (rank==2 && tileAxis==1) ||
+        (rank==2 && tileAxis==2) ||
+        (rank==3 && tileAxis==2)
+        );
 
+    if(rank==2){
+        assert(
+            (rank==2 && tileAxis==1) ||
+            (rank==2 && tileAxis==2)
+            );
+    }
+    if(rank==3){
+        assert(rank==3 && tileAxis==2);
+    }
+
+    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskTile::BankIndex_inputTn);
+
+    // Eliminating expaded dimensions manually.
+    unsigned _dim0=0,_dim1=0,_dim2=0;
     OclTensorF* rsltTn = nullptr;
-    if(inputTn->getRank()==4 &&  tileAxis==2){
-      rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned int)tileCount,_dim3},DATAMOVER_KERNEL_BANK_B_INDEX);
-    }
-    if(inputTn->getRank()==3 &&  tileAxis==1){
-      rsltTn= new OclTensorF(context, {_dim0,(unsigned int)tileCount,_dim2},DATAMOVER_KERNEL_BANK_B_INDEX);
-    }
-    if(inputTn->getRank()==3 &&  tileAxis==2){
-      rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned int)tileCount},DATAMOVER_KERNEL_BANK_B_INDEX);
-    }
 
-    if(rank==4 && tileAxis==2){
-        // Force to use rank3 axis1 kernel to save up resources
-        rank=3;
-        _tileAxis=1;
-        _dim0 = _dim0 * _dim1;
-        _dim1 = 1;
-        _dim2 = _dim3;
+    if(rank==2){
+        _dim0 = inputTn->getShape()[0];
+        _dim1 = inputTn->getShape()[1];
+        if(tileAxis==1){
+            rsltTn= new OclTensorF(context, {_dim0,(unsigned int)tileCount,_dim1},ConfigTaskTile::BankIndex_outputTn);
+        }else if(tileAxis==2){
+            rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned int)tileCount},ConfigTaskTile::BankIndex_outputTn);
+        }else{
+            // Something is not right.
+            assert(false);
+        }
+        
+    }else if(rank==3 && tileAxis==2){
+        _dim0 = inputTn->getShape()[0];
+        _dim1 = inputTn->getShape()[1];
+        _dim2 = inputTn->getShape()[2];
+        rsltTn= new OclTensorF(context, {_dim0,_dim1,(unsigned)tileCount,_dim2},ConfigTaskTile::BankIndex_outputTn);
+    }else{
+        // Something is not right.
+        assert(false);
     }
 
     OclKernelObject *kernelObject = oclKernels[8];
 
     if(kernelObject->use_ndrange_kernel){
-
+        return nullptr;
     }else{
-        cl_int error;
-        cl_ulong len = inputTn->getLength();
-        error =  clSetKernelArg(kernelObject->kernel_task, 0, sizeof(cl_mem),  (void*)&((OclTensorF*)_inputTn)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_task, 1, sizeof(cl_mem),  (void*)&((OclTensorF*)rsltTn)->ocl_buff);
-        error |= clSetKernelArg(kernelObject->kernel_task, 2, sizeof(cl_uint), (void*)&_dim0);
-        error |= clSetKernelArg(kernelObject->kernel_task, 3, sizeof(cl_uint), (void*)&_dim1);
-        error |= clSetKernelArg(kernelObject->kernel_task, 4, sizeof(cl_uint), (void*)&_dim2);
-        error |= clSetKernelArg(kernelObject->kernel_task, 5, sizeof(cl_uint), (void*)&_dim3);
-        error |= clSetKernelArg(kernelObject->kernel_task, 6, sizeof(cl_int),  (void*)&rank);
-        error |= clSetKernelArg(kernelObject->kernel_task, 7, sizeof(cl_int),  (void*)&_tileAxis);
-        error |= clSetKernelArg(kernelObject->kernel_task, 8, sizeof(cl_int),  (void*)&tileCount);
+        cl_int error; int argcnt=0; cl_event exeEvt; 
+
+        printf("KERNEL ARGS:\ndim0..2:%d,%d,%d ; rank:%d ; tileAxis:%d ; tileCount:%d\n",
+            _dim0,_dim1,_dim2,
+            rank,tileAxis,tileCount);
+
+        error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem),  (void*)&((OclTensorF*)_inputTn)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem),  (void*)&((OclTensorF*)rsltTn)->ocl_buff);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&_dim0);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&_dim1);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&_dim2);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int),  (void*)&rank);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int),  (void*)&tileAxis);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int),  (void*)&tileCount);
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         assert(error==0);
 
-        cl_event exeEvt;
-        //unsigned long localThreads[]  = {16, 16};
-        size_t globalThreads[] = {len};
-
-        error = clEnqueueTask(queue,kernelObject->kernel_task,0,  NULL,&exeEvt);
+        error = clEnqueueTask(queue,kernelObject->kernel_task,0,NULL,&exeEvt);
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
+
         clWaitForEvents(1, &exeEvt);
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
@@ -1618,11 +1651,8 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
           exit(-22);
         }
 
-        rsltTn->ChangeDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_A_INDEX);
         return rsltTn;
     }
-*/
-    return nullptr;
 }
 
 void XilinxImplementation::DumpMatrix(

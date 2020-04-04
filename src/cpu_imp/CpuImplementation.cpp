@@ -1442,22 +1442,18 @@ TensorF* CpuImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
 }
 
 TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int tileAxis, int tileCount) {
-    //Makes new tensor with same rank as inputTn's with tileAxis, tileCount times multiplied
-    //tileAxis is in respect to the input tensor's axes.
-    //----------------------------------------------------------------------------------------
     // inputTn       rsltTn         tileAxis        inputTn's Rank
-    // BxNx1xD ----> BxNxKxD        2               4
-    // BxNx1   ----> BxNxK          2               3
-    // Bx1xN   ----> BxKxN          1               3
-    // 1xD     ----> KxD            0               2
+    // BxNxD   ----> BxNxKxD        2               3
+    // BxN     ----> BxNxK          2               2
+    // BxN     ----> BxKxN          1               2
 
     PrintInfo("Tile","tileAxis",tileAxis,"tileCount",tileCount,"",0,inputTn->getShape(),{},{});
     unsigned long indxS1,indxD;
-    if(inputTn->getRank()==4 && tileAxis==2) {
+    if(inputTn->getRank()==3 && tileAxis==2) {
         unsigned int B,N,K,D;
         B = inputTn->getShape()[0];
         N = inputTn->getShape()[1];
-        D = inputTn->getShape()[3];
+        D = inputTn->getShape()[2];
         K = (unsigned int)tileCount;
 
         //tile ing input of shape BxNxD into BxNxKxD.
@@ -1477,7 +1473,7 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
         return rsltTn;
     }
 
-    if(inputTn->getRank()==3 && tileAxis==2) { //BxN = BxNx1   ------->  BxNxK  (PAGE 221 of my design notebook)
+    if(inputTn->getRank()==2 && tileAxis==2) { //BxN = BxNx1   ------->  BxNxK  (PAGE 221 of my design notebook)
         unsigned int B,N,K,D;
         B = inputTn->getShape()[0];
         N = inputTn->getShape()[1];
@@ -1498,10 +1494,10 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
         return rsltTn;
     }
 
-    if(inputTn->getRank()==3 && tileAxis==1) { //BxN = Bx1xN   ------->  BxKxN  (PAGE 221 of my design notebook)
+    if(inputTn->getRank()==2 && tileAxis==1) { //BxN = Bx1xN   ------->  BxKxN  (PAGE 221 of my design notebook)
         unsigned int B,N,K,D;
         B = inputTn->getShape()[0];
-        N = inputTn->getShape()[2];
+        N = inputTn->getShape()[1];
         K = (unsigned int)tileCount;
 
         //tile ing input of shape BxN or Bx1xN into BxKxN.
@@ -1516,25 +1512,6 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
                 }
             }
         }
-        return rsltTn;
-    }
-
-    if(inputTn->getRank()==2 && tileAxis==0) {
-        unsigned int K,D;
-        D = inputTn->getShape()[1];
-        K = (unsigned int)tileCount;
-
-        //tile ing input of shape BxNxD into BxNxKxD.
-        TensorF* rsltTn = new TensorF({K, D});
-
-
-        for (int k = 0; k < K; k++) {
-            indxD = k * D + 0;
-            std::copy(inputTn->_buff ,
-                      inputTn->_buff + D,
-                      rsltTn->_buff + indxD);
-        }
-
         return rsltTn;
     }
 }

@@ -70,6 +70,7 @@ int TensorI::getRank() {
 
 
 void TensorI::ExpandDims(int axis) {
+    // DOES NOT AFFECT DATA PADDING PATTERNS
     assert((axis>=0 && axis<=getRank()) || axis==-1);
     if(axis==-1) axis=(int)shape.size();
     shape.insert(shape.begin()+axis,1);
@@ -77,10 +78,12 @@ void TensorI::ExpandDims(int axis) {
 }
 
 void TensorI::ExpandDimZero(){
+    // DOES NOT AFFECT DATA PADDING PATTERNS
     ExpandDims(0);
 }
 
 void TensorI::SqueezeDims() {
+    // DOES NOT AFFECT DATA PADDING PATTERNS
     std::vector<unsigned int> shapeNew;
 
     for (int i = 0; i < shape.size(); i++) {
@@ -91,6 +94,7 @@ void TensorI::SqueezeDims() {
 }
 
 void TensorI::SqueezeDimZero(){
+    // DOES NOT AFFECT DATA PADDING PATTERNS
     if(shape[0]==1){
         shape.erase(shape.begin());
         rank--;

@@ -94,14 +94,22 @@ make synthesis
 # Platforms
 Refer to the table below.
 
-Name | Supported Platform | Implementation
----  | ---                | ---
-ModelArch01 | CPU                   | CPU 
-ModelArch05 | CPU, FPGA             | Xilinx SDAccel Platform 
+Name | Supported Platform | Implementation | Notes
+---  | ---                | --- | ---
+ModelArch01 | CPU                   | CPU | Review's needed
+ModelArch05 | CPU, FPGA             | Xilinx SDAccel Platform | Review's needed
+ModelArch04 | CPU             | CPU | Compatible with new `Tile` layer
 
 # UnitTests for Platforms
-Unlike parent project, this repository does not use UnitTest++ framework for managing unittests.
-The reason is that declaring multiple executables in Eclipse SDAceel managed build environment is not straight forward. This repository has only one main executable(MainExecutable.cpp) that handles both classifier and unit tests while you can enable or disable each phase in the source code.
+This repository has only one main executable(MainExecutable.cpp) that handles both classifier and unit tests while you can enable or disable each phase in the source code.
+
+# UnitTests for Kernels
+In order to make design and debugging of the kernels much more easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
+
+# Debugging Host-side in CLion
+In order to debug the host-side program in any modes(`sw_emu`, `hw_emu`, or `system`), one could use CLion or any other IDE.
+
+Remember to run `scripts/debug_script.sh` before debugging session. `XilinxImplementation` is configured to select `sw_emu` in case variable `XCL_EMULATION_MODE` was not set beforehand.  
 
 # Credit
 Used repositories are listed below:

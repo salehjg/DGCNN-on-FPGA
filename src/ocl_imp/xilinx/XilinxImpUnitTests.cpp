@@ -4,9 +4,6 @@
 #include "xilinx/config.h"
 
 XilinxImpUnitTests::XilinxImpUnitTests(){
-    // GPU_OCL is FPGA now, because there is no reason to run code both on FPGA and GPU at same executable!
-    // So ... 
-    // GPU_OCL with attention to OCL part of the name means FPGA 
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL, {PLATFORMS::CPU,PLATFORMS::GPU_OCL},false);
 }
 
@@ -426,7 +423,7 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
     {
         int tileCount = 8;
         int tileAxis  = 2;
-        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,1,17});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,17});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -436,7 +433,7 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
     {
         int tileCount = 7;
         int tileAxis  = 2;
-        TensorF* tensorSrc1 = GenerateTensor(0,{2,5,1});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,5});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -446,7 +443,7 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
     {
         int tileCount = 3;
         int tileAxis  = 1;
-        TensorF* tensorSrc1 = GenerateTensor(0,{2,1,7});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,7});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -455,7 +452,7 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
     {
         int tileCount = 2;
         int tileAxis  = 1;
-        TensorF* tensorSrc1 = GenerateTensor(0,{2,1,18});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,18});
         TensorF* tensorCpu = platformSelector->Tile(PLATFORMS::CPU,scheduler,tensorSrc1,tileAxis,tileCount);
         TensorF* tensorGpu = platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tileAxis,tileCount);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -931,20 +928,15 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
     PrintReport(KernelReduceMax());
-    PrintReport(KernelReduceSum()); 
-    */
+    PrintReport(KernelReduceSum());
     PrintReport(KernelMatmul());
+    */
+    PrintReport(KernelTile());
     
-
     //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
-    
     /*PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
-    PrintReport(KernelTile());
-    
-
-    
     PrintReport(KernelTranspose());
     PrintReport(KernelGather());
     */
