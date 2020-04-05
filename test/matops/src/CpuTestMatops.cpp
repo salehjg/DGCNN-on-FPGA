@@ -210,9 +210,8 @@ int TestMatops(
                                         d3;
                     CONFIG_DTYPE rCpu = hostGold[indx];
                     CONFIG_DTYPE rUdt = hostUdtUnpadded[indx];
-                    CONFIG_DTYPE diff = (rUdt - rCpu);
-                    diff = diff>=0? diff: -1*diff;
-                    if(diff>1e-03){
+                    CONFIG_DTYPE diff = (rUdt - rCpu); 
+                    if(abs(diff)>1e-02){
                         std::printf("Mismatch at [d0,d1,d2,d3]=[%d,%d,%d,%d] Gold=%f, Udt=%f\n",
                             d0,d1,d2,d3,
                             rCpu,

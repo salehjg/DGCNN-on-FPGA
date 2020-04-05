@@ -5,14 +5,14 @@ include_directories(
 	inc 
 	${PROJECT_SOURCE_DIR}/test/common/inc)
 
-add_executable(CpuTestUnpadding
-    src/CpuTestUnpadding.cpp 
-    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp)
+add_executable(CpuTestGather
+    src/CpuTestGather.cpp 
+    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/gather.cpp)
 
-target_link_libraries(CpuTestUnpadding 
+target_link_libraries(CpuTestGather
     ${SDAccel_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
     ${SDAccel_FLOATING_POINT_LIBRARY} 
     ${SDAccel_LIBRARIES})
 
-add_test(NAME CpuTestUnpadding COMMAND CpuTestUnpadding)
+add_test(NAME CpuTestGather COMMAND CpuTestGather)

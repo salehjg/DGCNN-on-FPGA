@@ -67,8 +67,7 @@ int TestUnpadding(
         for(int d1=0; d1<dim1Unpadded; d1++){ 
             unsigned int indx = d0*dim1Unpadded+d1;
             CONFIG_DTYPE diff = (hostOutputTn[indx] - hostGold[indx]);
-            diff = diff>=0? diff: -1*diff;
-            if(diff>1e-03){
+            if(abs(diff)>1e-02){
                 std::cout<<"Mismatch at d0: "<< d0 <<", d1: "<< d1 << std::endl;
                 std::cout<<"Value: "<< hostOutputTn[indx] << std::endl;
                 std::cout<<"Gold: "<< hostGold[indx] << std::endl;

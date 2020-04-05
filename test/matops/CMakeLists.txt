@@ -14,3 +14,5 @@ target_link_libraries(CpuTestMatops
     ${CMAKE_THREAD_LIBS_INIT} 
     ${SDAccel_FLOATING_POINT_LIBRARY} 
     ${SDAccel_LIBRARIES})
+
+add_test(NAME CpuTestMatops COMMAND CpuTestMatops)

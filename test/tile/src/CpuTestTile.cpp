@@ -208,8 +208,8 @@ int TestTile(
                     const unsigned indxUdt = indxCpu;
                     CONFIG_DTYPE rCpu = hostGold[indxCpu];
                     CONFIG_DTYPE rUdt = hostUDT[indxUdt];
-
-                    if(rCpu!=rUdt){
+                    CONFIG_DTYPE diff = rCpu - rUdt;
+                    if(abs(diff)>1e-02){
                         printf("d0= (%03d)\td1= (%03d)\td2= (%03d)\trCPU=%f,\t\t rUDT=%f\n", 
                             d0, d1, d2, rCpu, rUdt);
                         rslt=false;
@@ -226,8 +226,8 @@ int TestTile(
                     const unsigned indxUdt = indxCpu;
                     CONFIG_DTYPE rCpu = hostGold[indxCpu];
                     CONFIG_DTYPE rUdt = hostUDT[indxUdt];
-
-                    if(rCpu!=rUdt){
+                    CONFIG_DTYPE diff = rCpu - rUdt;
+                    if(abs(diff)>1e-02){
                         printf("d0= (%03d)\td1= (%03d)\td2= (%03d)\trCPU=%f,\t\t rUDT=%f\n", 
                             d0, d1, d2, rCpu, rUdt);
                         rslt=false;
@@ -248,8 +248,8 @@ int TestTile(
                         const unsigned indxUdt = indxCpu;
                         CONFIG_DTYPE rCpu = hostGold[indxCpu];
                         CONFIG_DTYPE rUdt = hostUDT[indxUdt];
-
-                        if(rCpu!=rUdt){
+                        CONFIG_DTYPE diff = rCpu - rUdt;
+                        if(abs(diff)>1e-02){
                             printf("d0= (%03d)\td1= (%03d)\td2= (%03d)\td3= (%03d)\trCPU=%f,\t\t rUDT=%f\n", 
                                 d0, d1, d2, d3, rCpu, rUdt);
                             rslt=false;

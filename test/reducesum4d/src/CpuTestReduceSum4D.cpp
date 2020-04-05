@@ -120,8 +120,8 @@ int TestReduceSum4D(
         unsigned indxUdt = i;
         CONFIG_DTYPE rCpu = hostGold[indxCpu];
         CONFIG_DTYPE rUdt = hostUDT[indxUdt];
-
-        if(rCpu!=rUdt){
+        CONFIG_DTYPE diff = rCpu - rUdt;
+        if(abs(diff)>1e-02){
             printf("Index(d0)= (%03d)\trCPU=%f,\t\t rUDT=%f\n", i, rCpu, rUdt);
             rslt=false;
         }

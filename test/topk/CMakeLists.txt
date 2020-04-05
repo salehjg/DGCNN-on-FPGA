@@ -15,6 +15,8 @@ target_link_libraries(CpuTestTopkSelectionSort
     ${SDAccel_FLOATING_POINT_LIBRARY} 
     ${SDAccel_LIBRARIES})
 
+#add_test(NAME CpuTestTopkSelectionSort COMMAND CpuTestTopkSelectionSort)
+
 add_executable(CpuTestTopkInsertionSort
     src/CpuTestTopk.cpp 
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp)
@@ -25,6 +27,8 @@ target_link_libraries(CpuTestTopkInsertionSort
     ${SDAccel_FLOATING_POINT_LIBRARY} 
     ${SDAccel_LIBRARIES})
 
+#add_test(NAME CpuTestTopkInsertionSort COMMAND CpuTestTopkInsertionSort)
+
 add_executable(CpuTestTopkMergeSort
     src/CpuTestTopk.cpp 
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp)
@@ -34,3 +38,5 @@ target_link_libraries(CpuTestTopkMergeSort
     ${CMAKE_THREAD_LIBS_INIT} 
     ${SDAccel_FLOATING_POINT_LIBRARY} 
     ${SDAccel_LIBRARIES})
+
+add_test(NAME CpuTestTopkMergeSort COMMAND CpuTestTopkMergeSort)

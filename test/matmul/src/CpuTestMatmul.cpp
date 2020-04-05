@@ -2,7 +2,6 @@
 #include "Utility.h"
 #include "AxiHelper.h"
 #include <algorithm>
-#include <cmath>
 #include <iostream>
 #include <random>
 #include <type_traits>
@@ -168,9 +167,8 @@ int TestMatmul(
                                       m;
                 CONFIG_DTYPE rCpu = hostGold[indx];
                 CONFIG_DTYPE rUdt = hostUdtUnpadded[indx];
-                CONFIG_DTYPE diff = (rUdt - rCpu);
-                diff = diff>=0? diff: -1*diff;
-                if(diff>1e-03){
+                CONFIG_DTYPE diff = (rUdt - rCpu); 
+                if(abs(diff)>1e-02){
                     std::printf("Mismatch at [batch,n,m]=[%d,%d,%d] Gold=%f, Udt=%f\n",
                         batch,n,m,
                         rCpu,

@@ -23,7 +23,7 @@ void task_topk(
 
 void CpuGoldTopk(
     const CONFIG_DTYPE *inputBuff,
-    int *indicesSplitedBuff,
+    unsigned *indicesSplitedBuff,
     const unsigned dim0,
     const unsigned dim1,
     const unsigned kValue){
@@ -71,8 +71,8 @@ int TestTopk(
     const unsigned lenOutputUdt = dim0*(vecsPerOutputSlice*CONFIG_M_AXI_WIDTH);
 
     std::vector<CONFIG_DTYPE> hostInputTn(lenInput); 
-    std::vector<int> hostGold(lenOutput);
-    std::vector<int> hostUDT(lenOutputUdt);
+    std::vector<unsigned> hostGold(lenOutput);
+    std::vector<unsigned> hostUDT(lenOutputUdt);
 
     std::default_random_engine rng(kSeed);
     typename std::conditional<
@@ -83,13 +83,13 @@ int TestTopk(
         [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
 
     auto deviceInputTn = Pack<vecSize, CONFIG_DTYPE>(hostInputTn);
-    auto deviceOutputTn = Pack<vecSize, int>(hostUDT);
+    auto deviceOutputTn = Pack<vecSize, unsigned>(hostUDT);
 
     // The kernel writes the results in the output tensor with padding on the last dimension.
     task_topk(deviceInputTn.data(), deviceOutputTn.data(), dim0, dim1, kValue, vecsPerSlice, vecsPerOutputSlice);
     CpuGoldTopk(hostInputTn.data(), hostGold.data(), dim0, dim1, kValue);
 
-    const auto hostOutputTn = Unpack<vecSize, int>(deviceOutputTn);
+    const auto hostOutputTn = Unpack<vecSize, unsigned>(deviceOutputTn);
     bool rslt = true;
 
     for(unsigned b=0;b<dim0;b++){
@@ -97,8 +97,8 @@ int TestTopk(
             // The kernel writes the results in the output tensor with padding on the last dimension.
             unsigned indxCpu = b*kValue+kk;
             unsigned indxUdt = b*(vecsPerOutputSlice*CONFIG_M_AXI_WIDTH)+kk;
-            int rCpu = hostGold[indxCpu];
-            int rUdt = hostOutputTn[indxUdt];
+            unsigned rCpu = hostGold[indxCpu];
+            unsigned rUdt = hostOutputTn[indxUdt];
 
             if(rCpu!=rUdt){
                 printf("Index(B,K)= (%02d, %02d)\t\trCPU=%04d, rUDT=%04d\t\tValue[rCPU]:%f\tValue[rUDT]:%f\n",

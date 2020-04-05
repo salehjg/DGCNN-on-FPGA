@@ -118,8 +118,8 @@ int TestReduceSum(
             unsigned indxUdt = d0*dim1+d1;
             CONFIG_DTYPE rCpu = hostGold[indxCpu];
             CONFIG_DTYPE rUdt = hostUDT[indxUdt];
-
-            if(rCpu!=rUdt){
+            CONFIG_DTYPE diff = rCpu - rUdt;
+            if(abs(diff)>1e-02){
                 printf("d0= (%03d)\td1= (%03d)\trCPU=%f,\t\t rUDT=%f\n", d0, d1, rCpu, rUdt);
                 rslt=false;
             }

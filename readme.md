@@ -104,12 +104,15 @@ ModelArch04 | CPU             | CPU | Compatible with new `Tile` layer
 This repository has only one main executable(MainExecutable.cpp) that handles both the classifier and the unit tests while you can enable or disable each phase in the source code.
 
 # UnitTests for Kernels
-In order to make design and debugging of the kernels much more easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
+In order to make debugging of the kernels much more easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
+```
+make test
+```
 
 # Debugging Host-side in CLion
-In order to debug the host-side program in any modes(`sw_emu`, `hw_emu`, or `system`), one could use CLion or any other IDE.
+In order to debug the host-side program in any modes(`sw_emu`, `hw_emu`, or `system`), CLion or any other C++ IDE could be used.
 
-Remember to run `scripts/debug_script.sh` before debugging session. `XilinxImplementation` is configured to select `sw_emu` in case variable `XCL_EMULATION_MODE` was not set beforehand.  
+Remember to run `scripts/debug_script.sh` before starting debugging session. Note that class `XilinxImplementation` is configured to select `sw_emu` in the case that variable `XCL_EMULATION_MODE` was not set beforehand.  
 
 # Credit
 Used repositories are listed below:
