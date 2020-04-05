@@ -65,8 +65,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -164,7 +163,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false),
+                false,
+                DISABLED_KERNEL),
 
         /* IDX 12 :*/
         new OclKernelObject(
@@ -1091,34 +1091,27 @@ TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
     return nullptr;
 }
 
-///concat 2 matrices
-/// [matA, matB]
 TensorF* XilinxImplementation::Concat2(
         WorkScheduler scheduler,
         TensorF* inputTn1,
         TensorF* inputTn2,
         int concatDim){
     PrintInfo("Concat2","concatDim",concatDim,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
-/*
-    TensorF* _inputTn1 = ((OclTensorF*)inputTn1)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
-    TensorF* _inputTn2 = ((OclTensorF*)inputTn2)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
 
+    TensorF* _inputTn1 = ((OclTensorF*)inputTn1)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskConcat::BankIndex_inputTn1);
+    TensorF* _inputTn2 = ((OclTensorF*)inputTn2)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskConcat::BankIndex_inputTn2);
 
-    unsigned int dim0,dim1,dim2,dimR3,dimR3Padded;
-    unsigned int dimA3,dimA3Padded,dimB3,dimB3Padded;
+    unsigned int dim0,dim1,dim2,dimR3;
+    unsigned int dimA3,dimB3;
 
     dim0 = inputTn1->getShape()[0]; 
     dim1 = inputTn1->getShape()[1]; 
     dim2 = inputTn1->getShape()[2];
     dimA3 = inputTn1->getShape()[3]; 
-    dimA3Padded = ((OclTensorF*)inputTn1)->getPaddedLastDim();
     dimB3 = inputTn2->getShape()[3];
-    dimB3Padded = ((OclTensorF*)inputTn2)->getPaddedLastDim();
     dimR3 = dimA3 + dimB3;
 
-    OclTensorF* rsltTn = new OclTensorF(context, {dim0,dim1,dim2,dimR3},DATAMOVER_KERNEL_BANK_B_INDEX);
-
-    dimR3Padded = rsltTn->getPaddedLastDim();
+    OclTensorF* rsltTn = new OclTensorF(context, {dim0,dim1,dim2,dimR3},ConfigTaskConcat::BankIndex_outputTn);
 
     OclKernelObject *kernelObject = oclKernels[0];
 
@@ -1135,18 +1128,13 @@ TensorF* XilinxImplementation::Concat2(
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim1);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dim2);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimA3);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimA3Padded);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimB3); 
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimB3Padded); 
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimR3); 
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint), (void*)&dimR3Padded); 
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_int),  (void*)&concatDim); 
 
         if(error != CL_SUCCESS) cout<<getErrorString(error)<<endl;
         assert(error==0);
 
         cl_event exeEvt;
-
         error = clEnqueueTask( queue,
                                kernelObject->kernel_task,
                                NULL,
@@ -1161,12 +1149,8 @@ TensorF* XilinxImplementation::Concat2(
             exit(-22);
         }
 
-
-        rsltTn->ChangeDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_A_INDEX);
         return rsltTn;
     }
-*/
-    return nullptr;
 }
 
 TensorF* XilinxImplementation::ReduceMax(

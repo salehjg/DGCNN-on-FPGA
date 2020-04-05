@@ -931,10 +931,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelReduceSum());
     PrintReport(KernelMatmul());
     PrintReport(KernelTile());
-    */
     PrintReport(KernelGather());
-    
-    //PrintReport(KernelConcat2());             // NO IDEA HOW TO WRITE THE KERNEL
+    */
+    PrintReport(KernelConcat2());
+             
     /*PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());  
