@@ -9,7 +9,6 @@
 using namespace std;
 using namespace ConfigTaskUnpadding;
 
-
 /**
  * @brief      Unpads the padded input tensor on the last dimension.
  *             Currently 

@@ -1,15 +1,16 @@
-/// @author    Johannes de Fine Licht (definelicht@inf.ethz.ch) with small changes to the original design.
+/// @author    Johannes de Fine Licht (definelicht@inf.ethz.ch) 
+///            with small changes to the original design by Saleh Jamali Golzar.
 /// @date      June 2018 
 /// @copyright This software is copyrighted under the BSD 3-Clause License. 
 
-#include "AxiHelper.h"
-#include "Conv2D.h"
-#include "xilinx/config.h"
+#include <cassert>
+#include <iostream>
 #include "hlslib/xilinx/Stream.h"
 #include "hlslib/xilinx/Simulation.h"
 #include "hlslib/xilinx/Utility.h"
-#include <cassert>
-#include <iostream>
+#include "AxiHelper.h"
+#include "Conv2D.h"
+#include "xilinx/config.h"
 
 using namespace ConfigTaskConv2;
 
@@ -25,8 +26,7 @@ void ProcessingElement( Stream<ComputePackN_t, kPipeDepth> &aIn,
     assert((static_cast<unsigned long>(OuterTilesN(size_n)) * OuterTilesM(size_m) * size_k *
             kInnerTilesN * kInnerTilesM * kComputeTileSizeN *
             kComputeTileSizeM) ==
-            ((static_cast<unsigned long>(size_n) * size_k * size_m) /
-            kComputeTilesN));
+            ((static_cast<unsigned long>(size_n) * size_k * size_m) / kComputeTilesN));
 
     // A is double-buffered, such that new values can be read while the 
     // previous outer product is being computed. This is required to achieve

@@ -1,16 +1,3 @@
-/*
-ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
-ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
-ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
-ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
-ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
-ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
-ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
-
-ReduceMax: reductionDim=1, DIM2 SHOULD BE ONE, ARGS(0,1,2)=DIM0x(DIM1)xDIM3,
-ReduceMax: reductionDim=2, ARGS(0,1,2)=[DIM0*DIM1]x(DIM2)xDIM3
-*/
-
 #include <cassert>
 #include <iostream>
 #include <limits>
@@ -24,8 +11,6 @@ ReduceMax: reductionDim=2, ARGS(0,1,2)=[DIM0*DIM1]x(DIM2)xDIM3
 using namespace std;
 using namespace ConfigTaskReduceMax;
 using hlslib::Stream;
-
-constexpr unsigned CONFIG_MAX_SLICE_SIZE = 1024;
 
 CONFIG_DTYPE _Max(CONFIG_DTYPE val1, CONFIG_DTYPE val2){
 #pragma HLS INLINE
@@ -58,7 +43,7 @@ void ReduceMax3Axis1_V2(
     
     const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSlice = dim2Padded/CONFIG_M_AXI_WIDTH;
-    constexpr unsigned buffVecCount = CONFIG_MAX_SLICE_SIZE/CONFIG_M_AXI_WIDTH;
+    constexpr unsigned buffVecCount = MaxSliceLen/CONFIG_M_AXI_WIDTH;
 
     CONFIG_DTYPE buffResult1[buffVecCount][CONFIG_M_AXI_WIDTH];
 #pragma HLS ARRAY_PARTITION variable=buffResult1 complete dim=2

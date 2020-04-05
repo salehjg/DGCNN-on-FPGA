@@ -1,8 +1,3 @@
-/*
-* Shape=5x1024x3    FFT
-* Shape=5x1024x64   FFT
-*/
-
 #include <cassert>
 #include <iostream>
 #include <limits>
@@ -17,7 +12,6 @@
 
 using namespace std;
 using namespace ConfigTaskReduceSum;
-constexpr unsigned CONFIG_MAX_SLICE_SIZE = 64;
 
 /**
  * @brief      Reduces the input tensor of rank 3 over the axis 2.(FFT) 
@@ -47,9 +41,9 @@ void ReduceSum3Axis2_V1(
     const unsigned vecsPerSliceIn = dim2Padded/CONFIG_M_AXI_WIDTH;
     const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSliceOut = dim1Padded/CONFIG_M_AXI_WIDTH;
-    constexpr unsigned buffVecCount = CONFIG_MAX_SLICE_SIZE/CONFIG_M_AXI_WIDTH;
+    constexpr unsigned buffVecCount = MaxSliceLen/CONFIG_M_AXI_WIDTH;
 
-    CONFIG_DTYPE buffResult1[CONFIG_MAX_SLICE_SIZE];
+    CONFIG_DTYPE buffResult1[MaxSliceLen];
 #pragma HLS ARRAY_PARTITION variable=buffResult1 cyclic factor=16 dim=1
     
     MemoryPackF_t vecOut; 
@@ -75,7 +69,7 @@ void ReduceSum3Axis2_V1(
                 }
             }
 
-            CONFIG_DTYPE reduced = hlslib::TreeReduce<CONFIG_DTYPE, hlslib::op::Add<CONFIG_DTYPE>, CONFIG_MAX_SLICE_SIZE>(buffResult1);
+            CONFIG_DTYPE reduced = hlslib::TreeReduce<CONFIG_DTYPE, hlslib::op::Add<CONFIG_DTYPE>, MaxSliceLen>(buffResult1);
             const unsigned vecOutSubIndex = batchD1%CONFIG_M_AXI_WIDTH;
             const unsigned vecOutIndex = batchD0*vecsPerSliceOut + batchD1/CONFIG_M_AXI_WIDTH;
             vecOut[vecOutSubIndex] = reduced;

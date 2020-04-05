@@ -6,9 +6,10 @@
 #include "AxiHelper.h"
 #include "xilinx/config.h"
 
-#define LOCAL_BUFF_LEN 48
 using namespace std;
 using namespace ConfigTaskPadding;
+
+//#define LOCAL_BUFF_LEN 48
 
 void PadLastDimSuperVec(
     const MemoryPackF_t *inputTn,
