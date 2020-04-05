@@ -16,7 +16,7 @@ using namespace ConfigTaskTopK;
 extern "C"
 void task_gather(
     const MemoryPackF_t *inputTn,
-    const MemoryPackI_t *indicesTn,
+    const unsigned *indicesTn,
     MemoryPackF_t *outputTn,
     unsigned indicesAxis,
     unsigned inputDim0,
@@ -119,13 +119,13 @@ int TestGather(
     PadTensor<unsigned >(hostIndicesTn, hostIndicesTnPadded, sizeB*sizeN, sizeK, sizeKPadded);
 
     auto deviceInputTn = Pack<vecSize, CONFIG_DTYPE>(hostInputTnPadded);
-    auto deviceIndicesTn = Pack<vecSize, unsigned>(hostIndicesTnPadded);
+    //auto deviceIndicesTn = Pack<vecSize, unsigned>(hostIndicesTnPadded);
     auto deviceOutputTn = Pack<vecSize, CONFIG_DTYPE>(hostUDT);
 
     //task_topk(deviceInputTn.data(), deviceOutputTn.data(), dim0, dim1, kValue, vecsPerSlice, vecsPerOutputSlice);
     task_gather(
         deviceInputTn.data(),
-        deviceIndicesTn.data(),
+        hostIndicesTnPadded.data(),
         deviceOutputTn.data(), 
         axis,
         sizeB,sizeN,sizeD,

@@ -137,7 +137,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -163,8 +164,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false,
-                DISABLED_KERNEL),
+                false),
 
         /* IDX 12 :*/
         new OclKernelObject(
@@ -1325,27 +1325,27 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 
 TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, TensorI* indices, int indices_axis){
     PrintInfo("Gather","indices_axis",indices_axis,"",0,"",0,inputTn->getShape(),indices->getShape(),{});
-/*
+
     assert(inputTn->getRank()==3);
     assert(indices->getRank()==3);
     assert(inputTn->getShape()[0]==indices->getShape()[0]);
     assert(inputTn->getShape()[1]==indices->getShape()[1]);
 
-    unsigned int B,N,D,K,indicesAxis;
+    unsigned B,N,D,K,indicesAxis;
     B = inputTn->getShape()[0];
     N = inputTn->getShape()[1];
     D = inputTn->getShape()[2];
     K = indices->getShape()[2];
     indicesAxis = 1;
 
-    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
-    TensorI* _indices = ((OclTensorI*)indices)->CloneToDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_B_INDEX);
+    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskGather::BankIndex_inputTn);
+    TensorI* _indices = ((OclTensorI*)indices)->CloneToDDRBank(program,context,queue,ConfigTaskGather::BankIndex_indicesTn);
 
-    OclTensorF* rsltTn = new OclTensorF(context,{B,N,K,D}, DATAMOVER_KERNEL_BANK_B_INDEX);
+    OclTensorF* rsltTn = new OclTensorF(context,{B,N,K,D}, ConfigTaskGather::BankIndex_outputTn);
     OclKernelObject *kernelObject = oclKernels[11];
 
     if(kernelObject->use_ndrange_kernel){
-
+        return nullptr;
     }else{
         cl_int error;
         error =  clSetKernelArg(kernelObject->kernel_task, 0 , sizeof(cl_mem) , (void*)&((OclTensorF*)_inputTn)->ocl_buff);
@@ -1374,11 +1374,8 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
             exit(-22);
         }
 
-        rsltTn->ChangeDDRBank(program,context,queue,DATAMOVER_KERNEL_BANK_A_INDEX);
         return rsltTn;
     }
-*/
-    return nullptr;
 }
 
 /**

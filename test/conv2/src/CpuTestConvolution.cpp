@@ -13,7 +13,6 @@
 #include <type_traits>
 #include <vector>
 
-using namespace std;
 using namespace ConfigTaskConv2;
 
 extern "C"
@@ -35,63 +34,63 @@ int main(int argc, char **argv) {
     unsigned conv_dout = 128;
 
     if (argc < 6 || argc > 6) {
-        cout << "Usage: ./TestSimulation Conv_B Conv_N Conv_K Conv_Din Conv_Dout" << endl;
-        cout << "Running with the default parameters(B,N,K,Din,Dout)=("<< 
+        std::cout << "Usage: ./TestSimulation Conv_B Conv_N Conv_K Conv_Din Conv_Dout" << std::endl;
+        std::cout << "Running with the default parameters(B,N,K,Din,Dout)=("<< 
                 conv_b << "," <<
                 conv_n << "," <<
                 conv_k << "," <<  
                 conv_din << "," <<
                 conv_dout << "," <<
-                ")"<<endl;
+                ")"<<std::endl;
     }else{
-        conv_b = stoul(argv[1]);
-        conv_n = stoul(argv[2]);
-        conv_k = stoul(argv[3]);
-        conv_din = stoul(argv[4]);
-        conv_dout = stoul(argv[5]);
+        conv_b = std::stoul(argv[1]);
+        conv_n = std::stoul(argv[2]);
+        conv_k = std::stoul(argv[3]);
+        conv_din = std::stoul(argv[4]);
+        conv_dout = std::stoul(argv[5]);
     }
 
-    cout << "Convolution Shapes: Data(BxNxKxD1), Weight(D1xD2) :   " <<
+    std::cout << "Convolution Shapes: Data(BxNxKxD1), Weight(D1xD2) :   " <<
             conv_b << "x" << conv_n << "x" << conv_k << "x" << conv_din << "  " <<
-            conv_din << "x" << conv_dout << endl;
+            conv_din << "x" << conv_dout << std::endl;
 
     const unsigned size_n = conv_b*conv_n*conv_k;
     const unsigned size_k = conv_din;
     const unsigned size_m = conv_dout;
 
-    cout << "[N, K, M] = [" << size_n << ", " << size_k << ", " << size_m << "]" << endl;
+    std::cout << "[N, K, M] = [" << size_n << ", " << size_k << ", " << size_m << "]" << std::endl;
 
     /*if (size_k % kMemoryWidthK != 0) {
-    cerr << "K must be divisable by memory width." << endl;
+    std::cerr << "K must be divisable by memory width." << std::endl;
     return 1;
     }*/
 
     if (size_m % kMemoryWidthM != 0) {
-        cerr << "M must be divisable by memory width." << endl;
+        std::cerr << "M must be divisable by memory width." << std::endl;
         return 1;
     }
     if (size_n % kOuterTileSizeN != 0) {
-        cerr << "N must be divisable by the outer tile size in N."
-        << endl;
+        std::cerr << "N must be divisable by the outer tile size in N."
+        << std::endl;
         return 1;
     }
     if (size_m % kOuterTileSizeM != 0) {
-        cerr << "M must be divisable by the outer tile size in M" << endl;
+        std::cerr << "M must be divisable by the outer tile size in M" << std::endl;
         return 1;
     }
 
     const auto size_k_padded = DivCeil<unsigned>(size_k, kTransposeWidth)*kTransposeWidth;
 
-    vector<CONFIG_DTYPE> a(size_n * size_k); //input
-    vector<CONFIG_DTYPE> b(size_k * size_m); //weight
-    vector<CONFIG_DTYPE> e(size_m); //bias
-    vector<CONFIG_DTYPE> cReference(size_n * size_m, 0);
-    vector<CONFIG_DTYPE> cReferenceConv2(size_n * size_m, 0);
+    std::vector<CONFIG_DTYPE> a(size_n * size_k); //input
+    std::vector<CONFIG_DTYPE> b(size_k * size_m); //weight
+    std::vector<CONFIG_DTYPE> e(size_m); //bias
+    std::vector<CONFIG_DTYPE> cReference(size_n * size_m, 0);
+    std::vector<CONFIG_DTYPE> cReferenceConv2(size_n * size_m, 0);
 
-    default_random_engine rng(kSeed);
-    typename conditional<
-        is_integral<CONFIG_DTYPE>::value, uniform_int_distribution<unsigned long>,
-        uniform_real_distribution<double>>::type dist(1, 10);
+    std::default_random_engine rng(kSeed);
+    typename std::conditional<
+        std::is_integral<CONFIG_DTYPE>::value, std::uniform_int_distribution<unsigned long>,
+        std::uniform_real_distribution<double>>::type dist(1, 10);
 
     for_each(a.begin(), a.end(),
         [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
@@ -100,28 +99,28 @@ int main(int argc, char **argv) {
     for_each(e.begin(), e.end(),
         [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
 
-    vector<CONFIG_DTYPE> aPadded(size_n * size_k_padded);
+    std::vector<CONFIG_DTYPE> aPadded(size_n * size_k_padded);
     PadTensor<CONFIG_DTYPE>(a, aPadded, size_n, size_k, DivCeil<unsigned>(size_k, kTransposeWidth)*kTransposeWidth);
 
-    const auto aKernel = Pack<kMemoryWidthA, float>(aPadded);
-    const auto bKernel = Pack<kMemoryWidthM, float>(b);
-    const auto eKernel = Pack<kMemoryWidthM, float>(e);
-    auto cKernel = Pack<kMemoryWidthM, float>(cReference);
+    const auto aKernel = Pack<kMemoryWidthA, CONFIG_DTYPE>(aPadded);
+    const auto bKernel = Pack<kMemoryWidthM, CONFIG_DTYPE>(b);
+    const auto eKernel = Pack<kMemoryWidthM, CONFIG_DTYPE>(e);
+    auto cKernel = Pack<kMemoryWidthM, CONFIG_DTYPE>(cReference);
 
     ReferenceImplementation(a.data(), b.data(), cReference.data(), size_n, size_k, size_m);
     Conv2Kernel1x1CPU<CONFIG_DTYPE >(
         a.data(), b.data(), e.data(), cReferenceConv2.data(), 
         conv_b, conv_n, conv_k, conv_din, conv_dout);
 
-    cout << "Running simulation...\n" << flush;
+    std::cout << "Running simulation...\n" << std::flush;
 
     task_conv2_1x1_direct(
         aKernel.data(), bKernel.data(), 
         eKernel.data(), cKernel.data(),
         size_n, size_k, size_m);
-    cout << "Verifying results...\n" << flush;
+    std::cout << "Verifying results...\n" << std::flush;
 
-    const auto cTest = Unpack<kMemoryWidthM, float>(cKernel);
+    const auto cTest = Unpack<kMemoryWidthM, CONFIG_DTYPE>(cKernel);
 
     for (unsigned i = 0; i < size_n; ++i) {
         for (unsigned j = 0; j < size_m; ++j) {
@@ -131,19 +130,19 @@ int main(int argc, char **argv) {
             //const CONFIG_DTYPE diff = abs(testVal - refVal);
             const CONFIG_DTYPE diff2 = abs(testVal - refValConv2);
             /*if (diff > static_cast<CONFIG_DTYPE>(1e-3)) {
-            cerr << "Mismatch detected(Kernel vs. CPU MM) at (" << i << ", " << j
+            std::cerr << "Mismatch detected(Kernel vs. CPU MM) at (" << i << ", " << j
             << "): " << testVal << " vs. " << refVal << "\n";
             return 1;
             }*/
             if (diff2 /*/ refValConv2*/ > static_cast<CONFIG_DTYPE>(1e-2)) {
-                cerr << "Mismatch detected(Kernel vs. CPU Conv2) at (" << i << ", " << j
+                std::cerr << "Mismatch detected(Kernel vs. CPU Conv2) at (" << i << ", " << j
                     << "): " << testVal << " vs. " << refValConv2 << "\n";
                 return 2;
             }
         }
     }
-    //cout << "Matrix-matrix multiplication successfully verified.\n";
-    cout << "Conv2D 1x1 successfully verified.\n";
+    //std::cout << "Matrix-matrix multiplication successfully verified.\n";
+    std::cout << "Conv2D 1x1 successfully verified.\n";
 
     return 0;
 }
