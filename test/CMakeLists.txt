@@ -11,6 +11,7 @@ add_subdirectory("matmul")
 add_subdirectory("tile")
 add_subdirectory("gather")
 add_subdirectory("concat")
+add_subdirectory("relu_sqrt_square")
 add_subdirectory("padding")
 add_subdirectory("unpadding")
 

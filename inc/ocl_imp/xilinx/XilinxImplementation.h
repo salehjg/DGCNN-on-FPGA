@@ -121,6 +121,8 @@ private:
             bool over_axis3,
             int pow_y);
 
+    TensorF* _ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare);
+
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
 
     std::string device_name;

@@ -932,12 +932,13 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMatmul());
     PrintReport(KernelTile());
     PrintReport(KernelGather());
-    */
     PrintReport(KernelConcat2());
-             
-    /*PrintReport(KernelRelu());
+    */
+    PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
-    PrintReport(KernelSquare());  
+    PrintReport(KernelSquare()); 
+             
+    /*
     PrintReport(KernelTranspose());
     */
 }
