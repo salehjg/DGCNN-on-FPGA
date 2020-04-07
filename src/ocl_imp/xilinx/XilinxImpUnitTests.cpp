@@ -933,14 +933,12 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelTile());
     PrintReport(KernelGather());
     PrintReport(KernelConcat2());
-    */
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare()); 
-             
-    /*
-    PrintReport(KernelTranspose());
     */
+
+    PrintReport(KernelTranspose());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

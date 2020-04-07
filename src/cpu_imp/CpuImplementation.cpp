@@ -56,7 +56,7 @@ void CpuImplementation::PrintInfo(
         finalStr += ", ";
     }
     finalStr+="\n";
-    //cout<<finalStr;
+    cout<<finalStr;
 }
 
 //float* CpuImplementation::Transpose(float* input,int batchsize, int matrix_rank, int matrixH, int matrixW){

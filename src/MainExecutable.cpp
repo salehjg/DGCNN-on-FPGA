@@ -5,7 +5,7 @@ using namespace std;
 
 
 #define RUN_KERNELTESTS true
-#define RUN_MODELARCH   false
+#define RUN_MODELARCH   false 
 
 char* globalArgXclBin;
 char* globalArgDataPath;
