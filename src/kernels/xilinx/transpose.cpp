@@ -13,7 +13,21 @@
 using namespace std;
 using namespace ConfigTaskTranspose;
 
-//Latency is for 5x1024x64 and CONFIG_W_H=(16,64)
+/**
+ * @brief      Batch transpose of the input tensor of rank 3.
+ *             This kernel uses Axi32 for the input and the output tensors.
+ *             This kernel complies with the padded last dim policy:
+ *               1) inputTn and outputTn is considered to be padded in the last dim to 
+ *                  be divisible by m_axi512's width.
+ *               2) inputTn of shape axbx1 will be considered to be padded as axbx16(for m_axi512).
+ *             The latency will be reported for an input tensor of shape 5x1024x64 and TileWidth and TileHeight of 16,64.
+ *
+ * @param[in]  inputTn   The input tn (row-major)
+ * @param      outputTn  The output tn (row-major)
+ * @param[in]  dim0      The dim 0 (batchSize)
+ * @param[in]  dim1      The dim 1 (rows)
+ * @param[in]  dim2      The dim 2 (cols)
+ */
 void BatchTransposeAXI32(
     const CONFIG_DTYPE* inputTn,
     CONFIG_DTYPE* outputTn,
@@ -39,7 +53,6 @@ void BatchTransposeAXI32(
 #pragma HLS LOOP_TRIPCOUNT min=4 max=4
             LoopTiles2:for(unsigned d1=0; d1<dim1; d1+=TileHeight){
 #pragma HLS LOOP_TRIPCOUNT min=16 max=16
-                //=====================================================
                 //Sec.1: Read current block into local buffer
                 LoopReadJ:for(unsigned j=0; j<TileHeight; j++){
                     LoopReadI:for(unsigned i=0; i<TileWidth; i++){
@@ -54,7 +67,6 @@ void BatchTransposeAXI32(
                     }
                 }
 
-                //=====================================================
                 //Sec.2: Write current block's data into output tensor
                 LoopWriteI:for(unsigned i=0; i<TileWidth; i++){
                     LoopWriteJ:for(unsigned j=0; j<TileHeight; j++){
@@ -69,8 +81,6 @@ void BatchTransposeAXI32(
                         }
                     }
                 }
-
-                //=====================================================
             }
         }
     }
