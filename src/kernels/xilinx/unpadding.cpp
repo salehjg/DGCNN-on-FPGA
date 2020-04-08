@@ -75,7 +75,7 @@ void task_unpad_last_dim(
     const unsigned int dim0,
     const unsigned int dim1,
     const unsigned int dim1Unpadded){
-#pragma HLS INTERFACE m_axi     port=inputTn        offset=slave    bundle=gmem0
+#pragma HLS INTERFACE m_axi     port=inputTn        offset=slave    bundle=gmem1
 #pragma HLS INTERFACE m_axi     port=outputTn       offset=slave    bundle=gmem1
 #pragma HLS INTERFACE s_axilite port=inputTn        bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn       bundle=control

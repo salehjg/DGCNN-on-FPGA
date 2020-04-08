@@ -23,6 +23,13 @@
 //#define DUMP_ENABLED
 #undef DUMP_ENABLED
 
+enum class RUN_MODE{
+    SwEmu,
+    HwEmu,
+    Hw,
+    Unknown
+};
+
 struct OclKernelObject{
     string fileName;
     string containerName;
@@ -90,6 +97,8 @@ public:
     TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded);
 
     const char * getErrorString(cl_int error);
+    int SetModeEnvVar(const RUN_MODE mode);
+    RUN_MODE GetModeEnvVar();
 
     cl_context          getContext();
     cl_command_queue    getQueue();

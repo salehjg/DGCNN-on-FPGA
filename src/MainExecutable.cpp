@@ -14,7 +14,7 @@ int main(int argc, char* argv[]){
     // Check the number of parameters
     if (argc < 3) {
         // Tell the user how to run the program
-        std::cerr << "Usage: " << argv[0] << " < Path to *.xclbin >" << " < Path to data dir with ...data >"<< "[< Emulation Mode(sw_emu, hw_emu) >]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " < Path to *.xclbin >" << " < Path to data dir with ...data >"<< " [< Emulation Mode(sw_emu, hw_emu) >]" << std::endl;
         return 1;
     }
     // Print the user's name:
@@ -22,6 +22,7 @@ int main(int argc, char* argv[]){
     std::cout << "FPGA BIN FNAME: " << argv[1] << std::endl;
     std::cout << "DATA DIR PATH: " << argv[2] << std::endl;
     if(argc>3) {
+        // for debugging...
         std::cout << "SELECTED EMULATION MODE: " << argv[3] << std::endl;
         if (setenv("XCL_EMULATION_MODE", argv[3], 1) < 0) {
             fprintf(stderr, "Error setting XCL_MODE env. var.\n");

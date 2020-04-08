@@ -93,10 +93,12 @@ TensorI* XilinxImpUnitTests::GenerateTensorInteger(int intMin, int intMax, vecto
 }
 
 void XilinxImpUnitTests::PrintReport(ReportObject *reportObj){
-    if(reportObj->passed)
-        cout << "\033[1;36mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
-    else
-        cout << "\033[1;31mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
+    if(reportObj){
+        if(reportObj->passed)
+            cout << "\033[1;36mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
+        else
+            cout << "\033[1;31mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
+    }
 }
 
 ReportObject* XilinxImpUnitTests::TensorFloat(){
@@ -822,6 +824,11 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
+    if(platformSelector->openclPlatformClass->GetModeEnvVar()!=RUN_MODE::HwEmu){
+        ReportObject* obj = new ReportObject(__FUNCTION__, false);
+        cerr << "KernelConv2Mlp: Skipping, only HwEmu mode is supported."<<endl;
+        return obj;
+    }
     bool comparisonResult = true;
     {
         TensorF* tensorSrc = GenerateTensor(0,{1,256,1,6});
@@ -836,6 +843,11 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTopK(){
+    if(platformSelector->openclPlatformClass->GetModeEnvVar()!=RUN_MODE::HwEmu){
+        ReportObject* obj = new ReportObject(__FUNCTION__, false);
+        cerr << "KernelTopK: Skipping, only HwEmu mode is supported."<<endl;
+        return obj;
+    }
     int kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
         <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
@@ -912,7 +924,7 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    /*PrintReport(TensorFloat());
+    PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
@@ -936,8 +948,6 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare()); 
-    */
-
     PrintReport(KernelTranspose());
 }
 

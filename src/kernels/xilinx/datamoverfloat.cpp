@@ -52,8 +52,8 @@ void task_datamover_mod1_float(
         MemoryPackF_t *dstBuff,
         int reverseSwitch,
         const unsigned long len){
-#pragma HLS INTERFACE m_axi     port=srcBuff            offset=slave bundle=gmem0
-#pragma HLS INTERFACE m_axi     port=dstBuff            offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi     port=srcBuff            offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi     port=dstBuff            offset=slave bundle=gmem2
 #pragma HLS INTERFACE s_axilite port=srcBuff            bundle=control
 #pragma HLS INTERFACE s_axilite port=dstBuff            bundle=control
 #pragma HLS INTERFACE s_axilite port=reverseSwitch      bundle=control

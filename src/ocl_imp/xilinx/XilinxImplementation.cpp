@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <ocl_imp/xilinx/XilinxImplementation.h>
 #include "xilinx/config.h"
 #include <algorithm>
@@ -17,13 +17,15 @@ XilinxImplementation::XilinxImplementation(int aa) {
     a = aa;
     //======================================================================================================================
     {
-        char *XCL_MODE;
-        XCL_MODE = getenv("XCL_EMULATION_MODE");
-        if (XCL_MODE == NULL) {
-            fprintf(stderr, "XCL_MODE env. var is not set yet, falling back into the default mode(sw-emu).\n");
-            if (setenv("XCL_EMULATION_MODE", "sw_emu", 1) < 0) {
-                fprintf(stderr, "Error setting XCL_MODE env. var.\n");
-            }
+        const RUN_MODE mode = GetModeEnvVar();
+        if(mode==RUN_MODE::Unknown){
+            cout<<"WARNING: XCL_EMULATION_MODE is not set. Falling back onto SwEmu mode.";
+            assert(SetModeEnvVar(RUN_MODE::SwEmu)==0);
+        }else{
+            cout << "Mode: " << (
+                mode==RUN_MODE::SwEmu?"Sw-emulation":
+                mode==RUN_MODE::HwEmu?"Hw-emulation":
+                "Hardware(FPGA)" ) << endl;
         }
     }
     //======================================================================================================================
@@ -65,8 +67,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -83,8 +84,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducemax",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -92,8 +92,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -101,8 +100,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -110,8 +108,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -137,8 +134,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -146,8 +142,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -163,8 +158,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 12 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -172,8 +166,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 13 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -181,8 +174,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 14 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -206,19 +198,11 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_relu_sqrt_square",
-                false,
-                DISABLED_KERNEL)
+                false)
     };
     
     //======================================================================================================================
     //Using signle binary container for all of the kernels for now!
-    char *_xcl_mode = getenv("XCL_EMULATION_MODE");
-    string xcl_mode = string(_xcl_mode);
-    xcl_mode =  xcl_mode=="sw_emu" ? "Emulation-SW" :
-                xcl_mode=="hw_emu" ? "Emulation-HW" :
-                xcl_mode=="system" ? "System" : "UNDEF" ;
-
-    cout<<"Running "<<xcl_mode<<endl;
 
     cout<<"*Using first kernel's container as default container.\n*Multiple container scenario is not supported yet."<<endl;
     size_t binary_content_length = load_file_to_memory(globalArgXclBin, &binary_content);
@@ -1700,4 +1684,31 @@ void XilinxImplementation::ReportDuration(const std::string &name, const bool &i
                 "\t( s): " << ns/1000000000.0f <<
                 std::endl;
 #endif
+}
+
+int XilinxImplementation::SetModeEnvVar(const RUN_MODE mode){
+    int result = 0;
+    if(mode==RUN_MODE::Unknown) return -2;
+    const char* strMode = mode==RUN_MODE::SwEmu? "sw_emu":
+                          mode==RUN_MODE::HwEmu? "hw_emu":
+                          "system";
+    result = setenv("XCL_EMULATION_MODE", strMode, 1); // Env var override is enabled.
+
+    if(result<0){
+        fprintf(stderr, "SetModeEnvVar: Error setting XCL_EMULATION_MODE env. var.\n");
+    }
+    return result;
+}
+
+RUN_MODE XilinxImplementation::GetModeEnvVar(){
+    if(const char *_xcl_mode = getenv("XCL_EMULATION_MODE")){
+        const string xcl_mode = string(_xcl_mode);
+        RUN_MODE mode =  xcl_mode=="sw_emu" ? RUN_MODE::SwEmu:
+                    xcl_mode=="hw_emu" ? RUN_MODE::HwEmu:
+                    xcl_mode=="system" ? RUN_MODE::Hw: 
+                    RUN_MODE::Unknown ;
+        return mode;
+    }else{
+        return RUN_MODE::Unknown;
+    }
 }
