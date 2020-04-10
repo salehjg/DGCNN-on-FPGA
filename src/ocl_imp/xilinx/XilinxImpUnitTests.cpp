@@ -554,8 +554,8 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     {
         //Ranks: 4,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,2});
-        TensorF* tensorSrc2 = GenerateTensor(3,{2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,2});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2});
         for(MAT_OPS op : ops) {
             TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, tensorSrc2,op);
             TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1,tensorSrc2, op);
@@ -593,8 +593,8 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     {
         //Ranks: 3,3
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2});
-        TensorF* tensorSrc2 = GenerateTensor(5,{2,2,2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2,2,2});
         for(MAT_OPS op : ops) {
             TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, tensorSrc2,op);
             TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1,tensorSrc2, op);
@@ -621,8 +621,8 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     {
         //Ranks: 3,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2});
-        TensorF* tensorSrc2 = GenerateTensor(3,{2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2});
         for(MAT_OPS op : ops) {
             TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, tensorSrc2,op);
             TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1,tensorSrc2, op);
@@ -646,8 +646,8 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     {
         //Ranks: 2,2
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2});
-        TensorF* tensorSrc2 = GenerateTensor(3,{2,2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2,2});
         for(MAT_OPS op : ops) {
             TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, tensorSrc2,op);
             TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1,tensorSrc2, op);
@@ -660,8 +660,8 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     {
         //Ranks: 2,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2});
-        TensorF* tensorSrc2 = GenerateTensor(3,{2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{5,9});
+        TensorF* tensorSrc2 = GenerateTensor(0,{9});
         for(MAT_OPS op : ops) {
             TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, tensorSrc2,op);
             TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1,tensorSrc2, op);
@@ -685,8 +685,8 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     {
         //Ranks: 1,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(3,{2});
-        TensorF* tensorSrc2 = GenerateTensor(3,{2});
+        TensorF* tensorSrc1 = GenerateTensor(0,{2});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2});
         for(MAT_OPS op : ops) {
             TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, tensorSrc2,op);
             TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1,tensorSrc2, op);
@@ -848,7 +848,7 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
         cerr << "KernelTopK: Skipping, only HwEmu mode is supported."<<endl;
         return obj;
     }
-    int kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount;
+    const unsigned kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
         <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
     assert(N==ConfigTaskTopK::MaxSliceLen);
@@ -934,7 +934,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
     PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
-    PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU 
+    PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
     PrintReport(KernelMatops());
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
@@ -947,7 +947,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
-    PrintReport(KernelSquare()); 
+    PrintReport(KernelSquare());
     PrintReport(KernelTranspose());
 }
 

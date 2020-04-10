@@ -1171,6 +1171,7 @@ TensorF* XilinxImplementation::ReduceMax(
 TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){
     PrintInfo("TopK","axis",axis,"k",k,"",0,batchedMat->getShape(),{},{});
     assert(batchedMat->getRank()==3);
+    assert(batchedMat->getShape()[2]%CONFIG_M_AXI_WIDTH==0);
     assert(axis==2);
 
     auto outputShape = batchedMat->getShape();
@@ -1187,12 +1188,13 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
         cl_int error; int argcnt=0; 
         const unsigned batchSize = outputShape[0]*outputShape[1];
         const unsigned vecsPerSlice = DivCeil<unsigned>(outputShape[2], CONFIG_M_AXI_WIDTH);
-        const unsigned vecsPerOutputSlice = DivCeil<unsigned>(k, CONFIG_M_AXI_WIDTH);;
+        const unsigned vecsPerOutputSlice = DivCeil<unsigned>(k, CONFIG_M_AXI_WIDTH);
+        const unsigned _dim2 = batchedMat->getShape()[2];
 
         error =  clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorF*)_batchedMat)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_mem) , (void*)&((OclTensorI*)rsltIndicesSplitedTn)->ocl_buff);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&batchSize);
-        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&outputShape[2]);
+        error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&_dim2);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&k);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&vecsPerSlice);
         error |= clSetKernelArg(kernelObject->kernel_task, argcnt++, sizeof(cl_uint) , (void*)&vecsPerOutputSlice);

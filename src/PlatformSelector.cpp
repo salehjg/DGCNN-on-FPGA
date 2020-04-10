@@ -73,6 +73,7 @@ PlatformSelector::~PlatformSelector(){
 }
 
 TensorF* PlatformSelector::CrossThePlatform(TensorF *srcTn, PLATFORMS platform) {
+    assert(srcTn->getShape()[srcTn->getRank()-1]!=1); //Just to make sure nothing will go wrong because of padding
     switch(srcTn->getPlatform()){
         case PLATFORMS::CPU :{
             //--------------------------------------------------------------
@@ -152,6 +153,7 @@ TensorF* PlatformSelector::CrossThePlatform(TensorF *srcTn, PLATFORMS platform) 
 
 
 TensorI* PlatformSelector::CrossThePlatform(TensorI *srcTn, PLATFORMS platform) {
+    assert(srcTn->getShape()[srcTn->getRank()-1]!=1); //Just to make sure nothing will go wrong because of padding
     switch(srcTn->getPlatform()){
         case PLATFORMS::CPU :{
             //--------------------------------------------------------------

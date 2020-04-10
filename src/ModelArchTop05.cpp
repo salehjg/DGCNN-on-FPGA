@@ -22,7 +22,9 @@ ModelInfo ModelArchTop05::GetModelInfo() {
     tmplt.ModelType="Classifier";
     tmplt.Version="5.0";
     tmplt.DesignNotes=
-            "1) "
+            "1) All of the layers are on OCL.\n"
+            "2) Not compatible with sw-emu.\n"
+            ""
             ;
     tmplt.ExperimentNotes="";
     tmplt.ToDo=""
@@ -205,7 +207,7 @@ TensorF* ModelArchTop05::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input
 }
 
 TensorF* ModelArchTop05::PairwiseDistance(WorkScheduler scheduler, TensorF *input_BxNxD) {
-
+    /*
     TensorF* point_cloud_transpose = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
     TensorF* point_cloud_inner =  platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,point_cloud_transpose);
     TensorF* point_cloud_inner2 = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner,-2.0f,MAT_OPS::MUL_ELEMENTWISE);
@@ -219,13 +221,23 @@ TensorF* ModelArchTop05::PairwiseDistance(WorkScheduler scheduler, TensorF *inpu
     TensorF* point_cloud_sum_transpose_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum_transpose,1,N); //result is BxkxN for k=N
     TensorF* rsltTmpTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum_tiled,point_cloud_sum_transpose_tiled, MAT_OPS::ADD); //both input tensors are BxNxN
     TensorF* rsltTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,rsltTmpTn,point_cloud_inner2, MAT_OPS::ADD); //both input tensors are BxNxN
+    */
+    TensorF* point_cloud_transpose = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
+    TensorF* point_cloud_inner =  platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,point_cloud_transpose);
+    TensorF* point_cloud_inner2 = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner,-2.0f,MAT_OPS::MUL_ELEMENTWISE);
+    TensorF* point_cloud_inner2p2 = platformSelector->Square(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
+    TensorF* point_cloud_sum = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner2p2,false,false,true);
+    TensorF* point_cloud_sum_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum,2,N); //result is BxNxK for k=N
+    TensorF* point_cloud_sum_transpose_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum,1,N); //result is BxkxN for k=N
+    TensorF* rsltTmpTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum_tiled,point_cloud_sum_transpose_tiled, MAT_OPS::ADD); //both input tensors are BxNxN
+    TensorF* rsltTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,rsltTmpTn,point_cloud_inner2, MAT_OPS::ADD); //both input tensors are BxNxN
 
     delete(point_cloud_transpose);
     delete(point_cloud_inner);
     delete(point_cloud_inner2);
     delete(point_cloud_inner2p2);
     delete(point_cloud_sum);
-    delete(point_cloud_sum_transpose);
+    //delete(point_cloud_sum_transpose);
     delete(point_cloud_sum_tiled);
     delete(point_cloud_sum_transpose_tiled);
     delete(rsltTmpTn);
@@ -491,7 +503,7 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         delete(biases);
         delete(transformTn);
 
-        return transformFinalTn;
+        return platformSelector->CrossThePlatform(transformFinalTn, PLATFORMS::CPU); // Force CPU
     }
 }
 

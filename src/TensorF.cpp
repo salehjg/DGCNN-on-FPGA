@@ -73,6 +73,11 @@ int TensorF::getRank() {
 void TensorF::ExpandDims(int axis) {
     // DOES NOT AFFECT DATA PADDING PATTERNS
     assert((axis>=0 && axis<=getRank()) || axis==-1);
+    if((axis==-1||axis==shape.size()) && (platform==PLATFORMS::GPU_OCL) ){
+        //Just making sure that padded last dim policy wont cause any problems.
+        assert(shape[shape.size()-1]==1);
+    }
+
     if(axis==-1) axis=(int)shape.size();
     shape.insert(shape.begin()+axis,1);
     this->rank++;
@@ -93,6 +98,10 @@ void TensorF::SqueezeDimZero(){
 
 void TensorF::SqueezeDims() {
     // DOES NOT AFFECT DATA PADDING PATTERNS
+
+    //Just making sure that padded last dim policy wont cause any problems.
+    if(platform==PLATFORMS::GPU_OCL) assert(shape[shape.size()-1]!=1);
+
     std::vector<unsigned int> shapeNew;
 
     for (int i = 0; i < shape.size(); i++) {
@@ -108,6 +117,10 @@ void TensorF::Reshape(std::vector<unsigned int> newShape){
         len = len * newShape[i];
     }
     assert(len==getLength());
+
+    //Just making sure that padded last dim policy wont cause any problems.
+    if(platform==PLATFORMS::GPU_OCL) assert(newShape[newShape.size()-1]==shape[shape.size()-1]);
+
     shape = newShape;
     rank = (int)shape.size();
 }
@@ -157,7 +170,7 @@ unsigned long TensorF::getLengthPadded(int vectorWords){
     }
 }
 
-std::vector<unsigned int> TensorF::PadShape(std::vector<unsigned int> actualShape, int vectorWords){
+std::vector<unsigned int> TensorF::PadShape(std::vector<unsigned int> &actualShape, int vectorWords){
     std::vector<unsigned int> paddedShape = actualShape;
     // always pad the last dimension.
     unsigned int lastDim = paddedShape[paddedShape.size()-1];
