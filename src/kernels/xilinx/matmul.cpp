@@ -18,6 +18,7 @@ using namespace ConfigTaskMatMul;
 /**
  * @brief      Computes batch-matmul operation of C=AB
  *             The inputs should be of rank three and be padded in the last dimension.
+ *             The latency will be reported for Shape1=5x1024x64 and Shape2=5x64x1024 and D=4.
  *             This kernel complies with the padded last dim policy.
  *
  * @param[in]  A          The Input Matrix A (Rank3, RowMajor, Batch*N*K)
@@ -61,13 +62,16 @@ void MatmulReorderedVectorized_V1(
 
     LoopBatch:
     for(unsigned batch=0; batch<sizeBatch; batch++) {
+        #pragma HLS LOOP_TRIPCOUNT min=5 max=5
         LoopN:
         for (unsigned n = 0; n < boundLoopN; n++) {
+            #pragma HLS LOOP_TRIPCOUNT min=256 max=256
             MemoryPackF_t acc[D][MaxM / CONFIG_M_AXI_WIDTH];
             #pragma HLS ARRAY_PARTITION variable=acc dim=1 complete
 
             LoopK:
             for (unsigned k = 0; k < sizeK; k++) {
+                #pragma HLS LOOP_TRIPCOUNT min=64 max=64
                 const unsigned kVecIndex = k / CONFIG_M_AXI_WIDTH;
                 CONFIG_DTYPE a_buffer[D];
                 LoopReadA:
@@ -79,6 +83,7 @@ void MatmulReorderedVectorized_V1(
                 }
                 LoopM:
                 for (unsigned m = 0; m < vecsPerSliceB; m++) {
+                    #pragma HLS LOOP_TRIPCOUNT min=64 max=64
                     #pragma HLS PIPELINE II=1
                     const unsigned indxS2 = (batch)*sizeK*vecsPerSliceB + k*vecsPerSliceB + m;
                     const auto b_val = B[indxS2];
@@ -95,6 +100,7 @@ void MatmulReorderedVectorized_V1(
             for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
                 LoopWriteM:
                 for (unsigned m = 0; m < vecsPerSliceB; ++m) {
+                    #pragma HLS LOOP_TRIPCOUNT min=64 max=64
                     #pragma HLS LOOP_FLATTEN
                     #pragma HLS PIPELINE II=1
                     const unsigned indxD = (batch)*sizeN*vecsPerSliceC + (n*D+nd)*vecsPerSliceC + m;
