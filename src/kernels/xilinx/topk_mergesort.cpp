@@ -109,8 +109,15 @@ void UnitReadInput(
         for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
             LoopPEs:
             for(unsigned iPE=0; iPE<UnitCount; iPE++){
-                indxS = (batch+iPE)*vecsPerSlice + iVec;
-                streamInputTn.Push(inputTn[indxS]);
+                const unsigned d0 = batch+iPE;
+                MemoryPackF_t vec(0.0f);
+                if(d0<dim0){
+                    indxS = (d0)*vecsPerSlice + iVec;
+                    vec = inputTn[indxS];
+                }else{
+                    vec.Fill(0.0f);
+                }
+                streamInputTn.Push(vec);
             }
         }
     }
@@ -145,8 +152,12 @@ void UnitWriteOutput(
         for(unsigned iPE=0; iPE<UnitCount; iPE++){
             LoopVecsPerPE:
             for(unsigned iVec=0; iVec<vecsPerOutputSlice; iVec++){
-                indxD = (batch+iPE)*vecsPerOutputSlice + iVec;
-                indicesSplitedTn[indxD] = streamIndices.Pop();
+                const unsigned d0 = batch+iPE;
+                MemoryPackI_t vec = streamIndices.Pop();
+                if(d0<dim0){
+                    indxD = (d0)*vecsPerOutputSlice + iVec;
+                    indicesSplitedTn[indxD] = vec;
+                }
             }
         }
     }
@@ -208,7 +219,6 @@ void UnitProcessingElement(
 
     LoopMain: for(unsigned batch=0; batch<dim0; batch+=UnitCount){
 #pragma HLS LOOP_TRIPCOUNT min=640 max=640
-        ///TODO: Check for out of bound batch index 
         //--------------------------------------------------
         // 1. Read current slice and indices into local memory.
         LoopReadSlice: for(unsigned idx=0; idx<vecsPerSlice; idx++){
@@ -219,7 +229,6 @@ void UnitProcessingElement(
                 #pragma HLS PIPELINE II=1
                 MemoryPackF_t vec = streamDataIn.Pop();
                 if(iPE>0){
-                    // Pass the data to other PEs and just keep the last one for this PE
                     if(unitIndex<(UnitCount-1)){
                         streamDataOut.Push(vec);
                     }
@@ -282,6 +291,7 @@ extern "C"{
 
 /**
  * @brief      The top-function of the kernel.
+ *             Supports handling an input tensor with "dim0 % UnitCount != 0"
  *
  * @param[in]  inputTn             The input tn
  * @param[out] indicesSplitedTn    The indices splited tn (the tensor with a buffer of length of batchsize x kValue)

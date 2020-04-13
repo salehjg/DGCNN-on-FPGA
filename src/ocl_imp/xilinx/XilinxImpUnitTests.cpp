@@ -848,7 +848,7 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
         cerr << "KernelTopK: Skipping, only HwEmu mode is supported."<<endl;
         return obj;
     }
-    const unsigned kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount;
+    const unsigned kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount+2;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
         <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
     assert(N==ConfigTaskTopK::MaxSliceLen);
