@@ -933,8 +933,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(TensorPadUnpadCpuInteger());
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
-    PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
-    PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
+    //PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
+    //PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
     PrintReport(KernelMatops());
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());

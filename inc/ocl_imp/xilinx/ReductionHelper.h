@@ -1,5 +1,4 @@
-#ifndef __REDUCTION_HELPER_H__
-#define __REDUCTION_HELPER_H__
+#pragma once
 
 template<typename DType, int ReductionLen>
 DType ParallelReduction1D(
@@ -46,5 +45,3 @@ DType ParallelReduction1D(
 
     return lastResult;
 }
-
-#endif

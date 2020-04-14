@@ -727,7 +727,7 @@ bool PlatformSelector::CompareTensorsInteger(PLATFORMS platform, WorkScheduler s
     return false;
 }
 
-TensorF* PlatformSelector::PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded){
+TensorF* PlatformSelector::PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded){
     TensorF* __inputTn = CrossThePlatform(inputTn, platform);
     switch(platform){
         case PLATFORMS::CPU :{
@@ -750,7 +750,7 @@ TensorF* PlatformSelector::PadLastDim(PLATFORMS platform, WorkScheduler schedule
     return nullptr;
 }
 
-TensorF* PlatformSelector::UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded){
+TensorF* PlatformSelector::UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded){
     TensorF* __inputTn = CrossThePlatform(inputTn, platform);
     switch(platform){
         case PLATFORMS::CPU :{

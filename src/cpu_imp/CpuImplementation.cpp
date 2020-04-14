@@ -21,8 +21,8 @@ void CpuImplementation::PrintInfo(
         const string &setting1, int val1,
         const string &setting2, int val2,
         const string &setting3, float val3,
-        vector<unsigned int> shape1,
-        vector<unsigned int> shape2,
+        vector<unsigned> shape1,
+        vector<unsigned> shape2,
         vector<bool> comb){
 
     string finalStr ;
@@ -42,12 +42,12 @@ void CpuImplementation::PrintInfo(
 
     if(!shape1.empty()){
         finalStr += ", Shape1=";
-        for(unsigned int i : shape1){ finalStr += to_string(i) + "x"; }
+        for(unsigned i : shape1){ finalStr += to_string(i) + "x"; }
         finalStr += ", ";
     }
     if(!shape2.empty()){
         finalStr += ", Shape2=";
-        for(unsigned int i : shape2){ finalStr += to_string(i) + "x"; }
+        for(unsigned i : shape2){ finalStr += to_string(i) + "x"; }
         finalStr += ", ";
     }
     if(!comb.empty()){
@@ -63,13 +63,13 @@ void CpuImplementation::PrintInfo(
 TensorF* CpuImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedMat){
     PrintInfo("Transpose","",0,"",0,"",0,batchedMat->getShape(),{});
     if(batchedMat->getRank()!=3){cout<<"Transpose: ERROR_BAD_MATRIX_RANK"<<endl;return nullptr;}
-    unsigned int B, dim0, dim1;
+    unsigned B, dim0, dim1;
     B = batchedMat->getShape()[0];
     dim0 = batchedMat->getShape()[1];
     dim1 = batchedMat->getShape()[2];
     float* rslt = new float[B*dim0*dim1];
-    unsigned long indxS=0;
-    unsigned long indxD=0;
+    unsigned indxS=0;
+    unsigned indxD=0;
 
     for(int b=0;b<B;b++)
     {
@@ -110,12 +110,12 @@ TensorF* CpuImplementation::MatMul(WorkScheduler scheduler,
         batchedMat2->ExpandDimZero();
     }
 
-    unsigned int matrixH1  = batchedMat1->getShape()[1];
-    unsigned int matrixW1  = batchedMat1->getShape()[2];
-    unsigned int matrixH2  = batchedMat2->getShape()[1];
-    unsigned int matrixW2  = batchedMat2->getShape()[2];
-    unsigned int batchsize = batchedMat1->getShape()[0];
-    unsigned int matrix_rank = batchedMat1->getRank();
+    unsigned matrixH1  = batchedMat1->getShape()[1];
+    unsigned matrixW1  = batchedMat1->getShape()[2];
+    unsigned matrixH2  = batchedMat2->getShape()[1];
+    unsigned matrixW2  = batchedMat2->getShape()[2];
+    unsigned batchsize = batchedMat1->getShape()[0];
+    unsigned matrix_rank = batchedMat1->getRank();
 
     if(matrix_rank!=3){cout<<"MatMul: ERROR_BAD_MATRIX_RANK"<<endl;return nullptr;}
     if(matrixW1!=matrixH2){cout<<"MatMul: ERROR_BAD_MATRIX_DIMs"<<endl;return nullptr;}
@@ -169,9 +169,9 @@ float* CpuImplementation::MatMul(float* mat1,float scalar,
 TensorF* CpuImplementation::MatMul(WorkScheduler scheduler, TensorF* batchedMat, float scalar){
     PrintInfo("MatMul_Scalar","",0,"",0,"scalarVal",scalar,batchedMat->getShape(),{});
     float* rslt = new float[batchedMat->getLength()];
-    unsigned long limit = batchedMat->getLength();
+    unsigned limit = batchedMat->getLength();
 
-    for(unsigned long b=0;b<limit;b++) {
+    for(unsigned b=0;b<limit;b++) {
         rslt[b] = batchedMat->_buff[b] * scalar;
     }
     TensorF* rsltTn = new TensorF(batchedMat->getShape(),rslt);
@@ -185,9 +185,9 @@ TensorF* CpuImplementation::Square(WorkScheduler scheduler, TensorF* batchedMat)
     PrintInfo("Square","",0,"",0,"",0,batchedMat->getShape(),{});
     if(batchedMat->getRank()!=3){cout<<"Square: ERROR_BAD_MATRIX_RANK"<<endl;return nullptr;}
     float* rslt = new float[batchedMat->getLength()];
-    unsigned long limit = batchedMat->getLength();
-    ///TODO: Check index variables to be unsigned long!
-    for(unsigned long b=0;b<limit;b++) {
+    unsigned limit = batchedMat->getLength();
+    ///TODO: Check index variables to be unsigned!
+    for(unsigned b=0;b<limit;b++) {
         rslt[b] = batchedMat->_buff[b] * batchedMat->_buff[b];
     }
     TensorF* rsltTn = new TensorF(batchedMat->getShape(),rslt);
@@ -214,10 +214,10 @@ TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
         inputTn->ExpandDimZero();
     }
 
-    unsigned long indxS=0;
-    unsigned long indxD=0;
+    unsigned indxS=0;
+    unsigned indxD=0;
     float* rslt;
-    unsigned int dim0 = inputTn->getShape()[0],
+    unsigned dim0 = inputTn->getShape()[0],
         dim1 = inputTn->getShape()[1],
         dim2 = inputTn->getShape()[2];
 
@@ -229,9 +229,9 @@ TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
     {
         float sum = 0;
         rslt = &sum;
-        unsigned long limit = inputTn->getLength();
+        unsigned limit = inputTn->getLength();
 
-        for(unsigned long b=0;b<limit;b++) {
+        for(unsigned b=0;b<limit;b++) {
             (*rslt) += inputTn->_buff[b];
         }
         TensorF* rsltTn = new TensorF({1},rslt);
@@ -344,10 +344,10 @@ TensorF* CpuImplementation::ReduceSum4D(WorkScheduler scheduler,
 
     PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
     //cout<<"**LA_SUM4D: "<<dim0<<","<<dim1<<","<<dim2<<","<<dim3<<";\n";
-    unsigned long indxS=0;
-    unsigned long indxD=0;
+    unsigned indxS=0;
+    unsigned indxD=0;
     float* rslt;
-    unsigned int dim0 = inputTn->getShape()[0],
+    unsigned dim0 = inputTn->getShape()[0],
         dim1 = inputTn->getShape()[1],
         dim2 = inputTn->getShape()[2],
         dim3 = inputTn->getShape()[3];
@@ -412,7 +412,7 @@ TensorF* CpuImplementation::Mean(
         bool mean_axis3){
 
     PrintInfo("Mean","",0,"",0,"",0,inputTn->getShape(),{},{mean_axis0,mean_axis1,mean_axis2,mean_axis3});
-    unsigned int dim0 = inputTn->getShape()[0],
+    unsigned dim0 = inputTn->getShape()[0],
         dim1 = inputTn->getShape()[1],
         dim2 = inputTn->getShape()[2],
         dim3 = inputTn->getShape()[3];
@@ -509,7 +509,7 @@ TensorF* CpuImplementation::Variance(
         bool variance_axis3){
 
     PrintInfo("Variance","",0,"",0,"",0,inputTn->getShape(),{},{variance_axis0,variance_axis1,variance_axis2,variance_axis3});
-    unsigned int dim0 = inputTn->getShape()[0],
+    unsigned dim0 = inputTn->getShape()[0],
         dim1 = inputTn->getShape()[1],
         dim2 = inputTn->getShape()[2],
         dim3 = inputTn->getShape()[3];
@@ -541,7 +541,7 @@ TensorF* CpuImplementation::Variance(
 
             TensorF* variance = new TensorF({dim3});
 
-            unsigned long indxS1,indxS2,indxD;
+            unsigned indxS1,indxS2,indxD;
             for (int d3 = 0; d3 < dim3; d3++) { //over last-dim
                 variance->_buff[d3]=0;
 
@@ -587,7 +587,7 @@ TensorF* CpuImplementation::Variance(
             TensorF* mean = Mean(scheduler,inputTn,true,false,false,false);
             TensorF* variance = new TensorF({dim1});
 
-            unsigned long indxS1,indxS2,indxD;
+            unsigned indxS1,indxS2,indxD;
             for (int d1 = 0; d1 < dim1; d1++) { //over last-dim
                 variance->_buff[d1]=0;
 
@@ -656,10 +656,10 @@ TensorF* CpuImplementation::MatAdd(WorkScheduler scheduler, TensorF* inputTn1, T
     PrintInfo("MatAdd","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
     if(inputTn1->getShape() != inputTn2->getShape()){cout<<"MatAdd: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
 
-    unsigned long limit = inputTn1->getLength();
+    unsigned limit = inputTn1->getLength();
     float* rslt=new float[limit];
 
-    for(unsigned long d0=0;d0<limit;d0++){
+    for(unsigned d0=0;d0<limit;d0++){
         rslt[d0] = inputTn1->_buff[d0] + inputTn2->_buff[d0];
     }
 
@@ -683,13 +683,13 @@ TensorF* CpuImplementation::MatSub(
         TensorF* inputTn1,
         TensorF* inputTn2){
     PrintInfo("MatSub","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
-    unsigned long limit;
+    unsigned limit;
     if(inputTn1->getShape() != inputTn2->getShape()){cout<<"MatSub: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
     limit = inputTn1->getLength();
 
     float *rslt = new float[limit];
 
-    for (unsigned long d0 = 0; d0 < limit; d0++) {
+    for (unsigned d0 = 0; d0 < limit; d0++) {
         rslt[d0] = inputTn1->_buff[d0] - inputTn2->_buff[d0];
     }
     TensorF* rsltTn = new TensorF(inputTn1->getShape(),rslt);
@@ -705,10 +705,10 @@ TensorF* CpuImplementation::MatAddTiled(WorkScheduler scheduler, TensorF* inputT
     if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"MatAddTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
     if(inputSmallTn2->getRank()!=1){cout<<"MatAddTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
 
-    unsigned long indxS1,indxS2,indxD;
+    unsigned indxS1,indxS2,indxD;
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
 
-    unsigned int dim0, dim1, dim2, dim3;
+    unsigned dim0, dim1, dim2, dim3;
 
     if(inputTn1->getRank()==4 && inputSmallTn2->getRank()==1){
         TensorF* rsltTn = new TensorF(inputTn1->getShape());
@@ -754,8 +754,8 @@ TensorF* CpuImplementation::MatSubTiled(WorkScheduler scheduler, TensorF* inputT
     if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"MatAddTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
     if(inputSmallTn2->getRank()!=1){cout<<"MatAddTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
 
-    unsigned long indxS1;
-    unsigned int dim0, dim1, dim2, dim3;
+    unsigned indxS1;
+    unsigned dim0, dim1, dim2, dim3;
 
     if(inputTn1->getRank()==4 && inputSmallTn2->getRank()==1){
         TensorF* rsltTn = new TensorF(inputTn1->getShape());
@@ -799,8 +799,8 @@ TensorF* CpuImplementation::MatSubTiled(WorkScheduler scheduler, TensorF* inputT
 TensorF* CpuImplementation::MatAddTiled(WorkScheduler scheduler, TensorF* inputTn1, float scalar){
     PrintInfo("MatAddTiled","",0,"",0,"scalar",scalar,inputTn1->getShape(),{},{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
-    unsigned long len = inputTn1->getLength();
-    for(unsigned long d=0;d<len;d++) {
+    unsigned len = inputTn1->getLength();
+    for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = inputTn1->_buff[d] + scalar;
     }
     return rsltTn;
@@ -809,8 +809,8 @@ TensorF* CpuImplementation::MatAddTiled(WorkScheduler scheduler, TensorF* inputT
 TensorF* CpuImplementation::MatSubTiled(WorkScheduler scheduler, TensorF* inputTn1, float scalar){
     PrintInfo("MatSubTiled","",0,"",0,"scalar",scalar,inputTn1->getShape(),{},{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
-    unsigned long len = inputTn1->getLength();
-    for(unsigned long d=0;d<len;d++) {
+    unsigned len = inputTn1->getLength();
+    for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = inputTn1->_buff[d] - scalar;
     }
     return rsltTn;
@@ -841,10 +841,10 @@ TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, T
         inputTn1->ExpandDimZero();
     }
 
-    unsigned long indxS1;
-    unsigned long indxS2;
-    unsigned int dim0, dim1, dim2, dim3;
-    unsigned int dim0B, dim1B, dim2B, dim3B;
+    unsigned indxS1;
+    unsigned indxS2;
+    unsigned dim0, dim1, dim2, dim3;
+    unsigned dim0B, dim1B, dim2B, dim3B;
     int dim0B_IsNotZero, dim1B_IsNotZero, dim2B_IsNotZero, dim3B_IsNotZero;
 
     TensorF* rsltTn = new TensorF( inputTn1->getShape() );
@@ -945,8 +945,8 @@ TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, f
 TensorF* CpuImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
     PrintInfo("MatSubTiled","",0,"",0,"",0,inputTn->getShape(),{},{});
     TensorF* rsltTn = new TensorF(inputTn->getShape());
-    unsigned long len = inputTn->getLength();
-    for(unsigned long d=0;d<len;d++) {
+    unsigned len = inputTn->getLength();
+    for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = sqrt(inputTn->_buff[d]);
     }
     return rsltTn;
@@ -955,8 +955,8 @@ TensorF* CpuImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
 TensorF* CpuImplementation::Multiply(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2){
     PrintInfo("Multiply","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
-    unsigned long len = inputTn1->getLength();
-    for(unsigned long d=0;d<len;d++) {
+    unsigned len = inputTn1->getLength();
+    for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = (inputTn1->_buff[d]) * (inputTn2->_buff[d]);
     }
     return rsltTn;
@@ -965,8 +965,8 @@ TensorF* CpuImplementation::Multiply(WorkScheduler scheduler, TensorF* inputTn1,
 TensorF* CpuImplementation::Divide(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2){
     PrintInfo("Divide","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
-    unsigned long len = inputTn1->getLength();
-    for(unsigned long d=0;d<len;d++) {
+    unsigned len = inputTn1->getLength();
+    for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = (inputTn1->_buff[d]) / (inputTn2->_buff[d]);
     }
     return rsltTn;
@@ -977,7 +977,7 @@ TensorF* CpuImplementation::MultiplyTiled(WorkScheduler scheduler, TensorF* inpu
     if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"MultiplyTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
     if(inputTn2->getRank()!=1){cout<<"MultiplyTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
 
-    unsigned long indxS1;
+    unsigned indxS1;
     int dim0, dim1, dim2, dim3;
 
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
@@ -1028,8 +1028,8 @@ TensorF* CpuImplementation::DivideTiled(WorkScheduler scheduler, TensorF* inputT
     if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"DivideTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
     if(inputTn2->getRank()!=1){cout<<"DivideTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
 
-    unsigned long indxS1;
-    unsigned int dim0, dim1, dim2, dim3;
+    unsigned indxS1;
+    unsigned dim0, dim1, dim2, dim3;
 
     if(inputTn1->getRank()==4 && inputTn2->getRank()==1){
         TensorF* rsltTn = new TensorF(inputTn1->getShape());
@@ -1101,17 +1101,17 @@ TensorF* CpuImplementation::Concat2(
     if(inputTn1->getRank() != inputTn2->getRank()){cout<<"Concat2: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
 
     int rank  = inputTn1->getRank();
-    unsigned int dimA0 = inputTn1->getShape()[0];
-    unsigned int dimA1 = inputTn1->getShape()[1];
-    unsigned int dimA2 = inputTn1->getShape()[2];
-    unsigned int dimA3 = inputTn1->getShape()[3];
-    unsigned int dimB0 = inputTn2->getShape()[0];
-    unsigned int dimB1 = inputTn2->getShape()[1];
-    unsigned int dimB2 = inputTn2->getShape()[2];
-    unsigned int dimB3 = inputTn2->getShape()[3];
+    unsigned dimA0 = inputTn1->getShape()[0];
+    unsigned dimA1 = inputTn1->getShape()[1];
+    unsigned dimA2 = inputTn1->getShape()[2];
+    unsigned dimA3 = inputTn1->getShape()[3];
+    unsigned dimB0 = inputTn2->getShape()[0];
+    unsigned dimB1 = inputTn2->getShape()[1];
+    unsigned dimB2 = inputTn2->getShape()[2];
+    unsigned dimB3 = inputTn2->getShape()[3];
 
     if(rank==4){
-        unsigned int  dimR0=0,dimR1=0,dimR2=0,dimR3=0;
+        unsigned  dimR0=0,dimR1=0,dimR2=0,dimR3=0;
         int mat2_offset_dim0=0;
         int mat2_offset_dim1=0;
         int mat2_offset_dim2=0;
@@ -1213,7 +1213,7 @@ TensorF* CpuImplementation::ReduceMax(
     // << dim0 << "x" << dim1 << "x" << dim2 << "x" << dim3 << endl;
 
     if(inputTn->getRank()==4){
-        unsigned int
+        unsigned
             dim0 = inputTn->getShape()[0],
             dim1 = inputTn->getShape()[1],
             dim2 = inputTn->getShape()[2],
@@ -1221,7 +1221,7 @@ TensorF* CpuImplementation::ReduceMax(
         
         if(reductionDim==3){
             float* rslt= new float[dim0*dim1*dim2];
-            unsigned long indxS,indxD;
+            unsigned indxS,indxD;
             float max_cte= -numeric_limits<float>::infinity();
             float max= -numeric_limits<float>::infinity();
 
@@ -1254,7 +1254,7 @@ TensorF* CpuImplementation::ReduceMax(
 
         if(reductionDim==2){
             float* rslt= new float[dim0*dim1*dim3];
-            unsigned long indxS,indxD;
+            unsigned indxS,indxD;
             float max_cte= -numeric_limits<float>::infinity();
             float max= 0;
 
@@ -1286,7 +1286,7 @@ TensorF* CpuImplementation::ReduceMax(
 
         if(reductionDim==1){
             float* rslt= new float[dim0*dim2*dim3];
-            unsigned long indxS,indxD;
+            unsigned indxS,indxD;
             float max_cte= -numeric_limits<float>::infinity();
             float max= 0;
 
@@ -1336,8 +1336,8 @@ TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, i
 
     //batchedMat is considered as BxNxN
     //we will use std::sort in ascending order.
-    unsigned int indxS=0;
-    unsigned int B = batchedMat->getShape()[0], N = batchedMat->getShape()[1], K = (unsigned int)k;
+    unsigned indxS=0;
+    unsigned B = batchedMat->getShape()[0], N = batchedMat->getShape()[1], K = (unsigned)k;
 
     TensorI* rslt = new TensorI({B,N,K});
 
@@ -1372,8 +1372,8 @@ TensorF* CpuImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, Te
 
 
     //Gather knn's indices from input array.
-    unsigned long indxS1, indxS2, indxD;
-    unsigned int
+    unsigned indxS1, indxS2, indxD;
+    unsigned
         B = inputTn->getShape()[0],
         N = inputTn->getShape()[1],
         K = indices->getShape()[2],
@@ -1400,8 +1400,8 @@ TensorF* CpuImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, Te
 
 TensorF* CpuImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn, TensorF* weights, TensorF* biases, int overrideDim2){
     PrintInfo("Conv2D","overrideDim2",overrideDim2,"",0,"",0,inputTn->getShape(),weights->getShape(),{});
-    unsigned int B,N,K,D,OverridedK,ch_out;
-    unsigned long indxS1,indxS2,indxD;
+    unsigned B,N,K,D,OverridedK,ch_out;
+    unsigned indxS1,indxS2,indxD;
 
     B = inputTn->getShape()[0];
     N = inputTn->getShape()[1];
@@ -1432,10 +1432,10 @@ TensorF* CpuImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn, Te
 
 TensorF* CpuImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
     PrintInfo("ReLU","",0,"",0,"",0,inputTn->getShape(),{},{});
-    unsigned long dim = inputTn->getLength();
+    unsigned dim = inputTn->getLength();
     TensorF* tmp = new TensorF(inputTn->getShape());
 
-    for(unsigned long i=0;i<dim;i++){
+    for(unsigned i=0;i<dim;i++){
         tmp->_buff[i] = (inputTn->_buff[i]>0)?inputTn->_buff[i]:0;
     }
     return tmp;
@@ -1448,13 +1448,13 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
     // BxN     ----> BxKxN          1               2
 
     PrintInfo("Tile","tileAxis",tileAxis,"tileCount",tileCount,"",0,inputTn->getShape(),{},{});
-    unsigned long indxS1,indxD;
+    unsigned indxS1,indxD;
     if(inputTn->getRank()==3 && tileAxis==2) {
-        unsigned int B,N,K,D;
+        unsigned B,N,K,D;
         B = inputTn->getShape()[0];
         N = inputTn->getShape()[1];
         D = inputTn->getShape()[2];
-        K = (unsigned int)tileCount;
+        K = (unsigned)tileCount;
 
         //tile ing input of shape BxNxD into BxNxKxD.
         TensorF* rsltTn = new TensorF({B, N, K, D});
@@ -1474,10 +1474,10 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
     }
 
     if(inputTn->getRank()==2 && tileAxis==2) { //BxN = BxNx1   ------->  BxNxK  (PAGE 221 of my design notebook)
-        unsigned int B,N,K,D;
+        unsigned B,N,K,D;
         B = inputTn->getShape()[0];
         N = inputTn->getShape()[1];
-        K = (unsigned int)tileCount;
+        K = (unsigned)tileCount;
 
         //tile ing input of shape BxN or BxNx1 into BxNxK.
         TensorF* rsltTn = new TensorF({B, N, K});
@@ -1495,10 +1495,10 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
     }
 
     if(inputTn->getRank()==2 && tileAxis==1) { //BxN = Bx1xN   ------->  BxKxN  (PAGE 221 of my design notebook)
-        unsigned int B,N,K,D;
+        unsigned B,N,K,D;
         B = inputTn->getShape()[0];
         N = inputTn->getShape()[1];
-        K = (unsigned int)tileCount;
+        K = (unsigned)tileCount;
 
         //tile ing input of shape BxN or Bx1xN into BxKxN.
         TensorF* rsltTn = new TensorF({B, K, N});
@@ -1533,9 +1533,9 @@ void CpuImplementation::DumpMatrix(
         TensorF* inputTn,
         string npy_dir){
 #ifdef DUMP_ENABLED
-    vector<unsigned int> shape = inputTn->getShape();
-    vector<unsigned long > shape_size_t(shape.begin(), shape.end());
-        cnpy::npy_save<float>(npy_dir+npy_fname,inputTn->_buff ,shape_size_t,"w");
+    vector<unsigned> shape = inputTn->getShape();
+    vector<unsigned long> shape_size_t(shape.begin(), shape.end());
+    cnpy::npy_save<float>(npy_dir+npy_fname,inputTn->_buff, shape_size_t,"w");
 #endif
 }
 
@@ -1545,8 +1545,8 @@ void CpuImplementation::DumpMatrix(
         TensorI* inputTn,
         string npy_dir){
 #ifdef DUMP_ENABLED
-        vector<unsigned int> shape = inputTn->getShape();
-        vector<unsigned long  > shape_size_t(shape.begin(), shape.end());
+        vector<unsigned> shape = inputTn->getShape();
+        vector<unsigned long> shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<int>(npy_dir+npy_fname,inputTn->_buff ,shape_size_t,"w");
 #endif
 }
@@ -1555,8 +1555,8 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn
     float totalDiff=0;
     float currentDiff=0;
     if(inputTn1->getShape() == inputTn2->getShape()){
-        unsigned long _len = inputTn1->getLength();
-        for(unsigned long i =0 ; i<_len;i++){
+        unsigned _len = inputTn1->getLength();
+        for(unsigned i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
             cout<< "CurrentDiff "<<i<<" :"<<currentDiff<<endl;
             cout<< "Gold "<<i<<" :"<<inputTn1->_buff[i]<<endl;
@@ -1577,8 +1577,8 @@ bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *
     float totalDiff=0;
     int currentDiff=0;
     if(inputTn1->getShape() == inputTn2->getShape()){
-        unsigned long _len = inputTn1->getLength();
-        for(unsigned long i =0 ; i<_len;i++){
+        unsigned _len = inputTn1->getLength();
+        for(unsigned i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
@@ -1592,13 +1592,13 @@ bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *
     return false;
 }
 
-TensorF* CpuImplementation::PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded){
+TensorF* CpuImplementation::PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded){
     PrintInfo("PadLastDim","lastDimPadded",lastDimPadded,"",0,"",0,inputTn->getShape(),{},{});
     if(lastDimPadded<=inputTn->getShape()[inputTn->getRank()-1]){cout<<"PadLastDim: ERROR_BAD_PARAM"<<endl;return nullptr;}
     
-    unsigned int dim0, dim1, lcm, _gcd, argcnt;
-    std::vector<unsigned int> shape = inputTn->getShape();
-    const unsigned int rank = inputTn->getRank();
+    unsigned dim0, dim1, lcm, _gcd, argcnt;
+    std::vector<unsigned> shape = inputTn->getShape();
+    const unsigned rank = inputTn->getRank();
 
     if(rank!=1){
         dim0=1;
@@ -1631,13 +1631,13 @@ TensorF* CpuImplementation::PadLastDim(WorkScheduler scheduler, TensorF* inputTn
     return rsltTn;
 }
 
-TensorF* CpuImplementation::UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded){
+TensorF* CpuImplementation::UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded){
     PrintInfo("UnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
     if(lastDimUnpadded>=inputTn->getShape()[inputTn->getRank()-1]){cout<<"UnpadLastDim: ERROR_BAD_PARAM"<<endl;return nullptr;}
 
-    unsigned int dim0, dim1, argcnt;
-    std::vector<unsigned int> shape = inputTn->getShape();
-    const unsigned int rank = inputTn->getRank();
+    unsigned dim0, dim1, argcnt;
+    std::vector<unsigned> shape = inputTn->getShape();
+    const unsigned rank = inputTn->getRank();
 
     if(rank!=1){
         dim0=1;

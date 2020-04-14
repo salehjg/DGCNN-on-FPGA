@@ -28,15 +28,15 @@ TensorI::TensorI() {
     platform = PLATFORMS::DEFAULT; //Till it's not initialized, keep it general
 }
 
-TensorI::TensorI(std::vector<unsigned int> shape) {
+TensorI::TensorI(std::vector<unsigned> shape) {
     Init(shape);
 }
 
-TensorI::TensorI(std::vector<unsigned int> shape, int *buff) {
+TensorI::TensorI(std::vector<unsigned> shape, int *buff) {
     Init(shape,buff);
 }
 
-void TensorI::Init(std::vector<unsigned int> shape) {
+void TensorI::Init(std::vector<unsigned> shape) {
     if(initialized){
         std::cout<<"--- TensorI: buffer deleted.\n";
         delete(_buff);
@@ -48,7 +48,7 @@ void TensorI::Init(std::vector<unsigned int> shape) {
     platform = PLATFORMS::CPU;
 }
 
-void TensorI::Init(std::vector<unsigned int> shape, int* buff){
+void TensorI::Init(std::vector<unsigned> shape, int* buff){
     if(initialized){
         std::cout<<"--- TensorI: buffer deleted.\n";
         delete(_buff);
@@ -60,7 +60,7 @@ void TensorI::Init(std::vector<unsigned int> shape, int* buff){
     platform = PLATFORMS::CPU;
 }
 
-std::vector<unsigned int> TensorI::getShape(){
+std::vector<unsigned> TensorI::getShape(){
     return shape;
 }
 
@@ -93,7 +93,7 @@ void TensorI::SqueezeDims() {
     //Just making sure that padded last dim policy wont cause any problems.
     if(platform==PLATFORMS::GPU_OCL) assert(shape[shape.size()-1]!=1);
 
-    std::vector<unsigned int> shapeNew;
+    std::vector<unsigned> shapeNew;
 
     for (int i = 0; i < shape.size(); i++) {
         if(shape[i]!=1) shapeNew.push_back(shape[i]);
@@ -110,8 +110,8 @@ void TensorI::SqueezeDimZero(){
     }
 }
 
-void TensorI::Reshape(std::vector<unsigned int> newShape){
-    unsigned long len = 1;
+void TensorI::Reshape(std::vector<unsigned> newShape){
+    unsigned len = 1;
     for (int i = 0; i < newShape.size(); i++) {
         len = len * newShape[i];
     }
@@ -128,9 +128,9 @@ PLATFORMS TensorI::getPlatform(){
     return platform;
 }
 
-unsigned long TensorI::getLength() {
+unsigned TensorI::getLength() {
     if(initialized) {
-        unsigned long len = 1;
+        unsigned len = 1;
         for (int i = 0; i < shape.size(); i++) {
             len = len * shape[i];
         }
@@ -140,9 +140,9 @@ unsigned long TensorI::getLength() {
     }
 }
 
-unsigned long TensorI::getLengthBytes() {
+unsigned TensorI::getLengthBytes() {
     if(initialized) {
-        unsigned long len = 1;
+        unsigned len = 1;
         for(int i = 0;i<shape.size();i++){
             len = len * shape[i];
         }
@@ -152,10 +152,10 @@ unsigned long TensorI::getLengthBytes() {
     }
 }
 
-unsigned long TensorI::getLengthPadded(int vectorWords){
+unsigned TensorI::getLengthPadded(int vectorWords){
     if(initialized) {
-        unsigned long len = 1;
-        std::vector<unsigned int> paddedShape = PadShape(shape, vectorWords);
+        unsigned len = 1;
+        std::vector<unsigned> paddedShape = PadShape(shape, vectorWords);
         for (int i = 0; i < paddedShape.size(); i++) {
             len = len * paddedShape[i];
         }
@@ -166,24 +166,24 @@ unsigned long TensorI::getLengthPadded(int vectorWords){
     }
 }
 
-std::vector<unsigned int> TensorI::PadShape(std::vector<unsigned int> &actualShape, int vectorWords){
-    std::vector<unsigned int> paddedShape = actualShape;
+std::vector<unsigned> TensorI::PadShape(std::vector<unsigned> &actualShape, int vectorWords){
+    std::vector<unsigned> paddedShape = actualShape;
     // always pad the last dimension.
-    unsigned int lastDim = paddedShape[paddedShape.size()-1];
-    paddedShape[paddedShape.size()-1] = MakeDivisible<unsigned int>(lastDim, vectorWords);
+    unsigned lastDim = paddedShape[paddedShape.size()-1];
+    paddedShape[paddedShape.size()-1] = MakeDivisible<unsigned>(lastDim, vectorWords);
 
     return paddedShape;
 }
 
-unsigned long TensorI::getLengthBytesPadded(int vectorWords){
+unsigned TensorI::getLengthBytesPadded(int vectorWords){
     assert(vectorWords>0);
     return getLengthPadded(vectorWords) * sizeof(int);
 }
 
-unsigned long TensorI::getVectorCountPadded(int vectorWords){
+unsigned TensorI::getVectorCountPadded(int vectorWords){
     assert(vectorWords>0);
-    unsigned long len = getLengthPadded(vectorWords);
-    return len / (unsigned long)vectorWords;
+    unsigned len = getLengthPadded(vectorWords);
+    return len / (unsigned)vectorWords;
 }
 
 TensorI::~TensorI() {

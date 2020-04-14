@@ -2,8 +2,7 @@
 // Created by saleh on 8/30/18.
 //
 
-#ifndef DEEPPOINTV1_WEIGHTSLOADER_H
-#define DEEPPOINTV1_WEIGHTSLOADER_H
+#pragma once
 
 #include <build_config.h>
 #include "../inc/TensorF.h"
@@ -52,6 +51,3 @@ private:
     bool _isUsedOCL  = false; 
 
 };
-
-
-#endif //DEEPPOINTV1_WEIGHTSLOADER_H

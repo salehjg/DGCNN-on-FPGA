@@ -8,9 +8,9 @@
 ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
     DB_OFFSET = dataset_offset;
-    B = (unsigned int)batchsize;
-    N = (unsigned int)pointcount;
-    K = (unsigned int)knn_k;
+    B = (unsigned)batchsize;
+    N = (unsigned)pointcount;
+    K = (unsigned)knn_k;
 }
 
 ModelInfo ModelArchTop01::GetModelInfo() {

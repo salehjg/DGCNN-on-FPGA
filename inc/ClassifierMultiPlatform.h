@@ -1,6 +1,4 @@
-#ifndef CLASSIFIERMULTIPLATFORM_H
-#define CLASSIFIERMULTIPLATFORM_H
+#pragma once
 
-    extern void ClassifierMultiplatform();
+extern void ClassifierMultiplatform();
 
-#endif

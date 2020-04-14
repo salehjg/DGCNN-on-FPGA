@@ -23,19 +23,19 @@ void _task_datamover(
         MemoryPackI_t *srcBuff,
         MemoryPackI_t *dstBuff,
         int reverseSwitch,
-        const unsigned long len){
+        const unsigned len){
 #pragma HLS inline
 
     MemoryPackI_t buff;
     
     if(reverseSwitch==0){
-        for(unsigned long i=0;i<len;i++){
+        for(unsigned i=0;i<len;i++){
 #pragma HLS PIPELINE II=1
             buff = srcBuff[i];
             dstBuff[i] = buff;
         }
     }else{
-        for(unsigned long i=0;i<len;i++){
+        for(unsigned i=0;i<len;i++){
 #pragma HLS PIPELINE II=1
             buff = dstBuff[i];
             srcBuff[i] = buff;
@@ -51,7 +51,7 @@ void task_datamover_mod1_int(
         MemoryPackI_t *srcBuff,
         MemoryPackI_t *dstBuff,
         int reverseSwitch,
-        const unsigned long len){
+        const unsigned len){
 #pragma HLS INTERFACE m_axi     port=srcBuff            offset=slave bundle=gmemi0
 #pragma HLS INTERFACE m_axi     port=dstBuff            offset=slave bundle=gmemi1
 #pragma HLS INTERFACE s_axilite port=srcBuff            bundle=control

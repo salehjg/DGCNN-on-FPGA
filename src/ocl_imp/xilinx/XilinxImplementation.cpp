@@ -1234,7 +1234,7 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
     indicesAxis = 1;
 
     TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskGather::BankIndex_inputTn);
-    TensorI* _indices = ((OclTensorI*)indices)->CloneToDDRBank(program,context,queue,ConfigTaskGather::BankIndex_indicesTn);
+    TensorI* _indices = ((OclTensorI*)indices)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskGather::BankIndex_indicesTn);
 
     OclTensorF* rsltTn = new OclTensorF(context,{B,N,K,D}, ConfigTaskGather::BankIndex_outputTn);
     OclKernelObject *kernelObject = oclKernels[11];

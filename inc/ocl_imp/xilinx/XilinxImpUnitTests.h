@@ -1,5 +1,4 @@
-#ifndef XILINXIMPUNITTESTS_
-#define XILINXIMPUNITTESTS_
+#pragma once
 
 #include "WorkScheduler.h"
 #include "TensorF.h"
@@ -63,5 +62,3 @@ private:
     PlatformSelector* platformSelector;
     WorkScheduler scheduler;
 };
-
-#endif

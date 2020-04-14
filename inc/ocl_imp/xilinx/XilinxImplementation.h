@@ -2,9 +2,7 @@
 // Created by saleh on 8/22/18.
 //
 
-#ifndef DEEPPOINTV1_XILINXIMPLEMENTATION_H
-
-#define DEEPPOINTV1_XILINXIMPLEMENTATION_H
+#pragma once
 
 #include <PlatformImplementation.h>
 #include <ocl_imp/xilinx/xcl.h>
@@ -143,6 +141,3 @@ private:
     char *binary_content;             // program binary content
     cl_int err;
 };
-
-
-#endif //DEEPPOINTV1_XILINXIMPLEMENTATION_H

@@ -2,8 +2,7 @@
 // Created by saleh on 8/22/18.
 //
 
-#ifndef DEEPPOINTV1_PLATFORMSELECTOR_H
-#define DEEPPOINTV1_PLATFORMSELECTOR_H
+#pragma once
 
 #include <vector>
 #include "../inc/TensorF.h"
@@ -48,8 +47,8 @@ public:
     void     DumpMatrix(PLATFORMS platform, WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir=REPO_DIR"/data/matrix_dumps/");
     bool     CompareTensors(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
     bool     CompareTensorsInteger(PLATFORMS platform, WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
-    TensorF* PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded);
-    TensorF* UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded);
+    TensorF* PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded);
+    TensorF* UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded);
     ~PlatformSelector();
 
     WeightsLoader* weightsLoader;
@@ -62,6 +61,3 @@ public:
 private:
 
 };
-
-
-#endif //DEEPPOINTV1_PLATFORMSELECTOR_H

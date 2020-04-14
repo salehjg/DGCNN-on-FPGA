@@ -30,15 +30,15 @@ TensorF::TensorF() {
     platform = PLATFORMS::DEFAULT; //Till it's not initialized, keep it general
 }
 
-TensorF::TensorF(std::vector<unsigned int> shape) {
+TensorF::TensorF(std::vector<unsigned> shape) {
     Init(shape);
 }
 
-TensorF::TensorF(std::vector<unsigned int> shape, float *buff) {
+TensorF::TensorF(std::vector<unsigned> shape, float *buff) {
     Init(shape,buff);
 }
 
-void TensorF::Init(std::vector<unsigned int> shape) {
+void TensorF::Init(std::vector<unsigned> shape) {
     if(initialized){
         std::cout<<"--- TensorF: buffer deleted.\n";
         delete(_buff);
@@ -50,7 +50,7 @@ void TensorF::Init(std::vector<unsigned int> shape) {
     platform = PLATFORMS::CPU;
 }
 
-void TensorF::Init(std::vector<unsigned int> shape, float* buff){
+void TensorF::Init(std::vector<unsigned> shape, float* buff){
     if(initialized){
         std::cout<<"--- TensorF: buffer deleted.\n";
         delete(_buff);
@@ -62,7 +62,7 @@ void TensorF::Init(std::vector<unsigned int> shape, float* buff){
     platform = PLATFORMS::CPU;
 }
 
-std::vector<unsigned int> TensorF::getShape(){
+std::vector<unsigned> TensorF::getShape(){
     return shape;
 }
 
@@ -102,7 +102,7 @@ void TensorF::SqueezeDims() {
     //Just making sure that padded last dim policy wont cause any problems.
     if(platform==PLATFORMS::GPU_OCL) assert(shape[shape.size()-1]!=1);
 
-    std::vector<unsigned int> shapeNew;
+    std::vector<unsigned> shapeNew;
 
     for (int i = 0; i < shape.size(); i++) {
         if(shape[i]!=1) shapeNew.push_back(shape[i]);
@@ -111,8 +111,8 @@ void TensorF::SqueezeDims() {
     rank = (int)shape.size();
 }
 
-void TensorF::Reshape(std::vector<unsigned int> newShape){
-    unsigned long len = 1;
+void TensorF::Reshape(std::vector<unsigned> newShape){
+    unsigned len = 1;
     for (int i = 0; i < newShape.size(); i++) {
         len = len * newShape[i];
     }
@@ -129,12 +129,12 @@ PLATFORMS TensorF::getPlatform(){
     return platform;
 }
 
-unsigned long TensorF::getLength() {
+unsigned TensorF::getLength() {
     ///TODO: Change the if statement, because if we init a Tensor instance with an external buffer,
     /// on destruction, the destructor will delete that external buffer which isn't right
     /// so 'initialized' should represent the presence of internal allocated buffer. NOT an external one!
     if(initialized) {
-        unsigned long len = 1;
+        unsigned len = 1;
         for (int i = 0; i < shape.size(); i++) {
             len = len * shape[i];
         }
@@ -144,9 +144,9 @@ unsigned long TensorF::getLength() {
     }
 }
 
-unsigned long TensorF::getLengthBytes() {
+unsigned TensorF::getLengthBytes() {
     if(initialized) {
-        unsigned long len = 1;
+        unsigned len = 1;
         for(int i = 0;i<shape.size();i++){
             len = len * shape[i];
         }
@@ -156,10 +156,10 @@ unsigned long TensorF::getLengthBytes() {
     }
 }
 
-unsigned long TensorF::getLengthPadded(int vectorWords){
+unsigned TensorF::getLengthPadded(int vectorWords){
     if(initialized) {
-        unsigned long len = 1;
-        std::vector<unsigned int> paddedShape = PadShape(shape, vectorWords);
+        unsigned len = 1;
+        std::vector<unsigned> paddedShape = PadShape(shape, vectorWords);
         for (int i = 0; i < paddedShape.size(); i++) {
             len = len * paddedShape[i];
         }
@@ -170,24 +170,24 @@ unsigned long TensorF::getLengthPadded(int vectorWords){
     }
 }
 
-std::vector<unsigned int> TensorF::PadShape(std::vector<unsigned int> &actualShape, int vectorWords){
-    std::vector<unsigned int> paddedShape = actualShape;
+std::vector<unsigned> TensorF::PadShape(std::vector<unsigned> &actualShape, int vectorWords){
+    std::vector<unsigned> paddedShape = actualShape;
     // always pad the last dimension.
-    unsigned int lastDim = paddedShape[paddedShape.size()-1];
-    paddedShape[paddedShape.size()-1] = MakeDivisible<unsigned int>(lastDim, vectorWords);
+    unsigned lastDim = paddedShape[paddedShape.size()-1];
+    paddedShape[paddedShape.size()-1] = MakeDivisible<unsigned>(lastDim, vectorWords);
 
     return paddedShape;
 }
 
-unsigned long TensorF::getLengthBytesPadded(int vectorWords){
+unsigned TensorF::getLengthBytesPadded(int vectorWords){
     assert(vectorWords>0);
     return getLengthPadded(vectorWords) * sizeof(float);
 }
 
-unsigned long TensorF::getVectorCountPadded(int vectorWords){
+unsigned TensorF::getVectorCountPadded(int vectorWords){
     assert(vectorWords>0);
-    unsigned long len = getLengthPadded(vectorWords);
-    return len / (unsigned long)vectorWords;
+    unsigned len = getLengthPadded(vectorWords);
+    return len / (unsigned)vectorWords;
 }
 
 // https://stackoverflow.com/questions/9331561/why-does-my-classs-destructor-get-called-when-i-add-instances-to-a-vector

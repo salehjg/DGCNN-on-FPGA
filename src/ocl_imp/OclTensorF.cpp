@@ -20,15 +20,15 @@ OclTensorF::OclTensorF(int vectorWords){
     this->vectorWords = vectorWords;
 }
 
-OclTensorF::OclTensorF(cl_context context, std::vector<unsigned int> shape, int bank, int vectorWords){
+OclTensorF::OclTensorF(cl_context context, std::vector<unsigned> shape, int bank, int vectorWords){
     Init(context, shape, bank, vectorWords);
 }
 
-OclTensorF::OclTensorF(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
+OclTensorF::OclTensorF(std::vector<unsigned> shape, cl_mem clBuff, int bank){
     Init(shape, clBuff, bank);
 }
 
-void OclTensorF::Init(cl_context context, std::vector<unsigned int> shape, int bank, int vectorWords) {
+void OclTensorF::Init(cl_context context, std::vector<unsigned> shape, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
@@ -39,7 +39,7 @@ void OclTensorF::Init(cl_context context, std::vector<unsigned int> shape, int b
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-    unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
+    unsigned lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
@@ -53,7 +53,7 @@ void OclTensorF::Init(cl_context context, std::vector<unsigned int> shape, int b
     assert(ocl_stat==CL_SUCCESS);
 }
 
-void OclTensorF::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
+void OclTensorF::Init(std::vector<unsigned> shape, cl_mem clBuff, int bank){
     cl_int ocl_stat;
     std::cout<<"--- OclTensorF: Warning: No padding\n";
     if(initialized){
@@ -64,7 +64,7 @@ void OclTensorF::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-    unsigned long len = getLengthBytes();
+    unsigned len = getLengthBytes();
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
@@ -72,7 +72,7 @@ void OclTensorF::Init(std::vector<unsigned int> shape, cl_mem clBuff, int bank){
     ocl_buff = clBuff;
 }
 
-void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned int> shape, float *hostBuff, int bank, int vectorWords) {
+void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned> shape, float *hostBuff, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
         std::cout<<"--- OclTensorF: buffer deleted.\n";
@@ -83,7 +83,7 @@ void OclTensorF::InitWithHostData(cl_context context, cl_command_queue queue, st
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-    unsigned long lenPadded = getLengthBytesPadded(this->vectorWords);
+    unsigned lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
@@ -123,7 +123,7 @@ int OclTensorF::LaunchDataMover(
     int dstBank, 
     cl_mem srcBuff, 
     cl_mem dstBuff, 
-    unsigned long len){
+    unsigned len){
 
     cl_int error;
 
@@ -141,7 +141,7 @@ int OclTensorF::LaunchDataMover(
     //reverseSwitch=0 : Copy srcBuff(bank0) to dstBuff(bank1).
     //reverseSwitch=1 : Copy dstBuff(bank1) to srcBuff(bank0).
     int reverseSwitch = (srcBank==DATAMOVER_KERNEL_BANK_A_INDEX) ? 0 : 1;
-    unsigned long lenVec = len / ((unsigned long)this->vectorWords);
+    unsigned lenVec = len / ((unsigned)this->vectorWords);
 
     int argcnt=0;
     if(reverseSwitch==0){
@@ -152,7 +152,7 @@ int OclTensorF::LaunchDataMover(
         error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff); 
     }
     error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_int), (void*)&reverseSwitch); 
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_ulong), (void*)&lenVec);
+    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&lenVec);
     
     if(error != CL_SUCCESS) cout<<"Failed to set internal data-mover kernel args, Err: "<< error <<endl;
     assert(error==CL_SUCCESS);
@@ -192,8 +192,8 @@ void OclTensorF::ChangeDDRBank(cl_program program, cl_context context, cl_comman
         memExt.obj = NULL;
         memExt.param = 0;
 
-        unsigned long lenBytesPadded = getLengthBytesPadded(this->vectorWords);
-        unsigned long lenWordsPadded = getLengthPadded(this->vectorWords);
+        unsigned lenBytesPadded = getLengthBytesPadded(this->vectorWords);
+        unsigned lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Creating new buffer within requested memory bank.
         cl_int ocl_stat;
@@ -240,7 +240,7 @@ TensorF* OclTensorF::CloneToDDRBank(cl_program program, cl_context context, cl_c
         //Creating new blank tensor within the required bank 
         OclTensorF* clonedTensor = new OclTensorF(context, shape, bank);
 
-        unsigned long lenWordsPadded = getLengthPadded(this->vectorWords);
+        unsigned lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
         //Unsupported memory banks will be checked within 'LaunchDataMover' method.
@@ -300,19 +300,19 @@ int OclTensorF::TranslateBankIndex(int bankIndex){
     };
 }
 
-float* OclTensorF::PadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords){
-    std::vector<unsigned int> paddedShape = PadShape(actualShape, vectorWords);
-    unsigned long paddedLen = 1;
+float* OclTensorF::PadHostBuffer(std::vector<unsigned> actualShape, float *hostSrcBuff, int vectorWords){
+    std::vector<unsigned> paddedShape = PadShape(actualShape, vectorWords);
+    unsigned paddedLen = 1;
     for(int i=0; i<paddedShape.size(); i++){
         paddedLen = paddedLen * paddedShape[i];
     }
 
-    const unsigned long sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
+    const unsigned sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
     const int actualSliceLen = actualShape[actualShape.size()-1];
     const int paddedSliceLen = paddedShape[actualShape.size()-1];
     float *paddedBuff = new float[paddedLen];
 
-    for(unsigned long slice=0; slice<sliceCount; slice++){
+    for(unsigned slice=0; slice<sliceCount; slice++){
         for(int i=0; i<paddedSliceLen; i++){
             paddedBuff[slice*paddedSliceLen + i] = (i<actualSliceLen)? hostSrcBuff[slice*actualSliceLen + i] : 0;
         }
@@ -321,19 +321,19 @@ float* OclTensorF::PadHostBuffer(std::vector<unsigned int> actualShape, float *h
     return paddedBuff;
 }
 
-float* OclTensorF::UnPadHostBuffer(std::vector<unsigned int> actualShape, float *hostSrcBuff, int vectorWords){
-    std::vector<unsigned int> paddedShape = PadShape(actualShape, vectorWords);
-    unsigned long paddedLen = 1;
+float* OclTensorF::UnPadHostBuffer(std::vector<unsigned> actualShape, float *hostSrcBuff, int vectorWords){
+    std::vector<unsigned> paddedShape = PadShape(actualShape, vectorWords);
+    unsigned paddedLen = 1;
     for(int i=0; i<paddedShape.size(); i++){
         paddedLen = paddedLen * paddedShape[i];
     }
 
-    const unsigned long sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
+    const unsigned sliceCount = paddedLen / paddedShape[paddedShape.size()-1];
     const int actualSliceLen = actualShape[actualShape.size()-1];
     const int paddedSliceLen = paddedShape[actualShape.size()-1];
     float *unpaddedBuff = new float[paddedLen];
 
-    for(unsigned long slice=0; slice<sliceCount; slice++){
+    for(unsigned slice=0; slice<sliceCount; slice++){
         for(int i=0; i<actualSliceLen; i++){
             unpaddedBuff[slice*actualSliceLen + i] = hostSrcBuff[slice*paddedSliceLen + i];
         }
@@ -342,9 +342,9 @@ float* OclTensorF::UnPadHostBuffer(std::vector<unsigned int> actualShape, float 
     return unpaddedBuff;
 }
 
-unsigned int OclTensorF::getPaddedLastDim(){
+unsigned OclTensorF::getPaddedLastDim(){
     if(initialized){
-        std::vector<unsigned int> paddedShape = PadShape(shape, vectorWords);
+        std::vector<unsigned> paddedShape = PadShape(shape, vectorWords);
         return paddedShape[paddedShape.size()-1];
     }else{
         return 0;

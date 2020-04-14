@@ -2,8 +2,7 @@
 // Created by saleh on 8/22/18.
 //
 
-#ifndef DEEPPOINTV1_PLATFORMIMPLEMENTATION_H
-#define DEEPPOINTV1_PLATFORMIMPLEMENTATION_H
+#pragma once
 
 #include "../inc/WorkScheduler.h"
 #include "../inc/TensorF.h"
@@ -53,13 +52,10 @@ public:
     virtual void     DumpMatrix(WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir)=0;
     virtual bool     CompareTensors(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2)=0;
     virtual bool     CompareTensorsInteger(WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2)=0;
-    virtual TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded)=0;
-    virtual TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded)=0;
+    virtual TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded)=0;
+    virtual TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded)=0;
 
 private:
 
 
 };
-
-
-#endif //DEEPPOINTV1_PLATFORMIMPLEMENTATION_H

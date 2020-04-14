@@ -2,8 +2,7 @@
 // Created by saleh on 8/23/18.
 //
 
-#ifndef DEEPPOINTV1_TENSORF_H
-#define DEEPPOINTV1_TENSORF_H
+#pragma once
 
 #include <vector>
 #include <build_config.h>
@@ -17,34 +16,31 @@ enum class PLATFORMS{
 class TensorF {
 public:
     TensorF();
-    TensorF(std::vector<unsigned int> shape);
-    TensorF(std::vector<unsigned int> shape, float* buff);
-    virtual void Init(std::vector<unsigned int> shape);
-    virtual void Init(std::vector<unsigned int> shape, float* buff);
-    std::vector<unsigned int> getShape();
+    TensorF(std::vector<unsigned> shape);
+    TensorF(std::vector<unsigned> shape, float* buff);
+    virtual void Init(std::vector<unsigned> shape);
+    virtual void Init(std::vector<unsigned> shape, float* buff);
+    std::vector<unsigned> getShape();
     int getRank();
     void ExpandDims(int axis);
     void SqueezeDims();
     void ExpandDimZero();
     void SqueezeDimZero();
-    void Reshape(std::vector<unsigned int> newShape);
+    void Reshape(std::vector<unsigned> newShape);
     PLATFORMS getPlatform();
-    unsigned long getLength();
-    unsigned long getLengthBytes();
-    unsigned long getLengthPadded(int vectorWords);
-    unsigned long getLengthBytesPadded(int vectorWords);
-    unsigned long getVectorCountPadded(int vectorWords);
-    static std::vector<unsigned int> PadShape(std::vector<unsigned int> &actualShape, int vectorWords);
+    unsigned getLength();
+    unsigned getLengthBytes();
+    unsigned getLengthPadded(int vectorWords);
+    unsigned getLengthBytesPadded(int vectorWords);
+    unsigned getVectorCountPadded(int vectorWords);
+    static std::vector<unsigned> PadShape(std::vector<unsigned> &actualShape, int vectorWords);
     virtual ~TensorF();
 
     float* _buff;
 
 protected:
-    std::vector<unsigned int> shape;
+    std::vector<unsigned> shape;
     int rank;
     bool initialized=false;
     PLATFORMS platform;
 };
-
-
-#endif //DEEPPOINTV1_TENSORF_H

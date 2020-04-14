@@ -2,8 +2,7 @@
 // Created by saleh on 8/28/18.
 //
 
-#ifndef DEEPPOINTV1_MODELARCHTOP05_H
-#define DEEPPOINTV1_MODELARCHTOP05_H
+#pragma once
 
 #include <iostream>
 #include <sys/time.h>
@@ -53,9 +52,9 @@ public:
     int         GetBatchSize();
 
 private:
-    unsigned int B=-1;
-    unsigned int N=-1;
-    unsigned int K=-1;
+    unsigned B=-1;
+    unsigned N=-1;
+    unsigned K=-1;
     TensorF* input_pcl_BxNxD;
     TensorI* input_labels_B;
     int DB_OFFSET=-1;
@@ -63,6 +62,3 @@ private:
     cnpy::NpyArray _npy_labels;
     PlatformSelector* platformSelector;
 };
-
-
-#endif //DEEPPOINTV1_MODELARCHTOP05_H
