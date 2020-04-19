@@ -37,11 +37,9 @@ public:
     unsigned getPaddedLastDim();
     virtual ~OclTensorF();
     cl_mem ocl_buff;
+    
 private:
-    int LaunchDataMover(cl_program program, cl_command_queue queue, int srcBank, int dstBank, cl_mem srcBuff, cl_mem dstBuff, unsigned len);
     int TranslateBankIndex(int bankIndex);
-
-
 
     //If bank arg were not specified, tensor would be allocated
     //on default bank which is default value of 'dramBank'

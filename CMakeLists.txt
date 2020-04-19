@@ -343,40 +343,37 @@ set(SP_TAG_RELUSQRTSQUARE
 "--sp task_relu_sqrt_square_1.inputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_inputTn}\
  --sp task_relu_sqrt_square_1.outputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_outputTn}")
 
-set(SP_TAG_DATAMOVER_FLOAT  
-"--sp task_datamover_mod1_float_1.srcBuff:bank${CFG13_DataMoverF_DDRBANK_srcBuff}\
- --sp task_datamover_mod1_float_1.dstBuff:bank${CFG13_DataMoverF_DDRBANK_dstBuff}")
-
-set(SP_TAG_DATAMOVER_INT    
-"--sp task_datamover_mod1_int_1.srcBuff:bank${CFG14_DataMoverI_DDRBANK_srcBuff}\
- --sp task_datamover_mod1_int_1.dstBuff:bank${CFG14_DataMoverI_DDRBANK_dstBuff}")
+set(SP_TAG_DATAMOVER   
+"--sp task_datamover_1.dataBank0:bank0\
+ --sp task_datamover_1.dataBank1:bank1\
+ --sp task_datamover_1.dataBank2:bank2\
+ --sp task_datamover_1.dataBank3:bank3")
 
 set(SP_TAG_PADDING          
-"--sp task_pad_last_dim_1.inputTn:bank${CFG15_Padding_DDRBANK_inputTn}\
- --sp task_pad_last_dim_1.outputTn:bank${CFG15_Padding_DDRBANK_outputTn}")
+"--sp task_pad_last_dim_1.inputTn:bank${CFG13_Padding_DDRBANK_inputTn}\
+ --sp task_pad_last_dim_1.outputTn:bank${CFG13_Padding_DDRBANK_outputTn}")
 
 set(SP_TAG_UNPADDING        
-"--sp task_unpad_last_dim_1.inputTn:bank${CFG16_Unpadding_DDRBANK_inputTn}\
- --sp task_unpad_last_dim_1.outputTn:bank${CFG16_Unpadding_DDRBANK_outputTn}")
+"--sp task_unpad_last_dim_1.inputTn:bank${CFG14_Unpadding_DDRBANK_inputTn}\
+ --sp task_unpad_last_dim_1.outputTn:bank${CFG14_Unpadding_DDRBANK_outputTn}")
 
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
+##sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+##sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp"    "relu_sqrt_square"  "task_relu_sqrt_square"     FALSE TRUE ${SP_TAG_RELUSQRTSQUARE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"      "datamoverfloat"    "task_datamover_mod1_float" FALSE TRUE ${SP_TAG_DATAMOVER_FLOAT} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"    "datamoverinteger"  "task_datamover_mod1_int"   FALSE TRUE ${SP_TAG_DATAMOVER_INT} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"             "padding"           "task_pad_last_dim"         FALSE TRUE ${SP_TAG_PADDING} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"           "unpadding"         "task_unpad_last_dim"       FALSE TRUE ${SP_TAG_UNPADDING} "")
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamover.cpp"           "datamover"         "task_datamover"            FALSE TRUE ${SP_TAG_DATAMOVER} "")
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"             "padding"           "task_pad_last_dim"         FALSE TRUE ${SP_TAG_PADDING} "")
+#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"           "unpadding"         "task_unpad_last_dim"       FALSE TRUE ${SP_TAG_UNPADDING} "")
 
 #==========================================================================================================================================
 
@@ -427,6 +424,7 @@ set(HOSTSIDE_SRC
     src/cpu_imp/CpuImplementation.cpp
     src/ocl_imp/OclTensorF.cpp
     src/ocl_imp/OclTensorI.cpp
+    src/ocl_imp/DataMover.cpp
     src/ocl_imp/xilinx/xcl.cpp
     src/ocl_imp/xilinx/XilinxImplementation.cpp
     #src/ocl_imp/xilinx/XilinxImpUnitTests.cpp

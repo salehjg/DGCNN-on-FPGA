@@ -4,6 +4,7 @@
 
 #include "ocl_imp/OclTensorF.h"
 #include "ocl_imp/OclTensorI.h"
+#include "ocl_imp/DataMover.h"
 
 #include <iostream>
 #include <cassert>
@@ -117,65 +118,6 @@ int OclTensorI::getDramBank(){
     return dramBank;
 }
 
-
-int OclTensorI::LaunchDataMover( 
-    cl_program program,
-    cl_command_queue queue, 
-    int srcBank, 
-    int dstBank, 
-    cl_mem srcBuff, 
-    cl_mem dstBuff, 
-    unsigned len){
-
-    cl_int error;
-
-    if(!(srcBank>=DATAMOVER_KERNEL_BANK_A_INDEX && srcBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported srcBank. (OclTensorI)" <<endl; std::exit(3);}
-    if(!(dstBank>=DATAMOVER_KERNEL_BANK_A_INDEX && dstBank<=DATAMOVER_KERNEL_BANK_B_INDEX)){cout<< "Invalid or unsupported dstBank. (OclTensorI)" <<endl; std::exit(3);}
-    assert(this->vectorWords>0);
-    
-    cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover_mod1_int", &error);
-    if (error != CL_SUCCESS) {
-        cout<<  "Failed to create internal data-mover task kernel (OclTensorI), Err: " << error << endl;
-        std::exit(1);
-    }
-
-    //Current datamover kernel only supports srcBuff within bank0 and dstBuff within bank1.
-    //reverseSwitch=0 : Copy srcBuff(bank0) to dstBuff(bank1).
-    //reverseSwitch=1 : Copy dstBuff(bank1) to srcBuff(bank0).
-    int reverseSwitch = (srcBank==DATAMOVER_KERNEL_BANK_A_INDEX) ? 0 : 1;
-    unsigned lenVec = len / ((unsigned)this->vectorWords);
-
-    int argcnt=0;
-    if(reverseSwitch==0){
-        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff); //Arg0 should always be on bank0
-        error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff); 
-    }else{
-        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff); //Arg0 should always be on bank0
-        error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff); 
-    }
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_int), (void*)&reverseSwitch); 
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&lenVec);
-    
-    if(error != CL_SUCCESS) cout<<"Failed to set internal data-mover kernel args (OclTensorI), Err: "<< error <<endl;
-    assert(error==CL_SUCCESS);
-
-    cl_event exeEvt;
-    error = clEnqueueTask( queue,
-                           kernel_datamover,
-                           0,
-                           NULL,
-                           &exeEvt);
-    if(error != CL_SUCCESS) cout<<"Failed to launch internal data-mover kernel (OclTensorI), Err: "<< error <<endl;
-    assert(error==CL_SUCCESS);
-    clWaitForEvents(1, &exeEvt);
-
-    cout<< "_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully (OclTensorI) -_-_-_-_-_-_-_-_"<<endl;
-
-    error = clReleaseKernel(kernel_datamover);
-    if(error != CL_SUCCESS) cout<<"Failed to release internal data-mover kernel (OclTensorI), Err: "<< error <<endl;
-    assert(error==CL_SUCCESS);
-}
-
 // The idea is to hide FPGA specific memory bank related stuff from the top ModelArch.
 // The only planned access to this method should be through 'XilinxImplementation' class.
 // Because of this, XilinxImpUnitTests wont be able to access cl_program directely.
@@ -207,11 +149,13 @@ void OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_comman
         LaunchDataMover(
             program, 
             queue, 
-            dramBank, 
-            bank, 
+            context,
             ocl_buff, 
             newBuff, 
-            lenWordsPadded);
+            dramBank, 
+            bank, 
+            lenWordsPadded,
+            (unsigned)this->vectorWords);
 
         //Now we have to release the old buffer and replace it with the new one.
         cl_int error = clReleaseMemObject(ocl_buff);
@@ -249,11 +193,13 @@ TensorI* OclTensorI::CloneToDDRBank(cl_program program, cl_context context, cl_c
         LaunchDataMover(
             program, 
             queue, 
-            dramBank, 
-            bank, 
+            context,
             ocl_buff, 
             clonedTensor->ocl_buff, 
-            lenWordsPadded);
+            dramBank, 
+            bank, 
+            lenWordsPadded,
+            (unsigned)this->vectorWords);
 
         return clonedTensor;
         

@@ -174,68 +174,87 @@ ReportObject* XilinxImpUnitTests::TensorBankInteger(){
 }
 
 ReportObject* XilinxImpUnitTests::TensorCloneBankFloat(){
+
+    unsigned err=0;
+
     TensorF* tensorCpu = GenerateTensor(7,{5,5,2});
     OclTensorF* tensorSrc_defaultBank = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
 
-    bool rslt_before_cloning_bank = platformSelector->CompareTensors(
-        PLATFORMS::CPU,
-        scheduler,
-        tensorCpu,
-        tensorSrc_defaultBank);
+    err += !platformSelector->CompareTensors(
+            PLATFORMS::CPU,
+            scheduler,
+            tensorCpu,
+            tensorSrc_defaultBank);
 
-    OclTensorF* tensorCloned_BankB = (OclTensorF*)
-    tensorSrc_defaultBank->CloneToDDRBank(
-        platformSelector->openclPlatformClass->getProgram(),
-        platformSelector->openclPlatformClass->getContext(),
-        platformSelector->openclPlatformClass->getQueue(),
-        DATAMOVER_KERNEL_BANK_B_INDEX);
+    for(unsigned bankSrc=0; bankSrc<4; bankSrc++){
+        for(unsigned bankDest=0; bankDest<4; bankDest++){
+            std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
+            OclTensorF* tensorCloned_BankB = (OclTensorF*)
+                tensorSrc_defaultBank->CloneIfNeededToDDRBank(
+                    platformSelector->openclPlatformClass->getProgram(),
+                    platformSelector->openclPlatformClass->getContext(),
+                    platformSelector->openclPlatformClass->getQueue(),
+                    bankSrc);
 
-    bool rslt_after_cloning_bank = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorCloned_BankB);
+            err += !platformSelector->CompareTensors(
+                PLATFORMS::CPU,
+                scheduler,
+                tensorCpu,
+                tensorCloned_BankB);
 
-    OclTensorF* tensorCloned_BankA = (OclTensorF*)
-    tensorCloned_BankB->CloneToDDRBank(
-        platformSelector->openclPlatformClass->getProgram(),
-        platformSelector->openclPlatformClass->getContext(),
-        platformSelector->openclPlatformClass->getQueue(),
-        DATAMOVER_KERNEL_BANK_A_INDEX);
+            OclTensorF* tensorCloned_BankA = (OclTensorF*)
+                tensorCloned_BankB->CloneIfNeededToDDRBank(
+                    platformSelector->openclPlatformClass->getProgram(),
+                    platformSelector->openclPlatformClass->getContext(),
+                    platformSelector->openclPlatformClass->getQueue(),
+                    bankDest);
 
-    bool rslt_after_cloning_bank_reverse = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorCloned_BankA);
+            err += !platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorCloned_BankA);
+        }       
+    }
 
-
-    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_cloning_bank && rslt_after_cloning_bank && rslt_after_cloning_bank_reverse);
+    ReportObject* obj = new ReportObject(__FUNCTION__, err==0);
     return obj;
 }
 
 ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
+
+    unsigned err=0;
+
     TensorI* tensorCpu = GenerateTensorInteger(7,{5,5,2});
     OclTensorI* tensorSrc_defaultBank = (OclTensorI*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
 
-    bool rslt_before_cloning_bank = platformSelector->CompareTensorsInteger(
-        PLATFORMS::CPU,
-        scheduler,
-        tensorCpu,
-        tensorSrc_defaultBank);
+    err += !platformSelector->CompareTensorsInteger(
+            PLATFORMS::CPU,
+            scheduler,
+            tensorCpu,
+            tensorSrc_defaultBank);
 
-    OclTensorI* tensorCloned_BankB = (OclTensorI*)
-    tensorSrc_defaultBank->CloneToDDRBank(
-        platformSelector->openclPlatformClass->getProgram(),
-        platformSelector->openclPlatformClass->getContext(),
-        platformSelector->openclPlatformClass->getQueue(),
-        DATAMOVER_KERNEL_BANK_B_INDEX);
+    for(unsigned bankSrc=0; bankSrc<4; bankSrc++){
+        for(unsigned bankDest=0; bankDest<4; bankDest++){
+            std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
 
-    bool rslt_after_cloning_bank = platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorCloned_BankB);
+            OclTensorI* tensorCloned_BankB = (OclTensorI*)
+                    tensorSrc_defaultBank->CloneIfNeededToDDRBank(
+                            platformSelector->openclPlatformClass->getProgram(),
+                            platformSelector->openclPlatformClass->getContext(),
+                            platformSelector->openclPlatformClass->getQueue(),
+                            bankSrc);
 
-    OclTensorI* tensorCloned_BankA = (OclTensorI*)
-    tensorCloned_BankB->CloneToDDRBank(
-        platformSelector->openclPlatformClass->getProgram(),
-        platformSelector->openclPlatformClass->getContext(),
-        platformSelector->openclPlatformClass->getQueue(),
-        DATAMOVER_KERNEL_BANK_A_INDEX);
+            err += !platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorCloned_BankB);
 
-    bool rslt_after_cloning_bank_reverse = platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorCloned_BankA);
+            OclTensorI* tensorCloned_BankA = (OclTensorI*)
+                    tensorCloned_BankB->CloneIfNeededToDDRBank(
+                            platformSelector->openclPlatformClass->getProgram(),
+                            platformSelector->openclPlatformClass->getContext(),
+                            platformSelector->openclPlatformClass->getQueue(),
+                            bankDest);
 
+            err += !platformSelector->CompareTensorsInteger(PLATFORMS::CPU,scheduler,tensorCpu,tensorCloned_BankA);
+        }
+    }
 
-    ReportObject* obj = new ReportObject(__FUNCTION__, rslt_before_cloning_bank && rslt_after_cloning_bank && rslt_after_cloning_bank_reverse);
+    ReportObject* obj = new ReportObject(__FUNCTION__, err==0);
     return obj;
 }
 
@@ -924,6 +943,7 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
+    /*
     PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
@@ -945,10 +965,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelTile());
     PrintReport(KernelGather());
     PrintReport(KernelConcat2());
-    PrintReport(KernelRelu());
-    PrintReport(KernelSqrt());
+    PrintReport(KernelRelu());*/
+    PrintReport(KernelSqrt());/*
     PrintReport(KernelSquare());
-    PrintReport(KernelTranspose());
+    PrintReport(KernelTranspose());*/
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
