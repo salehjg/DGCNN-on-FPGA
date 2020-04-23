@@ -12,7 +12,7 @@ add_executable(CpuTestReduceSum4D
 target_link_libraries(CpuTestReduceSum4D
     ${SDAccel_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 add_test(NAME CpuTestReduceSum4D COMMAND CpuTestReduceSum4D)

@@ -10,9 +10,9 @@ add_executable(CpuTestMatmul
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp)
 
 target_link_libraries(CpuTestMatmul 
-    ${SDAccel_LIBRARIES} 
+    ${Vitis_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 add_test(NAME CpuTestMatmul COMMAND CpuTestMatmul)

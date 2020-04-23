@@ -10,9 +10,9 @@ add_executable(CpuTestGather
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/gather.cpp)
 
 target_link_libraries(CpuTestGather
-    ${SDAccel_LIBRARIES} 
+    ${Vitis_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 add_test(NAME CpuTestGather COMMAND CpuTestGather)

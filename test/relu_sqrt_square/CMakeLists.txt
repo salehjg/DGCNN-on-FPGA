@@ -10,9 +10,9 @@ add_executable(CpuTestReluSqrtSquare
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp)
 
 target_link_libraries(CpuTestReluSqrtSquare
-    ${SDAccel_LIBRARIES} 
+    ${Vitis_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 add_test(NAME CpuTestReluSqrtSquare COMMAND CpuTestReluSqrtSquare)

@@ -10,10 +10,10 @@ add_executable(CpuTestTopkSelectionSort
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp)
 
 target_link_libraries(CpuTestTopkSelectionSort
-    ${SDAccel_LIBRARIES} 
+    ${Vitis_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 #add_test(NAME CpuTestTopkSelectionSort COMMAND CpuTestTopkSelectionSort)
 
@@ -22,10 +22,10 @@ add_executable(CpuTestTopkInsertionSort
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp)
 
 target_link_libraries(CpuTestTopkInsertionSort 
-    ${SDAccel_LIBRARIES} 
+    ${Vitis_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 #add_test(NAME CpuTestTopkInsertionSort COMMAND CpuTestTopkInsertionSort)
 
@@ -34,9 +34,9 @@ add_executable(CpuTestTopkMergeSort
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp)
 
 target_link_libraries(CpuTestTopkMergeSort
-    ${SDAccel_LIBRARIES} 
+    ${Vitis_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 add_test(NAME CpuTestTopkMergeSort COMMAND CpuTestTopkMergeSort)

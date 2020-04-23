@@ -16,7 +16,7 @@ cmake_minimum_required(VERSION 3.0)
 project(DeepPointV1FPGA)
 set(HostExecutableName DeepPointV1FPGA)
 if(NOT DEFINED ENV{AWS_PLATFORM})
-    message(FATAL_ERROR "You must set env variable AWS_PLATFORM to the path of the SDAccel platform file(*.xpfm)")
+    message(FATAL_ERROR "You must set env variable AWS_PLATFORM to the path of the Vitis platform file(*.xpfm)")
 endif()
 
 #==========================================================================================================================================
@@ -24,15 +24,14 @@ endif()
 #-DKERNEL_LOGS -DHLSLIB_SYNTHESIS
 
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
-set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
-set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
-set(SYNTH_FLAGS "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
-set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
-#set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
-set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
-set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
-set(KERNEL_CLOCK "-1" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
-set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty")
+set(BinaryContainersName "binarycontainer1" CACHE STRING "Binary Container's Name")
+set(Platform "$ENV{AWS_PLATFORM}" CACHE STRING "Known Vitis platform name or xpfm file path") 
+set(PartName "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
+set(KernelFlags "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for the kernels")
+set(Profiling ON CACHE BOOL "Profiling ON/OFF")
+set(OptimizationLevel "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
+set(KernelFrequency "200" CACHE STRING "MHz")
+set(IpCachePath "${CMAKE_BINARY_DIR}/ip_cache" CACHE STRING "IP Cache Path(with enough space for a hw build)")
 
 set(PASTEBIN_0_1 "0" CACHE STRING "Enable or disable PasteBin agent for uploading autobuild log files to PasteBin.") 
 set(PASTEBIN_USERNAME "" CACHE STRING "PasteBin Account's Username") 
@@ -44,32 +43,24 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_SOURCE_DIR}/hlslib/cmake
     )
 
-find_package(SDAccel REQUIRED)
+find_package(Vitis REQUIRED)
 find_package(Threads REQUIRED)
 include(CheckTypeSize)
 
 
 #==========================================================================================================================================
 
+if(((${Vitis_MAJOR_VERSION} LESS 2018) AND (${Vitis_MINOR_VERSION} LESS 3)) OR ${Vitis_MAJOR_VERSION} LESS 2017)
+  message(FATAL_ERROR "Legacy SDx is not supported on this branch.")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHLSLIB_LEGACY_SDX=0")
+endif()
 
-
-include_directories(config/output inc hlslib/include ${CMAKE_BINARY_DIR} ${SDAccel_INCLUDE_DIRS})
+add_subdirectory(${CMAKE_SOURCE_DIR}/config)
+include_directories(config/output inc hlslib/include ${CMAKE_BINARY_DIR} ${Vitis_INCLUDE_DIRS})
 add_definitions(-DREPO_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_definitions(-DBIN_DIR=\"${CMAKE_BINARY_DIR}\")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
-#add_definitions("-DHLSLIB_STREAM_TIMEOUT=16")
-if(((${SDAccel_MAJOR_VERSION} LESS 2018) AND (${SDAccel_MINOR_VERSION} LESS 3)) OR ${SDAccel_MAJOR_VERSION} LESS 2017)
-  add_definitions(-DHLSLIB_LEGACY_SDX=1)
-else()
-  add_definitions(-DHLSLIB_LEGACY_SDX=0)
-endif()
-
-
-
-#==========================================================================================================================================
-
-
 
 set(hw_link_command "")
 set(hwemu_link_command "")
@@ -78,216 +69,171 @@ set(hw_link "")
 set(hwemu_link "")
 set(swemu_link "")
 
+#Creating IpCacheFolder
+file(MAKE_DIRECTORY ${IpCachePath})
+
+# Create common-config.ini
+file(WRITE "${CMAKE_BINARY_DIR}/common-config.ini" "platform=$ENV{AWS_PLATFORM}\nsave-temps=1\n")
+
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
+file(WRITE "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
+
+include(ProcessorCount)
+ProcessorCount(_CpuCount)
+if(NOT ${_CpuCount} EQUAL 0)
+    set(CpuCount ${_CpuCount})
+else()
+    set(CpuCount 4)
+endif()
+message("Detected CPU Core Count: ${CpuCount}")
+
+if(${Profiling})
+    set(true_false_profiling "true")
+else()
+    set(true_false_profiling "false")
+endif()
+configure_file(${CMAKE_SOURCE_DIR}/scripts/xrt.ini.in ${CMAKE_BINARY_DIR}/xrt.ini)
 
 
 #==========================================================================================================================================
 
 
-
-function(floatexpr expr output)
-    set(FLOAT_EXPR_SRC "
-    #include <stdio.h>
-    int main(int argc, char *argv[]){printf(\"%f\", ${expr})\; return 0\;}
-    ")
-    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CMakeFloatExpr.c ${FLOAT_EXPR_SRC})
-
-    try_run(RESULT COMPRES ${CMAKE_CURRENT_BINARY_DIR}
-            ${CMAKE_CURRENT_BINARY_DIR}/CMakeFloatExpr.c
-            RUN_OUTPUT_VARIABLE __output)
-
-    set(${output} ${__output} PARENT_SCOPE)
+function(CreateLinkIni
+    nkTagsForKernels)
+    # Create <binary container>-link.ini
+    file(WRITE "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "debug=1\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "messageDb=${CMAKE_BINARY_DIR}/${BinaryContainersName}.mdb\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "temp_dir=${CMAKE_BINARY_DIR}/${BinaryContainersName}.build\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "report_dir=${CMAKE_BINARY_DIR}/${BinaryContainersName}.build/reports\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "log_dir=${CMAKE_BINARY_DIR}/${BinaryContainersName}.build/logs\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "remote_ip_cache=${IpCachePath}\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "[advanced]\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "misc=solution_name=link\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "[connectivity]\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "${${nkTagsForKernels}}\n")
+    #file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "nk=vadd_pipelined:1:vadd_pipelined_1\n")
 endfunction()
-
-
-
-#==========================================================================================================================================
-
-
-
-# Creates TCL scripts for the given kernel.
-function(synthesis_target 
-    KERNEL_FILE 
-    KERNEL_NAME)
-
-    set(HLSLIB_PART_NAME "${SYNTH_PART_NAME}")
-    set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
-    set(HLSLIB_SRC_SYNTHESIS "${KERNEL_FILE}")
-    set(HLSLIB_ENTRY_FUNCTION "${KERNEL_NAME}")
-    set(HLSLIB_TARGET_CLOCK_UNCERTAINTY "${KERNEL_CLOCK_UNCERTAINTY}")
-    set(HLSLIB_SYNTHESIS_FLAGS ${SYNTH_FLAGS})
-
-    if(KERNEL_CLOCK GREATER 0)
-        set(CLK "${KERNEL_CLOCK}")
-    else()
-        set(CLK "200")
-    endif()
-    set(HLSLIB_TARGET_CLOCK "${CLK}")
-
-    configure_file(scripts/Synthesis.tcl.in Synthesize${KERNEL_NAME}.tcl)
-
-endfunction()
-
-
-
-#==========================================================================================================================================
-
-
 
 # Generates and appends commands for compiling and linking the given kernel.
-function(sdaccel_target 
-    KERNEL_FILE
-    KERNEL_FNAME_WITHOUT_EXTENSION 
-    KERNEL_NAME  
-    IS_PROFILED
-    IS_MULTI_DDR_BANK
-    MULTI_DDR_SP_TAG
-    ADDITIONAL_FLAGS)
-    set(KERNEL_FLAGS "${SYNTH_FLAGS}")
-    #string(REPLACE " " ";" XOCC_FLAGS "${XOCC_FLAGS}")
-    #set(SYNTH_FLAGS "") #should be ';' seperated
-    set(XOCC_COMMAND
-        -s
-        ${XOCC_FLAGS}
-        -I${CMAKE_SOURCE_DIR}/inc
-        -I${CMAKE_SOURCE_DIR}/hlslib/include
-        -I${CMAKE_BINARY_DIR}
-        --kernel ${KERNEL_NAME} 
-        --platform ${DSA_NAME}
-        --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${KERNEL_FLAGS}"
-        --xp misc:solution_name="${KERNEL_NAME}_solution" 
-        --max_memory_ports all
-    )
+function(CreateKernel 
+    ContainersName
+    Path
+    TopFunctionsName  
+    IsProfiled
+    ProfileData
+    ProfileStall
+    ProfileExec
+    SpTag
+    OutNkTagsAppended)
 
-    if(ENABLE_PROFILING)
-        set(XOCC_COMMAND ${XOCC_COMMAND}
-            --profile_kernel "data:all:all:all"
-            --profile_kernel "stall:all:all"
-            --profile_kernel "exec:all:all")
-    endif()
+    # Creating compile config file for this kernel
+    file(WRITE "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "kernel=${TopFunctionsName}\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "debug=1\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "messageDb=${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}.mdb\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "temp_dir=${CMAKE_BINARY_DIR}/${ContainersName}.build\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "report_dir=${CMAKE_BINARY_DIR}/${ContainersName}.build/reports\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "log_dir=${CMAKE_BINARY_DIR}/${ContainersName}.build/logs\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "[advanced]\n")
+    file(APPEND "${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini" "misc=solution_name=${TopFunctionsName}\n")
+    set(NkTag "nk=${TopFunctionsName}:1:${TopFunctionsName}_1")
+    set(${OutNkTagsAppended} "${${OutNkTagsAppended}}\n${NkTag}" PARENT_SCOPE)
 
-    #if(ENABLE_DEBUGGING)
-    #  set(XOCC_COMMAND ${XOCC_COMMAND} -g
-    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM0
-    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM1
-    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM2)
-    #endif()
-    if(KERNEL_CLOCK GREATER 0)
-        if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
-            set(XOCC_COMMAND ${XOCC_COMMAND}
-                --xp prop:solution.hls_pre_tcl=KernelFreqSDx20174.tcl
-            )
-        else()
-            set(XOCC_COMMAND ${XOCC_COMMAND}
-                --kernel_frequency ${KERNEL_CLOCK}
-            )
+    set(ProfilingOptionsCompile "")
+    set(ProfilingOptionsLink "")
+
+    if(${IsProfiled})
+        if(${ProfileData})
+            set(ProfilingOptionsLink "${ProfilingOptionsLink} --profile_kernel data:${TopFunctionsName}:all:all:all")
+        endif()
+        if(${ProfileStall})
+            set(ProfilingOptionsCompile "${ProfilingOptionsCompile} --profile_kernel stall:${TopFunctionsName}:all:all")
+            set(ProfilingOptionsLink "${ProfilingOptionsLink} --profile_kernel stall:${TopFunctionsName}:all:all")
+        endif()
+        if(${ProfileExec})
+            set(ProfilingOptionsLink "${ProfilingOptionsLink} --profile_kernel exec:${TopFunctionsName}:all:all")
         endif()
     endif()
-    string (REPLACE ";" " " XOCC_COMMAND "${XOCC_COMMAND}")
 
-    set(hw_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -c -t hw ${XOCC_COMMAND} -R2 ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
-    set(hwemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -c -t hw_emu ${XOCC_COMMAND} -Restimate ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
-    set(swemu_compile "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -c -t sw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo") 
+
+    set(hw_compile 
+        ${Vitis_COMPILER} 
+        --target hw
+        --compile
+        --debug
+        --jobs ${CpuCount}
+        --kernel_frequency ${KernelFrequency}
+        --optimize ${OptimizationLevel}
+        --config ${CMAKE_BINARY_DIR}/common-config.ini 
+        --config ${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini
+        --advanced.prop kernel.${TopFunctionsName}.kernel_flags=\"${KernelFlags}\"
+        -o\"${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw.xo\" 
+        \"${Path}\"
+    )
+
+    set(hwemu_compile 
+        ${Vitis_COMPILER} 
+        --target hw_emu
+        --compile
+        --debug
+        --jobs ${CpuCount}
+        --kernel_frequency ${KernelFrequency}
+        --optimize ${OptimizationLevel}
+        --config ${CMAKE_BINARY_DIR}/common-config.ini 
+        --config ${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini
+        --advanced.prop kernel.${TopFunctionsName}.kernel_flags=\"${KernelFlags}\"
+        -o\"${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw_emu.xo\" 
+        \"${Path}\"
+    )
+
+    set(swemu_compile 
+        ${Vitis_COMPILER} 
+        --target sw_emu
+        --compile
+        --debug
+        --jobs ${CpuCount}
+        --kernel_frequency ${KernelFrequency}
+        --optimize ${OptimizationLevel}
+        --config ${CMAKE_BINARY_DIR}/common-config.ini 
+        --config ${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini
+        --advanced.prop kernel.${TopFunctionsName}.kernel_flags=\"${KernelFlags}\"
+        -o\"${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_sw_emu.xo\" 
+        \"${Path}\"
+    )
+
+    string (REPLACE ";" " " hw_compile "${hw_compile}")
+    string (REPLACE ";" " " hwemu_compile "${hwemu_compile}")
+    string (REPLACE ";" " " swemu_compile "${swemu_compile}")
+
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${hw_compile}\n")
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${hwemu_compile}\n")
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "${swemu_compile}\n")
 
-    #---------------------------------------------------------------------------------------------------------
-    # Generating linker commands
-    set(hw_link "${hw_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo" PARENT_SCOPE) 
-    set(hwemu_link "${hwemu_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo" PARENT_SCOPE) 
-    set(swemu_link "${swemu_link} ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo" PARENT_SCOPE) 
+    set(hw_link "${hw_link} ${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw.xo" PARENT_SCOPE) 
+    set(hwemu_link "${hwemu_link} ${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw_emu.xo" PARENT_SCOPE) 
+    set(swemu_link "${swemu_link} ${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_sw_emu.xo" PARENT_SCOPE) 
 
-    set(hw_link_command "${hw_link_command} --nk ${KERNEL_NAME}:1")
-    if(IS_PROFILED)
-        set(hw_link_command "${hw_link_command} --profile_kernel data:${KERNEL_NAME}:all:all")
+    if(${IsProfiled} AND (${ProfileData} OR ${ProfileStall} OR ${ProfileExec}))
+        set(hw_link_command "${hw_link_command} ${SpTag} ${ProfilingOptionsLink}")
+    else()
+        set(hw_link_command "${hw_link_command} ${SpTag}")
     endif()
-    if(IS_MULTI_DDR_BANK)
-        set(hw_link_command "${hw_link_command} ${MULTI_DDR_SP_TAG}")
-    endif()
+    
 
     # Identical commands for hw-emu link process
     set(hwemu_link_command "${hw_link_command}")
     set(swemu_link_command "${hw_link_command}")
 
     # Set link commands globally
-    set(hw_link_command         "${hw_link_command}"        PARENT_SCOPE)
-    set(hwemu_link_command      "${hwemu_link_command}"     PARENT_SCOPE)
-    set(swemu_link_command      "${swemu_link_command}"     PARENT_SCOPE)
-    #---------------------------------------------------------------------------------------------------------
+    set(hw_link_command "${hw_link_command}" PARENT_SCOPE)
+    set(hwemu_link_command "${hwemu_link_command}" PARENT_SCOPE)
+    set(swemu_link_command "${swemu_link_command}" PARENT_SCOPE)
+
 endfunction()
 
 
-
-
 #==========================================================================================================================================
 
-
-
-
-configure_file(scripts/SynthesisScriptLauncherBatch.sh.in SynthesisScriptLauncherBatch.sh)
-add_custom_target(synthesis COMMAND sh SynthesisScriptLauncherBatch.sh) 
-
-# Creating required tcl scripts to run hls synthesis
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"              )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"  )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"            "task_pad_last_dim"        )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"          "task_unpad_last_dim"      )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
-###synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"              )
-###synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"           )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"           )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"        "task_reducesum4d"         )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp"               "task_relu_sqrt_square"                )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"               "task_topk"                )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"           )
-
-
-
-
-
-
-
-
-#==========================================================================================================================================
-
-
-
-
-
-
-
-#Setting frequency override option.
-if(KERNEL_CLOCK GREATER 0)
-    if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
-        floatexpr("1000.0 / ${KERNEL_CLOCK}" KERNEL_PERIOD)
-        message(WARNING "Bug workaround for SDx2017.4 : https://forums.xilinx.com/t5/SDAccel/How-to-set-the-target-frequency-for-the-kernel-in-SDACCL-2018-2/m-p/916088 https://forums.xilinx.com/t5/SDAccel/sdx2017-4-XOCC-kernel-compiler-cannot-set-kernel-frequency/td-p/894185")
-        message("Calculated period for all of the kernels: ${KERNEL_PERIOD} nanoseconds")
-        configure_file(scripts/KernelFreqSDx20174.tcl.in KernelFreqSDx20174.tcl) 
-        set(hw_link_command "${hw_link_command} --xp prop:solution.hls_pre_tcl=${CMAKE_BINARY_DIR}/KernelFreqSDx20174.tcl")
-    else()
-        message("Overriding default kernel clock frequency normally with the kernel_frequency option...")
-        set(hw_link_command "${hw_link_command} --kernel_frequency ${KERNEL_CLOCK}")
-    endif()
-    set(KERNEL_CLOCK_RESOLVED ${KERNEL_CLOCK})
-else()
-    set(KERNEL_CLOCK_RESOLVED 200)
-endif()
-
-add_subdirectory(${CMAKE_SOURCE_DIR}/config)
-
-file(WRITE "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
-file(WRITE "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
-file(WRITE "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
-
-
-
-
-
-#==========================================================================================================================================
 
 set(SP_TAG_CONV2D           
 "--sp task_conv2_1x1_direct_1.a:bank${CFG1_Conv2_DDRBANK_inputTn}\
@@ -357,55 +303,255 @@ set(SP_TAG_UNPADDING
 "--sp task_unpad_last_dim_1.inputTn:bank${CFG14_Unpadding_DDRBANK_inputTn}\
  --sp task_unpad_last_dim_1.outputTn:bank${CFG14_Unpadding_DDRBANK_outputTn}")
 
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp"    "relu_sqrt_square"  "task_relu_sqrt_square"     FALSE TRUE ${SP_TAG_RELUSQRTSQUARE} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamover.cpp"           "datamover"         "task_datamover"            FALSE TRUE ${SP_TAG_DATAMOVER} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"             "padding"           "task_pad_last_dim"         FALSE TRUE ${SP_TAG_PADDING} "")
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"           "unpadding"         "task_unpad_last_dim"       FALSE TRUE ${SP_TAG_UNPADDING} "")
+
+
+set(GlobalNkTags "")
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"
+    "task_conv2_1x1_direct"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_CONV2D}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"
+    "task_topk"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_TOPK}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"
+    "task_matops"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_MATOPS}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"
+    "task_reducesum4d"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_REDUCESUM4D}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"
+    "task_matmul"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_MATMUL}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"
+    "task_tile"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_TILE}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"
+    "task_gather"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_GATHER}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"
+    "task_concat"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_CONCAT}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"
+    "task_reducemax"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_REDUCEMAX}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"
+    "task_transpose"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_TRANSPOSE}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"
+    "task_reducesum"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_REDUCESUM}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp"
+    "task_relu_sqrt_square"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_RELUSQRTSQUARE}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamover.cpp"
+    "task_datamover"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_DATAMOVER}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"
+    "task_pad_last_dim"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_PADDING}"
+    GlobalNkTags)
+
+CreateKernel(
+    "${BinaryContainersName}"
+    "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"
+    "task_unpad_last_dim"
+    ${Profiling}
+    FALSE # Data Profiling
+    FALSE # Stall Profiling
+    TRUE # Exec Profiling
+    "${SP_TAG_UNPADDING}"
+    GlobalNkTags)
+
+CreateLinkIni(GlobalNkTags)
+
 
 #==========================================================================================================================================
 
 
-
-# Generating bash script to compile the kernels to get *.xo files on a cmake custom target
 add_custom_target(compile_hw COMMAND sh Compile_Hw_Batch.sh) 
 add_custom_target(compile_hwemu COMMAND sh Compile_HwEmu_Batch.sh) 
 add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh) 
 
-# Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
-file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
-)
 
-file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
-)
+set( _link_hw_
+    ${Vitis_COMPILER}
+    --target hw --link
+    --debug
+    --optimize ${OptimizationLevel}
+    --jobs ${CpuCount}
+    --kernel_frequency ${KernelFrequency}
+    --config ${CMAKE_BINARY_DIR}/common-config.ini
+    --config ${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini
+    -o\"${CMAKE_BINARY_DIR}/${BinaryContainersName}_hw.xclbin\"
+    ${hw_link_command}
+    ${hw_link}
+    )
+string (REPLACE ";" " " _link_hw_ "${_link_hw_}")
+file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" "${_link_hw_}")
 
-file(WRITE "${CMAKE_BINARY_DIR}/Link_SwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t sw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
-)
+set( _link_hwemu_
+    ${Vitis_COMPILER}
+    --target hw_emu --link
+    --debug
+    --optimize ${OptimizationLevel}
+    --jobs ${CpuCount}
+    --kernel_frequency ${KernelFrequency}
+    --config ${CMAKE_BINARY_DIR}/common-config.ini
+    --config ${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini
+    -o\"${CMAKE_BINARY_DIR}/${BinaryContainersName}_hw_emu.xclbin\"
+    ${hwemu_link_command}
+    ${hwemu_link}
+    )
+string (REPLACE ";" " " _link_hwemu_ "${_link_hwemu_}")
+file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" "${_link_hwemu_}")
+
+set( _link_swemu_
+    ${Vitis_COMPILER}
+    --target sw_emu --link
+    --debug
+    --optimize ${OptimizationLevel}
+    --jobs ${CpuCount}
+    --kernel_frequency ${KernelFrequency}
+    --config ${CMAKE_BINARY_DIR}/common-config.ini
+    --config ${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini
+    -o\"${CMAKE_BINARY_DIR}/${BinaryContainersName}_sw_emu.xclbin\"
+    ${swemu_link_command}
+    ${swemu_link}
+    )
+string (REPLACE ";" " " _link_swemu_ "${_link_swemu_}")
+file(WRITE "${CMAKE_BINARY_DIR}/Link_SwEmu_Batch.sh" "${_link_swemu_}")
+
+set( _link_interactive_imp_
+    ${Vitis_COMPILER}
+    --target hw --link
+    --debug
+    --optimize ${OptimizationLevel}
+    --jobs ${CpuCount}
+    --kernel_frequency ${KernelFrequency}
+    --config ${CMAKE_BINARY_DIR}/common-config.ini
+    --config ${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini
+    -o\"${CMAKE_BINARY_DIR}/${BinaryContainersName}_hw.xclbin\"
+    ${hw_link_command}
+    ${hw_link}
+    --interactive impl
+    )
+string (REPLACE ";" " " _link_interactive_imp_ "${_link_interactive_imp_}")
+file(WRITE "${CMAKE_BINARY_DIR}/Interactrive_Hw_Batch.sh" "${_link_interactive_imp_}")
+
 add_custom_target(link_hw COMMAND sh Link_Hw_Batch.sh) 
 add_custom_target(link_hwemu COMMAND sh Link_HwEmu_Batch.sh ) 
 add_custom_target(link_swemu COMMAND sh Link_SwEmu_Batch.sh ) 
-
-
-file(WRITE "${CMAKE_BINARY_DIR}/Interactrive_Hw_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin --interactive synth"
-)
 add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh) 
-
 
 #==========================================================================================================================================
 
@@ -439,13 +585,13 @@ set(HOSTSIDE_MAIN_SRC
 )
 
 add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
-target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
+target_link_libraries(${HostExecutableName} ${Vitis_LIBRARIES} ${Vitis_FLOATING_POINT_LIBRARY} z OpenCL)
 
 
 
-set(xcl_path_swemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_sw_emu.xclbin")
-set(xcl_path_hwemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw_emu.xclbin")
-set(xcl_path_hw "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw.xclbin")
+set(xcl_path_swemu "${CMAKE_BINARY_DIR}/${BinaryContainersName}_sw_emu.xclbin")
+set(xcl_path_hwemu "${CMAKE_BINARY_DIR}/${BinaryContainersName}_hw_emu.xclbin")
+set(xcl_path_hw "${CMAKE_BINARY_DIR}/${BinaryContainersName}_hw.xclbin")
 set(HostExecutablePath "${CMAKE_BINARY_DIR}/${HostExecutableName}")
 set(DataDirectory "${CMAKE_SOURCE_DIR}/data")
 configure_file(${CMAKE_SOURCE_DIR}/scripts/LaunchDeepPointV1FPGA.sh.in LaunchDeepPointV1FPGA.sh @ONLY)
@@ -454,7 +600,6 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_swemu.sh ${CMAKE_BINARY_DIR
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hwemu.sh ${CMAKE_BINARY_DIR}/autobuild_hwemu.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hw.sh ${CMAKE_BINARY_DIR}/autobuild_hw.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/PasteBinAgentForAutoBuilds.py ${CMAKE_BINARY_DIR}/PasteBinAgentForAutoBuilds.py @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/scripts/sdaccel.ini ${CMAKE_BINARY_DIR}/sdaccel.ini COPYONLY)
 
 include(CTest)
 add_subdirectory("test")

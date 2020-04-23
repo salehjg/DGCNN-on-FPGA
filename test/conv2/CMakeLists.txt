@@ -10,9 +10,9 @@ add_executable(CpuTestConvolution
     ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp)
 
 target_link_libraries(CpuTestConvolution 
-    ${SDAccel_LIBRARIES} 
+    ${Vitis_LIBRARIES} 
     ${CMAKE_THREAD_LIBS_INIT} 
-    ${SDAccel_FLOATING_POINT_LIBRARY} 
-    ${SDAccel_LIBRARIES})
+    ${Vitis_FLOATING_POINT_LIBRARY} 
+    ${Vitis_LIBRARIES})
 
 add_test(NAME CpuTestConvolution COMMAND CpuTestConvolution)
