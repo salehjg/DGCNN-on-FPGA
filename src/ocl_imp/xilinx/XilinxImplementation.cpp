@@ -67,7 +67,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -84,7 +84,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducemax",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -92,7 +92,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -100,7 +100,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -108,7 +108,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -134,7 +134,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -142,7 +142,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -150,7 +150,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_transpose",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 11 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -158,7 +158,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 12 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -166,7 +166,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 13 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -174,7 +174,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 14 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -182,7 +182,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_pad_last_dim",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 15 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -190,7 +190,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "binary_container_1.xclbin",
                 "",
                 "task_unpad_last_dim",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 16 :*/
         new OclKernelObject(
                 KERNEL_DIR,
