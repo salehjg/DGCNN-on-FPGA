@@ -28,7 +28,7 @@ set(BinaryContainersName "binarycontainer1" CACHE STRING "Binary Container's Nam
 set(Platform "$ENV{AWS_PLATFORM}" CACHE STRING "Known Vitis platform name or xpfm file path") 
 set(PartName "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
 set(KernelFlags "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for the kernels")
-set(Profiling OFF CACHE BOOL "Profiling ON/OFF")
+set(Profiling ON CACHE BOOL "Profiling ON/OFF")
 set(OptimizationLevel "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(KernelFrequency "200" CACHE STRING "MHz")
 set(IpCachePath "${CMAKE_BINARY_DIR}/ip_cache" CACHE STRING "IP Cache Path(with enough space for a hw build)")
@@ -95,8 +95,11 @@ else()
     message("Profiling is disabled.")
     set(true_false_profiling "false")
 endif()
+
 configure_file(${CMAKE_SOURCE_DIR}/scripts/xrt.ini.in ${CMAKE_BINARY_DIR}/xrt.ini)
 
+set(SlrUtilizationReportFile ${CMAKE_BINARY_DIR}/${BinaryContainersName}.build/reports/SlrUtilizationReportOutput.txt)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl.in ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
 #==========================================================================================================================================
 
@@ -114,7 +117,6 @@ function(CreateLinkIni
     file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "misc=solution_name=link\n")
     file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "[connectivity]\n")
     file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "${${nkTagsForKernels}}\n")
-    #file(APPEND "${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini" "nk=vadd_pipelined:1:vadd_pipelined_1\n")
 endfunction()
 
 # Generates and appends commands for compiling and linking the given kernel.
@@ -494,6 +496,7 @@ set( _link_hw_
     --kernel_frequency ${KernelFrequency}
     --config ${CMAKE_BINARY_DIR}/common-config.ini
     --config ${CMAKE_BINARY_DIR}/${BinaryContainersName}-link.ini
+    --vivado.prop run.impl_1.STEPS.ROUTE_DESIGN.TCL.PRE=${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl
     -o\"${CMAKE_BINARY_DIR}/${BinaryContainersName}_hw.xclbin\"
     ${hw_link_command}
     ${hw_link}
