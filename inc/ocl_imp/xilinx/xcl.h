@@ -66,7 +66,7 @@ typedef struct {
  *   device_type - the type of device (i.e. CL_DEVICE_TYPE_ACCELERATOR)
  *
  * Returns:
- *   A struct containing the platform_id, device_id, context, and command
+ *   A struct containing the platform_id, deviceId, context, and command
  *   queue.
  */
 xcl_world xcl_world_single(cl_device_type device_type, 

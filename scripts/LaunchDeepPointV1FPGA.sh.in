@@ -18,7 +18,7 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 xclbin_swemu=@xcl_path_swemu@
 xclbin_hwemu=@xcl_path_hwemu@
 xclbin_hw=@xcl_path_hw@
-platform=@DSA_NAME@
+platform=@Platform@
 hostsideexe=@HostExecutablePath@
 datadir=@DataDirectory@
 
@@ -41,7 +41,7 @@ case $mode in
 	    exit 1
 	fi
 	#------------------------------------------Setting Emulation Config & Launch
-	echo "XILINX_SDX PATH = ${XILINX_SDX}"
+	echo "Vitis PATH = ${XILINX_VITIS}"
 	echo "Setting Emulation Config..."
 	emconfigutil --platform $platform --nd 1
 	export XCL_EMULATION_MODE=sw_emu
@@ -68,7 +68,7 @@ case $mode in
 	    exit 1
 	fi
 	#------------------------------------------Setting Emulation Config & Launch
-	echo "XILINX_SDX PATH = ${XILINX_SDX}"
+	echo "Vitis PATH = ${XILINX_VITIS}"
 	echo "Setting Emulation Config..."
 	emconfigutil --platform $platform --nd 1
 	export XCL_EMULATION_MODE=hw_emu

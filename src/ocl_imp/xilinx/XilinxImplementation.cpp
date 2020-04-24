@@ -8,6 +8,7 @@
 #include "xilinx/config.h"
 #include <algorithm>
 #include <vector>
+#include <string.h>
 
 using namespace std;
 
@@ -28,17 +29,64 @@ XilinxImplementation::XilinxImplementation(int aa) {
                 "Hardware(FPGA)" ) << endl;
         }
     }
+    
     //======================================================================================================================
     {
-        err = clGetPlatformIDs(1, &cpPlatform, NULL);
+        // Search for available platforms.
+        cl_uint platformCount = 0;
+        err = clGetPlatformIDs(16, NULL, &platformCount);
         assert(err == CL_SUCCESS);
-        err = clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_ACCELERATOR, 1, &device_id, NULL);
+
+        _platforms = new cl_platform_id[platformCount];
+        err = clGetPlatformIDs(16, _platforms, &platformCount);
         assert(err == CL_SUCCESS);
-        context = clCreateContext(0, 1, &device_id, NULL, NULL, &err);
+
+        bool deviceFound = false;
+
+        // Go through available platforms and find devices inside each one
+        for(unsigned id=0; id<platformCount && !deviceFound; id++){
+            cl_uint deviceCount = 0;
+            err = clGetDeviceIDs(_platforms[id], CL_DEVICE_TYPE_ALL, 0, NULL, &deviceCount);
+            assert(err == CL_SUCCESS);
+            if(!_devices) delete[](_devices);
+            _devices = new cl_device_id[deviceCount];
+            clGetDeviceIDs(_platforms[id], CL_DEVICE_TYPE_ALL, deviceCount, _devices, NULL);
+            for(unsigned idx=0; idx<deviceCount && !deviceFound; idx++){
+                size_t nameLen, vendorLen;
+
+                err = clGetDeviceInfo(_devices[idx], CL_DEVICE_NAME, 0, NULL, &nameLen);
+                assert(err == CL_SUCCESS);
+                char *deviceName = (char*) malloc(nameLen);
+                err = clGetDeviceInfo(_devices[idx], CL_DEVICE_NAME, nameLen, deviceName, NULL);
+                assert(err == CL_SUCCESS);
+
+                err = clGetDeviceInfo(_devices[idx], CL_DEVICE_VENDOR, 0, NULL, &vendorLen);
+                assert(err == CL_SUCCESS);
+                char *deviceVendor = (char*) malloc(vendorLen);
+                err = clGetDeviceInfo(_devices[idx], CL_DEVICE_VENDOR, vendorLen, deviceVendor, NULL);
+                assert(err == CL_SUCCESS);
+
+                if(strcmp(deviceVendor, "Xilinx") == 0){
+                    cout<<"Xilinx OpenCL device found, devName: "<< deviceName << endl;
+                    this->deviceName.assign(deviceName);
+                    cpPlatform = _platforms[id];
+                    deviceId = _devices[idx];
+                    deviceFound = true;
+                }
+            }
+            if(!deviceFound)delete[](_devices);
+        }
+
+        if(!deviceFound){
+            cout<<"Did not find any Xilinx devices."<<endl;
+            std::exit(1);
+        }
+
+        context = clCreateContext(nullptr, 1, &deviceId, NULL, NULL, &err);
         assert(err == CL_SUCCESS);
         queue = clCreateCommandQueue(
                 context,
-                device_id,
+                deviceId,
 #ifdef REPORT_EXECUTION_DURATION
                 CL_QUEUE_PROFILING_ENABLE,
 #else
@@ -210,7 +258,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
     program = clCreateProgramWithBinary(
                             context, 
                             1,
-                            &device_id,
+                            &deviceId,
                             &binary_content_length,
                             (const unsigned char**) &binary_content,
                             NULL,
@@ -226,7 +274,9 @@ XilinxImplementation::XilinxImplementation(int aa) {
         cout<<"Failed on clBuildProgram."<<endl;
         std::exit(1);
     }
- 
+
+    cout<<"The device is programmed successfully."<<endl;
+
     for(OclKernelObject *kernelObject : oclKernels){
         if(kernelObject->disabled) continue;
         if(kernelObject->use_ndrange_kernel){
@@ -261,7 +311,8 @@ XilinxImplementation::~XilinxImplementation(){
     cout<<"~XilinxImplementation"<<endl;
     clReleaseCommandQueue(queue);
     clReleaseContext(context);
-    clReleaseDevice(device_id);
+    clReleaseDevice(deviceId);
+    delete[](_platforms);
 
     for(OclKernelObject *kernelObject : oclKernels){
         if(kernelObject->use_ndrange_kernel)

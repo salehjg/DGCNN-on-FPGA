@@ -132,9 +132,11 @@ private:
 
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
 
-    std::string device_name;
+    std::string deviceName;
+    cl_platform_id *_platforms;        // OpenCL platform
+    cl_device_id *_devices;           // device ID
     cl_platform_id cpPlatform;        // OpenCL platform
-    cl_device_id device_id;           // device ID
+    cl_device_id deviceId;           // device ID
     cl_context context;               // context
     cl_command_queue queue;           // command queue
     cl_program program;               // program

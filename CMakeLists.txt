@@ -28,7 +28,7 @@ set(BinaryContainersName "binarycontainer1" CACHE STRING "Binary Container's Nam
 set(Platform "$ENV{AWS_PLATFORM}" CACHE STRING "Known Vitis platform name or xpfm file path") 
 set(PartName "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
 set(KernelFlags "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for the kernels")
-set(Profiling ON CACHE BOOL "Profiling ON/OFF")
+set(Profiling OFF CACHE BOOL "Profiling ON/OFF")
 set(OptimizationLevel "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(KernelFrequency "200" CACHE STRING "MHz")
 set(IpCachePath "${CMAKE_BINARY_DIR}/ip_cache" CACHE STRING "IP Cache Path(with enough space for a hw build)")
@@ -73,7 +73,7 @@ set(swemu_link "")
 file(MAKE_DIRECTORY ${IpCachePath})
 
 # Create common-config.ini
-file(WRITE "${CMAKE_BINARY_DIR}/common-config.ini" "platform=$ENV{AWS_PLATFORM}\nsave-temps=1\n")
+file(WRITE "${CMAKE_BINARY_DIR}/common-config.ini" "platform=${Platform}\nsave-temps=1\n")
 
 file(WRITE "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
 file(WRITE "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "find . -name \"*.xo\" -type f -delete\n")
@@ -89,8 +89,10 @@ endif()
 message("Detected CPU Core Count: ${CpuCount}")
 
 if(${Profiling})
+    message("Profiling is enabled.")
     set(true_false_profiling "true")
 else()
+    message("Profiling is disabled.")
     set(true_false_profiling "false")
 endif()
 configure_file(${CMAKE_SOURCE_DIR}/scripts/xrt.ini.in ${CMAKE_BINARY_DIR}/xrt.ini)
@@ -585,7 +587,7 @@ set(HOSTSIDE_MAIN_SRC
 )
 
 add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
-target_link_libraries(${HostExecutableName} ${Vitis_LIBRARIES} ${Vitis_FLOATING_POINT_LIBRARY} z OpenCL)
+target_link_libraries(${HostExecutableName} ${Vitis_LIBRARIES} ${Vitis_FLOATING_POINT_LIBRARY} z)
 
 
 
