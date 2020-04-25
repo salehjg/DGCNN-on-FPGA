@@ -27,13 +27,15 @@ int LaunchDataMover(
 
     cl_int error;
 
-    OclTensorF *tnDummyBank0 = new OclTensorF(context, {1}, 0);
+    //OclTensorF *tnDummyBank0 = new OclTensorF(context, {1}, 0);
     OclTensorF *tnDummyBank1 = new OclTensorF(context, {1}, 1);
     OclTensorF *tnDummyBank2 = new OclTensorF(context, {1}, 2);
     OclTensorF *tnDummyBank3 = new OclTensorF(context, {1}, 3);
 
-    if(!(srcBank>=0 && srcBank<=3)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
-    if(!(dstBank>=0 && dstBank<=3)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
+    //if(!(srcBank>=0 && srcBank<=3)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
+    //if(!(dstBank>=0 && dstBank<=3)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
+    if(!(srcBank>=1 && srcBank<=3)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
+    if(!(dstBank>=1 && dstBank<=3)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
     assert(vectorWords>0);
 
     cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover", &error);
@@ -48,7 +50,7 @@ int LaunchDataMover(
     // arguments should be like: bank0 only, bank1 only, bank2 only, and bank3 only.
 
     //Bank0
-    if(srcBank==0 || dstBank==0){
+    /*if(srcBank==0 || dstBank==0){
         if(srcBank==0){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
         }else{
@@ -57,7 +59,7 @@ int LaunchDataMover(
     }else{
         cl_mem null_mem_object = NULL;
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank0->ocl_buff);
-    }
+    }*/
     
     //Bank1
     if(srcBank==1 || dstBank==1){
@@ -115,7 +117,7 @@ int LaunchDataMover(
     if(error != CL_SUCCESS) cout<<"Failed to release internal data-mover kernel, Err: "<< error <<endl;
     assert(error==CL_SUCCESS);
 
-    delete(tnDummyBank0);
+    //delete(tnDummyBank0);
     delete(tnDummyBank1);
     delete(tnDummyBank2);
     delete(tnDummyBank3);

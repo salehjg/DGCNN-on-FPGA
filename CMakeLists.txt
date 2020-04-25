@@ -294,10 +294,15 @@ set(SP_TAG_RELUSQRTSQUARE
  --sp task_relu_sqrt_square_1.outputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_outputTn}")
 
 set(SP_TAG_DATAMOVER   
-"--sp task_datamover_1.dataBank0:bank0\
- --sp task_datamover_1.dataBank1:bank1\
+"--sp task_datamover_1.dataBank1:bank1\
  --sp task_datamover_1.dataBank2:bank2\
  --sp task_datamover_1.dataBank3:bank3")
+
+#set(SP_TAG_DATAMOVER   
+#"--sp task_datamover_1.dataBank0:bank0\
+# --sp task_datamover_1.dataBank1:bank1\
+# --sp task_datamover_1.dataBank2:bank2\
+# --sp task_datamover_1.dataBank3:bank3")
 
 set(SP_TAG_PADDING          
 "--sp task_pad_last_dim_1.inputTn:bank${CFG13_Padding_DDRBANK_inputTn}\
@@ -316,7 +321,7 @@ CreateKernel(
     "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"
     "task_conv2_1x1_direct"
     ${Profiling}
-    FALSE # Data Profiling
+    TRUE # Data Profiling
     FALSE # Stall Profiling
     TRUE # Exec Profiling
     "${SP_TAG_CONV2D}"
@@ -327,7 +332,7 @@ CreateKernel(
     "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"
     "task_topk"
     ${Profiling}
-    FALSE # Data Profiling
+    TRUE # Data Profiling
     FALSE # Stall Profiling
     TRUE # Exec Profiling
     "${SP_TAG_TOPK}"
@@ -338,7 +343,7 @@ CreateKernel(
     "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"
     "task_matops"
     ${Profiling}
-    FALSE # Data Profiling
+    TRUE # Data Profiling
     FALSE # Stall Profiling
     TRUE # Exec Profiling
     "${SP_TAG_MATOPS}"
@@ -349,7 +354,7 @@ CreateKernel(
     "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"
     "task_reducesum4d"
     ${Profiling}
-    FALSE # Data Profiling
+    TRUE # Data Profiling
     FALSE # Stall Profiling
     TRUE # Exec Profiling
     "${SP_TAG_REDUCESUM4D}"
@@ -360,7 +365,7 @@ CreateKernel(
     "${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"
     "task_matmul"
     ${Profiling}
-    FALSE # Data Profiling
+    TRUE # Data Profiling
     FALSE # Stall Profiling
     TRUE # Exec Profiling
     "${SP_TAG_MATMUL}"

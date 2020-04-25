@@ -186,8 +186,9 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankFloat(){
             tensorCpu,
             tensorSrc_defaultBank);
 
-    for(unsigned bankSrc=0; bankSrc<4; bankSrc++){
-        for(unsigned bankDest=0; bankDest<4; bankDest++){
+    // Change 0 to 1 (as bank0 is disabled to save resources)
+    for(unsigned bankSrc=1; bankSrc<4; bankSrc++){
+        for(unsigned bankDest=1; bankDest<4; bankDest++){
             std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
             OclTensorF* tensorCloned_BankB = (OclTensorF*)
                 tensorSrc_defaultBank->CloneIfNeededToDDRBank(
@@ -230,8 +231,9 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
             tensorCpu,
             tensorSrc_defaultBank);
 
-    for(unsigned bankSrc=0; bankSrc<4; bankSrc++){
-        for(unsigned bankDest=0; bankDest<4; bankDest++){
+    // Change 0 to 1 (as bank0 is disabled to save resources)
+    for(unsigned bankSrc=1; bankSrc<4; bankSrc++){
+        for(unsigned bankDest=1; bankDest<4; bankDest++){
             std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
 
             OclTensorI* tensorCloned_BankB = (OclTensorI*)
@@ -869,7 +871,8 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
     }
     const unsigned kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount+2;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
-        <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
+        <<" and N="<< N <<", Press ESC to skip..."<<endl; 
+    if(cin.get()==27) return nullptr;
     assert(N==ConfigTaskTopK::MaxSliceLen);
 
     TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
