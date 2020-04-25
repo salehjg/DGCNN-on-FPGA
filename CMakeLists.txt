@@ -27,11 +27,15 @@ endif()
 set(BinaryContainersName "binarycontainer1" CACHE STRING "Binary Container's Name")
 set(Platform "$ENV{AWS_PLATFORM}" CACHE STRING "Known Vitis platform name or xpfm file path") 
 set(PartName "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
-set(KernelFlags "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for the kernels")
+set(KernelFlags_ "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for the kernels")
 set(Profiling ON CACHE BOOL "Profiling ON/OFF")
 set(OptimizationLevel "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(KernelFrequency "200" CACHE STRING "MHz")
 set(IpCachePath "${CMAKE_BINARY_DIR}/ip_cache" CACHE STRING "IP Cache Path(with enough space for a hw build)")
+set(UseMemoryBank0 OFF CACHE BOOL "Enable/Disable usage of memory bank 0")
+set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
+set(UseMemoryBank2 ON CACHE BOOL "Enable/Disable usage of memory bank 2")
+set(UseMemoryBank3 OFF CACHE BOOL "Enable/Disable usage of memory bank 3")
 
 set(PASTEBIN_0_1 "0" CACHE STRING "Enable or disable PasteBin agent for uploading autobuild log files to PasteBin.") 
 set(PASTEBIN_USERNAME "" CACHE STRING "PasteBin Account's Username") 
@@ -101,6 +105,26 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/xrt.ini.in ${CMAKE_BINARY_DIR}/xrt.in
 set(SlrUtilizationReportFile ${CMAKE_BINARY_DIR}/${BinaryContainersName}.build/reports/SlrUtilizationReportOutput.txt)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl.in ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
+set(KernelFlags "")
+if(NOT(${UseMemoryBank0} OR ${UseMemoryBank1} OR ${UseMemoryBank2} OR ${UseMemoryBank3}))
+    message(FATAL_ERROR "All of the memory banks cannot be disabled.")
+endif()
+if(${UseMemoryBank0})
+    # using lists helps to eliminate the extra space at the begining or at the end of string.
+    list(APPEND KernelFlags "-DUSEMEMORYBANK0")
+endif()
+if(${UseMemoryBank1})
+    list(APPEND KernelFlags "-DUSEMEMORYBANK1")
+endif()
+if(${UseMemoryBank2})
+    list(APPEND KernelFlags "-DUSEMEMORYBANK2")
+endif()
+if(${UseMemoryBank3})
+    list(APPEND KernelFlags "-DUSEMEMORYBANK3")
+endif()
+string(REPLACE ";" " " KernelFlags "${KernelFlags}" )
+set(KernelFlags "${KernelFlags} ${KernelFlags_}")
+message("Kernel Flags: ${KernelFlags}")
 #==========================================================================================================================================
 
 
@@ -293,16 +317,25 @@ set(SP_TAG_RELUSQRTSQUARE
 "--sp task_relu_sqrt_square_1.inputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_inputTn}\
  --sp task_relu_sqrt_square_1.outputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_outputTn}")
 
-set(SP_TAG_DATAMOVER   
-"--sp task_datamover_1.dataBank1:bank1\
- --sp task_datamover_1.dataBank2:bank2\
- --sp task_datamover_1.dataBank3:bank3")
-
 #set(SP_TAG_DATAMOVER   
 #"--sp task_datamover_1.dataBank0:bank0\
 # --sp task_datamover_1.dataBank1:bank1\
 # --sp task_datamover_1.dataBank2:bank2\
 # --sp task_datamover_1.dataBank3:bank3")
+set(SP_TAG_DATAMOVER "")
+if(${UseMemoryBank0})
+    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank0:bank0")
+endif()
+if(${UseMemoryBank1})
+    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank1:bank1")
+endif()
+if(${UseMemoryBank2})
+    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank2:bank2")
+endif()
+if(${UseMemoryBank3})
+    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank3:bank3")
+endif()
+message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
 
 set(SP_TAG_PADDING          
 "--sp task_pad_last_dim_1.inputTn:bank${CFG13_Padding_DDRBANK_inputTn}\
