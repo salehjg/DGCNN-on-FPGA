@@ -27,7 +27,7 @@ int LaunchDataMover(
 
     cl_int error;
 
-    OclTensorF *tnDummyBank0 = new OclTensorF(context, {1}, 0);
+    //OclTensorF *tnDummyBank0 = new OclTensorF(context, {1}, 0);
     OclTensorF *tnDummyBank1 = new OclTensorF(context, {1}, 1);
     OclTensorF *tnDummyBank2 = new OclTensorF(context, {1}, 2);
     OclTensorF *tnDummyBank3 = new OclTensorF(context, {1}, 3);
@@ -48,6 +48,7 @@ int LaunchDataMover(
     // arguments should be like: bank0 only, bank1 only, bank2 only, and bank3 only.
 
     //Bank0
+#ifdef USEMEMORYBANK0
     if(srcBank==0 || dstBank==0){
         if(srcBank==0){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
@@ -58,8 +59,10 @@ int LaunchDataMover(
         cl_mem null_mem_object = NULL;
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank0->ocl_buff);
     }
-    
+#endif
+
     //Bank1
+#ifdef USEMEMORYBANK1
     if(srcBank==1 || dstBank==1){
         if(srcBank==1){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
@@ -69,8 +72,10 @@ int LaunchDataMover(
     }else{
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank1->ocl_buff);
     }
+#endif
 
     //Bank2
+#ifdef USEMEMORYBANK2
     if(srcBank==2 || dstBank==2){
         if(srcBank==2){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
@@ -80,8 +85,10 @@ int LaunchDataMover(
     }else{
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank2->ocl_buff);
     }
+#endif
 
     //Bank3
+#ifdef USEMEMORYBANK3
     if(srcBank==3 || dstBank==3){
         if(srcBank==3){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
@@ -91,6 +98,7 @@ int LaunchDataMover(
     }else{
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank3->ocl_buff);
     }
+#endif
 
     error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&srcBank); 
     error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&dstBank); 
@@ -115,7 +123,7 @@ int LaunchDataMover(
     if(error != CL_SUCCESS) cout<<"Failed to release internal data-mover kernel, Err: "<< error <<endl;
     assert(error==CL_SUCCESS);
 
-    delete(tnDummyBank0);
+    //delete(tnDummyBank0);
     delete(tnDummyBank1);
     delete(tnDummyBank2);
     delete(tnDummyBank3);

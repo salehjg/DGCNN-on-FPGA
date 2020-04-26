@@ -186,8 +186,22 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankFloat(){
             tensorCpu,
             tensorSrc_defaultBank);
 
-    for(unsigned bankSrc=0; bankSrc<4; bankSrc++){
-        for(unsigned bankDest=0; bankDest<4; bankDest++){
+    vector<unsigned> Banks;
+#ifdef USEMEMORYBANK0
+    Banks.push_back(0);
+#endif
+#ifdef USEMEMORYBANK1
+    Banks.push_back(1);
+#endif
+#ifdef USEMEMORYBANK2
+    Banks.push_back(2);
+#endif
+#ifdef USEMEMORYBANK3
+    Banks.push_back(3);
+#endif
+
+    for(unsigned bankSrc:Banks){
+        for(unsigned bankDest:Banks){
             std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
             OclTensorF* tensorCloned_BankB = (OclTensorF*)
                 tensorSrc_defaultBank->CloneIfNeededToDDRBank(
@@ -229,9 +243,23 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
             scheduler,
             tensorCpu,
             tensorSrc_defaultBank);
+    
+    vector<unsigned> Banks;
+#ifdef USEMEMORYBANK0
+    Banks.push_back(0);
+#endif
+#ifdef USEMEMORYBANK1
+    Banks.push_back(1);
+#endif
+#ifdef USEMEMORYBANK2
+    Banks.push_back(2);
+#endif
+#ifdef USEMEMORYBANK3
+    Banks.push_back(3);
+#endif
 
-    for(unsigned bankSrc=0; bankSrc<4; bankSrc++){
-        for(unsigned bankDest=0; bankDest<4; bankDest++){
+    for(unsigned bankSrc:Banks){
+        for(unsigned bankDest:Banks){
             std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
 
             OclTensorI* tensorCloned_BankB = (OclTensorI*)

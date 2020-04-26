@@ -18,6 +18,7 @@ set(HostExecutableName DeepPointV1FPGA)
 if(NOT DEFINED ENV{AWS_PLATFORM})
     message(FATAL_ERROR "You must set env variable AWS_PLATFORM to the path of the SDAccel platform file(*.xpfm)")
 endif()
+message("CMake Version: ${CMAKE_VERSION}")
 
 #==========================================================================================================================================
 
@@ -28,11 +29,13 @@ set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or x
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
 set(SYNTH_FLAGS "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
 set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
-#set(ENABLE_DEBUGGING OFF CACHE BOOL "Inject debugging cores to design")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
-set(XOCC_FLAGS "" CACHE STRING "Extra flags for xocc")
 set(KERNEL_CLOCK "-1" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty")
+set(UseMemoryBank0 OFF CACHE BOOL "Enable/Disable usage of memory bank 0")
+set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
+set(UseMemoryBank2 ON CACHE BOOL "Enable/Disable usage of memory bank 2")
+set(UseMemoryBank3 OFF CACHE BOOL "Enable/Disable usage of memory bank 3")
 
 set(PASTEBIN_0_1 "0" CACHE STRING "Enable or disable PasteBin agent for uploading autobuild log files to PasteBin.") 
 set(PASTEBIN_USERNAME "" CACHE STRING "PasteBin Account's Username") 
@@ -60,11 +63,42 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 #add_definitions("-DHLSLIB_STREAM_TIMEOUT=16")
 if(((${SDAccel_MAJOR_VERSION} LESS 2018) AND (${SDAccel_MINOR_VERSION} LESS 3)) OR ${SDAccel_MAJOR_VERSION} LESS 2017)
-  add_definitions(-DHLSLIB_LEGACY_SDX=1)
+    add_definitions(-DHLSLIB_LEGACY_SDX=1)
 else()
-  add_definitions(-DHLSLIB_LEGACY_SDX=0)
+    add_definitions(-DHLSLIB_LEGACY_SDX=0)
 endif()
 
+
+include(ProcessorCount)
+ProcessorCount(_CpuCount)
+if(NOT ${_CpuCount} EQUAL 0)
+    set(CpuCount ${_CpuCount})
+else()
+    set(CpuCount 4)
+endif()
+message("Detected CPU Core Count: ${CpuCount}")
+
+
+set(MemoryBankFlags "")
+if(NOT(${UseMemoryBank0} OR ${UseMemoryBank1} OR ${UseMemoryBank2} OR ${UseMemoryBank3}))
+    message(FATAL_ERROR "All of the memory banks cannot be disabled.")
+endif()
+if(${UseMemoryBank0})
+    # using lists helps to eliminate the extra space at the begining or at the end of string.
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK0")
+endif()
+if(${UseMemoryBank1})
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK1")
+endif()
+if(${UseMemoryBank2})
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK2")
+endif()
+if(${UseMemoryBank3})
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK3")
+endif()
+string(REPLACE ";" " " MemoryBankFlags "${MemoryBankFlags}" )
+add_definitions(${MemoryBankFlags})
+message("Kernel Flags: ${MemoryBankFlags}")
 
 
 #==========================================================================================================================================
@@ -104,35 +138,6 @@ endfunction()
 
 
 
-# Creates TCL scripts for the given kernel.
-function(synthesis_target 
-    KERNEL_FILE 
-    KERNEL_NAME)
-
-    set(HLSLIB_PART_NAME "${SYNTH_PART_NAME}")
-    set(HLSLIB_PROJECT_NAME "${KERNEL_NAME}")
-    set(HLSLIB_SRC_SYNTHESIS "${KERNEL_FILE}")
-    set(HLSLIB_ENTRY_FUNCTION "${KERNEL_NAME}")
-    set(HLSLIB_TARGET_CLOCK_UNCERTAINTY "${KERNEL_CLOCK_UNCERTAINTY}")
-    set(HLSLIB_SYNTHESIS_FLAGS ${SYNTH_FLAGS})
-
-    if(KERNEL_CLOCK GREATER 0)
-        set(CLK "${KERNEL_CLOCK}")
-    else()
-        set(CLK "200")
-    endif()
-    set(HLSLIB_TARGET_CLOCK "${CLK}")
-
-    configure_file(scripts/Synthesis.tcl.in Synthesize${KERNEL_NAME}.tcl)
-
-endfunction()
-
-
-
-#==========================================================================================================================================
-
-
-
 # Generates and appends commands for compiling and linking the given kernel.
 function(sdaccel_target 
     KERNEL_FILE
@@ -142,17 +147,16 @@ function(sdaccel_target
     IS_MULTI_DDR_BANK
     MULTI_DDR_SP_TAG
     ADDITIONAL_FLAGS)
-    set(KERNEL_FLAGS "${SYNTH_FLAGS}")
-    #string(REPLACE " " ";" XOCC_FLAGS "${XOCC_FLAGS}")
-    #set(SYNTH_FLAGS "") #should be ';' seperated
+    set(KERNEL_FLAGS "${MemoryBankFlags} ${SYNTH_FLAGS}")
+
     set(XOCC_COMMAND
         -s
-        ${XOCC_FLAGS}
         -I${CMAKE_SOURCE_DIR}/inc
         -I${CMAKE_SOURCE_DIR}/hlslib/include
         -I${CMAKE_BINARY_DIR}
         --kernel ${KERNEL_NAME} 
         --platform ${DSA_NAME}
+        --jobs ${CpuCount}
         --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${KERNEL_FLAGS}"
         --xp misc:solution_name="${KERNEL_NAME}_solution" 
         --max_memory_ports all
@@ -165,13 +169,7 @@ function(sdaccel_target
             --profile_kernel "exec:all:all")
     endif()
 
-    #if(ENABLE_DEBUGGING)
-    #  set(XOCC_COMMAND ${XOCC_COMMAND} -g
-    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM0
-    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM1
-    #    --dk chipscope:${KERNEL_NAME}_1:M_AXI_GMEM2)
-    #endif()
-    if(KERNEL_CLOCK GREATER 0)
+    if(${KERNEL_CLOCK} GREATER 0)
         if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
             set(XOCC_COMMAND ${XOCC_COMMAND}
                 --xp prop:solution.hls_pre_tcl=KernelFreqSDx20174.tcl
@@ -219,38 +217,6 @@ endfunction()
 
 
 
-#==========================================================================================================================================
-
-
-
-
-configure_file(scripts/SynthesisScriptLauncherBatch.sh.in SynthesisScriptLauncherBatch.sh)
-add_custom_target(synthesis COMMAND sh SynthesisScriptLauncherBatch.sh) 
-
-# Creating required tcl scripts to run hls synthesis
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"             "task_concat"              )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"   "task_conv2_1x1_direct"    )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverfloat.cpp"     "task_datamover_mod1_float")
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamoverinteger.cpp"   "task_datamover_mod1_int"  )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"            "task_pad_last_dim"        )
-synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"          "task_unpad_last_dim"      )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"             "task_gather"              )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"             "task_matmul"              )
-###synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"             "task_matops"              )
-###synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"          "task_reducemax"           )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"          "task_reducesum"           )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"        "task_reducesum4d"         )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp"               "task_relu_sqrt_square"                )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"               "task_tile"                )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"               "task_topk"                )
-#synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"          "task_transpose"           )
-
-
-
-
-
-
-
 
 #==========================================================================================================================================
 
@@ -261,7 +227,7 @@ synthesis_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"         
 
 
 #Setting frequency override option.
-if(KERNEL_CLOCK GREATER 0)
+if(${KERNEL_CLOCK} GREATER 0)
     if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
         floatexpr("1000.0 / ${KERNEL_CLOCK}" KERNEL_PERIOD)
         message(WARNING "Bug workaround for SDx2017.4 : https://forums.xilinx.com/t5/SDAccel/How-to-set-the-target-frequency-for-the-kernel-in-SDACCL-2018-2/m-p/916088 https://forums.xilinx.com/t5/SDAccel/sdx2017-4-XOCC-kernel-compiler-cannot-set-kernel-frequency/td-p/894185")
@@ -273,8 +239,10 @@ if(KERNEL_CLOCK GREATER 0)
         set(hw_link_command "${hw_link_command} --kernel_frequency ${KERNEL_CLOCK}")
     endif()
     set(KERNEL_CLOCK_RESOLVED ${KERNEL_CLOCK})
+    set(KernelFrequency ${KERNEL_CLOCK})
 else()
     set(KERNEL_CLOCK_RESOLVED 200)
+    set(KernelFrequency ${KERNEL_CLOCK})
 endif()
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/config)
@@ -343,11 +311,20 @@ set(SP_TAG_RELUSQRTSQUARE
 "--sp task_relu_sqrt_square_1.inputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_inputTn}\
  --sp task_relu_sqrt_square_1.outputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_outputTn}")
 
-set(SP_TAG_DATAMOVER   
-"--sp task_datamover_1.dataBank0:bank0\
- --sp task_datamover_1.dataBank1:bank1\
- --sp task_datamover_1.dataBank2:bank2\
- --sp task_datamover_1.dataBank3:bank3")
+set(SP_TAG_DATAMOVER "")
+if(${UseMemoryBank0})
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank0:bank0")
+endif()
+if(${UseMemoryBank1})
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank1:bank1")
+endif()
+if(${UseMemoryBank2})
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank2:bank2")
+endif()
+if(${UseMemoryBank3})
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank3:bank3")
+endif()
+message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
 
 set(SP_TAG_PADDING          
 "--sp task_pad_last_dim_1.inputTn:bank${CFG13_Padding_DDRBANK_inputTn}\
@@ -356,6 +333,8 @@ set(SP_TAG_PADDING
 set(SP_TAG_UNPADDING        
 "--sp task_unpad_last_dim_1.inputTn:bank${CFG14_Unpadding_DDRBANK_inputTn}\
  --sp task_unpad_last_dim_1.outputTn:bank${CFG14_Unpadding_DDRBANK_outputTn}")
+
+
 
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 #sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
@@ -386,15 +365,15 @@ add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh)
 
 # Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t hw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_SwEmu_Batch.sh" 
-    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t sw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
+    "XILINX_PATH=${CMAKE_BINARY_DIR} ${SDAccel_XOCC} -g -l -t sw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
 )
 add_custom_target(link_hw COMMAND sh Link_Hw_Batch.sh) 
 add_custom_target(link_hwemu COMMAND sh Link_HwEmu_Batch.sh ) 
