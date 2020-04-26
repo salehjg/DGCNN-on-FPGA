@@ -50,7 +50,8 @@ int LaunchDataMover(
     // arguments should be like: bank0 only, bank1 only, bank2 only, and bank3 only.
 
     //Bank0
-    /*if(srcBank==0 || dstBank==0){
+#ifdef USEMEMORYBANK0
+    if(srcBank==0 || dstBank==0){
         if(srcBank==0){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
         }else{
@@ -59,9 +60,11 @@ int LaunchDataMover(
     }else{
         cl_mem null_mem_object = NULL;
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank0->ocl_buff);
-    }*/
-    
+    }
+#endif
+
     //Bank1
+#ifdef USEMEMORYBANK1
     if(srcBank==1 || dstBank==1){
         if(srcBank==1){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
@@ -71,8 +74,10 @@ int LaunchDataMover(
     }else{
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank1->ocl_buff);
     }
+#endif
 
     //Bank2
+#ifdef USEMEMORYBANK2
     if(srcBank==2 || dstBank==2){
         if(srcBank==2){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
@@ -82,8 +87,10 @@ int LaunchDataMover(
     }else{
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank2->ocl_buff);
     }
+#endif
 
     //Bank3
+#ifdef USEMEMORYBANK3
     if(srcBank==3 || dstBank==3){
         if(srcBank==3){
             error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
@@ -93,6 +100,7 @@ int LaunchDataMover(
     }else{
         error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank3->ocl_buff);
     }
+#endif
 
     error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&srcBank); 
     error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&dstBank); 

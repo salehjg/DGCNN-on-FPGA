@@ -18,6 +18,7 @@ set(HostExecutableName DeepPointV1FPGA)
 if(NOT DEFINED ENV{AWS_PLATFORM})
     message(FATAL_ERROR "You must set env variable AWS_PLATFORM to the path of the Vitis platform file(*.xpfm)")
 endif()
+message("CMake Version: ${CMAKE_VERSION}")
 
 #==========================================================================================================================================
 
@@ -105,26 +106,26 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/xrt.ini.in ${CMAKE_BINARY_DIR}/xrt.in
 set(SlrUtilizationReportFile ${CMAKE_BINARY_DIR}/${BinaryContainersName}.build/reports/SlrUtilizationReportOutput.txt)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl.in ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
-set(KernelFlags "")
+set(MemoryBankFlags "")
 if(NOT(${UseMemoryBank0} OR ${UseMemoryBank1} OR ${UseMemoryBank2} OR ${UseMemoryBank3}))
     message(FATAL_ERROR "All of the memory banks cannot be disabled.")
 endif()
 if(${UseMemoryBank0})
     # using lists helps to eliminate the extra space at the begining or at the end of string.
-    list(APPEND KernelFlags "-DUSEMEMORYBANK0")
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK0")
 endif()
 if(${UseMemoryBank1})
-    list(APPEND KernelFlags "-DUSEMEMORYBANK1")
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK1")
 endif()
 if(${UseMemoryBank2})
-    list(APPEND KernelFlags "-DUSEMEMORYBANK2")
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK2")
 endif()
 if(${UseMemoryBank3})
-    list(APPEND KernelFlags "-DUSEMEMORYBANK3")
+    list(APPEND MemoryBankFlags "-DUSEMEMORYBANK3")
 endif()
-string(REPLACE ";" " " KernelFlags "${KernelFlags}" )
-set(KernelFlags "${KernelFlags} ${KernelFlags_}")
-message("Kernel Flags: ${KernelFlags}")
+string(REPLACE ";" " " MemoryBankFlags "${MemoryBankFlags}" )
+set(KernelFlags "${MemoryBankFlags} ${KernelFlags_}")
+#message("Kernel Flags: ${KernelFlags}")
 #==========================================================================================================================================
 
 
@@ -172,14 +173,14 @@ function(CreateKernel
 
     if(${IsProfiled})
         if(${ProfileData})
-            set(ProfilingOptionsLink "${ProfilingOptionsLink} --profile_kernel data:${TopFunctionsName}:all:all:all")
+            list(APPEND ProfilingOptionsLink "--profile_kernel data:${TopFunctionsName}:all:all:all")
         endif()
         if(${ProfileStall})
-            set(ProfilingOptionsCompile "${ProfilingOptionsCompile} --profile_kernel stall:${TopFunctionsName}:all:all")
-            set(ProfilingOptionsLink "${ProfilingOptionsLink} --profile_kernel stall:${TopFunctionsName}:all:all")
+            list(APPEND ProfilingOptionsCompile "--profile_kernel stall:${TopFunctionsName}:all:all")
+            list(APPEND ProfilingOptionsLink "--profile_kernel stall:${TopFunctionsName}:all:all")
         endif()
         if(${ProfileExec})
-            set(ProfilingOptionsLink "${ProfilingOptionsLink} --profile_kernel exec:${TopFunctionsName}:all:all")
+            list(APPEND ProfilingOptionsLink "--profile_kernel exec:${TopFunctionsName}:all:all")
         endif()
     endif()
 
@@ -237,14 +238,20 @@ function(CreateKernel
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_HwEmu_Batch.sh" "${hwemu_compile}\n")
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_SwEmu_Batch.sh" "${swemu_compile}\n")
 
-    set(hw_link "${hw_link} ${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw.xo" PARENT_SCOPE) 
-    set(hwemu_link "${hwemu_link} ${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw_emu.xo" PARENT_SCOPE) 
-    set(swemu_link "${swemu_link} ${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_sw_emu.xo" PARENT_SCOPE) 
+    list(APPEND hw_link "${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw.xo")
+    list(APPEND hwemu_link "${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_hw_emu.xo")
+    list(APPEND swemu_link "${CMAKE_BINARY_DIR}/${ContainersName}.build/${TopFunctionsName}_sw_emu.xo")
+    set(hw_link "${hw_link}" PARENT_SCOPE) 
+    set(hwemu_link "${hwemu_link}" PARENT_SCOPE) 
+    set(swemu_link "${swemu_link}" PARENT_SCOPE) 
 
     if(${IsProfiled} AND (${ProfileData} OR ${ProfileStall} OR ${ProfileExec}))
-        set(hw_link_command "${hw_link_command} ${SpTag} ${ProfilingOptionsLink}")
+        #set(hw_link_command "${hw_link_command} ${SpTag} ${ProfilingOptionsLink}")
+        list(APPEND hw_link_command "${SpTag}")
+        list(APPEND hw_link_command "${ProfilingOptionsLink}")
     else()
-        set(hw_link_command "${hw_link_command} ${SpTag}")
+        #set(hw_link_command "${hw_link_command} ${SpTag}")
+        list(APPEND hw_link_command "${SpTag}")
     endif()
     
 
@@ -317,25 +324,20 @@ set(SP_TAG_RELUSQRTSQUARE
 "--sp task_relu_sqrt_square_1.inputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_inputTn}\
  --sp task_relu_sqrt_square_1.outputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_outputTn}")
 
-#set(SP_TAG_DATAMOVER   
-#"--sp task_datamover_1.dataBank0:bank0\
-# --sp task_datamover_1.dataBank1:bank1\
-# --sp task_datamover_1.dataBank2:bank2\
-# --sp task_datamover_1.dataBank3:bank3")
 set(SP_TAG_DATAMOVER "")
 if(${UseMemoryBank0})
-    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank0:bank0")
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank0:bank0")
 endif()
 if(${UseMemoryBank1})
-    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank1:bank1")
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank1:bank1")
 endif()
 if(${UseMemoryBank2})
-    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank2:bank2")
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank2:bank2")
 endif()
 if(${UseMemoryBank3})
-    set(SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER} --sp task_datamover_1.dataBank3:bank3")
+    list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank3:bank3")
 endif()
-message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
+#message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
 
 set(SP_TAG_PADDING          
 "--sp task_pad_last_dim_1.inputTn:bank${CFG13_Padding_DDRBANK_inputTn}\
@@ -627,6 +629,7 @@ set(HOSTSIDE_MAIN_SRC
     src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
+add_definitions(${MemoryBankFlags})
 add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
 target_link_libraries(${HostExecutableName} ${Vitis_LIBRARIES} ${Vitis_FLOATING_POINT_LIBRARY} z)
 

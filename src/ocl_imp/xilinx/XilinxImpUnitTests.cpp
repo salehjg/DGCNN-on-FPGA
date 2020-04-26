@@ -186,9 +186,22 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankFloat(){
             tensorCpu,
             tensorSrc_defaultBank);
 
-    // Change 0 to 1 (as bank0 is disabled to save resources)
-    for(unsigned bankSrc=1; bankSrc<4; bankSrc++){
-        for(unsigned bankDest=1; bankDest<4; bankDest++){
+    vector<unsigned> Banks;
+#ifdef USEMEMORYBANK0
+    Banks.push_back(0);
+#endif
+#ifdef USEMEMORYBANK1
+    Banks.push_back(1);
+#endif
+#ifdef USEMEMORYBANK2
+    Banks.push_back(2);
+#endif
+#ifdef USEMEMORYBANK3
+    Banks.push_back(3);
+#endif
+
+    for(unsigned bankSrc:Banks){
+        for(unsigned bankDest:Banks){
             std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
             OclTensorF* tensorCloned_BankB = (OclTensorF*)
                 tensorSrc_defaultBank->CloneIfNeededToDDRBank(
@@ -231,9 +244,22 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
             tensorCpu,
             tensorSrc_defaultBank);
 
-    // Change 0 to 1 (as bank0 is disabled to save resources)
-    for(unsigned bankSrc=1; bankSrc<4; bankSrc++){
-        for(unsigned bankDest=1; bankDest<4; bankDest++){
+    vector<unsigned> Banks;
+#ifdef USEMEMORYBANK0
+    Banks.push_back(0);
+#endif
+#ifdef USEMEMORYBANK1
+    Banks.push_back(1);
+#endif
+#ifdef USEMEMORYBANK2
+    Banks.push_back(2);
+#endif
+#ifdef USEMEMORYBANK3
+    Banks.push_back(3);
+#endif
+
+    for(unsigned bankSrc:Banks){
+        for(unsigned bankDest:Banks){
             std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
 
             OclTensorI* tensorCloned_BankB = (OclTensorI*)
@@ -847,7 +873,7 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
 ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
     if(platformSelector->openclPlatformClass->GetModeEnvVar()!=RUN_MODE::HwEmu){
         ReportObject* obj = new ReportObject(__FUNCTION__, false);
-        cerr << "KernelConv2Mlp: Skipping, only HwEmu mode is supported."<<endl;
+        cerr << "KernelConv2Mlp: Skipping, only HwEmu/HW mode is supported."<<endl;
         return obj;
     }
     bool comparisonResult = true;
@@ -866,7 +892,7 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 ReportObject* XilinxImpUnitTests::KernelTopK(){
     if(platformSelector->openclPlatformClass->GetModeEnvVar()!=RUN_MODE::HwEmu){
         ReportObject* obj = new ReportObject(__FUNCTION__, false);
-        cerr << "KernelTopK: Skipping, only HwEmu mode is supported."<<endl;
+        cerr << "KernelTopK: Skipping, only HwEmu/HW mode is supported."<<endl;
         return obj;
     }
     const unsigned kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount+2;

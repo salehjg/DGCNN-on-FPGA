@@ -40,6 +40,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
         _platforms = new cl_platform_id[platformCount];
         err = clGetPlatformIDs(16, _platforms, &platformCount);
         assert(err == CL_SUCCESS);
+        cout<<"Available OpenCL Platforms: "<<platformCount<<endl;
 
         bool deviceFound = false;
 
@@ -51,12 +52,13 @@ XilinxImplementation::XilinxImplementation(int aa) {
             if(!_devices) delete[](_devices);
             _devices = new cl_device_id[deviceCount];
             clGetDeviceIDs(_platforms[id], CL_DEVICE_TYPE_ALL, deviceCount, _devices, NULL);
+            cout<<"Available Devices in Platform["<< id <<"]: "<<deviceCount<<endl;
             for(unsigned idx=0; idx<deviceCount && !deviceFound; idx++){
                 size_t nameLen, vendorLen;
 
                 err = clGetDeviceInfo(_devices[idx], CL_DEVICE_NAME, 0, NULL, &nameLen);
                 assert(err == CL_SUCCESS);
-                char *deviceName = (char*) malloc(nameLen);
+                char *deviceName = new char[nameLen];
                 err = clGetDeviceInfo(_devices[idx], CL_DEVICE_NAME, nameLen, deviceName, NULL);
                 assert(err == CL_SUCCESS);
 
@@ -84,6 +86,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
 
         context = clCreateContext(nullptr, 1, &deviceId, NULL, NULL, &err);
         assert(err == CL_SUCCESS);
+        cout<<"Created OCL Context.\n";
+
         queue = clCreateCommandQueue(
                 context,
                 deviceId,
@@ -94,6 +98,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
 #endif
                 &err);
         assert(err == CL_SUCCESS);
+        cout<<"Created OCL Queue.\n";
     }
 
     //======================================================================================================================
@@ -254,7 +259,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
 
     cout<<"*Using first kernel's container as default container.\n*Multiple container scenario is not supported yet."<<endl;
     size_t binary_content_length = load_file_to_memory(globalArgXclBin, &binary_content);
-
+    cout<<"FPGA Image Size(MB): "<< binary_content_length/1024.0f/1024.0f << endl;
     program = clCreateProgramWithBinary(
                             context, 
                             1,
@@ -268,6 +273,7 @@ XilinxImplementation::XilinxImplementation(int aa) {
         cout<<"Failed to create OpenCL program from binary."<<endl;
         std::exit(1);
     }
+    cout<<"OCL program created.\n";
 
     err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
     if (err != CL_SUCCESS) {
@@ -311,8 +317,9 @@ XilinxImplementation::~XilinxImplementation(){
     cout<<"~XilinxImplementation"<<endl;
     clReleaseCommandQueue(queue);
     clReleaseContext(context);
+    clReleaseProgram(program);
     clReleaseDevice(deviceId);
-    delete[](_platforms);
+    //delete(_platforms);
 
     for(OclKernelObject *kernelObject : oclKernels){
         if(kernelObject->use_ndrange_kernel)
