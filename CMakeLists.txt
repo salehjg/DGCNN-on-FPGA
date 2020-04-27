@@ -324,6 +324,7 @@ endif()
 if(${UseMemoryBank3})
     list(APPEND SP_TAG_DATAMOVER "--sp task_datamover_1.dataBank3:bank3")
 endif()
+string(REPLACE ";" " " SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER}" )
 message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
 
 set(SP_TAG_PADDING          
@@ -363,9 +364,13 @@ add_custom_target(compile_hw COMMAND sh Compile_Hw_Batch.sh)
 add_custom_target(compile_hwemu COMMAND sh Compile_HwEmu_Batch.sh) 
 add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh) 
 
+set(SlrUtilOutputFile ${CMAKE_BINARY_DIR}/SLR_UTILIZATION_REPORT.txt)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
+set(SlrUtilFilePath ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
+
 # Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
-    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" 
