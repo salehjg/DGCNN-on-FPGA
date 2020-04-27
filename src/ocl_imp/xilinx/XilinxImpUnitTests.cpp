@@ -897,7 +897,8 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
     }
     const unsigned kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount+2;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
-        <<" and N="<< N <<", Press any key to continue..."<<endl; cin.get();
+        <<" and N="<< N <<", Press ESC to skip..."<<endl; 
+    if(cin.get()==27) return nullptr;
     assert(N==ConfigTaskTopK::MaxSliceLen);
 
     TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
