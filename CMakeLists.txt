@@ -103,7 +103,7 @@ endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/scripts/xrt.ini.in ${CMAKE_BINARY_DIR}/xrt.ini)
 
-set(SlrUtilizationReportFile ${CMAKE_BINARY_DIR}/${BinaryContainersName}.build/reports/SlrUtilizationReportOutput.txt)
+set(SlrUtilizationReportFile ${CMAKE_BINARY_DIR}/SlrUtilizationReportOutput.txt)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl.in ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
 set(MemoryBankFlags "")
