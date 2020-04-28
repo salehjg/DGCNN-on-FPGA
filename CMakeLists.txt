@@ -28,10 +28,12 @@ message("CMake Version: ${CMAKE_VERSION}")
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path") 
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
 set(SYNTH_FLAGS "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
-set(ENABLE_PROFILING ON CACHE BOOL "Collect profiling information")
+set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information (Master Switch)")
+set(PROFILE_DATA ON CACHE BOOL "Data Profiling ON/OFF (For all of the kernels)")
+set(PROFILE_STALL OFF CACHE BOOL "Stall Profiling Switch (For all of the kernels)")
+set(PROFILE_EXEC OFF CACHE BOOL "Exec Profiling Switch (For all of the kernels)")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
-set(KERNEL_CLOCK "-1" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
-set(KERNEL_CLOCK_UNCERTAINTY "0.9" CACHE STRING "Clock Uncertainty")
+set(KERNEL_CLOCK "190" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(UseMemoryBank0 OFF CACHE BOOL "Enable/Disable usage of memory bank 0")
 set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
 set(UseMemoryBank2 ON CACHE BOOL "Enable/Disable usage of memory bank 2")
@@ -162,14 +164,11 @@ function(sdaccel_target
         --max_memory_ports all
     )
 
-    if(ENABLE_PROFILING)
-        set(XOCC_COMMAND ${XOCC_COMMAND}
-            --profile_kernel "data:all:all:all"
-            --profile_kernel "stall:all:all"
-            --profile_kernel "exec:all:all")
+    if(ENABLE_PROFILING AND PROFILE_STALL)
+        set(XOCC_COMMAND "${XOCC_COMMAND} --profile_kernel stall:all:all")
     endif()
 
-    if(${KERNEL_CLOCK} GREATER 0)
+    if(KERNEL_CLOCK GREATER 0)
         if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
             set(XOCC_COMMAND ${XOCC_COMMAND}
                 --xp prop:solution.hls_pre_tcl=KernelFreqSDx20174.tcl
@@ -227,7 +226,7 @@ endfunction()
 
 
 #Setting frequency override option.
-if(${KERNEL_CLOCK} GREATER 0)
+if(KERNEL_CLOCK GREATER 0)
     if((${SDAccel_MAJOR_VERSION} EQUAL 2017) AND (${SDAccel_MINOR_VERSION} EQUAL 4))
         floatexpr("1000.0 / ${KERNEL_CLOCK}" KERNEL_PERIOD)
         message(WARNING "Bug workaround for SDx2017.4 : https://forums.xilinx.com/t5/SDAccel/How-to-set-the-target-frequency-for-the-kernel-in-SDACCL-2018-2/m-p/916088 https://forums.xilinx.com/t5/SDAccel/sdx2017-4-XOCC-kernel-compiler-cannot-set-kernel-frequency/td-p/894185")
@@ -369,6 +368,24 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl ${CMAKE_BINA
 set(SlrUtilFilePath ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
 # Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
+if(ENABLE_PROFILING)
+    if(PROFILE_DATA)
+        set(swemu_link_command "${swemu_link_command} --profile_kernel data:all:all:all")
+        set(hwemu_link_command "${hwemu_link_command} --profile_kernel data:all:all:all")
+        set(hw_link_command "${hw_link_command} --profile_kernel data:all:all:all")
+    endif()
+    if(PROFILE_STALL)
+        set(swemu_link_command "${swemu_link_command} --profile_kernel stall:all:all")
+        set(hwemu_link_command "${hwemu_link_command} --profile_kernel stall:all:all")
+        set(hw_link_command "${hw_link_command} --profile_kernel stall:all:all")
+    endif()
+    if(PROFILE_EXEC)
+        set(swemu_link_command "${swemu_link_command} --profile_kernel exec:all:all")
+        set(hwemu_link_command "${hwemu_link_command} --profile_kernel exec:all:all")
+        set(hw_link_command "${hw_link_command} --profile_kernel data:all:all:all --profile_kernel stall:all:all --profile_kernel exec:all:all")
+    endif()
+endif()
+
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
     "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
