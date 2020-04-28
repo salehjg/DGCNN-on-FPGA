@@ -1,3 +1,4 @@
+start=$SECONDS
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' = | tee autobuild_swemu_log.txt
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' = | tee -a autobuild_swemu_log.txt
 make compile_swemu | tee -a autobuild_swemu_log.txt
@@ -17,4 +18,9 @@ else
 fi
 
 echo "DONE. RUNNING POWEROFF COMMAND..."
+stop=$SECONDS
+elapsed=$[stop-start]
+hours=$(bc <<< "scale=3;${elapsed}/3600.0")
+echo "Total Elapsed Seconds: ${elapsed}"
+echo "Total Elapsed Hours: ${hours}"
 sudo poweroff
