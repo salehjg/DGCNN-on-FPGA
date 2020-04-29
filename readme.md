@@ -107,7 +107,7 @@ make test
 # Branches
 This repository contains multiple branches as described below:
 Branch | AXI Width | DType | Tool | Notes
----  | --- | --- | ---
+---  | --- | --- | --- | ---
 master | 32-bits | float32 | SDx2019.1 | -
 axi32 | 32-bits | float32 | SDx2019.1 | -
 axi512 | 512-bits | float32 | SDx2019.1 | -
