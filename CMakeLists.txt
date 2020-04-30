@@ -31,6 +31,7 @@ set(PartName "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
 set(KernelFlags_ "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for the kernels")
 set(Profiling OFF CACHE BOOL "Profiling ON/OFF")
 set(OptimizationLevel "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
+set(ReportLevel "2" CACHE STRING "0: no DCP, 1: all of DCPs, 2: detailed, estimate: generate design.xml")
 set(KernelFrequency "190" CACHE STRING "MHz")
 set(IpCachePath "${CMAKE_BINARY_DIR}/ip_cache" CACHE STRING "IP Cache Path(with enough space for a hw build)")
 set(UseMemoryBank0 OFF CACHE BOOL "Enable/Disable usage of memory bank 0")
@@ -193,6 +194,7 @@ function(CreateKernel
         --jobs ${CpuCount}
         --kernel_frequency ${KernelFrequency}
         --optimize ${OptimizationLevel}
+        --report_level ${ReportLevel}
         --config ${CMAKE_BINARY_DIR}/common-config.ini 
         --config ${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini
         --advanced.prop kernel.${TopFunctionsName}.kernel_flags=\"${KernelFlags}\"
@@ -208,6 +210,7 @@ function(CreateKernel
         --jobs ${CpuCount}
         --kernel_frequency ${KernelFrequency}
         --optimize ${OptimizationLevel}
+        --report_level ${ReportLevel}
         --config ${CMAKE_BINARY_DIR}/common-config.ini 
         --config ${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini
         --advanced.prop kernel.${TopFunctionsName}.kernel_flags=\"${KernelFlags}\"
@@ -223,6 +226,7 @@ function(CreateKernel
         --jobs ${CpuCount}
         --kernel_frequency ${KernelFrequency}
         --optimize ${OptimizationLevel}
+        --report_level ${ReportLevel}
         --config ${CMAKE_BINARY_DIR}/common-config.ini 
         --config ${CMAKE_BINARY_DIR}/${ContainersName}-${TopFunctionsName}-compile.ini
         --advanced.prop kernel.${TopFunctionsName}.kernel_flags=\"${KernelFlags}\"
@@ -532,6 +536,7 @@ set( _link_hw_
     --target hw --link
     --debug
     --optimize ${OptimizationLevel}
+    --report_level ${ReportLevel}
     --jobs ${CpuCount}
     --kernel_frequency ${KernelFrequency}
     --config ${CMAKE_BINARY_DIR}/common-config.ini
@@ -549,6 +554,7 @@ set( _link_hwemu_
     --target hw_emu --link
     --debug
     --optimize ${OptimizationLevel}
+    --report_level ${ReportLevel}
     --jobs ${CpuCount}
     --kernel_frequency ${KernelFrequency}
     --config ${CMAKE_BINARY_DIR}/common-config.ini
@@ -565,6 +571,7 @@ set( _link_swemu_
     --target sw_emu --link
     --debug
     --optimize ${OptimizationLevel}
+    --report_level ${ReportLevel}
     --jobs ${CpuCount}
     --kernel_frequency ${KernelFrequency}
     --config ${CMAKE_BINARY_DIR}/common-config.ini
@@ -581,6 +588,7 @@ set( _link_interactive_imp_
     --target hw --link
     --debug
     --optimize ${OptimizationLevel}
+    --report_level ${ReportLevel}
     --jobs ${CpuCount}
     --kernel_frequency ${KernelFrequency}
     --config ${CMAKE_BINARY_DIR}/common-config.ini
