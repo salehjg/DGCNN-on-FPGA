@@ -33,6 +33,7 @@ set(PROFILE_DATA ON CACHE BOOL "Data Profiling ON/OFF (For all of the kernels)")
 set(PROFILE_STALL OFF CACHE BOOL "Stall Profiling Switch (For all of the kernels)")
 set(PROFILE_EXEC OFF CACHE BOOL "Exec Profiling Switch (For all of the kernels)")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
+set(ReportLevel "0" CACHE STRING "0: no DCP, 1: all of DCPs, 2: detailed, estimate: generate design.xml")
 set(KERNEL_CLOCK "190" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(UseMemoryBank0 OFF CACHE BOOL "Enable/Disable usage of memory bank 0")
 set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
@@ -181,7 +182,7 @@ function(sdaccel_target
     endif()
     string (REPLACE ";" " " XOCC_COMMAND "${XOCC_COMMAND}")
 
-    set(hw_compile "${SDAccel_XOCC} -g -c -t hw ${XOCC_COMMAND} -R2 ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
+    set(hw_compile "${SDAccel_XOCC} -g -c -t hw ${XOCC_COMMAND} --report_level ${ReportLevel} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw.xo")
     set(hwemu_compile "${SDAccel_XOCC} -g -c -t hw_emu ${XOCC_COMMAND} -Restimate ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_hw_emu.xo") 
     set(swemu_compile "${SDAccel_XOCC} -g -c -t sw_emu ${XOCC_COMMAND} ${KERNEL_FILE} -o ${KERNEL_FNAME_WITHOUT_EXTENSION}_sw_emu.xo") 
     file(APPEND "${CMAKE_BINARY_DIR}/Compile_Hw_Batch.sh" "${hw_compile}\n")
@@ -387,7 +388,7 @@ if(ENABLE_PROFILING)
 endif()
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh" 
-    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} --optimize ${OPTIMIZATION_OPTION} --report_level ${ReportLevel} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh" 
