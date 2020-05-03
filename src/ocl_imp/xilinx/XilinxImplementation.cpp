@@ -19,8 +19,8 @@ XilinxImplementation::XilinxImplementation(int aa) {
     {
         const RUN_MODE mode = GetModeEnvVar();
         if(mode==RUN_MODE::Unknown){
-            cout<<"WARNING: XCL_EMULATION_MODE is not set. Falling back onto SwEmu mode.";
-            assert(SetModeEnvVar(RUN_MODE::SwEmu)==0);
+            cout<<"WARNING: XCL_EMULATION_MODE is not set. System run(real FPGA) is considered.";
+            //assert(SetModeEnvVar(RUN_MODE::SwEmu)==0);
         }else{
             cout << "Mode: " << (
                 mode==RUN_MODE::SwEmu?"Sw-emulation":
