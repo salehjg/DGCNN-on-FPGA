@@ -447,7 +447,7 @@ target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOAT
 
 set(xcl_path_swemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_sw_emu.xclbin")
 set(xcl_path_hwemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw_emu.xclbin")
-set(xcl_path_hw "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw.xclbin")
+set(xcl_path_hw "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_hw.awsxclbin")
 set(HostExecutablePath "${CMAKE_BINARY_DIR}/${HostExecutableName}")
 set(DataDirectory "${CMAKE_SOURCE_DIR}/data")
 configure_file(${CMAKE_SOURCE_DIR}/scripts/LaunchDeepPointV1FPGA.sh.in LaunchDeepPointV1FPGA.sh @ONLY)
