@@ -4,25 +4,17 @@
 #include "ocl_imp/OclTensorI.h"
 #include "ocl_imp/xilinx/AxiHelper.h"
 #include "xilinx/config.h"
-#include "ocl_imp/xilinx/xcl.h"
-#include <exception>
-#include <iostream>
-#include <cassert>
-#include <stdio.h>
-#include <cstring>
-#include <cstdio>
-#include <iostream>
-#include <vector>
+#include "ocl_imp/xilinx/xcl2.hpp"
 
 using namespace std;
 
-extern int LaunchDataMover( 
-    cl_program program,
-    cl_command_queue queue,
-    cl_context context,
-    cl_mem srcBuff, 
-    cl_mem dstBuff, 
-    const unsigned srcBank, 
-    const unsigned dstBank, 
-    const unsigned len,
-    const unsigned vectorWords);
+extern int LaunchDataMover(
+        cl::Program *program,
+        cl::CommandQueue *queue,
+        cl::Context *context,
+        cl::Buffer &srcBuff,
+        cl::Buffer &dstBuff,
+        const unsigned srcBank,
+        const unsigned dstBank,
+        const unsigned len,
+        const unsigned vectorWords);

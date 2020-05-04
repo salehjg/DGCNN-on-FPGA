@@ -973,7 +973,7 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 
 void XilinxImpUnitTests::RunAll(){
     
-    PrintReport(TensorFloat());
+    /*PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
@@ -990,7 +990,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelVariance());
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum());
-    PrintReport(KernelMatmul());
+    PrintReport(KernelMatmul());*/
     PrintReport(KernelTile());
     PrintReport(KernelGather());
     PrintReport(KernelConcat2());

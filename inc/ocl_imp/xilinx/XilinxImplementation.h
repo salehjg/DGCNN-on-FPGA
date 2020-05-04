@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <ocl_imp/xilinx/xcl2.hpp>
 #include <PlatformImplementation.h>
-#include <ocl_imp/xilinx/xcl.h>
 #include <TensorF.h>
 #include <TensorI.h>
 #include <ocl_imp/OclTensorF.h>
@@ -13,7 +13,6 @@
 #include <cnpy.h>
 #include <ocl_imp/xilinx/AxiHelper.h>
 
-#define XILINX_BOTTLENCK_BLOCKSIZE 1024
 
 //#define REPORT_EXECUTION_DURATION
 #undef REPORT_EXECUTION_DURATION
@@ -32,7 +31,7 @@ struct OclKernelObject{
     string fileName;
     string containerName;
     const char *kernelName_ndrange, *kernelName_task;
-    cl_kernel kernel_ndrange,kernel_task;
+    cl::Kernel *kernel_ndrange, *kernel_task;
     bool use_ndrange_kernel;
     bool disabled;
 
@@ -94,14 +93,14 @@ public:
     TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded);
     TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded);
 
-    const char * getErrorString(cl_int error);
+    const char *getErrorString(cl_int error);
     int SetModeEnvVar(const RUN_MODE mode);
     RUN_MODE GetModeEnvVar();
 
-    cl_context          getContext();
-    cl_command_queue    getQueue();
-    cl_program          getProgram();
-    void                GetPaddedWorkSize(int dims, size_t * inBlockSize, size_t * inWorkSize, size_t * outPaddedWorkSize);
+    cl::Context *getContext();
+    cl::CommandQueue *getQueue();
+    cl::Program *getProgram();
+
     ~XilinxImplementation();
 
     std::vector<OclKernelObject*> oclKernels;
@@ -110,8 +109,8 @@ private:
     int a;
     void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,
                    const string &setting3, float val3, vector<unsigned int> shape1, vector<unsigned int> shape2, vector<bool> comb={});
-    cl_ulong get_duration_ns (const cl_event &event);
-    void ReportDuration(const std::string &name, const bool &isNDRange, const cl_event &event);
+    cl_ulong get_duration_ns (const cl::Event &event);
+    void ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event);
     TensorF* _ReduceSum4D_Task(
             TensorF* inputTn,
             bool overaxis0,
@@ -131,13 +130,10 @@ private:
     TensorF* _ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare);
 
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
-
-    std::string device_name;
-    cl_platform_id cpPlatform;        // OpenCL platform
-    cl_device_id device_id;           // device ID
-    cl_context context;               // context
-    cl_command_queue queue;           // command queue
-    cl_program program;               // program
-    char *binary_content;             // program binary content
+    std::string deviceName;
+    cl::Device device;
+    cl::Context *context;
+    cl::Program *program;
+    cl::CommandQueue *queue;
     cl_int err;
 };

@@ -23,20 +23,20 @@ OclTensorI::OclTensorI(int vectorWords){
     this->vectorWords = vectorWords;
 }
 
-OclTensorI::OclTensorI(cl_context context, std::vector<unsigned> shape, int bank, int vectorWords){
-    Init(context, shape, bank, vectorWords);
+OclTensorI::OclTensorI(cl::Context *context, cl::CommandQueue *queue, std::vector<unsigned> shape, int bank, int vectorWords){
+    Init(context, queue, shape, bank, vectorWords);
 }
 
-OclTensorI::OclTensorI( std::vector<unsigned> shape, cl_mem clBuff, int bank){
+OclTensorI::OclTensorI( std::vector<unsigned> shape, cl::Buffer clBuff, int bank){
     Init(shape, clBuff, bank);
 }
 
 
-void OclTensorI::Init(cl_context context, std::vector<unsigned> shape, int bank, int vectorWords) {
+void OclTensorI::Init(cl::Context *context, cl::CommandQueue *queue, std::vector<unsigned> shape, int bank, int vectorWords, bool initToZero) {
     cl_int ocl_stat;
     if(initialized){
-        std::cout<<"--- OclTensorI: buffer deleted.\n";
-        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        //delete(ocl_buff);
     }
     this->vectorWords = vectorWords;
     this->shape = shape;
@@ -47,21 +47,36 @@ void OclTensorI::Init(cl_context context, std::vector<unsigned> shape, int bank,
 
     dramBank = bank==-1 ? dramBank : bank;
 
-    cl_mem_ext_ptr_t memExt;
-    memExt.flags = TranslateBankIndex(dramBank);
-    memExt.obj = NULL;
-    memExt.param = 0;
+    // https://software.intel.com/en-us/forums/opencl/topic/731519
+    //
+    //      If blocking_write is CL_TRUE, the OpenCL implementation copies
+    //      the data referred to by ptr and enqueues the write operation
+    //      in the command-queue.The memory pointed to by ptr can be reused by
+    //      the application after the clEnqueueWriteBuffer call returns.
+    //
 
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenPadded, &memExt, &ocl_stat);
-    assert(ocl_stat==CL_SUCCESS);
+    cl_mem_ext_ptr_t extPtr = CreateExtendedPointer(nullptr, TranslateBankIndex(dramBank));
+    cl_mem_flags  flags = CL_MEM_READ_WRITE;
+    //flags |= CL_MEM_USE_HOST_PTR;
+    flags |= CL_MEM_EXT_PTR_XILINX;
+
+    OCL_CHECK(ocl_stat, ocl_buff = cl::Buffer(*context, flags, lenPadded, &extPtr, &ocl_stat));
+    if(initToZero){
+        const unsigned zeroInitBuffLen = getLengthPadded(this->vectorWords);
+        int *zeroInitBuff = new int[zeroInitBuffLen];
+        for(unsigned i=0; i<zeroInitBuffLen; i++){zeroInitBuff[i]=0;}
+        //cl::Event event;
+        OCL_CHECK(ocl_stat, ocl_stat = queue->enqueueWriteBuffer(ocl_buff, CL_TRUE, 0, lenPadded, zeroInitBuff, nullptr, nullptr));
+        //event.wait();
+    }
 }
 
-void OclTensorI::Init(std::vector<unsigned> shape, cl_mem clBuff, int bank){
+void OclTensorI::Init(std::vector<unsigned> shape, cl::Buffer clBuff, int bank){
     cl_int ocl_stat;
-    std::cout<<"--- OclTensorI: Warning: No padding\n";
+    std::cout<<"--- OclTensorF: Warning: No padding\n";
     if(initialized){
-        std::cout<<"--- OclTensorI: buffer deleted.\n";
-        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        //delete(ocl_buff);
     }
     this->shape = shape;
     this->rank = (int)shape.size();
@@ -74,29 +89,20 @@ void OclTensorI::Init(std::vector<unsigned> shape, cl_mem clBuff, int bank){
     ocl_buff = clBuff;
 }
 
-void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, std::vector<unsigned> shape, int *hostBuff, int bank, int vectorWords) {
+void OclTensorI::InitWithHostData(cl::Context *context, cl::CommandQueue *queue, std::vector<unsigned> shape, int *hostBuff, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
-        std::cout<<"--- OclTensorI: buffer deleted.\n";
-        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
+        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        //delete(ocl_buff);
     }
     this->vectorWords = vectorWords;
     this->shape = shape;
     this->rank = (int)shape.size();
     this->initialized = true;
-
     unsigned lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
     dramBank = bank==-1 ? dramBank : bank;
-
-    cl_mem_ext_ptr_t memExt;
-    memExt.flags = TranslateBankIndex(dramBank);
-    memExt.obj = NULL;
-    memExt.param = 0;
-
-    ocl_buff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenPadded, &memExt, &ocl_stat);
-    assert(ocl_stat==CL_SUCCESS);
 
     // https://software.intel.com/en-us/forums/opencl/topic/731519
     //
@@ -108,9 +114,15 @@ void OclTensorI::InitWithHostData(cl_context context, cl_command_queue queue, st
 
     int *paddedBuff = PadHostBuffer(shape, hostBuff, vectorWords);
 
-    ocl_stat = clEnqueueWriteBuffer(queue, ocl_buff, CL_TRUE, 0, lenPadded, paddedBuff, 0, NULL, NULL);
-    assert(ocl_stat==CL_SUCCESS);
+    cl_mem_ext_ptr_t extPtr = CreateExtendedPointer(nullptr, TranslateBankIndex(dramBank));
+    cl_mem_flags  flags = CL_MEM_READ_WRITE;
+    //flags |= CL_MEM_USE_HOST_PTR;
+    flags |= CL_MEM_EXT_PTR_XILINX;
 
+    OCL_CHECK(ocl_stat, ocl_buff = cl::Buffer(*context, flags, lenPadded, &extPtr, &ocl_stat));
+    //cl::Event event;
+    OCL_CHECK(ocl_stat, ocl_stat = queue->enqueueWriteBuffer(ocl_buff, CL_TRUE, 0, lenPadded, paddedBuff, nullptr, nullptr));
+    //event.wait();
     delete(paddedBuff);
 }
 
@@ -122,47 +134,41 @@ int OclTensorI::getDramBank(){
 // The only planned access to this method should be through 'XilinxImplementation' class.
 // Because of this, XilinxImpUnitTests wont be able to access cl_program directely.
 // It should be accessed through platformSelector.openclPlatformClass(They are public)
-void OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
+void OclTensorI::ChangeDDRBank(cl::Program *program, cl::Context *context, cl::CommandQueue *queue, int bank){
     if(initialized){
         //The tensor has been initialized and DOES contain a clBuffer within a different bank.
         //We will run a kernel to read data from old bank and simelteneously write it to the new bank.
 
-    	if(bank == dramBank){cout<<"Trying to change to the same bank (OclTensorI)."<<endl; std::exit(3);}
+        if(bank == dramBank){cout<<"Trying to change to the same bank (OclTensorF)."<<endl; std::exit(3);}
         assert(this->vectorWords>0);
 
-        //Forcing memory bank requirements using xilinx external memory extension to opencl.
-        cl_mem_ext_ptr_t memExt;
-        memExt.flags = TranslateBankIndex(bank);
-        memExt.obj = NULL;
-        memExt.param = 0;
+        cl_mem_ext_ptr_t extPtr = CreateExtendedPointer(nullptr, TranslateBankIndex(bank));
+        cl_mem_flags  flags = CL_MEM_READ_WRITE;
+        //flags |= CL_MEM_USE_HOST_PTR;
+        flags |= CL_MEM_EXT_PTR_XILINX;
 
         unsigned lenBytesPadded = getLengthBytesPadded(this->vectorWords);
         unsigned lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Creating new buffer within requested memory bank.
         cl_int ocl_stat;
-        cl_mem newBuff = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX, lenBytesPadded, &memExt, &ocl_stat);
-        assert(ocl_stat==CL_SUCCESS);
+        OCL_CHECK(ocl_stat, cl::Buffer newBuff = cl::Buffer(*context, flags, lenBytesPadded, &extPtr, &ocl_stat));
 
         //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
         //Unsupported memory banks will be checked within 'LaunchDataMover' method.
         LaunchDataMover(
-            program, 
-            queue, 
-            context,
-            ocl_buff, 
-            newBuff, 
-            dramBank, 
-            bank, 
-            lenWordsPadded,
-            (unsigned)this->vectorWords);
+                program,
+                queue,
+                context,
+                ocl_buff,
+                newBuff,
+                dramBank,
+                bank,
+                lenWordsPadded,
+                (unsigned)this->vectorWords);
 
         //Now we have to release the old buffer and replace it with the new one.
-        cl_int error = clReleaseMemObject(ocl_buff);
-        if(error != CL_SUCCESS){
-            cout<<"Failed to release old buffer(opencl) (OclTensorI), Err: " << error << endl;
-            assert(error==CL_SUCCESS);
-        }
+        // OCL C++ interface: will be released automatically
 
         //Replacing old released buffer with new one.
         ocl_buff = newBuff;
@@ -177,32 +183,32 @@ void OclTensorI::ChangeDDRBank(cl_program program, cl_context context, cl_comman
 
 //Creates a new tensor within bank index 'arg:bank' and copies the content there, then returns the new tensor.
 //The content and the bank of the current tensor will be remained untouched. 
-TensorI* OclTensorI::CloneToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
+TensorI* OclTensorI::CloneToDDRBank(cl::Program *program, cl::Context *context, cl::CommandQueue *queue, int bank){
     if(initialized){
         if(bank == dramBank){
             throw SameBankException();
         }
 
         //Creating new blank tensor within the required bank 
-        OclTensorI* clonedTensor = new OclTensorI(context, shape, bank);
+        OclTensorI* clonedTensor = new OclTensorI(context, queue, shape, bank);
 
         unsigned lenWordsPadded = getLengthPadded(this->vectorWords);
 
         //Launching data mover kernel to burst read data chunks and burst write them on destination memory bank.
         //Unsupported memory banks will be checked within 'LaunchDataMover' method.
         LaunchDataMover(
-            program, 
-            queue, 
-            context,
-            ocl_buff, 
-            clonedTensor->ocl_buff, 
-            dramBank, 
-            bank, 
-            lenWordsPadded,
-            (unsigned)this->vectorWords);
+                program,
+                queue,
+                context,
+                ocl_buff,
+                clonedTensor->ocl_buff,
+                dramBank,
+                bank,
+                lenWordsPadded,
+                (unsigned)this->vectorWords);
 
         return clonedTensor;
-        
+
     }else{
         //The tensor has not yet been initialized!
         cout<<"Trying to clone an uninitialized tensor(OclTensorI)" << endl;
@@ -210,7 +216,7 @@ TensorI* OclTensorI::CloneToDDRBank(cl_program program, cl_context context, cl_c
     }
 }
 
-TensorI* OclTensorI::CloneIfNeededToDDRBank(cl_program program, cl_context context, cl_command_queue queue, int bank){
+TensorI* OclTensorI::CloneIfNeededToDDRBank(cl::Program *program, cl::Context *context, cl::CommandQueue *queue, int bank){
     try{
         return CloneToDDRBank(program, context, queue, bank);
     } catch(SameBankException& e) {
@@ -219,12 +225,20 @@ TensorI* OclTensorI::CloneIfNeededToDDRBank(cl_program program, cl_context conte
     }
 }
 
-TensorI* OclTensorI::TransferToHost(cl_command_queue queue) {
+TensorI* OclTensorI::TransferToHost(cl::CommandQueue *queue) {
     TensorI* rsltTn;
     cl_int ocl_stat;
     int* hostBuffPadded = new int[getLengthPadded(vectorWords)];
-    ocl_stat = clEnqueueReadBuffer(queue, ocl_buff, CL_TRUE, 0, getLengthBytesPadded(vectorWords), hostBuffPadded, 0, NULL, NULL);
-    assert(ocl_stat==CL_SUCCESS);
+
+    OCL_CHECK(ocl_stat,ocl_stat = queue->enqueueReadBuffer(
+            ocl_buff,
+            CL_TRUE,
+            0,
+            getLengthBytesPadded(vectorWords),
+            hostBuffPadded,
+            nullptr,
+            nullptr));
+
     int* hostBuff = UnPadHostBuffer(shape, hostBuffPadded, vectorWords);
     rsltTn = new TensorI(getShape(),hostBuff);
     delete(hostBuffPadded);
@@ -306,8 +320,14 @@ OclTensorI::~OclTensorI() {
     
     if(initialized){
         //std::cout<<"--- OclTensorI: buffer deleted.\n";
-        assert(clReleaseMemObject(ocl_buff) == CL_SUCCESS);
     }
 }
 
+cl_mem_ext_ptr_t OclTensorI::CreateExtendedPointer(void *hostPtr, cl_mem_flags memoryBank){
+    cl_mem_ext_ptr_t extendedPointer;
+    extendedPointer.flags = memoryBank;
+    extendedPointer.obj = hostPtr;
+    extendedPointer.param = 0;
+    return extendedPointer;
+}
 

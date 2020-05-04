@@ -14,7 +14,6 @@
 #endif
 
 #ifdef USE_OCL
-#include <CL/cl.h>
 #include "ocl_imp/xilinx/XilinxImplementation.h"
 #include "../inc/ocl_imp/OclTensorF.h"
 #include "../inc/ocl_imp/OclTensorI.h"

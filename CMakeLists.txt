@@ -427,7 +427,7 @@ set(HOSTSIDE_SRC
     src/ocl_imp/OclTensorF.cpp
     src/ocl_imp/OclTensorI.cpp
     src/ocl_imp/DataMover.cpp
-    src/ocl_imp/xilinx/xcl.cpp
+    src/ocl_imp/xilinx/xcl2.cpp
     src/ocl_imp/xilinx/XilinxImplementation.cpp
     #src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
@@ -440,9 +440,13 @@ set(HOSTSIDE_MAIN_SRC
     src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
+set(CMAKE_BUILD_TYPE Debug)
+
 add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
 target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
 
+add_executable(HostTest src/HostTest.cpp src/ocl_imp/xilinx/xcl2.cpp)
+target_link_libraries(HostTest ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
 
 
 set(xcl_path_swemu "${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}_sw_emu.xclbin")

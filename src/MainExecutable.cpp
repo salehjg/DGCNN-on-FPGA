@@ -1,6 +1,11 @@
 #include "ClassifierMultiPlatform.h"
 #include <ocl_imp/xilinx/XilinxImpUnitTests.h>
 #include <iostream>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 using namespace std;
 
 
@@ -10,7 +15,24 @@ using namespace std;
 char* globalArgXclBin;
 char* globalArgDataPath;
 
+void handler(int sig) {
+    void *array[40];
+    size_t size;
+
+    // get void*'s for all entries on the stack
+    size = backtrace(array, 40);
+
+    // print out all the frames to stderr
+    cerr<<"The host program has crashed, printing call stack:\n";
+    cerr<<"Error: signal "<< sig<<"\n";
+    backtrace_symbols_fd(array, size, STDERR_FILENO);
+    exit(1);
+}
+
 int main(int argc, char* argv[]){
+    signal(SIGSEGV, handler);
+    signal(SIGABRT, handler);
+
     // Check the number of parameters
     if (argc < 3) {
         // Tell the user how to run the program

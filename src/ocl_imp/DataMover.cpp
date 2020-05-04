@@ -4,43 +4,43 @@
 #include "ocl_imp/OclTensorI.h"
 #include "ocl_imp/xilinx/AxiHelper.h"
 #include "xilinx/config.h"
-#include "ocl_imp/xilinx/xcl.h"
+#include "ocl_imp/xilinx/xcl2.hpp"
 #include <exception>
 #include <iostream>
 #include <cassert>
-#include <stdio.h>
-#include <cstring>
-#include <cstdio>
 #include <iostream>
 #include <vector>
 
 int LaunchDataMover( 
-    cl_program program,
-    cl_command_queue queue,
-    cl_context context,
-    cl_mem srcBuff, 
-    cl_mem dstBuff, 
+    cl::Program *program,
+    cl::CommandQueue *queue,
+    cl::Context *context,
+    cl::Buffer &srcBuff,
+    cl::Buffer &dstBuff,
     const unsigned srcBank, 
     const unsigned dstBank, 
     const unsigned len,
     const unsigned vectorWords){
 
     cl_int error;
-
-    //OclTensorF *tnDummyBank0 = new OclTensorF(context, {1}, 0);
-    OclTensorF *tnDummyBank1 = new OclTensorF(context, {1}, 1);
-    OclTensorF *tnDummyBank2 = new OclTensorF(context, {1}, 2);
-    OclTensorF *tnDummyBank3 = new OclTensorF(context, {1}, 3);
+#ifdef USEMEMORYBANK0
+    OclTensorF *tnDummyBank0 = new OclTensorF(context, queue, {len}, 0, true);
+#endif
+#ifdef USEMEMORYBANK1
+    OclTensorF *tnDummyBank1 = new OclTensorF(context, queue, {len}, 1, true);
+#endif
+#ifdef USEMEMORYBANK2
+    OclTensorF *tnDummyBank2 = new OclTensorF(context, queue, {len}, 2, true);
+#endif
+#ifdef USEMEMORYBANK3
+    OclTensorF *tnDummyBank3 = new OclTensorF(context, queue, {len}, 3, true);
+#endif
 
     if(!(srcBank>=0 && srcBank<=3)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
     if(!(dstBank>=0 && dstBank<=3)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
     assert(vectorWords>0);
 
-    cl_kernel kernel_datamover = clCreateKernel(program, "task_datamover", &error);
-    if (error != CL_SUCCESS) {
-        cout<<  "Failed to create internal data-mover task kernel, Err: " << error << endl;
-        std::exit(1);
-    }
+    OCL_CHECK(error,cl::Kernel kernel_datamover(*program, "task_datamover", &error));
 
     unsigned lenVec = len / (vectorWords);
 
@@ -51,13 +51,12 @@ int LaunchDataMover(
 #ifdef USEMEMORYBANK0
     if(srcBank==0 || dstBank==0){
         if(srcBank==0){
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, srcBuff));
         }else{
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, dstBuff));
         }
     }else{
-        cl_mem null_mem_object = NULL;
-        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank0->ocl_buff);
+        OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, tnDummyBank0->ocl_buff));
     }
 #endif
 
@@ -65,12 +64,12 @@ int LaunchDataMover(
 #ifdef USEMEMORYBANK1
     if(srcBank==1 || dstBank==1){
         if(srcBank==1){
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, srcBuff));
         }else{
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, dstBuff));
         }
     }else{
-        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank1->ocl_buff);
+        OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, tnDummyBank1->ocl_buff));
     }
 #endif
 
@@ -78,12 +77,12 @@ int LaunchDataMover(
 #ifdef USEMEMORYBANK2
     if(srcBank==2 || dstBank==2){
         if(srcBank==2){
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, srcBuff));
         }else{
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, dstBuff));
         }
     }else{
-        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank2->ocl_buff);
+        OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, tnDummyBank2->ocl_buff));
     }
 #endif
 
@@ -91,40 +90,36 @@ int LaunchDataMover(
 #ifdef USEMEMORYBANK3
     if(srcBank==3 || dstBank==3){
         if(srcBank==3){
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& srcBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, srcBuff));
         }else{
-            error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), (void*)& dstBuff);
+            OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, dstBuff));
         }
     }else{
-        error  = clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_mem), & tnDummyBank3->ocl_buff);
+        OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, tnDummyBank3->ocl_buff));
     }
 #endif
 
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&srcBank); 
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&dstBank); 
-    error |= clSetKernelArg(kernel_datamover, argcnt++, sizeof(cl_uint), (void*)&lenVec);
-    
-    if(error != CL_SUCCESS) cout<<"Failed to set internal data-mover kernel args, Err: "<< error <<endl;
-    assert(error==CL_SUCCESS);
+    OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, srcBank));
+    OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, dstBank));
+    OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, lenVec));
 
-    cl_event exeEvt;
-    error = clEnqueueTask( queue,
-                           kernel_datamover,
-                           0,
-                           NULL,
-                           &exeEvt);
-    if(error != CL_SUCCESS) cout<<"Failed to launch internal data-mover kernel, Err: "<< error <<endl;
-    assert(error==CL_SUCCESS);
-    clWaitForEvents(1, &exeEvt);
+    cl::Event exeEvt;
+    OCL_CHECK(error,error = queue->enqueueTask(kernel_datamover, nullptr, &exeEvt));
+    exeEvt.wait();
+    //queue->finish();
 
     cout<< "_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_"<<endl;
 
-    error = clReleaseKernel(kernel_datamover);
-    if(error != CL_SUCCESS) cout<<"Failed to release internal data-mover kernel, Err: "<< error <<endl;
-    assert(error==CL_SUCCESS);
-
-    //delete(tnDummyBank0);
+#ifdef USEMEMORYBANK0
+    delete(tnDummyBank0);
+#endif
+#ifdef USEMEMORYBANK1
     delete(tnDummyBank1);
+#endif
+#ifdef USEMEMORYBANK2
     delete(tnDummyBank2);
+#endif
+#ifdef USEMEMORYBANK3
     delete(tnDummyBank3);
+#endif
 }
