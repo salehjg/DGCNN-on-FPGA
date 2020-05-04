@@ -28,8 +28,8 @@ void task_conv2_1x1_direct(
 int main(int argc, char **argv) {
 
     unsigned conv_b = 1;
-    unsigned conv_n = 128;
-    unsigned conv_k = 20;
+    unsigned conv_n = 1;
+    unsigned conv_k = 256;
     unsigned conv_din = 6;
     unsigned conv_dout = 128;
 
