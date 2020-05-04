@@ -35,7 +35,7 @@ XilinxImplementation::XilinxImplementation(int aa){
         cout<<"Xilinx Devices Found: "<< devices.size()<<endl;
         assert(devices.size()>0);
 
-        cout<<"Using device index 0."<<endl;
+        cout<<"Using device index 0"<<endl;
         device = devices[0];
 
         OCL_CHECK(err, context = new cl::Context(device, NULL, NULL, NULL, &err));

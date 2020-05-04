@@ -237,6 +237,9 @@ void _ReadAInner(MemoryPackK_t const a[],
                 const unsigned size_k, const unsigned size_m) {
 #pragma HLS INLINE
     auto pack = a[IndexA(n0, n1, n2, k0, k1, size_n, size_k, size_m)];
+#ifdef KERNEL_LOGS
+    //std::cout << "ReadA: index=" << IndexA(n0, n1, n2, k0, k1, size_n, size_k, size_m) << "\n";
+#endif
     ReadA_Unroll:
     for (unsigned w = 0; w < kMemoryWidthK; ++w) {
 #pragma HLS UNROLL
@@ -390,7 +393,10 @@ void ReadB(MemoryPackM_t const memory[],
                 for (unsigned m1m = 0; m1m < kOuterTileSizeMMemory; ++m1m) {
     #pragma HLS PIPELINE II=1
     #pragma HLS LOOP_FLATTEN
-                    pipe.Push(memory[IndexB(k, m0, m1m, size_n, size_k, size_m)]); 
+                    pipe.Push(memory[IndexB(k, m0, m1m, size_n, size_k, size_m)]);
+#ifdef KERNEL_LOGS
+                    std::cout << "ReadB: index=" << IndexB(k, m0, m1m, size_n, size_k, size_m) << "\n";
+#endif
                 }
 
             }
@@ -492,7 +498,7 @@ void WriteC(Stream<MemoryPackM_t, 2 * kOuterTileSizeMMemory> &pipe,
 #pragma HLS PIPELINE II=1
         biasBuff[iter] = bias[iter];
 #ifdef KERNEL_LOGS
-                    std::cout << "WriteC: Index Init Bias = " << iter << "\n";
+                    //std::cout << "WriteC: Index Init Bias = " << iter << "\n";
 #endif
     }
     WriteC_LoadBiasTn_Init:
@@ -519,7 +525,7 @@ void WriteC(Stream<MemoryPackM_t, 2 * kOuterTileSizeMMemory> &pipe,
                     indxC = IndexC(n0, n1, m0, m1m, size_n, size_k, size_m);
                     memory[indxC] = pipe.Pop() + biasBuff[indxB];
 #ifdef KERNEL_LOGS
-                    std::cout << "WriteC: IndexC = " << indxC << ", indxB:" << indxB << "\n";
+                    //std::cout << "WriteC: IndexC = " << indxC << ", indxB:" << indxB << "\n";
 #endif
                 }
             }

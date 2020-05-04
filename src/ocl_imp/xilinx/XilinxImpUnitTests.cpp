@@ -880,7 +880,7 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
     {
         TensorF* tensorSrc = GenerateTensor(0,{1,256,1,6});
         TensorF* tensorWeight = GenerateTensor(0,{1,1,6,16});
-        TensorF* tensorBiases = GenerateTensor(0,{16});
+        TensorF* tensorBiases = GenerateTensor(0,{128});
         TensorF* tensorCpu = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,tensorSrc,tensorWeight,tensorBiases);
         TensorF* tensorGpu = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,tensorSrc,tensorWeight,tensorBiases);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu); 
@@ -981,23 +981,23 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(TensorPadUnpadCpuFloat());
     PrintReport(TensorPadUnpadCpuInteger());
     PrintReport(KernelPadLastDimFloat());
-    PrintReport(KernelUnpadLastDimFloat());
+    PrintReport(KernelUnpadLastDimFloat());*/
     PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
-    PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
+    /*PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
     PrintReport(KernelMatops());
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum());
-    PrintReport(KernelMatmul());*/
+    PrintReport(KernelMatmul());
     PrintReport(KernelTile());
     PrintReport(KernelGather());
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());
-    PrintReport(KernelTranspose());
+    PrintReport(KernelTranspose());*/
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
