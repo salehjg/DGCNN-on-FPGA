@@ -98,8 +98,8 @@ int main(int argc, char **argv) {
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
     OCL_CHECK(err,program = new cl::Program(*context, {device}, bins, NULL, &err));
 
-    CreateBufferAndTest(context, queue, 128, 0); //Test Bank1
-    CreateBufferAndTest(context, queue, 128, 0); //Test Bank2
-    CreateBufferAndTest(context, queue, 128, 0); //Test Bank0
-    CreateBufferAndTest(context, queue, 128, 0); //Test Bank3
+    CreateBufferAndTest(context, queue, 128, 1); //Test Bank1
+    CreateBufferAndTest(context, queue, 128, 2); //Test Bank2
+    //CreateBufferAndTest(context, queue, 128, 0); //Test Bank0
+    //CreateBufferAndTest(context, queue, 128, 3); //Test Bank3
 }
