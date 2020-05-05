@@ -99,7 +99,7 @@ case $mode in
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 	echo -e "${GREEN}Launching DeepPointV1FPGA...${NC}"
 	echo ""
-	$hostsideexe $xclbin_hw $datadir
+	$hostsideexe $xclbin_hw $datadir 2>&1 | tee -a DeepPointV1FPGA_Host_Log.txt
 
 	;; 
 
