@@ -14,8 +14,8 @@
 #include <ocl_imp/xilinx/AxiHelper.h>
 
 
-//#define REPORT_EXECUTION_DURATION
-#undef REPORT_EXECUTION_DURATION
+#define REPORT_EXECUTION_DURATION
+//#undef REPORT_EXECUTION_DURATION
 
 #define DUMP_ENABLED
 //#undef DUMP_ENABLED
