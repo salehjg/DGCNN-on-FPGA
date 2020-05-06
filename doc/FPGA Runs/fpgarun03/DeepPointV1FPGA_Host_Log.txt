@@ -1,0 +1,1567 @@
+Executable Path: /mnt/mydrive/00_workspace/deeppoint-v1-fpga/build/DeepPointV1FPGA
+FPGA BIN FNAME: /mnt/mydrive/00_workspace/deeppoint-v1-fpga/build/DeepPointV1FPGA_hw.awsxclbin
+DATA DIR PATH: /mnt/mydrive/00_workspace/deeppoint-v1-fpga/data
+======================================================
+DeepPoint-V1-FPGA
+Details:
+
+======================================================
+Running Selected ModelArch ...
+
+WARNING: XCL_EMULATION_MODE is not set. System run(real FPGA) is considered.xclProbe found 1 FPGA slots with xocl driver running
+Found Platform
+Platform Name: Xilinx
+Xilinx Devices Found: 1
+Using device index 0
+Found Device=xilinx_aws-vu9p-f1-04261818_dynamic_5_0
+INFO: Reading /mnt/mydrive/00_workspace/deeppoint-v1-fpga/build/DeepPointV1FPGA_hw.awsxclbin
+Loading: '/mnt/mydrive/00_workspace/deeppoint-v1-fpga/build/DeepPointV1FPGA_hw.awsxclbin'
+This AFI already loaded. Skip reload!
+Successfully skipped reloading of local image.
+AFI load complete.
+- - - - - - - - - - -
+Weights Dir: /mnt/mydrive/00_workspace/deeppoint-v1-fpga/data/weights/
+Weights File List Path: /mnt/mydrive/00_workspace/deeppoint-v1-fpga/data/weights/filelist.txt
+PCL NPY PATH: /mnt/mydrive/00_workspace/deeppoint-v1-fpga/data/dataset/dataset_B5_pcl.npy
+LBL NPY PATH: /mnt/mydrive/00_workspace/deeppoint-v1-fpga/data/dataset/dataset_B5_labels_int32.npy
+Starting Process...
+Batch Size  = 5
+Point Count = 1024
+		** Transpose: , Shape1=5x1024x3x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** Transpose(task):: 	(us): 4386.23	(ms): 4.38623	( s): 0.00438623
+		** MatMul: , Shape1=5x1024x3x, , Shape2=5x3x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatMul(task):: 	(us): 8553.47	(ms): 8.55347	( s): 0.00855347
+		** MatOps: mode=2, Shape1=5x1024x1024x, 
+		** MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 18113.2	(ms): 18.1132	( s): 0.0181132
+		** Square: , Shape1=5x1024x3x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=5x1024x3x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 394.466	(ms): 0.394466	( s): 0.000394466
+		** ReduceSum: , Shape1=5x1024x3x, , Combination=0-0-1-, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceSum(task):: 	(us): 1232.01	(ms): 1.23201	( s): 0.00123201
+		** Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3448.69	(ms): 3.44869	( s): 0.00344869
+		** Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3437.16	(ms): 3.43716	( s): 0.00343716
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 19930.2	(ms): 19.9302	( s): 0.0199302
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19923.7	(ms): 19.9237	( s): 0.0199237
+		** TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+		** Gather: indices_axis=1, Shape1=5x1024x3x, , Shape2=5x1024x20x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor(OclTensorI).
+	** Gather(task):: 	(us): 6165.47	(ms): 6.16547	( s): 0.00616547
+		** Tile: tileAxis=2, tileCount=20, Shape1=5x1024x3x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** Tile(task):: 	(us): 9705.02	(ms): 9.70502	( s): 0.00970502
+		** MatOps: mode=1, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 6305.08	(ms): 6.30508	( s): 0.00630508
+		** Concat2: concatDim=3, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** Concat2(task):: 	(us): 98453.8	(ms): 98.4538	( s): 0.0984538
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x20x6x, , Shape2=1x1x6x64x, 
+vecSizeTranspose: 16
+		** PadLastDim: lastDimPadded=128, Shape1=1x1x6x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+dim0:6, dim1:64, lastDimPadded:128
+	** PadLastDim(task):: 	(us): 113.701	(ms): 0.113701	( s): 0.000113701
+Padding weightTn(super-vec padding):
+	D2: 64
+	D2Padded: 128
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [102400 6 128]
+	** Conv2D(task):: 	(us): 38397.6	(ms): 38.3976	( s): 0.0383976
+Launching Conv2 gemmHLS...DONE
+		** UnpadLastDim: lastDimUnpadded=64, Shape1=5x1024x20x128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** UnpadLastDim(task):: 	(us): 24835.5	(ms): 24.8355	( s): 0.0248355
+Unpadding results(super-vec unpadding).
+		** Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80032.2	(ms): 80.0322	( s): 0.0800322
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.268	(ms): 0.102268	( s): 0.000102268
+		** Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80027.1	(ms): 80.0271	( s): 0.0800271
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80021.8	(ms): 80.0218	( s): 0.0800218
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.714	(ms): 0.101714	( s): 0.000101714
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.497	(ms): 0.098497	( s): 9.8497e-05
+		** MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 103.498	(ms): 0.103498	( s): 0.000103498
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 108.857	(ms): 0.108857	( s): 0.000108857
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.351	(ms): 0.101351	( s): 0.000101351
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.408	(ms): 0.096408	( s): 9.6408e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.914	(ms): 0.101914	( s): 0.000101914
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 132.673	(ms): 0.132673	( s): 0.000132673
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.457	(ms): 0.105457	( s): 0.000105457
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 91.269	(ms): 0.091269	( s): 9.1269e-05
+		** MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23961	(ms): 23.961	( s): 0.023961
+		** MatOps: mode=0, Shape1=64x, 
+		** MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.651	(ms): 0.096651	( s): 9.6651e-05
+		** Sqrt: , Shape1=64x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 96.515	(ms): 0.096515	( s): 9.6515e-05
+		** MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 23903.5	(ms): 23.9035	( s): 0.0239035
+		** MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23906.1	(ms): 23.9061	( s): 0.0239061
+		** MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23897.4	(ms): 23.8974	( s): 0.0238974
+		** ReLU: , Shape1=5x1024x20x64x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x20x64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 22693.4	(ms): 22.6934	( s): 0.0226934
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x20x64x, , Shape2=1x1x64x128x, 
+vecSizeTranspose: 16
+Bypassing super-vec padding for weightTn
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [102400 64 128]
+	** Conv2D(task):: 	(us): 66500.6	(ms): 66.5006	( s): 0.0665006
+Launching Conv2 gemmHLS...DONE
+Bypassing super-vec unpadding of results.
+		** Mean: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 156143	(ms): 156.143	( s): 0.156143
+		** MatOps: mode=3, Shape1=128x, 
+		** MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.358	(ms): 0.100358	( s): 0.000100358
+		** Variance: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 156141	(ms): 156.141	( s): 0.156141
+		** ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 156133	(ms): 156.133	( s): 0.156133
+		** MatOps: mode=3, Shape1=128x, 
+		** MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.512	(ms): 0.104512	( s): 0.000104512
+		** MatOps: mode=3, Shape1=128x, 
+		** MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 89.981	(ms): 0.089981	( s): 8.9981e-05
+		** MatOps: mode=2, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 89.331	(ms): 0.089331	( s): 8.9331e-05
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 106.463	(ms): 0.106463	( s): 0.000106463
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.372	(ms): 0.099372	( s): 9.9372e-05
+		** MatOps: mode=2, Shape1=128x, 
+		** MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.931	(ms): 0.101931	( s): 0.000101931
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 87.095	(ms): 0.087095	( s): 8.7095e-05
+		** MatOps: mode=2, Shape1=128x, 
+		** MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.321	(ms): 0.105321	( s): 0.000105321
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.106	(ms): 0.097106	( s): 9.7106e-05
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.629	(ms): 0.100629	( s): 0.000100629
+		** MatOps: mode=1, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 48263.7	(ms): 48.2637	( s): 0.0482637
+		** MatOps: mode=0, Shape1=128x, 
+		** MatOps: mode=0, Shape1=128x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.123	(ms): 0.099123	( s): 9.9123e-05
+		** Sqrt: , Shape1=128x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=128x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 123.003	(ms): 0.123003	( s): 0.000123003
+		** MatOps: mode=3, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 48175	(ms): 48.175	( s): 0.048175
+		** MatOps: mode=2, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 48197.2	(ms): 48.1972	( s): 0.0481972
+		** MatOps: mode=0, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 48195	(ms): 48.195	( s): 0.048195
+		** ReLU: , Shape1=5x1024x20x128x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x20x128x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 45357.5	(ms): 45.3575	( s): 0.0453575
+		** ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceMax(task):: 	(us): 52577.6	(ms): 52.5776	( s): 0.0525776
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x1x128x, , Shape2=1x1x128x1024x, 
+vecSizeTranspose: 16
+Bypassing super-vec padding for weightTn
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [5120 128 1024]
+	** Conv2D(task):: 	(us): 41475.3	(ms): 41.4753	( s): 0.0414753
+Launching Conv2 gemmHLS...DONE
+Bypassing super-vec unpadding of results.
+		** Mean: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 62550.9	(ms): 62.5509	( s): 0.0625509
+		** MatOps: mode=3, Shape1=1024x, 
+		** MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 108.834	(ms): 0.108834	( s): 0.000108834
+		** Variance: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 62544.8	(ms): 62.5448	( s): 0.0625448
+		** ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 62540	(ms): 62.54	( s): 0.06254
+		** MatOps: mode=3, Shape1=1024x, 
+		** MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 112.22	(ms): 0.11222	( s): 0.00011222
+		** MatOps: mode=3, Shape1=1024x, 
+		** MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.765	(ms): 0.104765	( s): 0.000104765
+		** MatOps: mode=2, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 110.761	(ms): 0.110761	( s): 0.000110761
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.46	(ms): 0.10446	( s): 0.00010446
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 109.953	(ms): 0.109953	( s): 0.000109953
+		** MatOps: mode=2, Shape1=1024x, 
+		** MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.349	(ms): 0.104349	( s): 0.000104349
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 108.778	(ms): 0.108778	( s): 0.000108778
+		** MatOps: mode=2, Shape1=1024x, 
+		** MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.125	(ms): 0.104125	( s): 0.000104125
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 107.954	(ms): 0.107954	( s): 0.000107954
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.791	(ms): 0.101791	( s): 0.000101791
+		** MatOps: mode=1, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19980.6	(ms): 19.9806	( s): 0.0199806
+		** MatOps: mode=0, Shape1=1024x, 
+		** MatOps: mode=0, Shape1=1024x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 108.968	(ms): 0.108968	( s): 0.000108968
+		** Sqrt: , Shape1=1024x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 98.128	(ms): 0.098128	( s): 9.8128e-05
+		** MatOps: mode=3, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 19991.3	(ms): 19.9913	( s): 0.0199913
+		** MatOps: mode=2, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19931.1	(ms): 19.9311	( s): 0.0199311
+		** MatOps: mode=0, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19982	(ms): 19.982	( s): 0.019982
+		** ReLU: , Shape1=5x1024x1x1024x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x1x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 18243.8	(ms): 18.2438	( s): 0.0182438
+		** ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceMax(task):: 	(us): 7185.74	(ms): 7.18574	( s): 0.00718574
+		** MatMul: , Shape1=5x1024x, , Shape2=1024x512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatMul(task):: 	(us): 2337.51	(ms): 2.33751	( s): 0.00233751
+		** MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 114.213	(ms): 0.114213	( s): 0.000114213
+		** Mean: , Shape1=5x512x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x512x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 167.004	(ms): 0.167004	( s): 0.000167004
+		** MatOps: mode=3, Shape1=512x, 
+		** MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.791	(ms): 0.102791	( s): 0.000102791
+		** Variance: , Shape1=5x512x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x512x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 148.572	(ms): 0.148572	( s): 0.000148572
+		** ReduceSum4D: , Shape1=1x1x5x512x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 144.441	(ms): 0.144441	( s): 0.000144441
+		** MatOps: mode=3, Shape1=512x, 
+		** MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.83	(ms): 0.10183	( s): 0.00010183
+		** MatOps: mode=3, Shape1=512x, 
+		** MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.964	(ms): 0.102964	( s): 0.000102964
+		** MatOps: mode=2, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 111.269	(ms): 0.111269	( s): 0.000111269
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.686	(ms): 0.101686	( s): 0.000101686
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.784	(ms): 0.101784	( s): 0.000101784
+		** MatOps: mode=2, Shape1=512x, 
+		** MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.121	(ms): 0.101121	( s): 0.000101121
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.582	(ms): 0.100582	( s): 0.000100582
+		** MatOps: mode=2, Shape1=512x, 
+		** MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.66	(ms): 0.10466	( s): 0.00010466
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.809	(ms): 0.099809	( s): 9.9809e-05
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 111.597	(ms): 0.111597	( s): 0.000111597
+		** MatOps: mode=1, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 116.3	(ms): 0.1163	( s): 0.0001163
+		** MatOps: mode=0, Shape1=512x, 
+		** MatOps: mode=0, Shape1=512x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.941	(ms): 0.100941	( s): 0.000100941
+		** Sqrt: , Shape1=512x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=512x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 97.091	(ms): 0.097091	( s): 9.7091e-05
+		** MatOps: mode=3, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 107.571	(ms): 0.107571	( s): 0.000107571
+		** MatOps: mode=2, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 115.211	(ms): 0.115211	( s): 0.000115211
+		** MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 114.127	(ms): 0.114127	( s): 0.000114127
+		** ReLU: , Shape1=5x512x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x512x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 113.048	(ms): 0.113048	( s): 0.000113048
+		** MatMul: , Shape1=5x512x, , Shape2=512x256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatMul(task):: 	(us): 1118.24	(ms): 1.11824	( s): 0.00111824
+		** MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.05	(ms): 0.10505	( s): 0.00010505
+		** Mean: , Shape1=5x256x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x256x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 127.953	(ms): 0.127953	( s): 0.000127953
+		** MatOps: mode=3, Shape1=256x, 
+		** MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.114	(ms): 0.102114	( s): 0.000102114
+		** Variance: , Shape1=5x256x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x256x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 120.167	(ms): 0.120167	( s): 0.000120167
+		** ReduceSum4D: , Shape1=1x1x5x256x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 120.282	(ms): 0.120282	( s): 0.000120282
+		** MatOps: mode=3, Shape1=256x, 
+		** MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 106.633	(ms): 0.106633	( s): 0.000106633
+		** MatOps: mode=3, Shape1=256x, 
+		** MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.753	(ms): 0.101753	( s): 0.000101753
+		** MatOps: mode=2, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.833	(ms): 0.099833	( s): 9.9833e-05
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 116.059	(ms): 0.116059	( s): 0.000116059
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 103.741	(ms): 0.103741	( s): 0.000103741
+		** MatOps: mode=2, Shape1=256x, 
+		** MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.715	(ms): 0.104715	( s): 0.000104715
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.86	(ms): 0.10286	( s): 0.00010286
+		** MatOps: mode=2, Shape1=256x, 
+		** MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.617	(ms): 0.100617	( s): 0.000100617
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 103.511	(ms): 0.103511	( s): 0.000103511
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.08	(ms): 0.10208	( s): 0.00010208
+		** MatOps: mode=1, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 103.471	(ms): 0.103471	( s): 0.000103471
+		** MatOps: mode=0, Shape1=256x, 
+		** MatOps: mode=0, Shape1=256x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.709	(ms): 0.104709	( s): 0.000104709
+		** Sqrt: , Shape1=256x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=256x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 93.447	(ms): 0.093447	( s): 9.3447e-05
+		** MatOps: mode=3, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 110.289	(ms): 0.110289	( s): 0.000110289
+		** MatOps: mode=2, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.998	(ms): 0.105998	( s): 0.000105998
+		** MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 111.182	(ms): 0.111182	( s): 0.000111182
+		** ReLU: , Shape1=5x256x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x256x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 98.172	(ms): 0.098172	( s): 9.8172e-05
+		** MatOps: mode=0, Shape1=9x, , Shape2=9x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.808	(ms): 0.102808	( s): 0.000102808
+		** MatMul: , Shape1=5x256x, , Shape2=256x9x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatMul(task):: 	(us): 544.618	(ms): 0.544618	( s): 0.000544618
+		** MatOps: mode=0, Shape1=5x9x, , Shape2=9x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.624	(ms): 0.100624	( s): 0.000100624
+		** MatMul: , Shape1=5x1024x3x, , Shape2=5x3x3x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatMul(task):: 	(us): 5103.15	(ms): 5.10315	( s): 0.00510315
+STATUS: DGCCN0 Started
+		** Transpose: , Shape1=5x1024x3x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Transpose(task):: 	(us): 4367.27	(ms): 4.36727	( s): 0.00436727
+		** MatMul: , Shape1=5x1024x3x, , Shape2=5x3x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatMul(task):: 	(us): 8548.58	(ms): 8.54858	( s): 0.00854858
+		** MatOps: mode=2, Shape1=5x1024x1024x, 
+		** MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 18111.5	(ms): 18.1115	( s): 0.0181115
+		** Square: , Shape1=5x1024x3x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=5x1024x3x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** _ReluSqrtSquare(task):: 	(us): 388.754	(ms): 0.388754	( s): 0.000388754
+		** ReduceSum: , Shape1=5x1024x3x, , Combination=0-0-1-, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceSum(task):: 	(us): 1233.08	(ms): 1.23308	( s): 0.00123308
+		** Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3437	(ms): 3.437	( s): 0.00343699
+		** Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3477.53	(ms): 3.47753	( s): 0.00347753
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 19941.2	(ms): 19.9412	( s): 0.0199412
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19946.2	(ms): 19.9462	( s): 0.0199462
+		** TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+		** Gather: indices_axis=1, Shape1=5x1024x3x, , Shape2=5x1024x20x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor(OclTensorI).
+	** Gather(task):: 	(us): 6119.35	(ms): 6.11935	( s): 0.00611934
+		** Tile: tileAxis=2, tileCount=20, Shape1=5x1024x3x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 9707	(ms): 9.707	( s): 0.009707
+		** MatOps: mode=1, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 6383.22	(ms): 6.38322	( s): 0.00638322
+		** Concat2: concatDim=3, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** Concat2(task):: 	(us): 98522.1	(ms): 98.5221	( s): 0.0985221
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x20x6x, , Shape2=1x1x6x64x, 
+vecSizeTranspose: 16
+		** PadLastDim: lastDimPadded=128, Shape1=1x1x6x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+dim0:6, dim1:64, lastDimPadded:128
+	** PadLastDim(task):: 	(us): 112.667	(ms): 0.112667	( s): 0.000112667
+Padding weightTn(super-vec padding):
+	D2: 64
+	D2Padded: 128
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [102400 6 128]
+	** Conv2D(task):: 	(us): 38465.9	(ms): 38.4659	( s): 0.0384659
+Launching Conv2 gemmHLS...DONE
+		** UnpadLastDim: lastDimUnpadded=64, Shape1=5x1024x20x128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** UnpadLastDim(task):: 	(us): 24826.4	(ms): 24.8264	( s): 0.0248264
+Unpadding results(super-vec unpadding).
+		** Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80025.3	(ms): 80.0253	( s): 0.0800253
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 106.415	(ms): 0.106415	( s): 0.000106415
+		** Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80039.8	(ms): 80.0398	( s): 0.0800398
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80029.3	(ms): 80.0293	( s): 0.0800293
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.133	(ms): 0.105133	( s): 0.000105133
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 91.113	(ms): 0.091113	( s): 9.1113e-05
+		** MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 103.135	(ms): 0.103135	( s): 0.000103135
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 111.107	(ms): 0.111107	( s): 0.000111107
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.964	(ms): 0.099964	( s): 9.9964e-05
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 92.397	(ms): 0.092397	( s): 9.2397e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.45	(ms): 0.09945	( s): 9.945e-05
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.696	(ms): 0.102696	( s): 0.000102696
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 119.135	(ms): 0.119135	( s): 0.000119135
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 94.998	(ms): 0.094998	( s): 9.4998e-05
+		** MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23947.1	(ms): 23.9471	( s): 0.0239471
+		** MatOps: mode=0, Shape1=64x, 
+		** MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.373	(ms): 0.102373	( s): 0.000102373
+		** Sqrt: , Shape1=64x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 100.91	(ms): 0.10091	( s): 0.00010091
+		** MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 23911.4	(ms): 23.9114	( s): 0.0239114
+		** MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23916.9	(ms): 23.9169	( s): 0.0239169
+		** MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23920.1	(ms): 23.9201	( s): 0.0239201
+		** ReLU: , Shape1=5x1024x20x64x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x20x64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 22712.9	(ms): 22.7129	( s): 0.0227129
+		** ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceMax(task):: 	(us): 44505.8	(ms): 44.5058	( s): 0.0445058
+STATUS: DGCCN1 Started
+		** Transpose: , Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Transpose(task):: 	(us): 49498.5	(ms): 49.4985	( s): 0.0494985
+		** MatMul: , Shape1=5x1024x64x, , Shape2=5x64x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatMul(task):: 	(us): 105558	(ms): 105.558	( s): 0.105558
+		** MatOps: mode=2, Shape1=5x1024x1024x, 
+		** MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 18155.7	(ms): 18.1557	( s): 0.0181557
+		** Square: , Shape1=5x1024x64x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** _ReluSqrtSquare(task):: 	(us): 1267.91	(ms): 1.26791	( s): 0.00126791
+		** ReduceSum: , Shape1=5x1024x64x, , Combination=0-0-1-, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceSum(task):: 	(us): 1198.69	(ms): 1.19869	( s): 0.00119869
+		** Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3435.77	(ms): 3.43577	( s): 0.00343577
+		** Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3477.51	(ms): 3.47751	( s): 0.00347751
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 19981.3	(ms): 19.9813	( s): 0.0199813
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19967.3	(ms): 19.9673	( s): 0.0199673
+		** TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+		** Gather: indices_axis=1, Shape1=5x1024x64x, , Shape2=5x1024x20x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor(OclTensorI).
+	** Gather(task):: 	(us): 24467	(ms): 24.467	( s): 0.024467
+		** Tile: tileAxis=2, tileCount=20, Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 18595.9	(ms): 18.5959	( s): 0.0185959
+		** MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 24930.5	(ms): 24.9305	( s): 0.0249305
+		** Concat2: concatDim=3, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** Concat2(task):: 	(us): 47340.6	(ms): 47.3406	( s): 0.0473406
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x20x128x, , Shape2=1x1x128x64x, 
+vecSizeTranspose: 16
+		** PadLastDim: lastDimPadded=128, Shape1=1x1x128x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+dim0:128, dim1:64, lastDimPadded:128
+	** PadLastDim(task):: 	(us): 126.411	(ms): 0.126411	( s): 0.000126411
+Padding weightTn(super-vec padding):
+	D2: 64
+	D2Padded: 128
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [102400 128 128]
+	** Conv2D(task):: 	(us): 103510	(ms): 103.51	( s): 0.10351
+Launching Conv2 gemmHLS...DONE
+		** UnpadLastDim: lastDimUnpadded=64, Shape1=5x1024x20x128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** UnpadLastDim(task):: 	(us): 24870.4	(ms): 24.8704	( s): 0.0248704
+Unpadding results(super-vec unpadding).
+		** Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80028.2	(ms): 80.0282	( s): 0.0800282
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.198	(ms): 0.099198	( s): 9.9198e-05
+		** Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80025.8	(ms): 80.0258	( s): 0.0800258
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80023.8	(ms): 80.0238	( s): 0.0800238
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.729	(ms): 0.105729	( s): 0.000105729
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.285	(ms): 0.093285	( s): 9.3285e-05
+		** MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.151	(ms): 0.100151	( s): 0.000100151
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 89.548	(ms): 0.089548	( s): 8.9548e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.286	(ms): 0.096286	( s): 9.6286e-05
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 126.416	(ms): 0.126416	( s): 0.000126416
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 102.027	(ms): 0.102027	( s): 0.000102027
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.374	(ms): 0.101374	( s): 0.000101374
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.541	(ms): 0.098541	( s): 9.8541e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.28	(ms): 0.09628	( s): 9.628e-05
+		** MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23901.7	(ms): 23.9017	( s): 0.0239017
+		** MatOps: mode=0, Shape1=64x, 
+		** MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 103.824	(ms): 0.103824	( s): 0.000103824
+		** Sqrt: , Shape1=64x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 96.075	(ms): 0.096075	( s): 9.6075e-05
+		** MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 23977.9	(ms): 23.9779	( s): 0.0239779
+		** MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23961.2	(ms): 23.9612	( s): 0.0239612
+		** MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 24016.6	(ms): 24.0166	( s): 0.0240166
+		** ReLU: , Shape1=5x1024x20x64x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x20x64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 22730	(ms): 22.73	( s): 0.02273
+		** ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceMax(task):: 	(us): 44419.2	(ms): 44.4192	( s): 0.0444192
+STATUS: DGCCN2 Started
+		** Transpose: , Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Transpose(task):: 	(us): 49465.7	(ms): 49.4657	( s): 0.0494657
+		** MatMul: , Shape1=5x1024x64x, , Shape2=5x64x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatMul(task):: 	(us): 105694	(ms): 105.694	( s): 0.105694
+		** MatOps: mode=2, Shape1=5x1024x1024x, 
+		** MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 18111	(ms): 18.111	( s): 0.018111
+		** Square: , Shape1=5x1024x64x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** _ReluSqrtSquare(task):: 	(us): 1260.91	(ms): 1.26091	( s): 0.00126091
+		** ReduceSum: , Shape1=5x1024x64x, , Combination=0-0-1-, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceSum(task):: 	(us): 1192.04	(ms): 1.19204	( s): 0.00119204
+		** Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3439.74	(ms): 3.43974	( s): 0.00343974
+		** Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3473.95	(ms): 3.47395	( s): 0.00347395
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 19973.3	(ms): 19.9733	( s): 0.0199733
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19928.9	(ms): 19.9289	( s): 0.0199289
+		** TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+		** Gather: indices_axis=1, Shape1=5x1024x64x, , Shape2=5x1024x20x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor(OclTensorI).
+	** Gather(task):: 	(us): 24453.6	(ms): 24.4536	( s): 0.0244536
+		** Tile: tileAxis=2, tileCount=20, Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 18550.1	(ms): 18.5501	( s): 0.0185501
+		** MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 24922.9	(ms): 24.9229	( s): 0.0249229
+		** Concat2: concatDim=3, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** Concat2(task):: 	(us): 47362.9	(ms): 47.3629	( s): 0.0473629
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x20x128x, , Shape2=1x1x128x64x, 
+vecSizeTranspose: 16
+		** PadLastDim: lastDimPadded=128, Shape1=1x1x128x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+dim0:128, dim1:64, lastDimPadded:128
+	** PadLastDim(task):: 	(us): 128.766	(ms): 0.128766	( s): 0.000128766
+Padding weightTn(super-vec padding):
+	D2: 64
+	D2Padded: 128
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [102400 128 128]
+	** Conv2D(task):: 	(us): 103556	(ms): 103.556	( s): 0.103556
+Launching Conv2 gemmHLS...DONE
+		** UnpadLastDim: lastDimUnpadded=64, Shape1=5x1024x20x128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** UnpadLastDim(task):: 	(us): 24830.7	(ms): 24.8307	( s): 0.0248307
+Unpadding results(super-vec unpadding).
+		** Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80030.5	(ms): 80.0305	( s): 0.0800305
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.432	(ms): 0.096432	( s): 9.6432e-05
+		** Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80018.2	(ms): 80.0182	( s): 0.0800182
+		** ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 80047.3	(ms): 80.0473	( s): 0.0800473
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.071	(ms): 0.093071	( s): 9.3071e-05
+		** MatOps: mode=3, Shape1=64x, 
+		** MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.696	(ms): 0.097696	( s): 9.7696e-05
+		** MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 94.14	(ms): 0.09414	( s): 9.414e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 95.786	(ms): 0.095786	( s): 9.5786e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 89.763	(ms): 0.089763	( s): 8.9763e-05
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 91.179	(ms): 0.091179	( s): 9.1179e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 95.172	(ms): 0.095172	( s): 9.5172e-05
+		** MatOps: mode=2, Shape1=64x, 
+		** MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.939	(ms): 0.099939	( s): 9.9939e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.266	(ms): 0.093266	( s): 9.3266e-05
+		** MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.724	(ms): 0.093724	( s): 9.3724e-05
+		** MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23945	(ms): 23.945	( s): 0.023945
+		** MatOps: mode=0, Shape1=64x, 
+		** MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.373	(ms): 0.098373	( s): 9.8373e-05
+		** Sqrt: , Shape1=64x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 90.484	(ms): 0.090484	( s): 9.0484e-05
+		** MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 23907.4	(ms): 23.9074	( s): 0.0239074
+		** MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23913.3	(ms): 23.9133	( s): 0.0239133
+		** MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 23906.4	(ms): 23.9064	( s): 0.0239064
+		** ReLU: , Shape1=5x1024x20x64x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x20x64x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 22642.2	(ms): 22.6422	( s): 0.0226422
+		** ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceMax(task):: 	(us): 44437.3	(ms): 44.4373	( s): 0.0444373
+STATUS: DGCCN3 Started
+		** Transpose: , Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Transpose(task):: 	(us): 49456.3	(ms): 49.4563	( s): 0.0494563
+		** MatMul: , Shape1=5x1024x64x, , Shape2=5x64x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatMul(task):: 	(us): 105585	(ms): 105.585	( s): 0.105585
+		** MatOps: mode=2, Shape1=5x1024x1024x, 
+		** MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 18094.4	(ms): 18.0944	( s): 0.0180944
+		** Square: , Shape1=5x1024x64x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** _ReluSqrtSquare(task):: 	(us): 1256.72	(ms): 1.25672	( s): 0.00125672
+		** ReduceSum: , Shape1=5x1024x64x, , Combination=0-0-1-, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceSum(task):: 	(us): 1191.48	(ms): 1.19148	( s): 0.00119148
+		** Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3438.23	(ms): 3.43823	( s): 0.00343823
+		** Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 3434.26	(ms): 3.43426	( s): 0.00343426
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 19981.6	(ms): 19.9816	( s): 0.0199816
+		** MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 20016.8	(ms): 20.0168	( s): 0.0200168
+		** TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+		** Gather: indices_axis=1, Shape1=5x1024x64x, , Shape2=5x1024x20x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor(OclTensorI).
+	** Gather(task):: 	(us): 24446.1	(ms): 24.4461	( s): 0.0244461
+		** Tile: tileAxis=2, tileCount=20, Shape1=5x1024x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Tile(task):: 	(us): 18630.4	(ms): 18.6304	( s): 0.0186304
+		** MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 25003.9	(ms): 25.0039	( s): 0.0250039
+		** Concat2: concatDim=3, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** Concat2(task):: 	(us): 47330.1	(ms): 47.3301	( s): 0.0473301
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x20x128x, , Shape2=1x1x128x128x, 
+vecSizeTranspose: 16
+Bypassing super-vec padding for weightTn
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [102400 128 128]
+	** Conv2D(task):: 	(us): 103511	(ms): 103.511	( s): 0.103511
+Launching Conv2 gemmHLS...DONE
+Bypassing super-vec unpadding of results.
+		** Mean: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 156133	(ms): 156.133	( s): 0.156133
+		** MatOps: mode=3, Shape1=128x, 
+		** MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.512	(ms): 0.101512	( s): 0.000101512
+		** Variance: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 156159	(ms): 156.159	( s): 0.156159
+		** ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 156133	(ms): 156.133	( s): 0.156133
+		** MatOps: mode=3, Shape1=128x, 
+		** MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.758	(ms): 0.096758	( s): 9.6758e-05
+		** MatOps: mode=3, Shape1=128x, 
+		** MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.579	(ms): 0.100579	( s): 0.000100579
+		** MatOps: mode=2, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 92.445	(ms): 0.092445	( s): 9.2445e-05
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.551	(ms): 0.096551	( s): 9.6551e-05
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.832	(ms): 0.093832	( s): 9.3832e-05
+		** MatOps: mode=2, Shape1=128x, 
+		** MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.868	(ms): 0.097868	( s): 9.7868e-05
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.463	(ms): 0.093463	( s): 9.3463e-05
+		** MatOps: mode=2, Shape1=128x, 
+		** MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 95.637	(ms): 0.095637	( s): 9.5637e-05
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.603	(ms): 0.093603	( s): 9.3603e-05
+		** MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.448	(ms): 0.098448	( s): 9.8448e-05
+		** MatOps: mode=1, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 48162.7	(ms): 48.1627	( s): 0.0481627
+		** MatOps: mode=0, Shape1=128x, 
+		** MatOps: mode=0, Shape1=128x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.793	(ms): 0.096793	( s): 9.6793e-05
+		** Sqrt: , Shape1=128x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=128x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 93.306	(ms): 0.093306	( s): 9.3306e-05
+		** MatOps: mode=3, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 48295.1	(ms): 48.2951	( s): 0.0482951
+		** MatOps: mode=2, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 48274.5	(ms): 48.2745	( s): 0.0482745
+		** MatOps: mode=0, Shape1=5x1024x20x128x, , Shape2=128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 48273.3	(ms): 48.2733	( s): 0.0482733
+		** ReLU: , Shape1=5x1024x20x128x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x20x128x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 45417.2	(ms): 45.4172	( s): 0.0454172
+		** ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceMax(task):: 	(us): 52547.4	(ms): 52.5474	( s): 0.0525474
+STATUS: Agg Layer Started
+		** Concat2: concatDim=3, Shape1=5x1024x1x64x, , Shape2=5x1024x1x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Concat2(task):: 	(us): 2457.94	(ms): 2.45794	( s): 0.00245794
+		** Concat2: concatDim=3, Shape1=5x1024x1x128x, , Shape2=5x1024x1x64x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Concat2(task):: 	(us): 3553.05	(ms): 3.55305	( s): 0.00355305
+		** Concat2: concatDim=3, Shape1=5x1024x1x192x, , Shape2=5x1024x1x128x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** Concat2(task):: 	(us): 5870.02	(ms): 5.87002	( s): 0.00587001
+		** Conv2D: overrideDim2=-1, Shape1=5x1024x1x320x, , Shape2=1x1x320x1024x, 
+vecSizeTranspose: 16
+Bypassing super-vec padding for weightTn
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+Launching Conv2 gemmHLS
+[N K M] = [5120 320 1024]
+	** Conv2D(task):: 	(us): 85866.4	(ms): 85.8664	( s): 0.0858664
+Launching Conv2 gemmHLS...DONE
+Bypassing super-vec unpadding of results.
+		** Mean: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 62540.2	(ms): 62.5402	( s): 0.0625402
+		** MatOps: mode=3, Shape1=1024x, 
+		** MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 111.084	(ms): 0.111084	( s): 0.000111084
+		** Variance: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+		** ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 62538.3	(ms): 62.5383	( s): 0.0625383
+		** ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 62537.7	(ms): 62.5377	( s): 0.0625377
+		** MatOps: mode=3, Shape1=1024x, 
+		** MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.088	(ms): 0.101088	( s): 0.000101088
+		** MatOps: mode=3, Shape1=1024x, 
+		** MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 110.296	(ms): 0.110296	( s): 0.000110296
+		** MatOps: mode=2, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 92.115	(ms): 0.092115	( s): 9.2115e-05
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.958	(ms): 0.099958	( s): 9.9958e-05
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 111.385	(ms): 0.111385	( s): 0.000111385
+		** MatOps: mode=2, Shape1=1024x, 
+		** MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.936	(ms): 0.099936	( s): 9.9936e-05
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 91.224	(ms): 0.091224	( s): 9.1224e-05
+		** MatOps: mode=2, Shape1=1024x, 
+		** MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 107.2	(ms): 0.1072	( s): 0.0001072
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.164	(ms): 0.097164	( s): 9.7164e-05
+		** MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.675	(ms): 0.098675	( s): 9.8675e-05
+		** MatOps: mode=1, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 19933.4	(ms): 19.9334	( s): 0.0199334
+		** MatOps: mode=0, Shape1=1024x, 
+		** MatOps: mode=0, Shape1=1024x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 95.591	(ms): 0.095591	( s): 9.5591e-05
+		** Sqrt: , Shape1=1024x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 89.652	(ms): 0.089652	( s): 8.9652e-05
+		** MatOps: mode=3, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 20026.1	(ms): 20.0261	( s): 0.0200261
+		** MatOps: mode=2, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 20013.2	(ms): 20.0132	( s): 0.0200132
+		** MatOps: mode=0, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 20029.7	(ms): 20.0297	( s): 0.0200297
+		** ReLU: , Shape1=5x1024x1x1024x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x1024x1x1024x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 18174.6	(ms): 18.1746	( s): 0.0181746
+		** ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** ReduceMax(task):: 	(us): 7155.43	(ms): 7.15543	( s): 0.00715543
+STATUS: FC Layer1 Started
+		** MatMul: , Shape1=5x1024x, , Shape2=1024x512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatMul(task):: 	(us): 2329	(ms): 2.32899	( s): 0.00232899
+		** MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 112.859	(ms): 0.112859	( s): 0.000112859
+		** Mean: , Shape1=5x512x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x512x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 147.979	(ms): 0.147979	( s): 0.000147979
+		** MatOps: mode=3, Shape1=512x, 
+		** MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 99.287	(ms): 0.099287	( s): 9.9287e-05
+		** Variance: , Shape1=5x512x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x512x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 143.456	(ms): 0.143456	( s): 0.000143456
+		** ReduceSum4D: , Shape1=1x1x5x512x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 141.35	(ms): 0.14135	( s): 0.00014135
+		** MatOps: mode=3, Shape1=512x, 
+		** MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.081	(ms): 0.100081	( s): 0.000100081
+		** MatOps: mode=3, Shape1=512x, 
+		** MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.454	(ms): 0.100454	( s): 0.000100454
+		** MatOps: mode=2, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.814	(ms): 0.100814	( s): 0.000100814
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.591	(ms): 0.098591	( s): 9.8591e-05
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.223	(ms): 0.098223	( s): 9.8223e-05
+		** MatOps: mode=2, Shape1=512x, 
+		** MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 122.3	(ms): 0.1223	( s): 0.0001223
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.445	(ms): 0.098445	( s): 9.8445e-05
+		** MatOps: mode=2, Shape1=512x, 
+		** MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.338	(ms): 0.096338	( s): 9.6338e-05
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.366	(ms): 0.105366	( s): 0.000105366
+		** MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.493	(ms): 0.097493	( s): 9.7493e-05
+		** MatOps: mode=1, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 108.625	(ms): 0.108625	( s): 0.000108625
+		** MatOps: mode=0, Shape1=512x, 
+		** MatOps: mode=0, Shape1=512x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.907	(ms): 0.098907	( s): 9.8907e-05
+		** Sqrt: , Shape1=512x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=512x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 94.998	(ms): 0.094998	( s): 9.4998e-05
+		** MatOps: mode=3, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 105.243	(ms): 0.105243	( s): 0.000105243
+		** MatOps: mode=2, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.909	(ms): 0.105909	( s): 0.000105909
+		** MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 104.761	(ms): 0.104761	( s): 0.000104761
+		** ReLU: , Shape1=5x512x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x512x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 98.04	(ms): 0.09804	( s): 9.804e-05
+STATUS: FC Layer2 Started
+		** MatMul: , Shape1=5x512x, , Shape2=512x256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatMul(task):: 	(us): 1136.92	(ms): 1.13692	( s): 0.00113692
+		** MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 103.406	(ms): 0.103406	( s): 0.000103406
+		** Mean: , Shape1=5x256x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x256x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 116.664	(ms): 0.116664	( s): 0.000116664
+		** MatOps: mode=3, Shape1=256x, 
+		** MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.018	(ms): 0.097018	( s): 9.7018e-05
+		** Variance: , Shape1=5x256x, , Combination=1-0-0-0-, 
+		** ReduceSum4D: , Shape1=1x1x5x256x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 115.834	(ms): 0.115834	( s): 0.000115834
+		** ReduceSum4D: , Shape1=1x1x5x256x, , Combination=1-1-1-0-, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReduceSum4D_Task(task):: 	(us): 115.765	(ms): 0.115765	( s): 0.000115765
+		** MatOps: mode=3, Shape1=256x, 
+		** MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.567	(ms): 0.097567	( s): 9.7567e-05
+		** MatOps: mode=3, Shape1=256x, 
+		** MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 117.256	(ms): 0.117256	( s): 0.000117256
+		** MatOps: mode=2, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 101.146	(ms): 0.101146	( s): 0.000101146
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 94.296	(ms): 0.094296	( s): 9.4296e-05
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 95.593	(ms): 0.095593	( s): 9.5593e-05
+		** MatOps: mode=2, Shape1=256x, 
+		** MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 94.666	(ms): 0.094666	( s): 9.4666e-05
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 94.946	(ms): 0.094946	( s): 9.4946e-05
+		** MatOps: mode=2, Shape1=256x, 
+		** MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 95.798	(ms): 0.095798	( s): 9.5798e-05
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 93.509	(ms): 0.093509	( s): 9.3509e-05
+		** MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 100.481	(ms): 0.100481	( s): 0.000100481
+		** MatOps: mode=1, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 105.799	(ms): 0.105799	( s): 0.000105799
+		** MatOps: mode=0, Shape1=256x, 
+		** MatOps: mode=0, Shape1=256x, , Shape2=1x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 96.281	(ms): 0.096281	( s): 9.6281e-05
+		** Sqrt: , Shape1=256x, 
+		** ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=256x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 90.496	(ms): 0.090496	( s): 9.0496e-05
+		** MatOps: mode=3, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatOps(task):: 	(us): 99.069	(ms): 0.099069	( s): 9.9069e-05
+		** MatOps: mode=2, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 109.33	(ms): 0.10933	( s): 0.00010933
+		** MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 97.01	(ms): 0.09701	( s): 9.701e-05
+		** ReLU: , Shape1=5x256x, 
+		** ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=5x256x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** _ReluSqrtSquare(task):: 	(us): 88.916	(ms): 0.088916	( s): 8.8916e-05
+STATUS: FC Layer3 Started
+		** MatMul: , Shape1=5x256x, , Shape2=256x40x, 
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+	** MatMul(task):: 	(us): 542.023	(ms): 0.542023	( s): 0.000542023
+		** MatOps: mode=0, Shape1=5x40x, , Shape2=40x, 
+_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_
+CloneIfNeededToDDRBank: same banks detected, returning the original tensor.
+	** MatOps(task):: 	(us): 98.54	(ms): 0.09854	( s): 9.854e-05
+Total model execution time with 5 as batchsize: 19.1281 S
+STATUS: Computing Accuracy...
+Correct Count: 4
+Accuracy: 0.8

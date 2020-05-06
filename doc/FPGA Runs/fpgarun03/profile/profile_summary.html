@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<HTML>
+<BODY>
+<STYLE>
+	h1 {
+		font-size:200%;
+	}
+	table th,tr,td {
+		border-collapse: collapse; /* share common border between cells */
+		padding: 4px; /* padding within cells */
+		table-layout : fixed
+	}
+	table th {
+	background-color:lightsteelblue
+	}
+	/* Tooltip container */
+		.tooltip {
+		position: relative;
+		display: inline-block;
+	}
+	/* Tooltip text */
+	.tooltip .tooltiptext {
+		visibility: hidden;
+		width: 600px;
+		background-color: #555;
+		color: #fff;
+		text-align: left;
+		padding: 5px 0;
+		border-radius: 6px;
+		/* Position the tooltip text */
+		position: absolute;
+		z-index: 1;
+		bottom: 125%;
+		left: -100%;
+		margin-left: -60px;
+		/* Fade in tooltip */
+		opacity: 0;
+		transition: opacity 1s;
+	}
+	/* Tooltip arrow */
+	.tooltip .tooltiptext::after {
+		content: ;
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		margin-left: -5px;
+		border-width: 5px;
+		border-style: solid;
+		border-color: #555 transparent transparent transparent;
+	}
+	/* Show the tooltip text when you mouse over the tooltip container */
+	.tooltip:hover .tooltiptext {
+		visibility: visible;
+		opacity: 1;
+	}
+</STYLE>
+<h1>Profile Summary</h1>
+<br>
+<h3>Application: DeepPointV1FPGA</h3>
+<h3>Created: 2020-05-05 00:42:41</h3>
+<h3>Devices: xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</h3>
+<h3>Msec: 1588639361628</h3>
+<h3>Report name: Profile Summary</h3>
+<h3>Target: System Run</h3>
+<h3>Tool version: 2019.1</h3>
+<br>
+<h2>OpenCL API Calls</h2>
+
+<TABLE border="1">
+<TR>
+<TH>API Name</TH>
+<TH>Number<br>Of Calls</TH>
+<TH>Total<br>Time (ms)</TH>
+<TH>Minimum<br>Time (ms)</TH>
+<TH>Average<br>Time (ms)</TH>
+<TH>Maximum<br>Time (ms)</TH>
+</TR>
+<TR>
+<TD>clWaitForEvents</TD>
+<TD>520</TD>
+<TD>7708.830</TD>
+<TD>0.099</TD>
+<TD>14.825</TD>
+<TD>156.321</TD>
+</TR>
+<TR>
+<TD>clCreateBuffer</TD>
+<TD>1120</TD>
+<TD>2878.240</TD>
+<TD>0.017</TD>
+<TD>2.570</TD>
+<TD>23.979</TD>
+</TR>
+<TR>
+<TD>clReleaseMemObject</TD>
+<TD>656</TD>
+<TD>376.117</TD>
+<TD>0.005</TD>
+<TD>0.573</TD>
+<TD>4.669</TD>
+</TR>
+<TR>
+<TD>clEnqueueReadBuffer</TD>
+<TD>45</TD>
+<TD>341.673</TD>
+<TD>0.149</TD>
+<TD>7.593</TD>
+<TD>40.828</TD>
+</TR>
+<TR>
+<TD>clEnqueueTask</TD>
+<TD>520</TD>
+<TD>222.933</TD>
+<TD>0.072</TD>
+<TD>0.429</TD>
+<TD>13.352</TD>
+</TR>
+<TR>
+<TD>clCreateKernel</TD>
+<TD>177</TD>
+<TD>221.706</TD>
+<TD>1.208</TD>
+<TD>1.253</TD>
+<TD>1.460</TD>
+</TR>
+<TR>
+<TD>clCreateProgramWithBinary</TD>
+<TD>1</TD>
+<TD>213.736</TD>
+<TD>213.736</TD>
+<TD>213.736</TD>
+<TD>213.736</TD>
+</TR>
+<TR>
+<TD>clSetKernelArg</TD>
+<TD>4940</TD>
+<TD>187.848</TD>
+<TD>0.005</TD>
+<TD>0.038</TD>
+<TD>6.002</TD>
+</TR>
+<TR>
+<TD>clEnqueueWriteBuffer</TD>
+<TD>274</TD>
+<TD>36.003</TD>
+<TD>0.047</TD>
+<TD>0.131</TD>
+<TD>1.472</TD>
+</TR>
+<TR>
+<TD>clReleaseEvent</TD>
+<TD>520</TD>
+<TD>4.746</TD>
+<TD>0.007</TD>
+<TD>0.009</TD>
+<TD>0.037</TD>
+</TR>
+<TR>
+<TD>clGetEventProfilingInfo</TD>
+<TD>714</TD>
+<TD>4.235</TD>
+<TD>0.005</TD>
+<TD>0.006</TD>
+<TD>0.035</TD>
+</TR>
+<TR>
+<TD>clReleaseKernel</TD>
+<TD>163</TD>
+<TD>1.073</TD>
+<TD>0.006</TD>
+<TD>0.007</TD>
+<TD>0.030</TD>
+</TR>
+<TR>
+<TD>clGetExtensionFunctionAddress</TD>
+<TD>2</TD>
+<TD>0.094</TD>
+<TD>0.017</TD>
+<TD>0.047</TD>
+<TD>0.078</TD>
+</TR>
+<TR>
+<TD>clGetPlatformInfo</TD>
+<TD>14</TD>
+<TD>0.073</TD>
+<TD>0.005</TD>
+<TD>0.005</TD>
+<TD>0.008</TD>
+</TR>
+<TR>
+<TD>clRetainDevice</TD>
+<TD>4</TD>
+<TD>0.042</TD>
+<TD>0.005</TD>
+<TD>0.011</TD>
+<TD>0.025</TD>
+</TR>
+<TR>
+<TD>clReleaseDevice</TD>
+<TD>3</TD>
+<TD>0.020</TD>
+<TD>0.005</TD>
+<TD>0.007</TD>
+<TD>0.009</TD>
+</TR>
+<TR>
+<TD>clGetExtensionFunctionAddressForPlatform</TD>
+<TD>2</TD>
+<TD>0.018</TD>
+<TD>0.006</TD>
+<TD>0.009</TD>
+<TD>0.012</TD>
+</TR>
+<TR>
+<TD>clGetDeviceIDs</TD>
+<TD>2</TD>
+<TD>0.018</TD>
+<TD>0.005</TD>
+<TD>0.009</TD>
+<TD>0.012</TD>
+</TR>
+<TR>
+<TD>clGetDeviceInfo</TD>
+<TD>2</TD>
+<TD>0.014</TD>
+<TD>0.007</TD>
+<TD>0.007</TD>
+<TD>0.008</TD>
+</TR>
+<TR>
+<TD>clCreateCommandQueue</TD>
+<TD>1</TD>
+<TD>0.012</TD>
+<TD>0.012</TD>
+<TD>0.012</TD>
+<TD>0.012</TD>
+</TR>
+<TR>
+<TD>clCreateContext</TD>
+<TD>1</TD>
+<TD>0.011</TD>
+<TD>0.011</TD>
+<TD>0.011</TD>
+<TD>0.011</TD>
+</TR>
+</TABLE>
+<br>
+<h2>Kernel Execution</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Kernel</TH>
+<TH>Number Of<br>Enqueues</TH>
+<TH>Total<br>Time (ms)</TH>
+<TH>Minimum<br>Time (ms)</TH>
+<TH>Average<br>Time (ms)</TH>
+<TH>Maximum<br>Time (ms)</TH>
+</TR>
+<TR>
+<TD>task_concat</TD>
+<TD>8</TD>
+<TD>350.891</TD>
+<TD>2.458</TD>
+<TD>43.861</TD>
+<TD>98.522</TD>
+</TR>
+<TR>
+<TD>task_conv2_1x1_direct</TD>
+<TD>8</TD>
+<TD>581.283</TD>
+<TD>38.398</TD>
+<TD>72.660</TD>
+<TD>103.556</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.106</TD>
+<TD>0.106</TD>
+<TD>0.106</TD>
+<TD>0.106</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.369</TD>
+<TD>0.369</TD>
+<TD>0.369</TD>
+<TD>0.369</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>16.796</TD>
+<TD>16.796</TD>
+<TD>16.796</TD>
+<TD>16.796</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.357</TD>
+<TD>0.357</TD>
+<TD>0.357</TD>
+<TD>0.357</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>41.896</TD>
+<TD>0.103</TD>
+<TD>20.948</TD>
+<TD>41.793</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>5.319</TD>
+<TD>5.319</TD>
+<TD>5.319</TD>
+<TD>5.319</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>5.322</TD>
+<TD>5.322</TD>
+<TD>5.322</TD>
+<TD>5.322</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>33.628</TD>
+<TD>16.797</TD>
+<TD>16.814</TD>
+<TD>16.831</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>21.067</TD>
+<TD>0.098</TD>
+<TD>10.533</TD>
+<TD>20.969</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>3</TD>
+<TD>42.054</TD>
+<TD>0.094</TD>
+<TD>14.018</TD>
+<TD>20.996</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>62.773</TD>
+<TD>20.968</TD>
+<TD>31.386</TD>
+<TD>41.805</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.441</TD>
+<TD>0.441</TD>
+<TD>0.441</TD>
+<TD>0.441</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>3</TD>
+<TD>83.827</TD>
+<TD>20.983</TD>
+<TD>27.942</TD>
+<TD>41.806</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.365</TD>
+<TD>0.365</TD>
+<TD>0.365</TD>
+<TD>0.365</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>5.323</TD>
+<TD>5.323</TD>
+<TD>5.323</TD>
+<TD>5.323</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>21.056</TD>
+<TD>0.092</TD>
+<TD>10.528</TD>
+<TD>20.964</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>41.921</TD>
+<TD>20.953</TD>
+<TD>20.960</TD>
+<TD>20.968</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>3</TD>
+<TD>0.305</TD>
+<TD>0.085</TD>
+<TD>0.102</TD>
+<TD>0.120</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.190</TD>
+<TD>0.092</TD>
+<TD>0.095</TD>
+<TD>0.099</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>16.894</TD>
+<TD>0.102</TD>
+<TD>8.447</TD>
+<TD>16.793</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.204</TD>
+<TD>0.097</TD>
+<TD>0.102</TD>
+<TD>0.107</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.108</TD>
+<TD>0.108</TD>
+<TD>0.108</TD>
+<TD>0.108</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>20.968</TD>
+<TD>20.968</TD>
+<TD>20.968</TD>
+<TD>20.968</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.090</TD>
+<TD>0.090</TD>
+<TD>0.090</TD>
+<TD>0.090</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.109</TD>
+<TD>0.109</TD>
+<TD>0.109</TD>
+<TD>0.109</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>20.967</TD>
+<TD>20.967</TD>
+<TD>20.967</TD>
+<TD>20.967</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>41.795</TD>
+<TD>41.795</TD>
+<TD>41.795</TD>
+<TD>41.795</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>3</TD>
+<TD>18.681</TD>
+<TD>0.103</TD>
+<TD>6.227</TD>
+<TD>16.808</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.208</TD>
+<TD>0.096</TD>
+<TD>0.104</TD>
+<TD>0.112</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.110</TD>
+<TD>0.110</TD>
+<TD>0.110</TD>
+<TD>0.110</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.205</TD>
+<TD>0.097</TD>
+<TD>0.102</TD>
+<TD>0.107</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.117</TD>
+<TD>0.117</TD>
+<TD>0.117</TD>
+<TD>0.117</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.100</TD>
+<TD>0.100</TD>
+<TD>0.100</TD>
+<TD>0.100</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>5</TD>
+<TD>0.916</TD>
+<TD>0.098</TD>
+<TD>0.183</TD>
+<TD>0.515</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>4</TD>
+<TD>60.931</TD>
+<TD>0.092</TD>
+<TD>15.233</TD>
+<TD>41.802</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.098</TD>
+<TD>0.098</TD>
+<TD>0.098</TD>
+<TD>0.098</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.100</TD>
+<TD>0.100</TD>
+<TD>0.100</TD>
+<TD>0.100</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>16.788</TD>
+<TD>16.788</TD>
+<TD>16.788</TD>
+<TD>16.788</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.102</TD>
+<TD>0.102</TD>
+<TD>0.102</TD>
+<TD>0.102</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.170</TD>
+<TD>0.081</TD>
+<TD>0.085</TD>
+<TD>0.088</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>20.967</TD>
+<TD>20.967</TD>
+<TD>20.967</TD>
+<TD>20.967</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>5.366</TD>
+<TD>5.366</TD>
+<TD>5.366</TD>
+<TD>5.366</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>20.958</TD>
+<TD>20.958</TD>
+<TD>20.958</TD>
+<TD>20.958</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.190</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>5</TD>
+<TD>72.580</TD>
+<TD>1.152</TD>
+<TD>14.516</TD>
+<TD>20.955</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>41.905</TD>
+<TD>0.096</TD>
+<TD>20.952</TD>
+<TD>41.809</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.091</TD>
+<TD>0.091</TD>
+<TD>0.091</TD>
+<TD>0.091</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.103</TD>
+<TD>0.103</TD>
+<TD>0.103</TD>
+<TD>0.103</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.094</TD>
+<TD>0.094</TD>
+<TD>0.094</TD>
+<TD>0.094</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.103</TD>
+<TD>0.103</TD>
+<TD>0.103</TD>
+<TD>0.103</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>10.660</TD>
+<TD>5.311</TD>
+<TD>5.330</TD>
+<TD>5.348</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.363</TD>
+<TD>0.363</TD>
+<TD>0.363</TD>
+<TD>0.363</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>3</TD>
+<TD>50.434</TD>
+<TD>16.794</TD>
+<TD>16.811</TD>
+<TD>16.836</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+<TD>0.095</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+<TD>0.097</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.374</TD>
+<TD>0.374</TD>
+<TD>0.374</TD>
+<TD>0.374</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>6</TD>
+<TD>0.972</TD>
+<TD>0.080</TD>
+<TD>0.162</TD>
+<TD>0.522</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.101</TD>
+<TD>0.101</TD>
+<TD>0.101</TD>
+<TD>0.101</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.093</TD>
+<TD>0.093</TD>
+<TD>0.093</TD>
+<TD>0.093</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.203</TD>
+<TD>0.099</TD>
+<TD>0.102</TD>
+<TD>0.104</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>6</TD>
+<TD>18.966</TD>
+<TD>0.093</TD>
+<TD>3.161</TD>
+<TD>16.808</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.084</TD>
+<TD>0.084</TD>
+<TD>0.084</TD>
+<TD>0.084</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.089</TD>
+<TD>0.089</TD>
+<TD>0.089</TD>
+<TD>0.089</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>3</TD>
+<TD>0.310</TD>
+<TD>0.088</TD>
+<TD>0.103</TD>
+<TD>0.134</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.094</TD>
+<TD>0.094</TD>
+<TD>0.094</TD>
+<TD>0.094</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>20.968</TD>
+<TD>20.968</TD>
+<TD>20.968</TD>
+<TD>20.968</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>16.906</TD>
+<TD>16.906</TD>
+<TD>16.906</TD>
+<TD>16.906</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.106</TD>
+<TD>0.106</TD>
+<TD>0.106</TD>
+<TD>0.106</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>20.969</TD>
+<TD>20.969</TD>
+<TD>20.969</TD>
+<TD>20.969</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>33.638</TD>
+<TD>16.800</TD>
+<TD>16.819</TD>
+<TD>16.838</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>22.142</TD>
+<TD>1.169</TD>
+<TD>11.071</TD>
+<TD>20.973</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>4</TD>
+<TD>85.021</TD>
+<TD>1.148</TD>
+<TD>21.255</TD>
+<TD>41.875</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>21.057</TD>
+<TD>0.097</TD>
+<TD>10.528</TD>
+<TD>20.960</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.088</TD>
+<TD>0.088</TD>
+<TD>0.088</TD>
+<TD>0.088</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>21.019</TD>
+<TD>21.019</TD>
+<TD>21.019</TD>
+<TD>21.019</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>16.804</TD>
+<TD>16.804</TD>
+<TD>16.804</TD>
+<TD>16.804</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>83.582</TD>
+<TD>41.787</TD>
+<TD>41.791</TD>
+<TD>41.795</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>62.784</TD>
+<TD>20.964</TD>
+<TD>31.392</TD>
+<TD>41.820</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>33.596</TD>
+<TD>16.790</TD>
+<TD>16.798</TD>
+<TD>16.805</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.096</TD>
+<TD>0.096</TD>
+<TD>0.096</TD>
+<TD>0.096</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+<TD>0.092</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>20.973</TD>
+<TD>20.973</TD>
+<TD>20.973</TD>
+<TD>20.973</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.093</TD>
+<TD>0.093</TD>
+<TD>0.093</TD>
+<TD>0.093</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>22.131</TD>
+<TD>5.333</TD>
+<TD>11.066</TD>
+<TD>16.798</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>41.804</TD>
+<TD>41.804</TD>
+<TD>41.804</TD>
+<TD>41.804</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>3</TD>
+<TD>33.671</TD>
+<TD>0.100</TD>
+<TD>11.224</TD>
+<TD>16.788</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.090</TD>
+<TD>0.090</TD>
+<TD>0.090</TD>
+<TD>0.090</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.102</TD>
+<TD>0.102</TD>
+<TD>0.102</TD>
+<TD>0.102</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.096</TD>
+<TD>0.096</TD>
+<TD>0.096</TD>
+<TD>0.096</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>2</TD>
+<TD>0.176</TD>
+<TD>0.085</TD>
+<TD>0.088</TD>
+<TD>0.091</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.108</TD>
+<TD>0.108</TD>
+<TD>0.108</TD>
+<TD>0.108</TD>
+</TR>
+<TR>
+<TD>task_datamover</TD>
+<TD>1</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+<TD>0.104</TD>
+</TR>
+<TR>
+<TD>task_gather</TD>
+<TD>5</TD>
+<TD>85.652</TD>
+<TD>6.119</TD>
+<TD>17.130</TD>
+<TD>24.467</TD>
+</TR>
+<TR>
+<TD>task_matmul</TD>
+<TD>12</TD>
+<TD>347.051</TD>
+<TD>0.542</TD>
+<TD>28.921</TD>
+<TD>105.694</TD>
+</TR>
+<TR>
+<TD>task_matops</TD>
+<TD>219</TD>
+<TD>1323.340</TD>
+<TD>0.087</TD>
+<TD>6.043</TD>
+<TD>48.295</TD>
+</TR>
+<TR>
+<TD>task_pad_last_dim</TD>
+<TD>4</TD>
+<TD>0.482</TD>
+<TD>0.113</TD>
+<TD>0.120</TD>
+<TD>0.129</TD>
+</TR>
+<TR>
+<TD>task_reducemax</TD>
+<TD>7</TD>
+<TD>252.828</TD>
+<TD>7.155</TD>
+<TD>36.118</TD>
+<TD>52.578</TD>
+</TR>
+<TR>
+<TD>task_reducesum4d</TD>
+<TD>36</TD>
+<TD>2274.050</TD>
+<TD>0.116</TD>
+<TD>63.168</TD>
+<TD>156.159</TD>
+</TR>
+<TR>
+<TD>task_reducesum</TD>
+<TD>5</TD>
+<TD>6.047</TD>
+<TD>1.191</TD>
+<TD>1.209</TD>
+<TD>1.233</TD>
+</TR>
+<TR>
+<TD>task_relu_sqrt_square</TD>
+<TD>29</TD>
+<TD>224.103</TD>
+<TD>0.089</TD>
+<TD>7.728</TD>
+<TD>45.417</TD>
+</TR>
+<TR>
+<TD>task_tile</TD>
+<TD>15</TD>
+<TD>109.688</TD>
+<TD>3.434</TD>
+<TD>7.313</TD>
+<TD>18.630</TD>
+</TR>
+<TR>
+<TD>task_transpose</TD>
+<TD>5</TD>
+<TD>157.174</TD>
+<TD>4.367</TD>
+<TD>31.435</TD>
+<TD>49.498</TD>
+</TR>
+<TR>
+<TD>task_unpad_last_dim</TD>
+<TD>4</TD>
+<TD>99.363</TD>
+<TD>24.826</TD>
+<TD>24.841</TD>
+<TD>24.870</TD>
+</TR>
+</TABLE>
+<br>
+<h2>Compute Unit Utilization</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Device</TH>
+<TH>Compute Unit</TH>
+<TH>Kernel</TH>
+<TH>Global<br>Work Size</TH>
+<TH>Local<br>Work Size</TH>
+<TH>Number<br>Of Calls</TH>
+<TH>Dataflow<br>Execution</TH>
+<TH>Max Parallel<br>Executions</TH>
+<TH>Dataflow<br>Acceleration</TH>
+<TH>Total<br>Time (ms)</TH>
+<TH>Minimum<br>Time (ms)</TH>
+<TH>Average<br>Time (ms)</TH>
+<TH>Maximum<br>Time (ms)</TH>
+<TH>Clock<br>Freq (MHz)</TH>
+</TR>
+<TD colspan="14">No Data. Please use 'xocc -l --profile_kernel' to monitor and report kernel data transfers and execution.</TD>
+</TABLE>
+<br>
+<h2>Compute Units: Stall Information</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Compute Unit</TH>
+<TH>Execution Count</TH>
+<TH>Running<br>Time (ms)</TH>
+<TH>Intra-Kernel Dataflow<br>Stalls (ms)</TH>
+<TH>External Memory<br>Stalls (ms)</TH>
+<TH>Inter-Kernel Pipe<br>Stalls (ms)</TH>
+</TR>
+<TD colspan="6">No Data. Please use 'xocc -l --profile_kernel stall' to monitor and report kernel stall information.</TD>
+</TABLE>
+<br>
+<h2>Data Transfer: Host to Global Memory</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Context:Number<br>of Devices</TH>
+<TH>Transfer Type</TH>
+<TH>Number Of<br>Buffer Transfers</TH>
+<TH>Transfer<br>Rate (MB/s)</TH>
+<TH>Average Bandwidth<br>Utilization (%)</TH>
+<TH>Average<br>Buffer Size (KB)</TH>
+<TH>Total<br>Time (ms)</TH>
+<TH>Average<br>Time (ms)</TH>
+</TR>
+<TR>
+<TD>context0:1</TD>
+<TD>READ</TD>
+<TD>45</TD>
+<TD>1609.692473</TD>
+<TD>16.767630</TD>
+<TD>12039.500</TD>
+<TD>336.570962</TD>
+<TD>7.479355</TD>
+</TR>
+<TR>
+<TD>context0:1</TD>
+<TD>WRITE</TD>
+<TD>520</TD>
+<TD>9036.253989</TD>
+<TD>94.127646</TD>
+<TD>8771.240</TD>
+<TD>504.749343</TD>
+<TD>0.970672</TD>
+</TR>
+</TABLE>
+<br>
+<h2>Data Transfer: Kernels to Global Memory</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Device</TH>
+<TH>Compute Unit/<br>Port Name</TH>
+<TH>Kernel Arguments</TH>
+<TH>Memory Resources</TH>
+<TH>Transfer Type</TH>
+<TH>Number Of<br>Transfers</TH>
+<TH>Transfer<br>Rate (MB/s)</TH>
+<TH>Average Bandwidth<br>Utilization (%)</TH>
+<TH>Average<br>Size (KB)</TH>
+<TH>Average<br>Latency (ns)</TH>
+</TR>
+<TD colspan="10">No Data. Please use 'xocc -l --profile_kernel' to monitor and report kernel data transfers and execution.</TD>
+</TABLE>
+<br>
+<h2>Top Data Transfer: Kernels to Global Memory</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Device</TH>
+<TH>Compute Unit</TH>
+<TH>Number Of<br>Transfers</TH>
+<TH>Average Bytes<br>per Transfer</TH>
+<TH>Transfer<br>Efficiency (%)</TH>
+<TH>Total Data<br>Transfer (MB)</TH>
+<TH>Total<br>Write (MB)</TH>
+<TH>Total<br>Read (MB)</TH>
+<TH>Total Transfer<br>Rate (MB/s)</TH>
+</TR>
+<TD colspan="9">No Data. Please use 'xocc -l --profile_kernel' to monitor and report kernel data transfers and execution.</TD>
+</TABLE>
+<br>
+<h2>Top Kernel Execution</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Kernel Instance<br>Address</TH>
+<TH>Kernel</TH>
+<TH>Context ID</TH>
+<TH>Command<br>Queue ID</TH>
+<TH>Device</TH>
+<TH>Start<br>Time (ms)</TH>
+<TH>Duration (ms)</TH>
+<TH>Global<br>Work Size</TH>
+<TH>Local<br>Work Size</TH>
+</TR>
+<TR>
+<TD>0xf3b370</TD>
+<TD>task_reducesum4d</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>18122.500</TD>
+<TD>156.159</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf3b370</TD>
+<TD>task_reducesum4d</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>4317.680</TD>
+<TD>156.143</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf3b370</TD>
+<TD>task_reducesum4d</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>4594.870</TD>
+<TD>156.141</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf3b370</TD>
+<TD>task_reducesum4d</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>4870.410</TD>
+<TD>156.133</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf3b370</TD>
+<TD>task_reducesum4d</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>17848.200</TD>
+<TD>156.133</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf3b370</TD>
+<TD>task_reducesum4d</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>18398.000</TD>
+<TD>156.133</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf06910</TD>
+<TD>task_matmul</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>12650.600</TD>
+<TD>105.694</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf06910</TD>
+<TD>task_matmul</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>15610.100</TD>
+<TD>105.585</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf06910</TD>
+<TD>task_matmul</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>9701.430</TD>
+<TD>105.558</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+<TR>
+<TD>0xf07820</TD>
+<TD>task_conv2_1x1_direct</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0</TD>
+<TD>14672.400</TD>
+<TD>103.556</TD>
+<TD>1:1:1</TD>
+<TD>1:1:1</TD>
+</TR>
+</TABLE>
+<br>
+<h2>Top Memory Writes: Host to Global Memory</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Buffer Address</TH>
+<TH>Context ID</TH>
+<TH>Command<br>Queue ID</TH>
+<TH>Start<br>Time (ms)</TH>
+<TH>Duration (ms)</TH>
+<TH>Buffer Size (KB)</TH>
+<TH>Writing<br>Rate (MB/s)</TH>
+</TR>
+<TR>
+<TD>0x84746a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>18924.100</TD>
+<TD>5.508261</TD>
+<TD>52428.800</TD>
+<TD>9518.212735</TD>
+</TR>
+<TR>
+<TD>0x84106a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>18065.600</TD>
+<TD>5.494044</TD>
+<TD>52428.800</TD>
+<TD>9542.843122</TD>
+</TR>
+<TR>
+<TD>0x42e75a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>14592.300</TD>
+<TD>5.478023</TD>
+<TD>52428.800</TD>
+<TD>9570.752076</TD>
+</TR>
+<TR>
+<TD>0x43aa5a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>17551.300</TD>
+<TD>5.473011</TD>
+<TD>52428.800</TD>
+<TD>9579.516650</TD>
+</TR>
+<TR>
+<TD>0x42295a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>11632.100</TD>
+<TD>5.452041</TD>
+<TD>52428.800</TD>
+<TD>9616.362019</TD>
+</TR>
+<TR>
+<TD>0x810968000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>4813.490</TD>
+<TD>5.426305</TD>
+<TD>52428.800</TD>
+<TD>9661.970715</TD>
+</TR>
+<TR>
+<TD>0x80a568000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>4260.890</TD>
+<TD>5.417057</TD>
+<TD>52428.800</TD>
+<TD>9678.465632</TD>
+</TR>
+<TR>
+<TD>0x813b6a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>5622.260</TD>
+<TD>5.405980</TD>
+<TD>52428.800</TD>
+<TD>9698.297071</TD>
+</TR>
+<TR>
+<TD>0x80d768000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>4538.050</TD>
+<TD>5.387749</TD>
+<TD>52428.800</TD>
+<TD>9731.114052</TD>
+</TR>
+<TR>
+<TD>0x84426a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>18341.200</TD>
+<TD>5.384219</TD>
+<TD>52428.800</TD>
+<TD>9737.493962</TD>
+</TR>
+</TABLE>
+<br>
+<h2>Top Memory Reads: Host to Global Memory</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Buffer Address</TH>
+<TH>Context ID</TH>
+<TH>Command<br>Queue ID</TH>
+<TH>Start<br>Time (ms)</TH>
+<TH>Duration (ms)</TH>
+<TH>Buffer Size (KB)</TH>
+<TH>Reading<br>Rate (MB/s)</TH>
+</TR>
+<TR>
+<TD>0x41e85a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>5340.200</TD>
+<TD>40.669201</TD>
+<TD>52428.800</TD>
+<TD>1289.152447</TD>
+</TR>
+<TR>
+<TD>0x816d6a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>5747.540</TD>
+<TD>40.457441</TD>
+<TD>52428.800</TD>
+<TD>1295.900055</TD>
+</TR>
+<TR>
+<TD>0x41525a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>3979.570</TD>
+<TD>40.362981</TD>
+<TD>52428.800</TD>
+<TD>1298.932802</TD>
+</TR>
+<TR>
+<TD>0x40d55a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>2878.490</TD>
+<TD>20.236943</TD>
+<TD>26214.400</TD>
+<TD>1295.373516</TD>
+</TR>
+<TR>
+<TD>0x41395a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>3556.610</TD>
+<TD>20.127828</TD>
+<TD>26214.400</TD>
+<TD>1302.395867</TD>
+</TR>
+<TR>
+<TD>0x42a15a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>19268.700</TD>
+<TD>16.027370</TD>
+<TD>20971.500</TD>
+<TD>1308.481679</TD>
+</TR>
+<TR>
+<TD>0x407aba000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>1263.270</TD>
+<TD>15.201067</TD>
+<TD>20971.500</TD>
+<TD>1379.608418</TD>
+</TR>
+<TR>
+<TD>0x808c68000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>3746.430</TD>
+<TD>12.797316</TD>
+<TD>26214.400</TD>
+<TD>2048.429530</TD>
+</TR>
+<TR>
+<TD>0x419d5a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>8725.660</TD>
+<TD>12.782608</TD>
+<TD>26214.400</TD>
+<TD>2050.786506</TD>
+</TR>
+<TR>
+<TD>0x41e85a000</TD>
+<TD>0</TD>
+<TD>0</TD>
+<TD>9392.270</TD>
+<TD>12.760826</TD>
+<TD>26214.400</TD>
+<TD>2054.287081</TD>
+</TR>
+</TABLE>
+<br>
+<h2>Guidance (41 met, 7 warnings)</h2>
+
+<TABLE border="1">
+<TR>
+<TH>Name</TH>
+<TH>Threshold</TH>
+<TH>Actual</TH>
+<TH>Conclusion</TH>
+<TH>Details</TH>
+<TH>Resolution</TH>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>32</TD>
+<TD>Not Met</TD>
+<TD>Port task_transpose_1/m_axi_gmem1 has a data width of 32.</TD>
+<TD>
+  <a href=" " class="tooltip">Utilize the entire memory data width.
+    <span class="tooltiptext"><html>The width of data paths between kernels and the memory controller can be configured by the SDAccel compiler as 32, 64, 128, 256, or 512 bits depending on kernel argument types. For applications that require maximum data bandwidth between the kernel and DDR memory, it is recommended that global pointers are defined explicitly as 512-bit data types.<br><br>See Chapter 4 of <a href="https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1207-sdaccel-optimization-guide.pdf">SDAccel <br>Profiling and Optimization Guide</a></html></span>
+  </a>
+</TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>32</TD>
+<TD>Not Met</TD>
+<TD>Port task_gather_1/m_axi_gmem2 has a data width of 32.</TD>
+<TD>
+  <a href=" " class="tooltip">Utilize the entire memory data width.
+    <span class="tooltiptext"><html>The width of data paths between kernels and the memory controller can be configured by the SDAccel compiler as 32, 64, 128, 256, or 512 bits depending on kernel argument types. For applications that require maximum data bandwidth between the kernel and DDR memory, it is recommended that global pointers are defined explicitly as 512-bit data types.<br><br>See Chapter 4 of <a href="https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1207-sdaccel-optimization-guide.pdf">SDAccel <br>Profiling and Optimization Guide</a></html></span>
+  </a>
+</TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>32</TD>
+<TD>Not Met</TD>
+<TD>Port task_matmul_1/m_axi_gmem1 has a data width of 32.</TD>
+<TD>
+  <a href=" " class="tooltip">Utilize the entire memory data width.
+    <span class="tooltiptext"><html>The width of data paths between kernels and the memory controller can be configured by the SDAccel compiler as 32, 64, 128, 256, or 512 bits depending on kernel argument types. For applications that require maximum data bandwidth between the kernel and DDR memory, it is recommended that global pointers are defined explicitly as 512-bit data types.<br><br>See Chapter 4 of <a href="https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1207-sdaccel-optimization-guide.pdf">SDAccel <br>Profiling and Optimization Guide</a></html></span>
+  </a>
+</TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Port Data Width</TD>
+<TD>= 512</TD>
+<TD>512</TD>
+<TD>Met</TD>
+<TD>All kernel ports utilized the full memory data width.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Memory Connections</TD>
+<TD>> 0</TD>
+<TD>13</TD>
+<TD>Met</TD>
+<TD>Memory DDR[1] was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Memory Connections</TD>
+<TD>> 0</TD>
+<TD>12</TD>
+<TD>Met</TD>
+<TD>Memory DDR[2] was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>PLRAM Usage</TD>
+<TD>> 0</TD>
+<TD>0</TD>
+<TD>Not Met</TD>
+<TD>PLRAMs were used by 0 port(s).</TD>
+<TD>
+  <a href=" " class="tooltip">Utilize PLRAMs to maximize performance.
+    <span class="tooltiptext"><html>PLRAMs can increase your system performance by providing low-latency, high-bandwidth access to your data. To take advantage of PLRAMs, assign CL memory buffers to PLRAMs in the host code and specify corresponding port mapping using the --sp xocc linker option:<pre><i/>xocc -l --sp &lt;compute_unit_name&gt;.&lt;kernel_interface_name&gt;:PLRAM[0:3]</i></pre>For more information, see examples in the Kernel To Global Memory category from the Xilinx On-boarding Example GitHub.</html></span>
+  </a>
+</TD>
+</TR>
+<TR>
+<TD>Migrate Memory API Calls</TD>
+<TD>> 0</TD>
+<TD>0</TD>
+<TD>Not Met</TD>
+<TD>Migrate Memory OpenCL APIs were not used.</TD>
+<TD>
+  <a href=" " class="tooltip">Utilize the Migrate Memory APIs (e.g., clEnqueueMigrateMemObjects).
+    <span class="tooltiptext"><html>It is recommended to use clEnqueueMigrateMemObjects for transferring data between the host and the device. With this API, memory migration is explicitly performed ahead of the dependent commands.<br><br>See Chapter 5 of <a href="https://www.xilinx.com/cgi-bin/docs/rdoc?v=latest;d=ug1207-sdaccel-optimization-guide.pdf">SDAccel <br>Profiling and Optimization Guide</a></html></span>
+  </a>
+</TD>
+</TR>
+<TR>
+<TD>Average Read Size (KB)</TD>
+<TD>> 4.096</TD>
+<TD>12039.500</TD>
+<TD>Met</TD>
+<TD>Host read transfers were efficient from off-chip global memory.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Average Write Size (KB)</TD>
+<TD>> 4.096</TD>
+<TD>8771.240</TD>
+<TD>Met</TD>
+<TD>Host write transfers were efficient to off-chip global memory.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>8</TD>
+<TD>Met</TD>
+<TD>Compute unit task_concat_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>8</TD>
+<TD>Met</TD>
+<TD>Compute unit task_conv2_1x1_direct_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>163</TD>
+<TD>Met</TD>
+<TD>Compute unit task_datamover_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>5</TD>
+<TD>Met</TD>
+<TD>Compute unit task_gather_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>12</TD>
+<TD>Met</TD>
+<TD>Compute unit task_matmul_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>219</TD>
+<TD>Met</TD>
+<TD>Compute unit task_matops_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>4</TD>
+<TD>Met</TD>
+<TD>Compute unit task_pad_last_dim_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>7</TD>
+<TD>Met</TD>
+<TD>Compute unit task_reducemax_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>36</TD>
+<TD>Met</TD>
+<TD>Compute unit task_reducesum4d_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>5</TD>
+<TD>Met</TD>
+<TD>Compute unit task_reducesum_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>29</TD>
+<TD>Met</TD>
+<TD>Compute unit task_relu_sqrt_square_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>15</TD>
+<TD>Met</TD>
+<TD>Compute unit task_tile_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>0</TD>
+<TD>Not Met</TD>
+<TD>Compute unit task_topk_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was not used.</TD>
+<TD>
+  <a href=" " class="tooltip">Utilize all compute units on the device(s).
+    <span class="tooltiptext"><html>It is recommended to use all available compute units to achieve an optimum balance between resources and performance. If the unused compute unit is one of many for a given kernel, then compare your global and local work sizes to ensure the work is split evenly amongst all compute units.</html></span>
+  </a>
+</TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>5</TD>
+<TD>Met</TD>
+<TD>Compute unit task_transpose_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Compute Unit Calls - Minimum</TD>
+<TD>> 0</TD>
+<TD>4</TD>
+<TD>Met</TD>
+<TD>Compute unit task_unpad_last_dim_1 on device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Device Utilization (ms)</TD>
+<TD>> 0</TD>
+<TD>19112.177</TD>
+<TD>Met</TD>
+<TD>Device xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0 was used.</TD>
+<TD></TD>
+</TR>
+<TR>
+<TD>Objects Released</TD>
+<TD>true</TD>
+<TD>false</TD>
+<TD>Not Met</TD>
+<TD>OpenCL objects were not released by the host code.</TD>
+<TD>
+  <a href=" " class="tooltip">Ensure all OpenCL objects are released by host code.
+    <span class="tooltiptext"><html><br>Profiling may contain incomplete information. Please ensure all OpenCL objects are released by your host code (e.g., clReleaseProgram()).</html></span>
+  </a>
+</TD>
+</TR>
+</TABLE>
