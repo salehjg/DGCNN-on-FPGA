@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 
     cout<< "This program checks out some host side operations on the real device."<<endl;
     if(argc!=2){
-        cerr<<"Please enter the abs path for xclbin or awsxclbin file as the first and only argument.\nAborting...\n";
+        cerr<<"Please enter the abs path for the *.xclbin or *.awsxclbin file as the first and only argument.\nAborting...\n";
         exit(1);
     }
     std::string BinaryFile(argv[1]);
