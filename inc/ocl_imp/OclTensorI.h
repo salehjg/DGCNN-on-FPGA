@@ -31,10 +31,27 @@ public:
 
 private:
     int TranslateBankIndex(int bankIndex);
+    void ValidateBankIndex(int bankIndex);
     cl_mem_ext_ptr_t CreateExtendedPointer(void *hostPtr, cl_mem_flags memoryBank);
 
     //If bank arg were not specified, tensor would be allocated
     //on default bank which is default value of 'dramBank'
-    int dramBank = 1;
+#ifdef USEMEMORYBANK0
+    int dramBank = 0;
+#else
+    #ifdef USEMEMORYBANK1
+        int dramBank = 1;
+    #else
+        #ifdef USEMEMORYBANK2
+            int dramBank = 2;
+        #else
+            #ifdef USEMEMORYBANK3
+                int dramBank = 3;
+            #else
+                assert(false);
+            #endif  
+        #endif  
+    #endif  
+#endif 
     int vectorWords = -1;
 };

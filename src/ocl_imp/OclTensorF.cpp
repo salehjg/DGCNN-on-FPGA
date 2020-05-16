@@ -22,10 +22,12 @@ OclTensorF::OclTensorF(int vectorWords){
 }
 
 OclTensorF::OclTensorF(cl::Context *context, cl::CommandQueue *queue, std::vector<unsigned> shape, int bank, int vectorWords){
+    ValidateBankIndex(bank);
     Init(context, queue, shape, bank, vectorWords);
 }
 
 OclTensorF::OclTensorF(std::vector<unsigned> shape, cl::Buffer clBuff, int bank){
+    ValidateBankIndex(bank);
     Init(shape, clBuff, bank);
 }
 
@@ -42,6 +44,7 @@ void OclTensorF::Init(cl::Context *context, cl::CommandQueue *queue, std::vector
     unsigned lenPadded = getLengthBytesPadded(this->vectorWords);
     platform = PLATFORMS::GPU_OCL;
 
+    ValidateBankIndex(bank);
     dramBank = bank==-1 ? dramBank : bank;
 
     // https://software.intel.com/en-us/forums/opencl/topic/731519
@@ -257,6 +260,23 @@ int OclTensorF::TranslateBankIndex(int bankIndex){
             return XCL_MEM_DDR_BANK3;
         }break;
     };
+}
+
+void OclTensorF::ValidateBankIndex(int bankIndex){
+    if(bankIndex!=-1){
+#ifndef USEMEMORYBANK0
+        assert(bankIndex!=0)
+#endif
+#ifndef USEMEMORYBANK1
+        assert(bankIndex!=1)
+#endif
+#ifndef USEMEMORYBANK2
+        assert(bankIndex!=2)
+#endif
+#ifndef USEMEMORYBANK3
+        assert(bankIndex!=3)
+#endif
+    }
 }
 
 float* OclTensorF::PadHostBuffer(std::vector<unsigned> actualShape, float *hostSrcBuff, int vectorWords){

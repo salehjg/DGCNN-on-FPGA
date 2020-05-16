@@ -262,6 +262,23 @@ int OclTensorI::TranslateBankIndex(int bankIndex){
     };
 }
 
+void OclTensorF::ValidateBankIndex(int bankIndex){
+    if(bankIndex!=-1){
+#ifndef USEMEMORYBANK0
+        assert(bankIndex!=0)
+#endif
+#ifndef USEMEMORYBANK1
+        assert(bankIndex!=1)
+#endif
+#ifndef USEMEMORYBANK2
+        assert(bankIndex!=2)
+#endif
+#ifndef USEMEMORYBANK3
+        assert(bankIndex!=3)
+#endif
+    }
+}
+
 int* OclTensorI::PadHostBuffer(std::vector<unsigned> actualShape, int *hostSrcBuff, int vectorWords){
     std::vector<unsigned> paddedShape = PadShape(actualShape, vectorWords);
     unsigned paddedLen = 1;
