@@ -1,130 +1,238 @@
-/*
-Shape1=5x1024x1x128x,   , Shape2=5x1024x1x64x, 
-Shape1=5x1024x1x192x,   , Shape2=5x1024x1x128x, 
-Shape1=5x1024x1x64x,    , Shape2=5x1024x1x64x, 
-Shape1=5x1024x20x64x,   , Shape2=5x1024x20x64x, 
-Shape1=5x1024x20x64x,   , Shape2=5x1024x20x64x, 
-Shape1=5x1024x20x64x,   , Shape2=5x1024x20x64x, 
-Shape1=5x1024x20x3x,    , Shape2=5x1024x20x3x,  
-Shape1=5x1024x20x3x,    , Shape2=5x1024x20x3x,
-*/
+#include <cassert>
+#include <iostream>
+#include <limits>
+#include "hlslib/xilinx/Stream.h"
+#include "hlslib/xilinx/Simulation.h"
+#include "hlslib/xilinx/Utility.h"
+#include "hlslib/xilinx/DataPack.h"
+#include "hlslib/xilinx/Operators.h"
+#include "hlslib/xilinx/TreeReduce.h"
+#include "AxiHelper.h"
+#include "xilinx/config.h"
 
-void concat2(
-    float* inputTn1,
-    float* inputTn2,
-    float* outputTn,
-    unsigned int dimA0,
-    unsigned int dimA1,
-    unsigned int dimA2,
-    unsigned int dimA3,
-    unsigned int dimB0,
-    unsigned int dimB1,
-    unsigned int dimB2,
-    unsigned int dimB3){
+using namespace std;
+using hlslib::Stream;
+using namespace ConfigTaskConcat;
 
-    unsigned int  dimR0,dimR1,dimR2,dimR3;
-    dimR0 = dimA0;
-    dimR1 = dimA1;
-    dimR2 = dimA2;
-    dimR3 = dimA3 + dimB3;
-    unsigned long indxS1,indxS2,indxD;
+/**
+ * @brief      Concatenates the two input tensors over their last dimensions.
+ *             Shapes:
+ *               inputTn1: BxNxKxD1, inputTn2: BxNxKxD2, outputTn: BxNxKx(D1+D2)
+ *             This sub-kernel only handles the input tensors with (D1+D2)<m_axi_width.
+ *             This kernel complies with the padded last dim policy:
+ *                1) Both of the inputs and output tensors are considered to be padded in the last dim.
+ *             The latency will be reported for the input tensors of Shape1=5x1024x1x192, Shape2=5x1024x1x128
+ *             
+ * @param[in]  inputTn1  The input tn 1 of rank4
+ * @param[in]  inputTn2  The input tn 2 of rank4
+ * @param      outputTn  The output tn of rank4
+ * @param[in]  dim0      The shape of inputTn1 (dimension 0)
+ * @param[in]  dim1      The shape of inputTn1 (dimension 1)
+ * @param[in]  dim2      The shape of inputTn1 (dimension 2)
+ * @param[in]  dimA3     The shape of inputTn1 (dimension 3)
+ * @param[in]  dimB3     The shape of inputTn2 (dimension 3)
+ * @param[in]  dimR3     The shape of outputTn (dimension 3)(=dimA3+dimB3)
+ */
+void ConcatLastDimSubVec_V1(
+    const MemoryPackF_t *inputTn1,
+    const MemoryPackF_t *inputTn2,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2,
+    const unsigned dimA3,
+    const unsigned dimB3,
+    const unsigned dimR3){
 
-    Loop1: for(int d0=0;d0<dimA0;d0++){
-#pragma HLS LOOP_TRIPCOUNT min=5 max=5
-        Loop2: for(int d1=0;d1<dimA1;d1++){
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-            Loop3: for(int d2=0;d2<dimA2;d2++){
-#pragma HLS LOOP_TRIPCOUNT min=1 max=20
-                Loop4: for(int d3=0;d3<dimA3;d3++){
-#pragma HLS LOOP_TRIPCOUNT min=3 max=192
-#pragma HLS PIPELINE II=1
+    assert(dimR3<CONFIG_M_AXI_WIDTH); // sub vec
+    constexpr unsigned vecsPerSliceA = 1; // sub vec
+    constexpr unsigned vecsPerSliceB = 1; // sub vec
+    const unsigned dimR3Padded = MakeDivisible<unsigned>(dimR3, CONFIG_M_AXI_WIDTH); 
+    const unsigned vecsPerSliceOutputTn = dimR3Padded / CONFIG_M_AXI_WIDTH;
 
-                    indxS1 = d0*dimA1*dimA2*dimA3 +
-                             d1*dimA2*dimA3+
-                             d2*dimA3+
-                             d3;
-                    indxD = (d0)*dimR1*dimR2*dimR3 +
-                            (d1)*dimR2*dimR3+
-                            (d2)*dimR3+
-                            (d3);
-                    outputTn[indxD] = inputTn1[indxS1];
+    LoopDim0:
+    for(unsigned d0=0; d0<dim0; d0++){
+        #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+        LoopDim1:
+        for(unsigned d1=0; d1<dim1; d1++){
+            #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
+            LoopDim2:
+            for(unsigned d2=0; d2<dim2; d2++){
+                #pragma HLS LOOP_TRIPCOUNT min=1 max=1
+                #pragma HLS PIPELINE II=1
+
+                const unsigned indxSA = d0*dim1*dim2*vecsPerSliceA +
+                                        d1*dim2*vecsPerSliceA+
+                                        d2*vecsPerSliceA+
+                                        0;
+                const unsigned indxSB = d0*dim1*dim2*vecsPerSliceB +
+                                        d1*dim2*vecsPerSliceB+
+                                        d2*vecsPerSliceB+
+                                        0;
+                const unsigned indxD =  d0*dim1*dim2*vecsPerSliceOutputTn +
+                                        d1*dim2*vecsPerSliceOutputTn+
+                                        d2*vecsPerSliceOutputTn+
+                                        0;
+
+                MemoryPackF_t vecA = inputTn1[indxSA];
+                MemoryPackF_t vecB = inputTn2[indxSB];
+                MemoryPackF_t vecR;
+                LoopFillUnrolled:
+                for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                    #pragma HLS UNROLL
+                    vecR[i] = (i<dimA3)?vecA[i]:vecB[i-dimA3];
+                }
+                outputTn[indxD] = vecR;
+            }
+        }
+    }
+}
+
+/**
+ * @brief      Concatenates the two input tensors over their last dimensions.
+ *             Shapes:
+ *               inputTn1: BxNxKxD1, inputTn2: BxNxKxD2, outputTn: BxNxKx(D1+D2)
+ *             This sub-kernel only handles the input tensors with (D1+D2)>m_axi_width.
+ *             Currently, this sub-kernel only supports the inputs with these conditions:
+ *                1) D1 > m_axi_width && D1 % m_axi_width=0
+ *                2) D2 > m_axi_width && D2 % m_axi_width=0
+ *             This kernel complies with the padded last dim policy:
+ *                1) Both of the inputs and output tensors are considered to be padded in the last dim.
+ *             The latency will be reported for the input tensors of Shape1=5x1024x1x192, Shape2=5x1024x1x128
+ *             
+ * @param[in]  inputTn1  The input tn 1 of rank4
+ * @param[in]  inputTn2  The input tn 2 of rank4
+ * @param      outputTn  The output tn of rank4
+ * @param[in]  dim0      The shape of inputTn1 (dimension 0)
+ * @param[in]  dim1      The shape of inputTn1 (dimension 1)
+ * @param[in]  dim2      The shape of inputTn1 (dimension 2)
+ * @param[in]  dimA3     The shape of inputTn1 (dimension 3)
+ * @param[in]  dimB3     The shape of inputTn2 (dimension 3)
+ * @param[in]  dimR3     The shape of outputTn (dimension 3)(=dimA3+dimB3)
+ */
+void ConcatLastDimSuperVec_V1(
+    const MemoryPackF_t *inputTn1,
+    const MemoryPackF_t *inputTn2,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2,
+    const unsigned dimA3,
+    const unsigned dimB3,
+    const unsigned dimR3){
+
+    assert(dimA3%CONFIG_M_AXI_WIDTH==0);
+    assert(dimB3%CONFIG_M_AXI_WIDTH==0);
+
+    const unsigned dimA3Padded = MakeDivisible<unsigned>(dimA3, CONFIG_M_AXI_WIDTH); 
+    const unsigned vecsPerSliceA = dimA3Padded / CONFIG_M_AXI_WIDTH;
+    const unsigned dimB3Padded = MakeDivisible<unsigned>(dimB3, CONFIG_M_AXI_WIDTH); 
+    const unsigned vecsPerSliceB = dimB3Padded / CONFIG_M_AXI_WIDTH;
+    const unsigned dimR3Padded = MakeDivisible<unsigned>(dimR3, CONFIG_M_AXI_WIDTH); 
+    const unsigned vecsPerSliceOutputTn = dimR3Padded / CONFIG_M_AXI_WIDTH;
+
+    LoopDim0:
+    for(unsigned d0=0; d0<dim0; d0++){
+        #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+        LoopDim1:
+        for(unsigned d1=0; d1<dim1; d1++){
+            #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
+            LoopDim2:
+            for(unsigned d2=0; d2<dim2; d2++){
+                #pragma HLS LOOP_TRIPCOUNT min=1 max=1
+                LoopDimR3:
+                for(unsigned id3=0; id3<vecsPerSliceOutputTn; id3++){
+                    #pragma HLS LOOP_TRIPCOUNT min=20 max=20
+                    #pragma HLS PIPELINE II=1
+                    const bool isA = (id3<vecsPerSliceA);
+                    const unsigned currentSliceSize = (isA? vecsPerSliceA: vecsPerSliceB);
+                    const unsigned indxS =  d0*dim1*dim2*currentSliceSize +
+                                            d1*dim2*currentSliceSize+
+                                            d2*currentSliceSize+
+                                            (isA? id3: (id3-vecsPerSliceA));
+                    const unsigned indxD =  d0*dim1*dim2*vecsPerSliceOutputTn +
+                                            d1*dim2*vecsPerSliceOutputTn+
+                                            d2*vecsPerSliceOutputTn+
+                                            id3;
+                    outputTn[indxD] = isA? inputTn1[indxS]: inputTn2[indxS];
                 }
             }
         }
     }
+}
 
-    Loop5: for(int d0=0;d0<dimB0;d0++){
-#pragma HLS LOOP_TRIPCOUNT min=5 max=5
-        Loop6: for(int d1=0;d1<dimB1;d1++){
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-            Loop7: for(int d2=0;d2<dimB2;d2++){
-#pragma HLS LOOP_TRIPCOUNT min=1 max=20
-                Loop8: for(int d3=0;d3<dimB3;d3++){
-#pragma HLS LOOP_TRIPCOUNT min=3 max=128
-#pragma HLS PIPELINE II=1
-
-                    indxS2 = d0*dimB1*dimB2*dimB3 +
-                             d1*dimB2*dimB3+
-                             d2*dimB3+
-                             d3;
-                    indxD  = (d0+0)*dimR1*dimR2*dimR3 +
-                             (d1+0)*dimR2*dimR3+
-                             (d2+0)*dimR3+
-                             (d3+dimA3);
-                    outputTn[indxD] = inputTn2[indxS2];
-                }
-            }
-        }
-     }
+void ConcatLastDim_V1(
+    const MemoryPackF_t *inputTn1,
+    const MemoryPackF_t *inputTn2,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2,
+    const unsigned dimA3,
+    const unsigned dimB3){
+#pragma HLS INLINE
+    const unsigned dimR3 = dimA3 + dimB3;
+    if(dimR3<CONFIG_M_AXI_WIDTH){
+        ConcatLastDimSubVec_V1(
+            inputTn1,
+            inputTn2,
+            outputTn,
+            dim0,
+            dim1,
+            dim2,
+            dimA3,
+            dimB3,
+            dimR3);
+    }else{
+        ConcatLastDimSuperVec_V1(
+            inputTn1,
+            inputTn2,
+            outputTn,
+            dim0,
+            dim1,
+            dim2,
+            dimA3,
+            dimB3,
+            dimR3);
+    }
 }
 
 extern "C" {
 void task_concat(
-        float* inputTn1,
-        float* inputTn2,
-        float* outputTn,
+    const MemoryPackF_t *inputTn1,
+    const MemoryPackF_t *inputTn2,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2,
+    const unsigned dimA3,
+    const unsigned dimB3,
+    const int concatDim){
+#pragma HLS INTERFACE m_axi     port=inputTn1  offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi     port=inputTn2  offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi     port=outputTn  offset=slave bundle=gmem1
+#pragma HLS INTERFACE s_axilite port=inputTn1  bundle=control
+#pragma HLS INTERFACE s_axilite port=inputTn2  bundle=control
+#pragma HLS INTERFACE s_axilite port=outputTn  bundle=control
+#pragma HLS INTERFACE s_axilite port=dim0      bundle=control
+#pragma HLS INTERFACE s_axilite port=dim1      bundle=control
+#pragma HLS INTERFACE s_axilite port=dim2      bundle=control
+#pragma HLS INTERFACE s_axilite port=dimA3     bundle=control
+#pragma HLS INTERFACE s_axilite port=dimB3     bundle=control
+#pragma HLS INTERFACE s_axilite port=concatDim bundle=control 
+#pragma HLS INTERFACE s_axilite port=return    bundle=control
 
-        unsigned int dimA0,
-        unsigned int dimA1,
-        unsigned int dimA2,
-        unsigned int dimA3,
-
-        unsigned int dimB0,
-        unsigned int dimB1,
-        unsigned int dimB2,
-        unsigned int dimB3){
-
-    #pragma HLS INTERFACE m_axi     port=inputTn1   offset=slave bundle=gmem1
-    #pragma HLS INTERFACE m_axi     port=inputTn2   offset=slave bundle=gmem1
-    #pragma HLS INTERFACE m_axi     port=outputTn   offset=slave bundle=gmem2
-
-    #pragma HLS INTERFACE s_axilite port=inputTn1   bundle=control
-    #pragma HLS INTERFACE s_axilite port=inputTn2   bundle=control
-    #pragma HLS INTERFACE s_axilite port=outputTn   bundle=control
-
-    #pragma HLS INTERFACE s_axilite port=dimA0      bundle=control
-    #pragma HLS INTERFACE s_axilite port=dimA1      bundle=control
-    #pragma HLS INTERFACE s_axilite port=dimA2      bundle=control
-    #pragma HLS INTERFACE s_axilite port=dimA3      bundle=control
-    #pragma HLS INTERFACE s_axilite port=dimB0      bundle=control
-    #pragma HLS INTERFACE s_axilite port=dimB1      bundle=control
-    #pragma HLS INTERFACE s_axilite port=dimB2      bundle=control
-    #pragma HLS INTERFACE s_axilite port=dimB3      bundle=control
-
-    #pragma HLS INTERFACE s_axilite port=return     bundle=control
-
-    concat2(
+    if(concatDim==3){
+        ConcatLastDim_V1(
             inputTn1,
             inputTn2,
             outputTn,
-            dimA0,
-            dimA1,
-            dimA2,
+            dim0,
+            dim1,
+            dim2,
             dimA3,
-            dimB0,
-            dimB1,
-            dimB2,
             dimB3);
+    }
 
 }
 }

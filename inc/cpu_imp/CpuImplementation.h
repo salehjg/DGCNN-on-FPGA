@@ -2,19 +2,20 @@
 // Created by saleh on 8/22/18.
 //
 
-#ifndef DEEPPOINTV1_CPUIMPLEMENTATION_H
-#define DEEPPOINTV1_CPUIMPLEMENTATION_H
+#pragma once
 
 #include <iostream>
 #include <string>
 #include "../PlatformImplementation.h"
 #include "../../inc/TensorF.h"
 #include "../../inc/TensorI.h"
+#include "xilinx/config.h"
+#include <algorithm>
 
 using namespace std;
 
-#undef DUMP_ENABLED
-//#define DUMP_ENABLED
+//#undef DUMP_ENABLED
+#define DUMP_ENABLED
 
 class CpuImplementation: public PlatformImplementation {
 public:
@@ -57,13 +58,11 @@ public:
     void     DumpMatrix(WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir);
     bool     CompareTensors(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
     bool     CompareTensorsInteger(WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
-
+    TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded);
+    TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded);
 
 private:
     void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,
-            const string &setting3, float val3, vector<unsigned int> shape1, vector<unsigned int> shape2, vector<bool> comb={});
+            const string &setting3, float val3, vector<unsigned> shape1, vector<unsigned> shape2, vector<bool> comb={});
 
 };
-
-
-#endif //DEEPPOINTV1_CPUIMPLEMENTATION_H

@@ -2,8 +2,7 @@
 // Created by saleh on 8/27/18.
 //
 
-#ifndef DEEPPOINTV1_WORKSCHEDULER_H
-#define DEEPPOINTV1_WORKSCHEDULER_H
+#pragma once
 
 #include <build_config.h>
 
@@ -20,6 +19,3 @@ public:
 private:
 
 };
-
-
-#endif //DEEPPOINTV1_WORKSCHEDULER_H

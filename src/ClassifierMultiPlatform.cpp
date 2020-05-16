@@ -1,7 +1,7 @@
 //
 // Created by saleh on 9/3/18.
 //
-#include <ModelArchTop05.h>
+#include <ModelArchTop04.h>
 #include <iostream>
 using namespace std;
 
@@ -61,7 +61,7 @@ void CalculateAccuracy(TensorF* scores, TensorI* labels, int B, int classCount){
 void ClassifierMultiplatform(){
     WorkScheduler scheduler;
     int batchsize=5;
-    ModelArchTop05 modelArchTop(0,batchsize,1024,20);
+    ModelArchTop04 modelArchTop(0,batchsize,1024,20);
     std::string pclPath(globalArgDataPath); pclPath.append("/dataset/dataset_B5_pcl.npy");
     std::string labelPath(globalArgDataPath); labelPath.append("/dataset/dataset_B5_labels_int32.npy");
 

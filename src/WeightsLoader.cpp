@@ -6,7 +6,6 @@
 #include <algorithm>
 #include "../inc/WeightsLoader.h"
 #ifdef USE_OCL
-#include <CL/cl.h>
 #endif
 
 WeightsLoader::WeightsLoader(vector<PLATFORMS> neededPlatforms) {
@@ -32,7 +31,7 @@ WeightsLoader::WeightsLoader(vector<PLATFORMS> neededPlatforms) {
     }
 }
 #ifdef USE_OCL
-void WeightsLoader::LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl_context oclContex, cl_command_queue oclQueue) {
+void WeightsLoader::LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl::Context *oclContex, cl::CommandQueue *oclQueue) {
 #else
 void WeightsLoader::LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList) {
 #endif

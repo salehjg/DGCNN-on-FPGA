@@ -1,5 +1,4 @@
-#ifndef XILINXIMPUNITTESTS_
-#define XILINXIMPUNITTESTS_
+#pragma once
 
 #include "WorkScheduler.h"
 #include "TensorF.h"
@@ -27,6 +26,10 @@ public:
     ReportObject* TensorBankInteger();
     ReportObject* TensorCloneBankFloat();
     ReportObject* TensorCloneBankInteger();
+    ReportObject* TensorPadUnpadCpuFloat();
+    ReportObject* TensorPadUnpadCpuInteger();
+    ReportObject* KernelPadLastDimFloat();
+    ReportObject* KernelUnpadLastDimFloat();
     ReportObject* KernelConcat2();
     ReportObject* KernelSqrt();
     ReportObject* KernelReduceMax();
@@ -52,12 +55,10 @@ private:
     TensorF* GenerateTensor(int pattern, vector<unsigned int> shape);
     TensorI* GenerateTensorInteger(int pattern, vector<unsigned int> shape);
     float float_rand(float min, float max);
-    TensorI* GenerateTensor(int intMin, int intMax, vector<unsigned int> shape);
+    TensorI* GenerateTensorInteger(int intMin, int intMax, vector<unsigned int> shape);
     void PrintReport(ReportObject *reportObj);
 
 
     PlatformSelector* platformSelector;
     WorkScheduler scheduler;
 };
-
-#endif

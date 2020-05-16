@@ -2,31 +2,36 @@
 // Created by saleh on 8/22/18.
 //
 
-#ifndef DEEPPOINTV1_XILINXIMPLEMENTATION_H
+#pragma once
 
-#define DEEPPOINTV1_XILINXIMPLEMENTATION_H
-
+#include <ocl_imp/xilinx/xcl2.hpp>
 #include <PlatformImplementation.h>
-#include <ocl_imp/xilinx/xcl.h>
 #include <TensorF.h>
 #include <TensorI.h>
 #include <ocl_imp/OclTensorF.h>
 #include <ocl_imp/OclTensorI.h>
 #include <cnpy.h>
+#include <ocl_imp/xilinx/AxiHelper.h>
 
-#define XILINX_BOTTLENCK_BLOCKSIZE 1024
 
-//#define REPORT_EXECUTION_DURATION
-#undef REPORT_EXECUTION_DURATION
+#define REPORT_EXECUTION_DURATION
+//#undef REPORT_EXECUTION_DURATION
 
-//#define DUMP_ENABLED
-#undef DUMP_ENABLED
+#define DUMP_ENABLED
+//#undef DUMP_ENABLED
+
+enum class RUN_MODE{
+    SwEmu,
+    HwEmu,
+    Hw,
+    Unknown
+};
 
 struct OclKernelObject{
     string fileName;
     string containerName;
     const char *kernelName_ndrange, *kernelName_task;
-    cl_kernel kernel_ndrange,kernel_task;
+    cl::Kernel *kernel_ndrange, *kernel_task;
     bool use_ndrange_kernel;
     bool disabled;
 
@@ -85,12 +90,17 @@ public:
     void     DumpMatrix(WorkScheduler scheduler, string npy_fname, TensorI* inputTn, string npy_dir);
     bool     CompareTensors(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2);
     bool     CompareTensorsInteger(WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
-    const char * getErrorString(cl_int error);
+    TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded);
+    TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded);
 
-    cl_context          getContext();
-    cl_command_queue    getQueue();
-    cl_program          getProgram();
-    void                GetPaddedWorkSize(int dims, size_t * inBlockSize, size_t * inWorkSize, size_t * outPaddedWorkSize);
+    const char *getErrorString(cl_int error);
+    int SetModeEnvVar(const RUN_MODE mode);
+    RUN_MODE GetModeEnvVar();
+
+    cl::Context *getContext();
+    cl::CommandQueue *getQueue();
+    cl::Program *getProgram();
+
     ~XilinxImplementation();
 
     std::vector<OclKernelObject*> oclKernels;
@@ -99,29 +109,10 @@ private:
     int a;
     void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,
                    const string &setting3, float val3, vector<unsigned int> shape1, vector<unsigned int> shape2, vector<bool> comb={});
-    cl_ulong get_duration_ns (const cl_event &event);
-    void ReportDuration(const std::string &name, const bool &isNDRange, const cl_event &event);
-    int _ReduceSum4D_Try05_NDRange_Find_Kernel_Launches_Needed(int sliceCount, int SPT, int TGPB);
-    void _ReduceSum4D_Try05_NDRange(
+    cl_ulong get_duration_ns (const cl::Event &event);
+    void ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event);
+    TensorF* _ReduceSum4D_Task(
             TensorF* inputTn,
-            TensorF* outputTn,
-            unsigned int dim0,
-            unsigned int dim1,
-            unsigned int dim2,
-            unsigned int dim3,
-            bool overaxis0,
-            bool overaxis1,
-            bool overaxis2,
-            bool overaxis3,
-            int pow_y);
-
-    void _ReduceSum4D_Task(
-            TensorF* inputTn,
-            TensorF* outputTn,
-            unsigned int dim0,
-            unsigned int dim1,
-            unsigned int dim2,
-            unsigned int dim3,
             bool overaxis0,
             bool overaxis1,
             bool overaxis2,
@@ -129,24 +120,20 @@ private:
             int pow_y);
 
     TensorF* _ReduceSum4D(WorkScheduler scheduler,
-                                            TensorF* inputTn,
-                                            bool over_axis0,
-                                            bool over_axis1,
-                                            bool over_axis2,
-                                            bool over_axis3,
-                                            int pow_y);
+            TensorF* inputTn,
+            bool over_axis0,
+            bool over_axis1,
+            bool over_axis2,
+            bool over_axis3,
+            int pow_y);
+
+    TensorF* _ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare);
 
     const std::string KERNEL_DIR = REPO_DIR "src/kernels";
-
-    std::string device_name;
-    cl_platform_id cpPlatform;        // OpenCL platform
-    cl_device_id device_id;           // device ID
-    cl_context context;               // context
-    cl_command_queue queue;           // command queue
-    cl_program program;               // program
-    char *binary_content;             // program binary content
+    std::string deviceName;
+    cl::Device device;
+    cl::Context *context;
+    cl::Program *program;
+    cl::CommandQueue *queue;
     cl_int err;
 };
-
-
-#endif //DEEPPOINTV1_XILINXIMPLEMENTATION_H

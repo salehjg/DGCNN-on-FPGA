@@ -2,8 +2,7 @@
 // Created by saleh on 8/30/18.
 //
 
-#ifndef DEEPPOINTV1_WEIGHTSLOADER_H
-#define DEEPPOINTV1_WEIGHTSLOADER_H
+#pragma once
 
 #include <build_config.h>
 #include "../inc/TensorF.h"
@@ -33,7 +32,7 @@ class WeightsLoader {
 public:
     WeightsLoader(vector<PLATFORMS> neededPlatforms);
 #ifdef USE_OCL
-    void LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl_context oclContex, cl_command_queue oclQueue) ;
+    void LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList, cl::Context *oclContex, cl::CommandQueue *oclQueue);
 #else
     void LoadFromDisk(string weightsBaseDir, string pathToTxtFnameList) ;
 #endif
@@ -52,6 +51,3 @@ private:
     bool _isUsedOCL  = false; 
 
 };
-
-
-#endif //DEEPPOINTV1_WEIGHTSLOADER_H

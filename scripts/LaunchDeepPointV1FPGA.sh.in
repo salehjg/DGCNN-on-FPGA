@@ -3,17 +3,17 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 
-echo "============================================================="
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' = 
 echo "DeepPointV1 Emulation Launcher Script"
 echo "Version 1"
-echo "-------------------------------------------------------------"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 read -p "Choose launch mode(1.sw-emu / 2.hw-emu / 3.system):" mode
 #read -p "Enter Data Directory [../data/]: " datadir
-echo "-------------------------------------------------------------"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 echo "Data Directory is set to ${datadir}"
 echo "Mode ${mode} is selected."
 echo "Preparing to launch..."
-echo "-------------------------------------------------------------"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 
 xclbin_swemu=@xcl_path_swemu@
 xclbin_hwemu=@xcl_path_hwemu@
@@ -45,7 +45,7 @@ case $mode in
 	echo "Setting Emulation Config..."
 	emconfigutil --platform $platform --nd 1
 	export XCL_EMULATION_MODE=sw_emu
-	echo "-------------------------------------------------------------"
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 	echo -e "${GREEN}Launching DeepPointV1FPGA...${NC}"
 	echo ""
 	$hostsideexe $xclbin_swemu $datadir
@@ -72,7 +72,7 @@ case $mode in
 	echo "Setting Emulation Config..."
 	emconfigutil --platform $platform --nd 1
 	export XCL_EMULATION_MODE=hw_emu
-	echo "-------------------------------------------------------------"
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 	echo -e "${GREEN}Launching DeepPointV1FPGA...${NC}"
 	echo ""
 	$hostsideexe $xclbin_hwemu $datadir
@@ -96,10 +96,10 @@ case $mode in
 	    exit 1
 	fi
 	#------------------------------------------ Launch
-	echo "-------------------------------------------------------------"
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 	echo -e "${GREEN}Launching DeepPointV1FPGA...${NC}"
 	echo ""
-	$hostsideexe $xclbin_hw $datadir
+	$hostsideexe $xclbin_hw $datadir 2>&1 | tee -a DeepPointV1FPGA_Host_Log.txt
 
 	;; 
 

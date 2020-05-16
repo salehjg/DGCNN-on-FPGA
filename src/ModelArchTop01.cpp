@@ -8,9 +8,9 @@
 ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
     DB_OFFSET = dataset_offset;
-    B = (unsigned int)batchsize;
-    N = (unsigned int)pointcount;
-    K = (unsigned int)knn_k;
+    B = (unsigned)batchsize;
+    N = (unsigned)pointcount;
+    K = (unsigned)knn_k;
 }
 
 ModelInfo ModelArchTop01::GetModelInfo() {
@@ -129,9 +129,9 @@ TensorF* ModelArchTop01::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input
     TensorF* point_cloud_neighbors = platformSelector->Gather(platformSelector->defaultPlatform,scheduler,input_BxNxD,knn_output_BxNxK,1);
 
     //tile ing input of shape BxNxD into BxNxKxD..
-    input_BxNxD->ExpandDims(2);
+    //input_BxNxD->ExpandDims(2);
     TensorF* point_cloud_central = platformSelector->Tile(platformSelector->defaultPlatform,scheduler,input_BxNxD,2,K);
-    input_BxNxD->SqueezeDims();
+    //input_BxNxD->SqueezeDims();
 
     TensorF* features = platformSelector->MatOps(platformSelector->defaultPlatform,scheduler, point_cloud_neighbors,point_cloud_central, MAT_OPS::SUB);
 

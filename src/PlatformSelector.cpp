@@ -14,7 +14,6 @@
 #endif
 
 #ifdef USE_OCL
-#include <CL/cl.h>
 #include "ocl_imp/xilinx/XilinxImplementation.h"
 #include "../inc/ocl_imp/OclTensorF.h"
 #include "../inc/ocl_imp/OclTensorI.h"
@@ -73,6 +72,7 @@ PlatformSelector::~PlatformSelector(){
 }
 
 TensorF* PlatformSelector::CrossThePlatform(TensorF *srcTn, PLATFORMS platform) {
+    assert(srcTn->getShape()[srcTn->getRank()-1]!=1); //Just to make sure nothing will go wrong because of padding
     switch(srcTn->getPlatform()){
         case PLATFORMS::CPU :{
             //--------------------------------------------------------------
@@ -152,6 +152,7 @@ TensorF* PlatformSelector::CrossThePlatform(TensorF *srcTn, PLATFORMS platform) 
 
 
 TensorI* PlatformSelector::CrossThePlatform(TensorI *srcTn, PLATFORMS platform) {
+    assert(srcTn->getShape()[srcTn->getRank()-1]!=1); //Just to make sure nothing will go wrong because of padding
     switch(srcTn->getPlatform()){
         case PLATFORMS::CPU :{
             //--------------------------------------------------------------
@@ -723,4 +724,50 @@ bool PlatformSelector::CompareTensorsInteger(PLATFORMS platform, WorkScheduler s
 #endif
     }
     return false;
+}
+
+TensorF* PlatformSelector::PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded){
+    TensorF* __inputTn = CrossThePlatform(inputTn, platform);
+    switch(platform){
+        case PLATFORMS::CPU :{
+            return cpuPlatformClass->PadLastDim(scheduler, __inputTn, lastDimPadded);
+            break;
+        }
+#ifdef USE_CUDA
+        case PLATFORMS::GPU_CUDA :{
+            throw "Not Implement.";
+            break;
+        }
+#endif
+#ifdef USE_OCL
+        case PLATFORMS::GPU_OCL :{
+            return openclPlatformClass->PadLastDim(scheduler, __inputTn, lastDimPadded);
+            break;
+        }
+#endif
+    }
+    return nullptr;
+}
+
+TensorF* PlatformSelector::UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded){
+    TensorF* __inputTn = CrossThePlatform(inputTn, platform);
+    switch(platform){
+        case PLATFORMS::CPU :{
+            return cpuPlatformClass->UnpadLastDim(scheduler, __inputTn, lastDimUnpadded);
+            break;
+        }
+#ifdef USE_CUDA
+        case PLATFORMS::GPU_CUDA :{
+            throw "Not Implement.";
+            break;
+        }
+#endif
+#ifdef USE_OCL
+        case PLATFORMS::GPU_OCL :{
+            return openclPlatformClass->UnpadLastDim(scheduler, __inputTn, lastDimUnpadded);
+            break;
+        }
+#endif
+    }
+    return nullptr;
 }

@@ -1,183 +1,140 @@
 #include <cassert>
+#include <iostream>
+#include <limits>
+#include "hlslib/xilinx/Stream.h"
+#include "hlslib/xilinx/Simulation.h"
+#include "hlslib/xilinx/Utility.h"
+#include "hlslib/xilinx/DataPack.h"
+#include "hlslib/xilinx/Operators.h"
+#include "hlslib/xilinx/TreeReduce.h"
+#include "AxiHelper.h"
+#include "xilinx/config.h"
 
-#define CONFIG_BUFF_DEPTH           2
-#define CONFIG_MAX_COMMON_DIM       1024
+using namespace std;
+using namespace ConfigTaskMatMul;
 
-template <typename DType>
-void BatchMatMul(
-    DType *inputTn1, //Same as MatA
-    DType *inputTn2, //Same as MatB
-    DType *outputTn,
+// Architecture adopted from https://github.com/spcl/hls_tutorial_examples
 
-    unsigned int dim0A, //Batch
-    unsigned int dim1A, //rows
-    unsigned int dim2A, //cols
+/**
+ * @brief      Computes batch-matmul operation of C=AB
+ *             The inputs should be of rank three and be padded in the last dimension.
+ *             The latency will be reported for Shape1=5x1024x64 and Shape2=5x64x1024 and D=4.
+ *             This kernel complies with the padded last dim policy.
+ *
+ * @param[in]  A          The Input Matrix A (Rank3, RowMajor, Batch*N*K)
+ * @param[in]  B          The Input Matrix B (Rank3, RowMajor, Batch*K*M)
+ * @param      C          The output Matrix C(Rank3, RowMajor, Batch*N*M)
+ * @param[in]  sizeBatch  Batch Size
+ * @param[in]  sizeN      N 
+ * @param[in]  sizeK      K
+ * @param[in]  sizeM      M
+ *
+ * @tparam     D          Row-tile Size(in C)
+ */
+template<unsigned D>
+void MatmulReorderedVectorized_V1(
+    const CONFIG_DTYPE* A,
+    const MemoryPackF_t* B,
+    MemoryPackF_t *C,
+    const unsigned sizeBatch,
+    const unsigned sizeN,
+    const unsigned sizeK,
+    const unsigned sizeM){
 
-    unsigned int dim0B, //Batch
-    unsigned int dim1B, //rows
-    unsigned int dim2B  //cols
-){
-    assert(dim0A==dim0B);
-    assert(dim2A==dim1B);
+    // MatA's  shape = [dim0, dim1, dim2] = [batchSize, sizeN, sizeK] = [Batch, Height, Width]; Row-major
+    // MatB's  shape = [dim0, dim1, dim2] = [batchSize, sizeK, sizeM] = [Batch, Height, Width]; Row-major
+    // MatC=AB shape = [dim0, dim1, dim2] = [batchSize, sizeN, sizeM] = [Batch, Height, Width]; Row-major
+ 
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
 
-    int commonDim = dim2A;
-    unsigned long indxS1,indxD;
-
-    DType buff1[CONFIG_BUFF_DEPTH][CONFIG_MAX_COMMON_DIM]; //Row major buffer
-    DType buff2[CONFIG_MAX_COMMON_DIM][CONFIG_BUFF_DEPTH]; //Row major buffer
+    const unsigned lastDimPaddedA = MakeDivisible<unsigned>(sizeK, CONFIG_M_AXI_WIDTH);
+    const unsigned lastDimPaddedB = MakeDivisible<unsigned>(sizeM, CONFIG_M_AXI_WIDTH);
+    const unsigned lastDimPaddedC = lastDimPaddedB;
 
 
-    //Because burst reading a window of MatB is slower than MatA, outermost for-loop must belong to MatB to maximize data reuse for this matrix.
-    LoopBatch:for(int batch=0; batch<dim0A; batch++){
-#pragma HLS LOOP_TRIPCOUNT min=5 max=5
-        LoopTiles1:for(int d2B=0; d2B<dim2B; d2B+=CONFIG_BUFF_DEPTH){
-#pragma HLS LOOP_TRIPCOUNT min=512 max=512
-            LoopTiles2:for(int d1A=0; d1A<dim1A; d1A+=CONFIG_BUFF_DEPTH){
-#pragma HLS LOOP_TRIPCOUNT min=512 max=512
-                //===============================================================================================================================
-                //Sec. 1 : Burst read current window of matrix B only once in the begining of the loop. (TRYING TO MAXIMIZE DATA REUSE)
-                //Avoiding logic between nested loops to make some optimization techniques possible.
-                if(d1A==0){
+    const unsigned vecsPerSliceA = lastDimPaddedA/CONFIG_M_AXI_WIDTH;
+    const unsigned vecsPerSliceB = lastDimPaddedB/CONFIG_M_AXI_WIDTH;
+    const unsigned vecsPerSliceC = lastDimPaddedC/CONFIG_M_AXI_WIDTH;
 
-                    int valid_w;
-                    if(d2B+CONFIG_BUFF_DEPTH > dim2B){
-                        valid_w = dim2B - d2B;
-                    }else{
-                        valid_w = CONFIG_BUFF_DEPTH;
-                    }
+    const unsigned boundLoopN = DivCeil<unsigned>(sizeN, D);
 
-                    ///TODO: INIT THE WHOLE LOCAL BUFF2 TO ZERO, BECAUSE DOING IT INSIDE BURST READ LOOP
-                    ///      WILL CAUSE PROBLEMS AGAINST BURST READ OPERATION INFERMENT.
-                    /*
-                    LoopInitZero0:for(int j=0; j<CONFIG_MAX_COMMON_DIM; j++){
-                        LoopInitZero1:for(int i=0; i<CONFIG_BUFF_DEPTH; i++){
-                            buff2[j][i] = 0;
-                        }
-                    }
-                    */
-                    LoopInitZero0:for(int j=commonDim; j<CONFIG_MAX_COMMON_DIM; j++){
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-                        LoopInitZero1:for(int i=valid_w; i<CONFIG_BUFF_DEPTH; i++){
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-                            buff2[j][i] = 0;
-                        }
-                    }
+    LoopBatch:
+    for(unsigned batch=0; batch<sizeBatch; batch++) {
+        #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+        LoopN:
+        for (unsigned n = 0; n < boundLoopN; n++) {
+            #pragma HLS LOOP_TRIPCOUNT min=256 max=256
+            MemoryPackF_t acc[D][MaxM / CONFIG_M_AXI_WIDTH];
+            #pragma HLS ARRAY_PARTITION variable=acc dim=1 complete
 
-                    //burst reading the separated rows in burst mode
-                    LoopBurstReadA_J:for(int j=0; j<commonDim;j++){
-#pragma HLS LOOP_TRIPCOUNT min=64 max=64
-                        LoopBurstReadA_I:for(int i=0; i<valid_w;i++){
-#pragma HLS LOOP_TRIPCOUNT min=2 max=2
-                            indxS1 = (batch)*commonDim*dim2B + (j)*dim2B + (d2B+i);
-                            buff2[j][i] = inputTn2[indxS1];
-                        }
+            LoopK:
+            for (unsigned k = 0; k < sizeK; k++) {
+                #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                const unsigned kVecIndex = k / CONFIG_M_AXI_WIDTH;
+                CONFIG_DTYPE a_buffer[D];
+                LoopReadA:
+                for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); nd++) {
+                    #pragma HLS PIPELINE II=1
+                    // matrix A is padded on the last dimension but it is accessed by axi-32bits.
+                    const unsigned indxS1 = (batch)*sizeN*lastDimPaddedA + (n*D+nd)*lastDimPaddedA + (k);
+                    a_buffer[nd] = A[indxS1];
+                }
+                LoopM:
+                for (unsigned m = 0; m < vecsPerSliceB; m++) {
+                    #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                    #pragma HLS PIPELINE II=1
+                    const unsigned indxS2 = (batch)*sizeK*vecsPerSliceB + k*vecsPerSliceB + m;
+                    const auto b_val = B[indxS2];
+                    LoopUnrolled:
+                    for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
+                        #pragma HLS UNROLL
+                        const auto prev = (k > 0) ? acc[nd][m] : MemoryPackF_t(0.);
+                        acc[nd][m] = prev + a_buffer[nd] * b_val;
+                        #pragma HLS DEPENDENCE variable=acc inter false
                     }
                 }
-
-                //===============================================================================================================================
-                //Sec. 2 : Burst read different windows of matrix A. (LESS DATA REUSE)
-                int valid_h,valid_len;
-                if(d1A+CONFIG_BUFF_DEPTH > dim1A){
-                    valid_h = dim1A - d1A;
-                }else{
-                    valid_h = CONFIG_BUFF_DEPTH;
+            }
+            LoopWriteD:
+            for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
+                LoopWriteM:
+                for (unsigned m = 0; m < vecsPerSliceB; ++m) {
+                    #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                    #pragma HLS LOOP_FLATTEN
+                    #pragma HLS PIPELINE II=1
+                    const unsigned indxD = (batch)*sizeN*vecsPerSliceC + (n*D+nd)*vecsPerSliceC + m;
+                    C[indxD] = acc[nd][m];
                 }
-                valid_len = valid_h * commonDim;
-
-                ///TODO: INIT THE WHOLE LOCAL BUFF1 TO ZERO, BECAUSE DOING IT INSIDE BURST READ LOOP
-                ///      WILL CAUSE PROBLEMS AGAINST BURST READ OPERATION INFERMENT.
-                /*
-                 LoopInitZero2:for(int j=0; j<CONFIG_BUFF_DEPTH; j++){
-                    LoopInitZero3:for(int i=0; i<CONFIG_MAX_COMMON_DIM; i++){
-                        buff1[j][i] = 0;
-                    }
-                }
-                */
-                 LoopInitZero2:for(int j=valid_h; j<CONFIG_BUFF_DEPTH; j++){
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-                    LoopInitZero3:for(int i=commonDim; i<CONFIG_MAX_COMMON_DIM; i++){
-#pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-                        buff1[j][i] = 0;
-                    }
-                }
-
-                //burst reading the whole buffer size worth of elements of matA
-                LoopBurstReadB_J:for(int j=0; j<valid_h;j++){
-#pragma HLS LOOP_TRIPCOUNT min=2 max=2
-                    LoopBurstReadB_I:for(int i=0; i<commonDim;i++){
-#pragma HLS LOOP_TRIPCOUNT min=64 max=64
-                        indxS1 = (batch)*dim1A*commonDim + (d1A+j)*commonDim + (i);
-                        buff1[j][i] = inputTn1[indxS1];
-                    }
-                }
-
-                //=====================================================================================
-                //Sec. 3: Process content of two local buffers and produce the output elements for (x, y) .
-                int x,y;
-                x=0;
-                y=0;
-                int xx,yy;
-                //Fused loops for (x,y), pay attention that virtual x-loop is the inner loop. So gmem writes will be in order.
-                LoopProcess1:for(int iter=0; iter<CONFIG_BUFF_DEPTH*CONFIG_BUFF_DEPTH; iter++){
-#pragma HLS LOOP_TRIPCOUNT min=4 max=4
-                    DType sum=0;
-                    LoopProcess2:for(int q=0; q<commonDim; q++){
-#pragma HLS LOOP_TRIPCOUNT min=64 max=64
-                        sum += buff1[y][q] * buff2[q][x];
-                    }
-                    //Writing output as row-major array.
-                    xx = x+d2B;
-                    yy = y+d1A;
-                    indxD = (batch)*dim1A*dim2B + (yy)*dim2B + (xx);
-                    if(yy<dim1A && xx<dim2B){
-                        outputTn[indxD] = sum;
-                    }
-
-                    //=====================================
-                    if(x == CONFIG_BUFF_DEPTH-1){
-                        x=0;
-                        y++;
-                    }else{
-                        x++;
-                    }
-                }
-
             }
         }
     }
-
 }
+
 extern "C"{
 void task_matmul(
-        float *inputTn1,
-        float *inputTn2,
-        float *outputTn,
+        const CONFIG_DTYPE *inputTn1,
+        const MemoryPackF_t *inputTn2,
+        MemoryPackF_t *outputTn,
+        const unsigned sizeBatch,
+        const unsigned sizeN,
+        const unsigned sizeK,
+        const unsigned sizeM){
+#pragma HLS INTERFACE m_axi port=inputTn1 offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi port=inputTn2 offset=slave bundle=gmem2
+#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem2
+#pragma HLS INTERFACE s_axilite port=inputTn1 bundle=control
+#pragma HLS INTERFACE s_axilite port=inputTn2 bundle=control
+#pragma HLS INTERFACE s_axilite port=outputTn bundle=control
+#pragma HLS INTERFACE s_axilite port=sizeBatch bundle=control
+#pragma HLS INTERFACE s_axilite port=sizeN bundle=control
+#pragma HLS INTERFACE s_axilite port=sizeK bundle=control
+#pragma HLS INTERFACE s_axilite port=sizeM bundle=control
+#pragma HLS INTERFACE s_axilite port=return bundle=control
 
-        unsigned int dim0A,
-        unsigned int dim1A,
-        unsigned int dim2A,
+    MatmulReorderedVectorized_V1<RowTileSizeD>(
+        inputTn1, inputTn2, outputTn, 
+        sizeBatch, sizeN, sizeK, sizeM);
 
-        unsigned int dim0B,
-        unsigned int dim1B,
-        unsigned int dim2B){
-
-#pragma HLS INTERFACE m_axi     port=inputTn1   offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=inputTn2   offset=slave bundle=gmem2
-#pragma HLS INTERFACE m_axi     port=outputTn   offset=slave bundle=gmem1
-#pragma HLS INTERFACE s_axilite port=inputTn1   bundle=control
-#pragma HLS INTERFACE s_axilite port=inputTn2   bundle=control
-#pragma HLS INTERFACE s_axilite port=outputTn   bundle=control
-
-#pragma HLS INTERFACE s_axilite port=dim0A       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim1A       bundle=control
-#pragma HLS INTERFACE s_axilite port=dim2A       bundle=control
-
-#pragma HLS INTERFACE s_axilite port=dim0B      bundle=control
-#pragma HLS INTERFACE s_axilite port=dim1B      bundle=control
-#pragma HLS INTERFACE s_axilite port=dim2B      bundle=control
-
-#pragma HLS INTERFACE s_axilite port=return     bundle=control
-
-    BatchMatMul<float>(inputTn1, inputTn2, outputTn, dim0A, dim1A, dim2A, dim0B, dim1B, dim2B);
 }
 }

@@ -8,9 +8,9 @@
 ModelArchTop05::ModelArchTop05(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
     DB_OFFSET = dataset_offset;
-    B = (unsigned int)batchsize;
-    N = (unsigned int)pointcount;
-    K = (unsigned int)knn_k;
+    B = (unsigned)batchsize;
+    N = (unsigned)pointcount;
+    K = (unsigned)knn_k;
 #ifndef USE_OCL
     cout<<"This ModelArch needs OpenCL enabled.\nTerminating..."<<endl;
     exit(1);
@@ -22,8 +22,9 @@ ModelInfo ModelArchTop05::GetModelInfo() {
     tmplt.ModelType="Classifier";
     tmplt.Version="5.0";
     tmplt.DesignNotes=
-            "1) Layers square,reducesum,gather,concat2 are on cpu "
-            "2) "
+            "1) All of the layers are on OCL.\n"
+            "2) Not compatible with sw-emu.\n"
+            ""
             ;
     tmplt.ExperimentNotes="";
     tmplt.ToDo=""
@@ -186,7 +187,7 @@ TensorF* ModelArchTop05::Batchnorm_Forward(WorkScheduler scheduler, TensorF* inp
 
 TensorF* ModelArchTop05::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input_BxNxD, TensorI *knn_output_BxNxK) {
     //Gather knn's indices from input array.
-    TensorF* point_cloud_neighbors = platformSelector->Gather(PLATFORMS::CPU,scheduler,input_BxNxD,knn_output_BxNxK,1);
+    TensorF* point_cloud_neighbors = platformSelector->Gather(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,knn_output_BxNxK,1);
 
     //tile ing input of shape BxNxD into BxNxKxD..
     input_BxNxD->ExpandDims(2);
@@ -196,7 +197,7 @@ TensorF* ModelArchTop05::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input
     TensorF* features = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler, point_cloud_neighbors,point_cloud_central,MAT_OPS::SUB);
 
     //concatenate centrals and features (BxNxKxD) and (BxNxKxD)
-    TensorF* edge_feature = platformSelector->Concat2(PLATFORMS::CPU,scheduler, point_cloud_central,features,3);
+    TensorF* edge_feature = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, point_cloud_central,features,3);
 
     delete(point_cloud_neighbors);
     delete(point_cloud_central);
@@ -206,12 +207,12 @@ TensorF* ModelArchTop05::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input
 }
 
 TensorF* ModelArchTop05::PairwiseDistance(WorkScheduler scheduler, TensorF *input_BxNxD) {
-
+    /*
     TensorF* point_cloud_transpose = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
     TensorF* point_cloud_inner =  platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,point_cloud_transpose);
     TensorF* point_cloud_inner2 = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner,-2.0f,MAT_OPS::MUL_ELEMENTWISE);
-    TensorF* point_cloud_inner2p2 = platformSelector->Square(PLATFORMS::CPU,scheduler,input_BxNxD);
-    TensorF* point_cloud_sum = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,point_cloud_inner2p2,false,false,true);
+    TensorF* point_cloud_inner2p2 = platformSelector->Square(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
+    TensorF* point_cloud_sum = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner2p2,false,false,true);
     point_cloud_sum->ExpandDims(-1);
     //2D Matrix fed into function with virutal batch size of 1
     TensorF* point_cloud_sum_transpose = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum);  //changed dims
@@ -220,13 +221,23 @@ TensorF* ModelArchTop05::PairwiseDistance(WorkScheduler scheduler, TensorF *inpu
     TensorF* point_cloud_sum_transpose_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum_transpose,1,N); //result is BxkxN for k=N
     TensorF* rsltTmpTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum_tiled,point_cloud_sum_transpose_tiled, MAT_OPS::ADD); //both input tensors are BxNxN
     TensorF* rsltTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,rsltTmpTn,point_cloud_inner2, MAT_OPS::ADD); //both input tensors are BxNxN
+    */
+    TensorF* point_cloud_transpose = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
+    TensorF* point_cloud_inner =  platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,point_cloud_transpose);
+    TensorF* point_cloud_inner2 = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner,-2.0f,MAT_OPS::MUL_ELEMENTWISE);
+    TensorF* point_cloud_inner2p2 = platformSelector->Square(PLATFORMS::GPU_OCL,scheduler,input_BxNxD);
+    TensorF* point_cloud_sum = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,point_cloud_inner2p2,false,false,true);
+    TensorF* point_cloud_sum_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum,2,N); //result is BxNxK for k=N
+    TensorF* point_cloud_sum_transpose_tiled =  platformSelector->Tile(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum,1,N); //result is BxkxN for k=N
+    TensorF* rsltTmpTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,point_cloud_sum_tiled,point_cloud_sum_transpose_tiled, MAT_OPS::ADD); //both input tensors are BxNxN
+    TensorF* rsltTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,rsltTmpTn,point_cloud_inner2, MAT_OPS::ADD); //both input tensors are BxNxN
 
     delete(point_cloud_transpose);
     delete(point_cloud_inner);
     delete(point_cloud_inner2);
     delete(point_cloud_inner2p2);
     delete(point_cloud_sum);
-    delete(point_cloud_sum_transpose);
+    //delete(point_cloud_sum_transpose);
     delete(point_cloud_sum_tiled);
     delete(point_cloud_sum_transpose_tiled);
     delete(rsltTmpTn);
@@ -492,7 +503,7 @@ TensorF* ModelArchTop05::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         delete(biases);
         delete(transformTn);
 
-        return transformFinalTn;
+        return platformSelector->CrossThePlatform(transformFinalTn, PLATFORMS::CPU); // Force CPU
     }
 }
 
@@ -723,13 +734,13 @@ TensorF* ModelArchTop05::Execute(WorkScheduler scheduler) {
         endpoint_1->ExpandDims(2);
         endpoint_2->ExpandDims(2);
         endpoint_3->ExpandDims(2);
-        TensorF *concatA = platformSelector->Concat2(PLATFORMS::CPU,scheduler, endpoint_0, endpoint_1, 3);
+        TensorF *concatA = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, endpoint_0, endpoint_1, 3);
         delete(endpoint_0);
         delete(endpoint_1);
-        TensorF *concatB = platformSelector->Concat2(PLATFORMS::CPU,scheduler, concatA, endpoint_2, 3);
+        TensorF *concatB = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, concatA, endpoint_2, 3);
         delete(endpoint_2);
         delete(concatA);
-        TensorF *concatC = platformSelector->Concat2(PLATFORMS::CPU,scheduler, concatB, endpoint_3, 3);
+        TensorF *concatC = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler, concatB, endpoint_3, 3);
         delete(endpoint_3);
         delete(concatB);
 
