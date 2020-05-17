@@ -109,10 +109,10 @@ This repository contains multiple branches as described below:
 
 Branch | AXI Width | DType | Tool | Notes
 ---  |  --- |  --- |  --- |  ---
-master | 32-bits | float32 | SDx2019.1 | -
-axi32 | 32-bits | float32 | SDx2019.1 | -
-axi512 | 512-bits | float32 | SDx2019.1 | -
-vitis20192_axi512 | 512-bits | float32 | Vitis2019.2 | -
+master | 512-bits | float32 | SDx2019.1 | main branch to be used
+axi32 | 32-bits | float32 | SDx2019.1 | DEPRECATED
+axi512 | 512-bits | float32 | SDx2019.1 | Soon will be removed
+vitis20192_axi512 | 512-bits | float32 | Vitis2019.2 | HW build fails with clock partitioning error
 
 # Debugging Host-side in CLion
 In order to debug the host-side program in any modes(`sw_emu`, `hw_emu`, or `system`), CLion or any other C++ IDE could be used.
