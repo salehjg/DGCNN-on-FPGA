@@ -68,7 +68,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -76,7 +77,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_reducemax",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 2 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -84,7 +86,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -92,7 +95,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -100,7 +104,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -108,7 +113,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -116,7 +122,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 7 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -124,7 +131,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_transpose",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 8 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -132,7 +140,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -140,7 +149,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -156,7 +166,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_pad_last_dim",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 12 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -164,7 +175,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_unpad_last_dim",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 13 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -172,7 +184,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_relu_sqrt_square",
-                false)
+                false,
+                DISABLED_KERNEL)
     };
     
     //======================================================================================================================
@@ -1019,6 +1032,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
     assert(axis==2);
 
     auto outputShape = batchedMat->getShape();
+    const auto sliceSize = outputShape[2];
     outputShape[2] = k;
 
     TensorF* _batchedMat = 
@@ -1031,12 +1045,18 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
     }else{
         cl_int error; int argcnt=0; 
         const unsigned batchSize = outputShape[0]*outputShape[1];
-        const unsigned vecsPerSlice = DivCeil<unsigned>(outputShape[2], CONFIG_M_AXI_WIDTH);
+        const unsigned vecsPerSlice = DivCeil<unsigned>(sliceSize, CONFIG_M_AXI_WIDTH);
         const unsigned vecsPerOutputSlice = DivCeil<unsigned>(k, CONFIG_M_AXI_WIDTH);
         const unsigned _dim2 = batchedMat->getShape()[2];
 
+        cout<<"BatchSize: "<<batchSize<<endl;
+        cout<<"vecsPerSlice: "<<vecsPerSlice<<endl;
+        cout<<"vecsPerOutputSlice: "<<vecsPerOutputSlice<<endl;
+        cout<<"_dim2: "<<_dim2<<endl;
+        cout<<"k: "<<k<<endl;
+
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_batchedMat)->ocl_buff));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)rsltIndicesSplitedTn)->ocl_buff));
+        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorI*)rsltIndicesSplitedTn)->ocl_buff));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, batchSize));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim2));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, k));

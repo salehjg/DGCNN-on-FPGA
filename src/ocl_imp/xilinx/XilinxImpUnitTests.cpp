@@ -895,7 +895,7 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
         cerr << "KernelTopK: Skipping, only HwEmu mode is supported."<<endl;
         return obj;
     }
-    const unsigned kVal=20 , N=32 , B=ConfigTaskTopK::UnitCount+2;
+    const unsigned kVal=20 , N=ConfigTaskTopK::MaxSliceLen , B=ConfigTaskTopK::UnitCount+2;
     cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
         <<" and N="<< N <<", Press ESC to skip..."<<endl; 
     if(cin.get()==27) return nullptr;
@@ -972,8 +972,8 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    
-    /*PrintReport(TensorFloat());
+    /*
+    PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
@@ -981,9 +981,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(TensorPadUnpadCpuFloat());
     PrintReport(TensorPadUnpadCpuInteger());
     PrintReport(KernelPadLastDimFloat());
-    PrintReport(KernelUnpadLastDimFloat());*/
-    PrintReport(KernelConv2Mlp()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
-    /*PrintReport(KernelTopK()); //DO NOT RUN THIS ON SW-EMU, MULTI-PEs DO NOT WORK IN XILINX SW-EMU
+    PrintReport(KernelUnpadLastDimFloat());
+    PrintReport(KernelConv2Mlp());
+    */
+    PrintReport(KernelTopK());
     PrintReport(KernelMatops());
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelMean());
@@ -997,7 +998,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());
-    PrintReport(KernelTranspose());*/
+    PrintReport(KernelTranspose());
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
