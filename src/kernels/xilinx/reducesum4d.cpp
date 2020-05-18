@@ -10,19 +10,118 @@ using namespace std;
 using namespace ConfigTaskReduceSum4D;
 using hlslib::Stream;
 
-// for dataflow version only:
-//constexpr unsigned CONFIG_MAX_SLICE_SIZE = 1024;
-//constexpr unsigned PipeDepth = 1;
-
 constexpr unsigned MAX_POW_Y_MINUS_ONE = (MaxPowY-1);
 
+void ReduceSumRank4Axes012_V3_UnitRead(
+    const MemoryPackF_t *inputTn,
+    Stream<MemoryPackF_t, PipeDepth> &streamsData,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2,
+    const unsigned dim3){
+
+    const unsigned batchSize = dim0*dim1*dim2;
+    const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
+
+    LoopBatch:
+    for(unsigned batch=0; batch<batchSize; batch++){
+#pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
+
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+#pragma HLS LOOP_TRIPCOUNT min=8 max=8
+#pragma HLS PIPELINE II=1
+            const unsigned indxS = batch*vecsPerSlice + iVec;
+            streamsData.Push(inputTn[indxS]);
+        }
+
+    }
+}
+
+void ReduceSumRank4Axes012_V3_UnitProcess(
+        Stream<MemoryPackF_t, PipeDepth> &streamsData,
+        MemoryPackF_t *outputTn,
+        const unsigned pow_y,
+        const unsigned dim0,
+        const unsigned dim1,
+        const unsigned dim2,
+        const unsigned dim3){
+
+    assert(pow_y>=1 && pow_y<=MaxPowY);
+
+    CONFIG_DTYPE buffResult1[MaxSliceLen];
+#pragma HLS ARRAY_PARTITION variable=buffResult1 cyclic factor=CONFIG_M_AXI_WIDTH dim=1
+
+    unsigned indxS;
+
+    const unsigned batchSize = dim0*dim1*dim2;
+    const unsigned pow_y_minus_one = pow_y -1;
+    const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
+
+    LoopInit0:
+    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+        #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+        LoopInit1:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            buffResult1[iVec*CONFIG_M_AXI_WIDTH+i]=0;
+        }
+    }
+
+    LoopBatch:
+    for(unsigned batch=0; batch<batchSize; batch++){
+        #pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
+
+        LoopSlice0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
+
+            indxS = batch*vecsPerSlice + iVec;
+            MemoryPackF_t vec = streamsData.Pop();
+
+            LoopCompute:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+
+                CONFIG_DTYPE rslt = vec[i];
+                LoopPow:
+                for(unsigned ipwr=0; ipwr<MAX_POW_Y_MINUS_ONE; ipwr++){
+                    #pragma HLS UNROLL
+                    if(ipwr<pow_y_minus_one){
+                        rslt = rslt * rslt;
+                    }
+                }
+                buffResult1[iVec*CONFIG_M_AXI_WIDTH + i] += rslt;
+            }
+
+        }
+    }
+
+    LoopSlice1:
+    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+        #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+        
+        MemoryPackF_t outVec;
+
+        LoopOutput:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            outVec[i]=buffResult1[iVec*CONFIG_M_AXI_WIDTH+i];
+        }
+
+        outputTn[iVec] = outVec;
+    }
+}
 
 /**
  * @brief      Reduces the input tensor in the given dimensions.
  *             Currently, only TTTF reduction combination is supported.
- *             For 'LoopCompute', the best achievable II is 4.
+ *             For 'LoopCompute', the best achievable II is 5.
  *             The latency is reported for inputTn of shape 5x1024x20x128
  *             This kernel complies with the padded last dim policy.
+ *             This version(v3) alleviates external memory access stalls using dataflow scheme and FIFO depth.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
@@ -32,6 +131,34 @@ constexpr unsigned MAX_POW_Y_MINUS_ONE = (MaxPowY-1);
  * @param[in]  dim2      The dim 2
  * @param[in]  dim3      The dim 3
  */
+void ReduceSumRank4Axes012_V3(
+        const MemoryPackF_t *inputTn,
+        MemoryPackF_t *outputTn,
+        const unsigned pow_y,
+        const unsigned dim0,
+        const unsigned dim1,
+        const unsigned dim2,
+        const unsigned dim3){
+#pragma HLS DATAFLOW
+
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+
+    Stream<MemoryPackF_t, PipeDepth> streamData;
+#pragma HLS STREAM variable=streamData depth=PipeDepth
+
+    HLSLIB_DATAFLOW_INIT();
+
+    HLSLIB_DATAFLOW_FUNCTION(ReduceSumRank4Axes012_V3_UnitRead, 
+        inputTn, streamData, dim0, dim1, dim2, dim3);
+    HLSLIB_DATAFLOW_FUNCTION(ReduceSumRank4Axes012_V3_UnitProcess, 
+        streamData, outputTn, pow_y, dim0, dim1, dim2, dim3);
+
+    HLSLIB_DATAFLOW_FINALIZE();
+}
+
+/*
 void ReduceSumRank4Axes012_V1(
         const MemoryPackF_t *inputTn,
         MemoryPackF_t *outputTn,
@@ -98,58 +225,60 @@ void ReduceSumRank4Axes012_V1(
     }
 }
 
-/*
-void UnitRead(
-    const MemoryPackF_t *inputTn,
-    Stream<MemoryPackF_t, PipeDepth> &streamsData,
-    const unsigned dim0,
-    const unsigned dim1,
-    const unsigned dim2,
-    const unsigned dim3){
+void ReduceSumRank4Axes012_V2(
+        const MemoryPackF_t *inputTn,
+        MemoryPackF_t *outputTn,
+        const unsigned pow_y,
+        const unsigned dim0,
+        const unsigned dim1,
+        const unsigned dim2,
+        const unsigned dim3){
+
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+
+    assert(pow_y>=1 && pow_y<=MaxPowY);
+
+
+    constexpr unsigned MAXSLICELEN_LOCAL = 1024;
+
+
+    CONFIG_DTYPE buffResult1[MAXSLICELEN_LOCAL];
+#pragma HLS ARRAY_PARTITION variable=buffResult1 cyclic factor=16 dim=1
+
+    unsigned indxS;
 
     const unsigned batchSize = dim0*dim1*dim2;
+    const unsigned pow_y_minus_one = pow_y -1;
     const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
 
+    LoopInit0:
     for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-#pragma HLS LOOP_TRIPCOUNT min=8 max=8
-        LoopBatch:
-        for(unsigned batch=0; batch<batchSize; batch++){
-#pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
-#pragma HLS PIPELINE II=1
-            const unsigned indxS = batch*vecsPerSlice + iVec;
-            MemoryPackF_t vec = inputTn[indxS];
-            streamsData.Push(vec);
+        LoopInit1:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            buffResult1[iVec*CONFIG_M_AXI_WIDTH+i]=0;
         }
     }
-}
 
-void UnitPowY(
-    Stream<MemoryPackF_t, PipeDepth> &streamsData,
-    Stream<MemoryPackF_t, PipeDepth> &streamsPowOut,
-    const unsigned pow_y,
-    const unsigned dim0,
-    const unsigned dim1,
-    const unsigned dim2,
-    const unsigned dim3){
+    LoopBatch:
+    for(unsigned batch=0; batch<batchSize; batch++){
+        #pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
 
-    const unsigned pow_y_minus_one = pow_y -1;
-    const unsigned batchSize = dim0*dim1*dim2;
-    const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
-    const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
+        LoopSlice0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
 
-    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-#pragma HLS LOOP_TRIPCOUNT min=8 max=8
-        LoopBatch:
-        for(unsigned batch=0; batch<batchSize; batch++){
-#pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
-#pragma HLS PIPELINE II=1
+            indxS = batch*vecsPerSlice + iVec;
+            MemoryPackF_t vec = inputTn[indxS];
 
-            MemoryPackF_t vec = streamsData.Pop();
-            MemoryPackF_t vecOut;
             LoopCompute:
             for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
-#pragma HLS UNROLL
+                #pragma HLS UNROLL
+
                 CONFIG_DTYPE rslt = vec[i];
                 LoopPow:
                 for(unsigned ipwr=0; ipwr<MAX_POW_Y_MINUS_ONE; ipwr++){
@@ -157,93 +286,27 @@ void UnitPowY(
                     if(ipwr<pow_y_minus_one){
                         rslt = rslt * rslt;
                     }
-                    //std::cout<<"**indxI="<<i << " ,pow_rslt= "<< pow_rslt <<std::endl;
-                    buff_rslt[i] = buff_rslt[i] + pow_rslt;
-                    //std::cout<<"**indxI="<<i << " ,Sum= "<< buff_rslt[i] <<std::endl;
-
                 }
-                vecOut[i] = rslt;
+                buffResult1[iVec*CONFIG_M_AXI_WIDTH + i] += rslt;
             }
-            streamsPowOut.Push(vecOut);
+
         }
     }
-}
 
-void UnitReduction(
-    Stream<MemoryPackF_t, PipeDepth> &streamsPowIn,
-    Stream<MemoryPackF_t, PipeDepth> &streamsResults,
-    const unsigned dim0,
-    const unsigned dim1,
-    const unsigned dim2,
-    const unsigned dim3){
 
-    const unsigned batchSize = dim0*dim1*dim2;
-    const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
-    const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
-
-    CONFIG_DTYPE buffResult[CONFIG_MAX_SLICE_SIZE];
-#pragma HLS ARRAY_PARTITION variable=buffResult cyclic factor=16 dim=1
-
-    LoopInitBuffs:
-    for(unsigned i=0; i<CONFIG_MAX_SLICE_SIZE; i++){
-#pragma HLS PIPELINE II=1
-        buffResult[i] = 0;
-    }
-
-    LoopSlice:
+    LoopSlice1:
     for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-#pragma HLS LOOP_TRIPCOUNT min=8 max=8
+        #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+        
+        MemoryPackF_t outVec;
 
-        MemoryPackF_t accVec(0.0f);
-
-        LoopBatch:
-        for(unsigned batch=0; batch<batchSize; batch++){
-#pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
-#pragma HLS PIPELINE II=4
-
-            MemoryPackF_t tmpVec = streamsPowIn.Pop();
-            accVec = accVec + tmpVec;
+        LoopOutput:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            outVec[i]=buffResult1[iVec*CONFIG_M_AXI_WIDTH+i];
         }
 
-        LoopReduceUnrolled:
-        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++) {
-#pragma HLS UNROLL
-            buffResult[iVec*CONFIG_MAX_SLICE_SIZE+i] = accVec[i];
-        }
-    }
-
-    LoopResults:
-    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-#pragma HLS LOOP_TRIPCOUNT min=8 max=8
-#pragma HLS PIPELINE II=1
-
-        MemoryPackF_t tmpVec(0.0f);
-        LoopResultsUnrolled:
-        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++) {
-#pragma HLS UNROLL
-            tmpVec[i] = buffResult[iVec*CONFIG_MAX_SLICE_SIZE+i];
-        }
-        streamsResults.Push(tmpVec);
-    }
-}
-
-void UnitWrite(
-    Stream<MemoryPackF_t, PipeDepth> &streamsResults,
-    MemoryPackF_t *outputTn,
-    const unsigned dim0,
-    const unsigned dim1,
-    const unsigned dim2,
-    const unsigned dim3){
-
-    const unsigned batchSize = dim0*dim1*dim2;
-    const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
-    const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
-
-    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-#pragma HLS LOOP_TRIPCOUNT min=8 max=8
-#pragma HLS PIPELINE II=1
-        MemoryPackF_t vec = streamsResults.Pop();
-        outputTn[iVec] = vec;
+        outputTn[iVec] = outVec;
     }
 }
 */
@@ -277,30 +340,12 @@ void task_reducesum4d(
 #pragma HLS INTERFACE s_axilite port=overaxis3 bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-/*
     #ifdef KERNEL_LOGS
         cout<<"Simulation mode is enabled."<<endl;
     #endif
 
-#pragma HLS DATAFLOW
-
-    Stream<MemoryPackF_t, PipeDepth> streamData;
-    Stream<MemoryPackF_t, PipeDepth> streamPow;
-    Stream<MemoryPackF_t, PipeDepth> streamsResults;
-#pragma HLS STREAM variable=streamData depth=PipeDepth
-#pragma HLS STREAM variable=streamPow depth=PipeDepth
-#pragma HLS STREAM variable=streamsResults depth=PipeDepth
-
-    HLSLIB_DATAFLOW_INIT();
-
-    HLSLIB_DATAFLOW_FUNCTION(UnitRead, inputTn, streamData, dim0, dim1, dim2, dim3);
-    HLSLIB_DATAFLOW_FUNCTION(UnitPowY, streamData, streamPow, pow_y, dim0, dim1, dim2, dim3);
-    HLSLIB_DATAFLOW_FUNCTION(UnitReduction, streamPow, streamsResults, dim0, dim1, dim2, dim3);
-    HLSLIB_DATAFLOW_FUNCTION(UnitWrite, streamsResults, outputTn, dim0, dim1, dim2, dim3);
-
-    HLSLIB_DATAFLOW_FINALIZE();
-*/
-    ReduceSumRank4Axes012_V1(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3);
-
+    //ReduceSumRank4Axes012_V1(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3);
+    //ReduceSumRank4Axes012_V2(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3); 
+    ReduceSumRank4Axes012_V3(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3); 
 }
 }

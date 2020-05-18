@@ -86,8 +86,7 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_reducesum4d",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -158,7 +157,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 11 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -205,6 +205,7 @@ XilinxImplementation::XilinxImplementation(int aa){
 
 XilinxImplementation::~XilinxImplementation(){
     cout<<"~XilinxImplementation"<<endl;
+    /*
     delete(queue);
     delete(program);
     delete(context);
@@ -215,6 +216,7 @@ XilinxImplementation::~XilinxImplementation(){
         else
             delete(kernelObject->kernel_task);
     }
+    */
 }
 
 cl::Context* XilinxImplementation::getContext(){
