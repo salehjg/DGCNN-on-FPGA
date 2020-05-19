@@ -111,6 +111,17 @@ private:
                    const string &setting3, float val3, vector<unsigned int> shape1, vector<unsigned int> shape2, vector<bool> comb={});
     cl_ulong get_duration_ns (const cl::Event &event);
     void ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event);
+
+    TensorF* _Reduce_Task(
+            TensorF* inputTn,
+            bool reduceSum,
+            bool reduceMax,
+            unsigned pow_y,
+            bool overaxis0,
+            bool overaxis1,
+            bool overaxis2,
+            bool overaxis3);
+
     TensorF* _ReduceSum4D_Task(
             TensorF* inputTn,
             bool overaxis0,
@@ -126,6 +137,13 @@ private:
             bool over_axis2,
             bool over_axis3,
             int pow_y);
+
+    TensorF* _PadUnpadLastDim(
+            TensorF* inputTn, 
+            bool pad,
+            bool unpad,
+            unsigned lastDimPadded,
+            unsigned lastDimUnpadded);
 
     TensorF* _ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare);
 
