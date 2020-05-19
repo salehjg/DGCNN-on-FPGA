@@ -7,7 +7,7 @@ include_directories(
 
 add_executable(CpuTestReduceMax
     src/CpuTestReduceMax.cpp 
-    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp)
+    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/reduce.cpp)
 
 target_link_libraries(CpuTestReduceMax
     ${SDAccel_LIBRARIES} 

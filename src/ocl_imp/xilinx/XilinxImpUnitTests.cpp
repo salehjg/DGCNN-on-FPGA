@@ -972,24 +972,25 @@ ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    /*
-    PrintReport(TensorFloat());
-    PrintReport(TensorBankFloat());
-    PrintReport(TensorBankInteger());
-    PrintReport(TensorCloneBankFloat());
-    PrintReport(TensorCloneBankInteger());
-    PrintReport(TensorPadUnpadCpuFloat());
-    PrintReport(TensorPadUnpadCpuInteger());
+    
+    //PrintReport(TensorFloat());
+    //PrintReport(TensorBankFloat());
+    //PrintReport(TensorBankInteger());
+    //PrintReport(TensorCloneBankFloat());
+    //PrintReport(TensorCloneBankInteger());
+    //PrintReport(TensorPadUnpadCpuFloat());
+    //PrintReport(TensorPadUnpadCpuInteger());
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
-    PrintReport(KernelConv2Mlp());
-    PrintReport(KernelTopK());
-    PrintReport(KernelMatops());*/
+    //PrintReport(KernelConv2Mlp());
+    //PrintReport(KernelTopK());
+    //PrintReport(KernelMatops());
     PrintReport(KernelReduceSum4D());
-    /*PrintReport(KernelMean());
-    PrintReport(KernelVariance());
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum());
+    /*
+    PrintReport(KernelMean());
+    PrintReport(KernelVariance());
     PrintReport(KernelMatmul());
     PrintReport(KernelTile());
     PrintReport(KernelGather());
@@ -997,7 +998,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());
-    PrintReport(KernelTranspose());*/
+    PrintReport(KernelTranspose());
+    */
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

@@ -366,7 +366,7 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
                                       bool over_axis1,
                                       bool over_axis2){
     PrintInfo("ReduceSum","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2});
-    return _Reduce_Task(inputTn, true, false, 0, overaxis0, overaxis1, overaxis2, false);
+    return _Reduce_Task(inputTn, true, false, 0, over_axis0, over_axis1, over_axis2, false);
 }
 
 TensorF* XilinxImplementation::_Reduce_Task(
@@ -397,7 +397,7 @@ TensorF* XilinxImplementation::_Reduce_Task(
         rsltTn = new OclTensorF(context, queue, {_dim0,_dim1}, ConfigTaskReduce::BankIndex_outputTn);
     }else if(reduceSum && rank==4){
         assert(overaxis0&&overaxis1&&overaxis2&&!overaxis3); // ReduceSum4D TTTF
-        assert(pow_y<=ConfigTaskReduceSum4D::MaxPowY);
+        assert(pow_y<=ConfigTaskReduce::Sum4D::MaxPowY);
         _dim0 = inputTn->getShape()[0];
         _dim1 = inputTn->getShape()[1];
         _dim2 = inputTn->getShape()[2];
@@ -553,7 +553,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
 
     cl_int error; 
     int argcnt=0;
-    unsigned dim0, dim1, lcm, _gcd;
+    unsigned dim0, dim1, lcm=0, _gcd;
     unsigned mode;
     OclTensorF* outputTn;
     std::vector<unsigned> shape = inputTn->getShape();
@@ -570,7 +570,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
         dim1 = shape[0];
     }
 
-    if(mode==1){ //PAD
+    if(pad){ //PAD
         if(shape[rank-1]<CONFIG_M_AXI_WIDTH){
             //sub-vector padding
             _gcd = __gcd(dim1, CONFIG_M_AXI_WIDTH);
@@ -579,14 +579,13 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
             lcm=0;
         }
         shape[rank-1] = lastDimPadded;
-        outputTn = new OclTensorF(context, queue, shape, ConfigTaskPadding::BankIndex_outputTn);
-        //std::cout<<"dim0:"<<dim0<<", dim1:"<<dim1<<", lastDimPadded:"<<lastDimPadded<<std::endl;
+        outputTn = new OclTensorF(context, queue, shape, ConfigTaskPadUnpad::BankIndex_outputTn);
         mode=1;
 
-    }else if(mode==2){ //UNPAD
+    }else if(unpad){ //UNPAD
         shape[rank-1] = lastDimUnpadded;
-        OclTensorF* outputTn = new OclTensorF(context, queue, shape, ConfigTaskUnpadding::BankIndex_outputTn);
-        //std::cout<<"dim0:"<<dim0<<", dim1:"<<dim1<<", lastDimUnpadded:"<<lastDimUnpadded<<std::endl;
+        outputTn = new OclTensorF(context, queue, shape, ConfigTaskPadUnpad::BankIndex_outputTn);
+        //std::cout<<"dim0:"<<dim0<<", dim1:"<<dim1<<std::endl;
         mode=2;
     
     }else{
@@ -594,6 +593,11 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
     }
 
     OclKernelObject *kernelObject = oclKernels[9];
+    std::cout<<"dim0:"<<dim0<<", dim1:"<<dim1<<
+                ", lastDimPadded:"<<lastDimPadded<<
+                ", lcm:"<<lcm<<
+                ", lastDimUnpadded:"<<lastDimUnpadded<<
+                std::endl;
 
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)outputTn)->ocl_buff));
@@ -602,7 +606,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, dim1));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lastDimPadded));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lcm));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, unpad_dim1Unpadded));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lastDimUnpadded));
 
     cl::Event exeEvt;
     OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));

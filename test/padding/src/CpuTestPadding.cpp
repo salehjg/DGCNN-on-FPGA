@@ -13,13 +13,15 @@
 using namespace std;
 
 extern "C"
-void task_pad_last_dim(
+void task_pad_unpad(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
-    const unsigned int dim0,
-    const unsigned int dim1,
-    const unsigned int dim1Padded,
-    const unsigned int lcm);
+    const unsigned mode,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned pad_dim1Padded,
+    const unsigned pad_lcm,
+    const unsigned unpad_dim1Unpadded);
 
 template<unsigned int vecSize>
 int TestPadding(
@@ -64,7 +66,7 @@ int TestPadding(
     const auto deviceInputTn = Pack<vecSize, float>(hostInputTn);
     auto deviceOutputTn = Pack<vecSize, float>(hostGold);
 
-    task_pad_last_dim(deviceInputTn.data(), deviceOutputTn.data(), dim0, dim1, dim1Padded, lcm);
+    task_pad_unpad(deviceInputTn.data(), deviceOutputTn.data(), 1, dim0, dim1, dim1Padded, lcm, 0);
     PadTensor<CONFIG_DTYPE>(hostInputTn, hostGold, dim0, dim1, dim1Padded);
 
     const auto hostOutputTn = Unpack<vecSize, float>(deviceOutputTn);

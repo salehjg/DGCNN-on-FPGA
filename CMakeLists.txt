@@ -320,8 +320,8 @@ string(REPLACE ";" " " SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER}" )
 message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
 
 set(SP_TAG_PADUNPAD
-"--sp task_pad_last_dim_1.inputTn:bank${CFG13_PadUnpad_DDRBANK_inputTn}\
- --sp task_pad_last_dim_1.outputTn:bank${CFG13_PadUnpad_DDRBANK_outputTn}")
+"--sp task_pad_unpad_1.inputTn:bank${CFG13_PadUnpad_DDRBANK_inputTn}\
+ --sp task_pad_unpad_1.outputTn:bank${CFG13_PadUnpad_DDRBANK_outputTn}")
 
 
 

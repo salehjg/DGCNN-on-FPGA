@@ -10,18 +10,18 @@
 #include "PaddingCpu.h"
 
 using namespace std;
-using namespace ConfigTaskReduceMax;
+using namespace ConfigTaskReduce::Max3D;
 
 extern "C"
-void task_reducesum(
-    const MemoryPackF_t *inputTn,
-    MemoryPackF_t *outputTn,
-    const unsigned dim0,
-    const unsigned dim1,
-    const unsigned dim2,
-    const int overaxis0,
-    const int overaxis1,
-    const int overaxis2);
+void task_reduce(
+        const MemoryPackF_t *inputTn,
+        MemoryPackF_t *outputTn,
+        const unsigned mode,
+        const unsigned pow_y,
+        const unsigned dim0,
+        const unsigned dim1,
+        const unsigned dim2,
+        const unsigned dim3);
 
 void GoldReduceSum(
     const CONFIG_DTYPE *inputTn,
@@ -93,13 +93,12 @@ int TestReduceSum(
     auto deviceInputTn = Pack<vecSize, CONFIG_DTYPE>(hostInputTnPadded);
     auto deviceOutputTn = Pack<vecSize, CONFIG_DTYPE>(hostUDT);
 
-    task_reducesum(
+    task_reduce(
         deviceInputTn.data(),
         deviceOutputTn.data(),
-        dim0, dim1, dim2, 
-        (int)overaxis0,
-        (int)overaxis1,
-        (int)overaxis2);
+        1,
+        0,
+        dim0, dim1, dim2, 0);
 
     GoldReduceSum(
         hostInputTn.data(), 
