@@ -25,6 +25,8 @@ message("CMake Version: ${CMAKE_VERSION}")
 #-DKERNEL_LOGS -DHLSLIB_SYNTHESIS
 
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
+
+set(BuildRelease ON CACHE BOOL "Build the host application and CpuTests with release mode.")
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path")
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
 set(SYNTH_FLAGS "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
@@ -62,7 +64,14 @@ include(CheckTypeSize)
 include_directories(config/output inc hlslib/include ${CMAKE_BINARY_DIR} ${SDAccel_INCLUDE_DIRS})
 add_definitions(-DREPO_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_definitions(-DBIN_DIR=\"${CMAKE_BINARY_DIR}\")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+
+if(BuildRelease)
+    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3")
+else()
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -g")
+endif()
 
 #add_definitions("-DHLSLIB_STREAM_TIMEOUT=16")
 if(((${SDAccel_MAJOR_VERSION} LESS 2018) AND (${SDAccel_MINOR_VERSION} LESS 3)) OR ${SDAccel_MAJOR_VERSION} LESS 2017)
