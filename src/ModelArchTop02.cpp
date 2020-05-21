@@ -2,10 +2,10 @@
 // Created by saleh on 8/28/18.
 //
 
-#include "ModelArchTop04.h"
+#include "ModelArchTop02.h"
 
 
-ModelArchTop04::ModelArchTop04(int dataset_offset, int batchsize, int pointcount, int knn_k) {
+ModelArchTop02::ModelArchTop02(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
     DB_OFFSET = dataset_offset;
     B = (unsigned)batchsize;
@@ -17,28 +17,28 @@ ModelArchTop04::ModelArchTop04(int dataset_offset, int batchsize, int pointcount
 #endif
 }
 
-ModelInfo ModelArchTop04::GetModelInfo() {
+ModelInfo ModelArchTop02::GetModelInfo() {
     ModelInfo tmplt;
     tmplt.ModelType="Classifier";
-    tmplt.Version="4.0";
+    tmplt.Version="2.0";
     tmplt.DesignNotes=
-            "1) Based on ModelArchTop05, edited to be compatible with sw-emu.\n"
-            "2) all of the layers are on OCL except TopK and Conv2 which are multi-PE.";
+            "1) FPGA only.\n"
+            "2) ";
     tmplt.ExperimentNotes="";
     tmplt.ToDo=""
                "";
-    tmplt.Date="99.1.16";
+    tmplt.Date="99.3.2";
     return tmplt;
 }
 
-void ModelArchTop04::SetModelInput_data(string npy_pcl) {
+void ModelArchTop02::SetModelInput_data(string npy_pcl) {
     _npy_pcl = cnpy::npy_load(npy_pcl);
     input_pcl_BxNxD = new TensorF({B,N,3}, _npy_pcl.data<float>());
     input_pcl_BxNxD += DB_OFFSET*N*3;///TODO: CHECK COMPATIBILITY FOR GPU TENSOR(CUDA & OCL)
     assert( N == (int)(_npy_pcl.shape[1]) );
 }
 
-void ModelArchTop04::SetModelInput_labels(string npy_labels) {
+void ModelArchTop02::SetModelInput_labels(string npy_labels) {
     // dataType of npy file should be int32, NOT uchar8!
     // use dataset_B5_labels_int32.npy
     _npy_labels = cnpy::npy_load(npy_labels);
@@ -46,7 +46,7 @@ void ModelArchTop04::SetModelInput_labels(string npy_labels) {
     input_labels_B->_buff += DB_OFFSET;
 }
 
-TensorF* ModelArchTop04::FullyConnected_Forward(WorkScheduler scheduler, TensorF* input_BxD, TensorF* weights, TensorF* biases){
+TensorF* ModelArchTop02::FullyConnected_Forward(WorkScheduler scheduler, TensorF* input_BxD, TensorF* weights, TensorF* biases){
     int ch_out = (int)weights->getShape().back();
     TensorF* tmp = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,input_BxD,weights);
     TensorF* rsltTn = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,tmp,biases,MAT_OPS::ADD);
@@ -54,7 +54,7 @@ TensorF* ModelArchTop04::FullyConnected_Forward(WorkScheduler scheduler, TensorF
     return rsltTn;
 }
 
-TensorF* ModelArchTop04::Batchnorm_Forward(WorkScheduler scheduler, TensorF* input, TensorF* gamma, TensorF* beta, TensorF* ema_ave, TensorF* ema_var){
+TensorF* ModelArchTop02::Batchnorm_Forward(WorkScheduler scheduler, TensorF* input, TensorF* gamma, TensorF* beta, TensorF* ema_ave, TensorF* ema_var){
     int rank;
     float bn_decay = 0.5f;
 
@@ -183,7 +183,7 @@ TensorF* ModelArchTop04::Batchnorm_Forward(WorkScheduler scheduler, TensorF* inp
     return nullptr;
 }
 
-TensorF* ModelArchTop04::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input_BxNxD, TensorI *knn_output_BxNxK) {
+TensorF* ModelArchTop02::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input_BxNxD, TensorI *knn_output_BxNxK) {
     //Gather knn's indices from input array.
     TensorF* point_cloud_neighbors = platformSelector->Gather(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,knn_output_BxNxK,1);
 
@@ -204,7 +204,7 @@ TensorF* ModelArchTop04::GetEdgeFeatures(WorkScheduler scheduler, TensorF *input
     return edge_feature;
 }
 
-TensorF* ModelArchTop04::PairwiseDistance(WorkScheduler scheduler, TensorF *input_BxNxD) {
+TensorF* ModelArchTop02::PairwiseDistance(WorkScheduler scheduler, TensorF *input_BxNxD) {
     /*
     TensorF* point_cloud_transpose = platformSelector->Transpose(PLATFORMS::CPU,scheduler,input_BxNxD);
     TensorF* point_cloud_inner =  platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,input_BxNxD,point_cloud_transpose);
@@ -244,7 +244,7 @@ TensorF* ModelArchTop04::PairwiseDistance(WorkScheduler scheduler, TensorF *inpu
     return rsltTn;
 }
 
-TensorF* ModelArchTop04::TransformNet(WorkScheduler scheduler, TensorF* edgeFeatures){
+TensorF* ModelArchTop02::TransformNet(WorkScheduler scheduler, TensorF* edgeFeatures){
 
     TensorF* net;
     {
@@ -509,7 +509,7 @@ TensorF* ModelArchTop04::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
 /// Returns per-class score tensor of shape=40 and rank=1
 /// \param scheduler
 /// \return
-TensorF* ModelArchTop04::Execute(WorkScheduler scheduler) {
+TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     TensorF* net;
     TensorF* net_BxNx3;
 
@@ -887,10 +887,10 @@ TensorF* ModelArchTop04::Execute(WorkScheduler scheduler) {
     return net;
 }
 
-TensorI* ModelArchTop04::GetLabels(){
+TensorI* ModelArchTop02::GetLabels(){
     return input_labels_B;
 }
 
-int ModelArchTop04::GetBatchSize(){
+int ModelArchTop02::GetBatchSize(){
     return B;
 }

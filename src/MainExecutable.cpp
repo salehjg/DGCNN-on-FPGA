@@ -14,7 +14,7 @@ string globalArgXclBin;
 string globalArgDataPath;
 unsigned globalBatchsize;
 bool globalRunTests=true;
-bool globalRunClassifier=false;
+bool globalRunClassifier=true;
 
 void handler(int sig) {
     void *array[40];
@@ -56,13 +56,13 @@ int main(int argc, const char* argv[]){
         .required(false);  
 
     parser.add_argument()
-        .names({"-x", "--notests"})
-        .description("Disable running OCl tests(no value is needed for this argument)")
+        .names({"-t", "--testsonly"})
+        .description("Only run OCl tests(no value is needed for this argument)")
         .required(false);
 
     parser.add_argument()
-        .names({"-y", "--noclassifier"})
-        .description("Disable running OCl Classifier(no value is needed for this argument)")
+        .names({"-c", "--classifieronly"})
+        .description("Only run OCl classifier(no value is needed for this argument)")
         .required(false);    
 
     parser.enable_help();
@@ -103,12 +103,16 @@ int main(int argc, const char* argv[]){
         }
     }
 
-    if(parser.exists("notests")) {
-        globalRunTests = false;
+    if(parser.exists("testsonly")) {
+        globalRunClassifier = false;
+        globalRunTests = true;
+        std::cout<<"Only OCl tests are going to be run."<<std::endl;
     }
 
-    if(parser.exists("noclassifier")) {
-        globalRunClassifier = false;
+    if(parser.exists("classifieronly")) {
+        globalRunClassifier = true;
+        globalRunTests = false;
+        std::cout<<"Only OCl classifier is going to be run."<<std::endl;
     }
 
     if(globalRunTests){
@@ -116,9 +120,8 @@ int main(int argc, const char* argv[]){
         cout<< "Running Kernel Unit Tests ...\n" <<endl;
         XilinxImpUnitTests xilinxImpUnitTests;
         xilinxImpUnitTests.RunAll();
-        //xilinxImpUnitTests.~XilinxImpUnitTests();
     }
-    //---------------------
+
     if(globalRunClassifier){
         cout<< "======================================================" <<endl;
         cout<< "Running Selected ModelArch ...\n" <<endl;

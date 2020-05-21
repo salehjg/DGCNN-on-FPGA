@@ -92,9 +92,8 @@ Refer to the table below.
 
 Name | Supported Platform | Implementation | Notes
 ---  | ---                | --- | ---
-ModelArch01 | CPU                   | CPU | Review's needed
-ModelArch05 | CPU, FPGA             | Xilinx SDAccel Platform | Review's needed
-ModelArch04 | CPU             | CPU | Compatible with new `Tile` layer
+ModelArch01 | CPU         | CPU | CPU Only
+ModelArch02 | CPU, FPGA   | Xilinx SDAccel Platform | FPGA Only
 
 # UnitTests for The Platforms
 This repository has only one main executable(MainExecutable.cpp) that handles both the classifier and the unit tests while you can enable or disable each phase in the source code.
@@ -129,7 +128,7 @@ These repositories are used in this project:
 * [cnpy](https://github.com/rogersce/cnpy)
 * [PointNet](https://github.com/charlesq34/pointnet)
 * [PointNet++](https://github.com/charlesq34/pointnet2)
-
+* [argparse](https://github.com/jamolnng/argparse)
 
 
 

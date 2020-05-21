@@ -20,14 +20,14 @@ ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount
 ModelInfo ModelArchTop01::GetModelInfo() {
     ModelInfo tmplt;
     tmplt.ModelType="Classifier";
-    tmplt.Version="4.0";
+    tmplt.Version="2.0";
     tmplt.DesignNotes=
-            "1) Based on ModelArchTop05, edited to be compatible with sw-emu.\n"
-            "2) all of the layers are on OCL except TopK and Conv2 which are multi-PE.";
+            "1) CPU only.\n"
+            "2) ";
     tmplt.ExperimentNotes="";
     tmplt.ToDo=""
                "";
-    tmplt.Date="99.1.16";
+    tmplt.Date="99.3.2";
     return tmplt;
 }
 
