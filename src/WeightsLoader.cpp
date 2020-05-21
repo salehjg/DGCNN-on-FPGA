@@ -45,7 +45,7 @@ void WeightsLoader::LoadFromDisk(string weightsBaseDir, string pathToTxtFnameLis
 
     ifstream txtfile (pathToTxtFnameList);
     if (!txtfile.is_open()) {
-        cout<<"Failed to open text file (WeightsLoader::LoadFromDisk)!";
+        cout<<"Failed to open text file (WeightsLoader::LoadFromDisk)!"<<endl;
         return;
     }
 

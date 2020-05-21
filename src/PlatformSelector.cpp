@@ -2,6 +2,7 @@
 // Created by saleh on 8/22/18.
 //
 
+#include "build_config.h"
 #include "../inc/PlatformSelector.h"
 #include "../inc/cpu_imp/CpuImplementation.h"
 
@@ -47,8 +48,8 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
     if(!loadWeights) cout<<"/!\\ Weight are not loaded into device memory."<<endl;
 #ifdef USE_OCL
     if(loadWeights){
-        std::string wDir(globalArgDataPath); wDir.append("/weights/");
-        std::string wFileList(globalArgDataPath); wFileList.append("/weights/filelist.txt");
+        std::string wDir = globalArgDataPath; wDir.append("/weights/");
+        std::string wFileList = globalArgDataPath; wFileList.append("/weights/filelist.txt");
         cout<< "Weights Dir: " << wDir << endl;
         cout<< "Weights File List Path: " << wFileList << endl;
         weightsLoader->LoadFromDisk(wDir.c_str() ,

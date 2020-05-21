@@ -43,8 +43,7 @@ XilinxImplementation::XilinxImplementation(int aa){
         deviceName = device.getInfo<CL_DEVICE_NAME>();
         cout << "Found Device=" << deviceName.c_str() << endl;
 
-        string strPath(globalArgXclBin);
-        auto fileBuf = xcl::read_binary_file(strPath);
+        auto fileBuf = xcl::read_binary_file(globalArgXclBin);
         cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
         OCL_CHECK(err,program = new cl::Program(*context, {device}, bins, NULL, &err));
     }

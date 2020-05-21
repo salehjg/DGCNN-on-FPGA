@@ -3,6 +3,8 @@
 //
 #include <ModelArchTop04.h>
 #include <iostream>
+#include "build_config.h"
+
 using namespace std;
 
 void CalculateAccuracy(TensorF* scores, TensorI* labels, int B, int classCount){
@@ -60,10 +62,9 @@ void CalculateAccuracy(TensorF* scores, TensorI* labels, int B, int classCount){
 
 void ClassifierMultiplatform(){
     WorkScheduler scheduler;
-    int batchsize=5;
-    ModelArchTop04 modelArchTop(0,batchsize,1024,20);
-    std::string pclPath(globalArgDataPath); pclPath.append("/dataset/dataset_B2048_pcl.npy");
-    std::string labelPath(globalArgDataPath); labelPath.append("/dataset/dataset_B2048_labels_int32.npy");
+    ModelArchTop04 modelArchTop(0,globalBatchsize,1024,20);
+    std::string pclPath = globalArgDataPath; pclPath.append("/dataset/dataset_B2048_pcl.npy");
+    std::string labelPath = globalArgDataPath; labelPath.append("/dataset/dataset_B2048_labels_int32.npy");
 
     cout<<"PCL NPY PATH: "<<pclPath<<endl;
     cout<<"LBL NPY PATH: "<<labelPath<<endl;
@@ -73,7 +74,7 @@ void ClassifierMultiplatform(){
 
     double timerStart = seconds();
     TensorF* classScores = modelArchTop.Execute(scheduler);
-    cout<< "Total model execution time with "<< batchsize <<" as batchsize: " << seconds() -timerStart<<" S"<<endl;
+    cout<< "Total model execution time with "<< globalBatchsize <<" as batchsize: " << seconds() -timerStart<<" S"<<endl;
 
     CalculateAccuracy(classScores,modelArchTop.GetLabels(),modelArchTop.GetBatchSize(),40);
 }

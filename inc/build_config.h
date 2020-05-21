@@ -1,10 +1,8 @@
-//
-// Created by saleh on 11/9/18.
-//
-
+#include <string>
 #pragma once
 
-extern char* globalArgXclBin;
-extern char* globalArgDataPath;
+extern std::string globalArgXclBin;
+extern std::string globalArgDataPath;
+extern unsigned globalBatchsize;;
 
 #define USE_OCL

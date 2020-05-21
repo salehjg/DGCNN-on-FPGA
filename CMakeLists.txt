@@ -61,7 +61,13 @@ include(CheckTypeSize)
 
 
 
-include_directories(config/output inc hlslib/include ${CMAKE_BINARY_DIR} ${SDAccel_INCLUDE_DIRS})
+include_directories(
+    ${CMAKE_SOURCE_DIR}/config/output 
+    ${CMAKE_SOURCE_DIR}/inc 
+    ${CMAKE_SOURCE_DIR}/hlslib/include 
+    ${CMAKE_SOURCE_DIR}/argparse
+    ${CMAKE_BINARY_DIR} 
+    ${SDAccel_INCLUDE_DIRS})
 add_definitions(-DREPO_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_definitions(-DBIN_DIR=\"${CMAKE_BINARY_DIR}\")
 
@@ -433,7 +439,7 @@ set(HOSTSIDE_MAIN_SRC
 set(CMAKE_BUILD_TYPE Debug)
 
 add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
-target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
+target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z stdc++fs)
 
 add_executable(HostTest src/HostTest.cpp src/ocl_imp/xilinx/xcl2.cpp)
 target_link_libraries(HostTest ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
