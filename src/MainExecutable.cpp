@@ -10,12 +10,11 @@
 using namespace std;
 using namespace argparse;
 
-#define RUN_KERNELTESTS false    
-#define RUN_MODELARCH   true
-
 string globalArgXclBin;
 string globalArgDataPath;
 unsigned globalBatchsize;
+bool globalRunTests=true;
+bool globalRunClassifier=false;
 
 void handler(int sig) {
     void *array[40];
@@ -56,6 +55,16 @@ int main(int argc, const char* argv[]){
         .description("Forced emulation mode(sw_emu or hw_emu)")
         .required(false);  
 
+    parser.add_argument()
+        .names({"-x", "--notests"})
+        .description("Disable running OCl tests(no value is needed for this argument)")
+        .required(false);
+
+    parser.add_argument()
+        .names({"-y", "--noclassifier"})
+        .description("Disable running OCl Classifier(no value is needed for this argument)")
+        .required(false);    
+
     parser.enable_help();
     auto err = parser.parse(argc, argv);
     if(err){
@@ -94,7 +103,15 @@ int main(int argc, const char* argv[]){
         }
     }
 
-    if(RUN_KERNELTESTS){
+    if(parser.exists("notests")) {
+        globalRunTests = false;
+    }
+
+    if(parser.exists("noclassifier")) {
+        globalRunClassifier = false;
+    }
+
+    if(globalRunTests){
         cout<< "======================================================" <<endl;
         cout<< "Running Kernel Unit Tests ...\n" <<endl;
         XilinxImpUnitTests xilinxImpUnitTests;
@@ -102,7 +119,7 @@ int main(int argc, const char* argv[]){
         //xilinxImpUnitTests.~XilinxImpUnitTests();
     }
     //---------------------
-    if(RUN_MODELARCH){
+    if(globalRunClassifier){
         cout<< "======================================================" <<endl;
         cout<< "Running Selected ModelArch ...\n" <<endl;
         ClassifierMultiplatform();
