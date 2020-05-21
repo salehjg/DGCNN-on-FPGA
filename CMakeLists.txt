@@ -407,10 +407,7 @@ add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh)
 
 
 set(HOSTSIDE_SRC
-    #src/ClassifierMultiPlatform.cpp
     src/cnpy.cpp
-    #src/MainExecutable.cpp
-    #src/ModelArchTop05.cpp
     src/PlatformImplementation.cpp
     src/PlatformSelector.cpp
     src/TensorF.cpp
@@ -423,7 +420,6 @@ set(HOSTSIDE_SRC
     src/ocl_imp/DataMover.cpp
     src/ocl_imp/xilinx/xcl2.cpp
     src/ocl_imp/xilinx/XilinxImplementation.cpp
-    #src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
 set(HOSTSIDE_MAIN_SRC

@@ -9,8 +9,8 @@
 using namespace std;
 
 
-#define RUN_KERNELTESTS true    
-#define RUN_MODELARCH   false 
+#define RUN_KERNELTESTS false    
+#define RUN_MODELARCH   true 
 
 char* globalArgXclBin;
 char* globalArgDataPath;
