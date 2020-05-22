@@ -23,7 +23,7 @@ ModelInfo ModelArchTop01::GetModelInfo() {
     tmplt.Version="2.0";
     tmplt.DesignNotes=
             "1) CPU only.\n"
-            "2) ";
+            "2) Weights are on CPU.";
     tmplt.ExperimentNotes="";
     tmplt.ToDo=""
                "";

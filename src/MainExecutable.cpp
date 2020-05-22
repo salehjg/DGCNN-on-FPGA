@@ -15,6 +15,7 @@ string globalArgDataPath;
 unsigned globalBatchsize;
 bool globalRunTests=true;
 bool globalRunClassifier=true;
+bool globalDumpTensors=false;
 
 void handler(int sig) {
     void *array[40];
@@ -63,7 +64,12 @@ int main(int argc, const char* argv[]){
     parser.add_argument()
         .names({"-c", "--classifieronly"})
         .description("Only run OCl classifier(no value is needed for this argument)")
-        .required(false);    
+        .required(false);   
+
+    parser.add_argument()
+        .names({"-k", "--dumptensors"})
+        .description("Dump tensors into *.npy files in the data directory(no value is needed for this argument)")
+        .required(false);      
 
     parser.enable_help();
     auto err = parser.parse(argc, argv);
@@ -113,6 +119,11 @@ int main(int argc, const char* argv[]){
         globalRunClassifier = true;
         globalRunTests = false;
         std::cout<<"Only OCl classifier is going to be run."<<std::endl;
+    }
+
+    if(parser.exists("dumptensors")) {
+        globalDumpTensors = true;
+        std::cout<<"Tensors will be dumped into separate numpy files in the data directory."<<std::endl;
     }
 
     if(globalRunTests){

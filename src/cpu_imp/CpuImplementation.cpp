@@ -9,6 +9,7 @@
 #include "../../inc/TensorF.h"
 #include <cmath>
 #include <algorithm>
+#include "build_config.h"
 
 using namespace std;
 ///
@@ -1532,11 +1533,11 @@ void CpuImplementation::DumpMatrix(
         string npy_fname,
         TensorF* inputTn,
         string npy_dir){
-#ifdef DUMP_ENABLED
-    vector<unsigned> shape = inputTn->getShape();
-    vector<unsigned long> shape_size_t(shape.begin(), shape.end());
-    cnpy::npy_save<float>(npy_dir+npy_fname,inputTn->_buff, shape_size_t,"w");
-#endif
+    if(globalDumpTensors){
+        vector<unsigned> shape = inputTn->getShape();
+        vector<unsigned long> shape_size_t(shape.begin(), shape.end());
+        cnpy::npy_save<float>(npy_dir+npy_fname,inputTn->_buff, shape_size_t,"w");
+    }
 }
 
 void CpuImplementation::DumpMatrix(
@@ -1544,11 +1545,11 @@ void CpuImplementation::DumpMatrix(
         string npy_fname,
         TensorI* inputTn,
         string npy_dir){
-#ifdef DUMP_ENABLED
+    if(globalDumpTensors){
         vector<unsigned> shape = inputTn->getShape();
         vector<unsigned long> shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<int>(npy_dir+npy_fname,inputTn->_buff ,shape_size_t,"w");
-#endif
+    }
 }
 
 bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn1, TensorF *inputTn2) {

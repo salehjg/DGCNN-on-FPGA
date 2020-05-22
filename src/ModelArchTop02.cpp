@@ -23,7 +23,7 @@ ModelInfo ModelArchTop02::GetModelInfo() {
     tmplt.Version="2.0";
     tmplt.DesignNotes=
             "1) FPGA only.\n"
-            "2) ";
+            "2) Weights are on FPGA.";
     tmplt.ExperimentNotes="";
     tmplt.ToDo=""
                "";
@@ -533,7 +533,7 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
         TensorF *adj_matrix = PairwiseDistance(scheduler, net_BxNx3);
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B01_tnet_adj_matrix.npy",adj_matrix);
 
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
 
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B02_tnet_nn_idx.npy",nn_idx);
@@ -560,7 +560,7 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     cout<<"STATUS: "<<"DGCCN0 Started"<<endl;
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
                                                  edge_features,
@@ -604,7 +604,7 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     cout<<"STATUS: "<<"DGCCN1 Started"<<endl;
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
                                                  edge_features,
@@ -646,7 +646,7 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     cout<<"STATUS: "<<"DGCCN2 Started"<<endl;
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
                                                  edge_features,
@@ -688,7 +688,7 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     cout<<"STATUS: "<<"DGCCN3 Started"<<endl;
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
                                                  edge_features,

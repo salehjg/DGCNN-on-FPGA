@@ -6,6 +6,7 @@
 #include <cassert>
 #include <ocl_imp/xilinx/XilinxImplementation.h>
 #include "xilinx/config.h"
+#include "build_config.h"
 #include <algorithm>
 #include <vector>
 
@@ -1300,11 +1301,11 @@ void XilinxImplementation::DumpMatrix(
         TensorF* inputTn,
         string npy_dir){
     TensorF *_inputTn = ((OclTensorF*)inputTn)->TransferToHost(queue);
-#ifdef DUMP_ENABLED
+    if(globalDumpTensors){
         vector<unsigned int> shape = _inputTn->getShape();
         vector<unsigned long > shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<float>(npy_dir+npy_fname,_inputTn->_buff ,shape_size_t,"w");
-#endif
+    }
 }
 
 void XilinxImplementation::DumpMatrix(
@@ -1313,11 +1314,11 @@ void XilinxImplementation::DumpMatrix(
         TensorI* inputTn,
         string npy_dir){
     TensorI *_inputTn = ((OclTensorI*)inputTn)->TransferToHost(queue);
-#ifdef DUMP_ENABLED
+    if(globalDumpTensors){
         vector<unsigned int> shape = _inputTn->getShape();
-        vector<unsigned long  > shape_size_t(shape.begin(), shape.end());
+        vector<unsigned long> shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<int>(npy_dir+npy_fname,_inputTn->_buff ,shape_size_t,"w");
-#endif
+    }
 }
 
 bool XilinxImplementation::CompareTensors(WorkScheduler scheduler,TensorF *inputTn1, TensorF *inputTn2) {

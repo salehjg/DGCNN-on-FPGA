@@ -14,9 +14,6 @@
 
 using namespace std;
 
-//#undef DUMP_ENABLED
-#define DUMP_ENABLED
-
 class CpuImplementation: public PlatformImplementation {
 public:
     CpuImplementation();///TODO: Constructor should handle platform initialization procedure!
