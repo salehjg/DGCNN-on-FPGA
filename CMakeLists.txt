@@ -364,7 +364,7 @@ add_custom_target(compile_hw COMMAND sh Compile_Hw_Batch.sh)
 add_custom_target(compile_hwemu COMMAND sh Compile_HwEmu_Batch.sh)
 add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh)
 
-set(SlrUtilOutputFile ${CMAKE_BINARY_DIR}/SLR_UTILIZATION_REPORT.txt)
+set(SlrUtilOutputFile ${CMAKE_BINARY_DIR}/SLR_UTILIZATION.log)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 set(SlrUtilFilePath ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
@@ -457,6 +457,7 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hwemu.sh ${CMAKE_BINARY_DIR
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hw.sh ${CMAKE_BINARY_DIR}/autobuild_hw.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/PasteBinAgentForAutoBuilds.py ${CMAKE_BINARY_DIR}/PasteBinAgentForAutoBuilds.py @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/sdaccel.ini ${CMAKE_BINARY_DIR}/sdaccel.ini COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/gather_results.sh ${CMAKE_BINARY_DIR}/gather_results.sh COPYONLY)
 
 include(CTest)
 add_subdirectory("test")

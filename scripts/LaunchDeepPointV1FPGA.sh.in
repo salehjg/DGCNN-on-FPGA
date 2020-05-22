@@ -48,7 +48,8 @@ case $mode in
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 	echo -e "${GREEN}Launching DeepPointV1FPGA...${NC}"
 	echo ""
-	$hostsideexe -i $xclbin_swemu -d $datadir "$@"
+	$hostsideexe -i $xclbin_swemu -d $datadir "$@" 2>&1 | tee -a DeepPointV1FPGA_Host.log
+	sh gather_results.sh
 	
 	;;
 
@@ -75,7 +76,8 @@ case $mode in
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 	echo -e "${GREEN}Launching DeepPointV1FPGA...${NC}"
 	echo ""
-	$hostsideexe -i $xclbin_hwemu -d $datadir "$@"
+	$hostsideexe -i $xclbin_hwemu -d $datadir "$@" 2>&1 | tee -a DeepPointV1FPGA_Host.log
+	sh gather_results.sh
 
 	;;
 
@@ -99,7 +101,8 @@ case $mode in
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' - 
 	echo -e "${GREEN}Launching DeepPointV1FPGA...${NC}"
 	echo ""
-	$hostsideexe -i $xclbin_hw -d $datadir "$@" 2>&1 | tee -a DeepPointV1FPGA_Host_Log.txt
+	$hostsideexe -i $xclbin_hw -d $datadir "$@" 2>&1 | tee -a DeepPointV1FPGA_Host.log
+	sh gather_results.sh
 
 	;; 
 
