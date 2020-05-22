@@ -13,7 +13,7 @@ using namespace argparse;
 string globalArgXclBin;
 string globalArgDataPath;
 unsigned globalBatchsize;
-bool globalRunTests=true;
+bool globalRunTests=false;
 bool globalRunClassifier=true;
 bool globalDumpTensors=false;
 
