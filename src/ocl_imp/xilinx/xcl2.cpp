@@ -27,8 +27,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
 
-#include "ocl_imp/xilinx/xcl2.hpp"
 #include "build_config.h"
+#include "ocl_imp/xilinx/xcl2.hpp"
 #include <limits.h>
 #include <sys/stat.h>
 #include <unistd.h>

@@ -45,7 +45,7 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
     }
 
     weightsLoader = new WeightsLoader(neededPlatforms);
-    if(!loadWeights) SPDLOG_LOGGER_WARN(logger,"Weight are not loaded into device memory");
+    if(!loadWeights) SPDLOG_LOGGER_WARN(logger,"Weights are not loaded to the device memory");
 #ifdef USE_OCL
     if(loadWeights){
         std::string wDir = globalArgDataPath; wDir.append("/weights/");

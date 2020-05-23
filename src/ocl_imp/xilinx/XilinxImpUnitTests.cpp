@@ -1,7 +1,8 @@
+#include "xilinx/config.h"
 #include <ocl_imp/xilinx/XilinxImpUnitTests.h>
 #include <ocl_imp/xilinx/AxiHelper.h>
 #include <cnpy.h>
-#include "xilinx/config.h"
+
 
 XilinxImpUnitTests::XilinxImpUnitTests(){
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL, {PLATFORMS::CPU,PLATFORMS::GPU_OCL},false);
@@ -95,9 +96,9 @@ TensorI* XilinxImpUnitTests::GenerateTensorInteger(int intMin, int intMax, vecto
 void XilinxImpUnitTests::PrintReport(ReportObject *reportObj){
     if(reportObj){
         if(reportObj->passed)
-            cout << "\033[1;36mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
+            SPDLOG_LOGGER_INFO(logger,"\033[1;36mTEST: {}\t\tRESULT: {}\033[0m", reportObj->unitTestName, "PASS");
         else
-            cout << "\033[1;31mTEST: "<<reportObj->unitTestName << "\t\tRESULT: "<< (reportObj->passed? "PASS":"FAIL") << "\033[0m"<<endl;
+            SPDLOG_LOGGER_ERROR(logger,"\033[1;31mTEST: {}\t\tRESULT: {}\033[0m", reportObj->unitTestName, "FAIL");
     }
 }
 
@@ -202,7 +203,10 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankFloat(){
 
     for(unsigned bankSrc:Banks){
         for(unsigned bankDest:Banks){
-            std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
+            SPDLOG_LOGGER_INFO(logger,"From bank {} to {}", bankSrc, bankDest);
+            if(err>0){
+                SPDLOG_LOGGER_ERROR(logger,"Tensor data mismatch");
+            }
             OclTensorF* tensorCloned_BankB = (OclTensorF*)
                 tensorSrc_defaultBank->CloneIfNeededToDDRBank(
                     platformSelector->openclPlatformClass->getProgram(),
@@ -260,7 +264,10 @@ ReportObject* XilinxImpUnitTests::TensorCloneBankInteger(){
 
     for(unsigned bankSrc:Banks){
         for(unsigned bankDest:Banks){
-            std::cout<<"\tFrom bank "<<bankSrc<<" to "<<bankDest<<", current error count: "<<err<<std::endl;
+            SPDLOG_LOGGER_INFO(logger,"From bank {} to {}", bankSrc, bankDest);
+            if(err>0){
+                SPDLOG_LOGGER_ERROR(logger,"Tensor data mismatch");
+            }
 
             OclTensorI* tensorCloned_BankB = (OclTensorI*)
                     tensorSrc_defaultBank->CloneIfNeededToDDRBank(
@@ -539,9 +546,9 @@ ReportObject* XilinxImpUnitTests::KernelSquare(){
 
 ReportObject* XilinxImpUnitTests::KernelMatops(){
     bool comparisonResult=true;
-    bool printLog=false;
+    bool printLog=true;
 
-    if(printLog) cout << "TEST(Rank_4_4)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_4_4)");
     {
         //Ranks: 4,4
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -597,7 +604,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     }
     */
     
-    if(printLog) cout << "TEST(Rank_4_1)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_4_1)");
     {
         //Ranks: 4,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -610,7 +617,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    if(printLog) cout << "TEST(Rank_4_1)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_4_1)");
     {
         //Ranks: 4,4
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -624,7 +631,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    if(printLog) cout << "TEST(Rank_4_0)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_4_0)");
     {
         //Ranks: 4,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -636,7 +643,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    if(printLog) cout << "TEST(Rank_3_3)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_3_3)");
     {
         //Ranks: 3,3
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -664,7 +671,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     }
     */
 
-    if(printLog) cout << "TEST(Rank_3_1)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_3_1)");
     {
         //Ranks: 3,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -677,7 +684,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    if(printLog) cout << "TEST(Rank_3_0)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_3_0)");
     {
         //Ranks: 3,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -689,7 +696,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    if(printLog) cout << "TEST(Rank_2_2)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_2_2)");
     {
         //Ranks: 2,2
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -703,7 +710,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     }
 
     
-    if(printLog) cout << "TEST(Rank_2_1)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_2_1)");
     {
         //Ranks: 2,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -716,7 +723,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
     
-    if(printLog) cout << "TEST(Rank_2_0)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_2_0)");
     {
         //Ranks: 2,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -728,7 +735,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    if(printLog) cout << "TEST(Rank_1_1)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_1_1)");
     {
         //Ranks: 1,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -741,7 +748,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
     }
 
-    if(printLog) cout << "TEST(Rank_1_0)"<<endl;
+    if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_1_0)");
     {
         //Ranks: 1,0
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -873,7 +880,7 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
 ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
     if(platformSelector->openclPlatformClass->GetModeEnvVar()!=RUN_MODE::HwEmu){
         ReportObject* obj = new ReportObject(__FUNCTION__, false);
-        cerr << "KernelConv2Mlp: Skipping, only HwEmu mode is supported."<<endl;
+        SPDLOG_LOGGER_WARN(logger,"Skipping KernelConv2Mlp, only HwEmu mode is supported");
         return obj;
     }
     bool comparisonResult = true;
@@ -892,12 +899,11 @@ ReportObject* XilinxImpUnitTests::KernelConv2Mlp(){
 ReportObject* XilinxImpUnitTests::KernelTopK(){
     if(platformSelector->openclPlatformClass->GetModeEnvVar()!=RUN_MODE::HwEmu){
         ReportObject* obj = new ReportObject(__FUNCTION__, false);
-        cerr << "KernelTopK: Skipping, only HwEmu mode is supported."<<endl;
+        SPDLOG_LOGGER_WARN(logger,"Skipping KernelTopK, only HwEmu mode is supported");
         return obj;
     }
     const unsigned kVal=20 , N=ConfigTaskTopK::MaxSliceLen , B=ConfigTaskTopK::UnitCount+2;
-    cout<<"Please confirm that TOPK kernel is configured for K="<< kVal
-        <<" and N="<< N <<", Press ESC to skip..."<<endl; 
+    SPDLOG_LOGGER_INFO(logger,"Please confirm that TOPK kernel is configured for K={} and N={}, Press ESC to skip...",kVal,N);    
     if(cin.get()==27) return nullptr;
     assert(N==ConfigTaskTopK::MaxSliceLen);
 
@@ -918,10 +924,12 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
                     unsigned int i = b*N*kVal + n1*kVal + kk;
                     int rCpu = tensorCpu->_buff[i];
                     int rUdt = tensorGpuTransfered->_buff[i];
-                    printf("Index(B,N,K)= (%02d, %02d, %02d)\t\trCPU=%04d, rUDT=%04d\t\tValue[rCPU]:%f\tValue[rUDT]:%f\n",
-                       b, n1, kk,
-                       rCpu,rUdt,
-                       tensorSrc->_buff[b*N*N+ n1*N+ rCpu], tensorSrc->_buff[b*N*N+ n1*N+ rUdt]);
+                    SPDLOG_LOGGER_INFO(
+                        logger,
+                        "Index(B,N,K)= ({},{},{}), rCPU={}, rUDT={}, Value[rCPU]={}, Value[rUDT]={}",
+                        b,n1,kk,
+                        rCpu,rUdt,
+                        tensorSrc->_buff[b*N*N+ n1*N+ rCpu], tensorSrc->_buff[b*N*N+ n1*N+ rUdt]);
 
                     /*cout <<
                             "Index(B,N,K)= ("<< b <<", "<<n1<<", "<<kk<<")   " <<
@@ -951,28 +959,8 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
     return obj;
 }
 
-ReportObject* XilinxImpUnitTests::temporaryUnitTest1(){
-    bool comparisonResult=true;
-
-
-    cout << "TEST(Rank_4_0)"<<endl;
-    {
-        //Ranks: 4,0
-        vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
-        TensorF* tensorSrc1 = GenerateTensor(3,{2,2,2,2});
-        for(MAT_OPS op : ops) {
-            TensorF *tensorCpu = platformSelector->MatOps(PLATFORMS::CPU, scheduler, tensorSrc1, 1.5f,op);
-            TensorF *tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL, scheduler, tensorSrc1, 1.5f,op);
-            comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu,tensorGpu);
-        }
-    }
-
-    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
-    return obj;
-}
-
 void XilinxImpUnitTests::RunAll(){
-    
+    /*
     PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
@@ -983,7 +971,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
     PrintReport(KernelConv2Mlp());
-    PrintReport(KernelTopK());
+    PrintReport(KernelTopK());*/
     PrintReport(KernelMatops());
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelReduceMax());
@@ -1002,7 +990,7 @@ void XilinxImpUnitTests::RunAll(){
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){
-    cout<<"~XilinxImpUnitTests"<<endl;
+    SPDLOG_LOGGER_TRACE(logger,"~XilinxImpUnitTests");
     delete(platformSelector);
 }
 
