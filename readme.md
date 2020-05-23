@@ -129,6 +129,7 @@ These repositories are used in this project:
 * [PointNet](https://github.com/charlesq34/pointnet)
 * [PointNet++](https://github.com/charlesq34/pointnet2)
 * [argparse](https://github.com/jamolnng/argparse)
+* [spdlog](https://github.com/gabime/spdlog)
 
 
 
