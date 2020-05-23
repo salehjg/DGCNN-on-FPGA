@@ -1,7 +1,3 @@
-//
-// Created by saleh on 8/22/18.
-//
-
 #include "../../inc/PlatformImplementation.h"
 #include "../../inc/PlatformSelector.h"
 #include "../../inc/cpu_imp/CpuImplementation.h"
@@ -12,12 +8,12 @@
 #include "build_config.h"
 
 using namespace std;
-///
+
 CpuImplementation::CpuImplementation(){
 
 }
 
-void CpuImplementation::PrintInfo(
+inline void CpuImplementation::PrintInfo(
         string opName,
         const string &setting1, int val1,
         const string &setting2, int val2,
@@ -28,13 +24,13 @@ void CpuImplementation::PrintInfo(
 
     string finalStr ;
     if(!setting1.empty() && !setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting1+ "=" + to_string(val1)+ ", " + setting2+ "=" + to_string(val2);
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1)+ ", " + setting2+ "=" + to_string(val2);
     }else if(!setting1.empty() && setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting1+ "=" + to_string(val1);
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1);
     }else if(setting1.empty() && !setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting2+ "=" + to_string(val2);
+        finalStr = "## " + opName + ": " + setting2+ "=" + to_string(val2);
     }else if(setting1.empty() && setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " ;
+        finalStr = "## " + opName + ": " ;
     }
 
     if(!setting3.empty()){
@@ -56,14 +52,17 @@ void CpuImplementation::PrintInfo(
         for(bool i : comb){ finalStr += to_string(i) + "-"; }
         finalStr += ", ";
     }
-    finalStr+="\n";
-    cout<<finalStr;
+    //finalStr+="\n";
+    SPDLOG_LOGGER_DEBUG(reporter, "{}", finalStr); // dbg level because this is not on device
 }
 
-//float* CpuImplementation::Transpose(float* input,int batchsize, int matrix_rank, int matrixH, int matrixW){
 TensorF* CpuImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedMat){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Transpose","",0,"",0,"",0,batchedMat->getShape(),{});
-    if(batchedMat->getRank()!=3){cout<<"Transpose: ERROR_BAD_MATRIX_RANK"<<endl;return nullptr;}
+    if(batchedMat->getRank()!=3){
+        SPDLOG_LOGGER_ERROR(logger,"Transpose: ERROR_BAD_MATRIX_RANK");
+        return nullptr;
+    }
     unsigned B, dim0, dim1;
     B = batchedMat->getShape()[0];
     dim0 = batchedMat->getShape()[1];
@@ -83,11 +82,12 @@ TensorF* CpuImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedM
         }
     }
     TensorF *rsltTn = new TensorF({B,dim1,dim0},rslt);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 
-/// // rslt = MAT1 * MAT2
+/// rslt = MAT1 * MAT2
 /// \param mat1
 /// \param mat2
 /// \param batchsize
@@ -97,12 +97,12 @@ TensorF* CpuImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedM
 /// \param matrixH2
 /// \param matrixW2
 /// \return
-/*float* CpuImplementation::MatMul(float* mat1,float* mat2,
-                              int batchsize, int matrix_rank,
-                              int matrixH1,int matrixW1,
-                              int matrixH2,int matrixW2){*/
-TensorF* CpuImplementation::MatMul(WorkScheduler scheduler,
-    TensorF* batchedMat1, TensorF* batchedMat2){
+TensorF* CpuImplementation::MatMul(
+    WorkScheduler scheduler,
+    TensorF* batchedMat1, 
+    TensorF* batchedMat2){
+
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatMul","",0,"",0,"",0,batchedMat1->getShape(),batchedMat2->getShape());
     int rankDiff = 3 - batchedMat1->getRank();
 
@@ -118,9 +118,18 @@ TensorF* CpuImplementation::MatMul(WorkScheduler scheduler,
     unsigned batchsize = batchedMat1->getShape()[0];
     unsigned matrix_rank = batchedMat1->getRank();
 
-    if(matrix_rank!=3){cout<<"MatMul: ERROR_BAD_MATRIX_RANK"<<endl;return nullptr;}
-    if(matrixW1!=matrixH2){cout<<"MatMul: ERROR_BAD_MATRIX_DIMs"<<endl;return nullptr;}
-    if(batchedMat1->getShape()[0]!=batchedMat2->getShape()[0]){cout<<"MatMul: ERROR_BAD_MATRIX_DIM0s"<<endl;return nullptr;}
+    if(matrix_rank!=3){
+        SPDLOG_LOGGER_ERROR(logger,"MatMul: ERROR_BAD_MATRIX_RANK");
+        return nullptr;
+    }
+    if(matrixW1!=matrixH2){
+        SPDLOG_LOGGER_ERROR(logger,"MatMul: ERROR_BAD_MATRIX_DIMs");
+        return nullptr;
+    }
+    if(batchedMat1->getShape()[0]!=batchedMat2->getShape()[0]){
+        SPDLOG_LOGGER_ERROR(logger,"MatMul: ERROR_BAD_MATRIX_DIM0s");
+        return nullptr;
+    }
     float* rslt = new float[batchsize*matrixH1*matrixW2];
     int indxS1=0;
     int indxS2=0;
@@ -160,14 +169,12 @@ TensorF* CpuImplementation::MatMul(WorkScheduler scheduler,
         rsltTn->SqueezeDimZero();
 
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
-/*
-float* CpuImplementation::MatMul(float* mat1,float scalar,
-                              int batchsize, int matrix_rank,
-                              int matrixH1,int matrixW1){*/
 TensorF* CpuImplementation::MatMul(WorkScheduler scheduler, TensorF* batchedMat, float scalar){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatMul_Scalar","",0,"",0,"scalarVal",scalar,batchedMat->getShape(),{});
     float* rslt = new float[batchedMat->getLength()];
     unsigned limit = batchedMat->getLength();
@@ -176,15 +183,17 @@ TensorF* CpuImplementation::MatMul(WorkScheduler scheduler, TensorF* batchedMat,
         rslt[b] = batchedMat->_buff[b] * scalar;
     }
     TensorF* rsltTn = new TensorF(batchedMat->getShape(),rslt);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
-/*float* CpuImplementation::Square(float* mat1,
-                              int batchsize, int matrix_rank,
-                              int matrixH1,int matrixW1){*/
 TensorF* CpuImplementation::Square(WorkScheduler scheduler, TensorF* batchedMat){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Square","",0,"",0,"",0,batchedMat->getShape(),{});
-    if(batchedMat->getRank()!=3){cout<<"Square: ERROR_BAD_MATRIX_RANK"<<endl;return nullptr;}
+    if(batchedMat->getRank()!=3){
+        SPDLOG_LOGGER_ERROR(logger,"Square: ERROR_BAD_MATRIX_RANK");
+        return nullptr;
+    }
     float* rslt = new float[batchedMat->getLength()];
     unsigned limit = batchedMat->getLength();
     ///TODO: Check index variables to be unsigned!
@@ -192,22 +201,16 @@ TensorF* CpuImplementation::Square(WorkScheduler scheduler, TensorF* batchedMat)
         rslt[b] = batchedMat->_buff[b] * batchedMat->_buff[b];
     }
     TensorF* rsltTn = new TensorF(batchedMat->getShape(),rslt);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
-/*
-float* CpuImplementation::ReduceSum(float* mat1,
-                           bool over_axis0,
-                           bool over_axis1,
-                           bool over_axis2,
-                           int dim0,
-                           int dim1,
-                           int dim2){*/
 TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
         TensorF* inputTn,
         bool over_axis0,
         bool over_axis1,
         bool over_axis2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceSum","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2});
 
     int rankDiff = 3 - inputTn->getRank();
@@ -222,7 +225,10 @@ TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
         dim1 = inputTn->getShape()[1],
         dim2 = inputTn->getShape()[2];
 
-    if(inputTn->getRank() != 3){cout<<"ReduceSum: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
+    if(inputTn->getRank() != 3){
+        SPDLOG_LOGGER_ERROR(logger,"ReduceSum: ERROR_BAD_TENSOR_RANK");
+        return nullptr;
+    }
 
     if(over_axis0==true &&
        over_axis1==true &&
@@ -239,6 +245,7 @@ TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
         for(int i=0;i<rankDiff;i++){
             inputTn->SqueezeDimZero();
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
@@ -265,6 +272,7 @@ TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
         for(int i=0;i<rankDiff;i++){
             inputTn->SqueezeDimZero();
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
@@ -292,6 +300,7 @@ TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
             inputTn->SqueezeDimZero();
             rsltTn->SqueezeDimZero();
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
@@ -319,32 +328,24 @@ TensorF* CpuImplementation::ReduceSum(WorkScheduler scheduler,
             inputTn->SqueezeDimZero();
             rsltTn->SqueezeDimZero();
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    cout<<"ReduceSum:ERROR_UNIMPLEMENTED_AXES_COMB"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"ReduceSum:ERROR_UNIMPLEMENTED_AXES_COMB");
     return nullptr;
 }
 
-///[axis0,axis1,axis2,axis3] //No batch op, uses data as is(as a matrix)
-/*float* CpuImplementation::ReduceSum4D(float* mat1,
-                             bool over_axis0,
-                             bool over_axis1,
-                             bool over_axis2,
-                             bool over_axis3,
-                             int dim0,
-                             int dim1,
-                             int dim2,
-                             int dim3){*/
+//[axis0,axis1,axis2,axis3] //Not a batch op, uses data as is(as a matrix)
 TensorF* CpuImplementation::ReduceSum4D(WorkScheduler scheduler,
                                         TensorF* inputTn,
                                         bool over_axis0,
                                         bool over_axis1,
                                         bool over_axis2,
                                         bool over_axis3){
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
-    //cout<<"**LA_SUM4D: "<<dim0<<","<<dim1<<","<<dim2<<","<<dim3<<";\n";
+
     unsigned indxS=0;
     unsigned indxD=0;
     float* rslt;
@@ -353,7 +354,10 @@ TensorF* CpuImplementation::ReduceSum4D(WorkScheduler scheduler,
         dim2 = inputTn->getShape()[2],
         dim3 = inputTn->getShape()[3];
 
-    if(inputTn->getRank() != 4){cout<<"ReduceSum4D: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
+    if(inputTn->getRank() != 4){
+        SPDLOG_LOGGER_ERROR(logger,"ReduceSum4D: ERROR_BAD_TENSOR_RANK");
+        return nullptr;
+    }
 
     if(over_axis0==true &&
        over_axis1==true &&
@@ -383,27 +387,14 @@ TensorF* CpuImplementation::ReduceSum4D(WorkScheduler scheduler,
             rslt[indxD] = sum;
         }
         TensorF* rsltTn = new TensorF({dim3},rslt);
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    cout<<"ReduceSum4D:ERROR_UNIMPLEMENTED_AXES_COMB"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"ReduceSum4D:ERROR_UNIMPLEMENTED_AXES_COMB");
     return nullptr;
 }
 
-/*
-float* CpuImplementation::Mean(
-        float* mat,
-        int rank,
-        bool mean_axis0,
-        bool mean_axis1,
-        bool mean_axis2,
-        bool mean_axis3,
-        int dim0,
-        int dim1,
-        int dim2,
-        int dim3
-
-){*/
 TensorF* CpuImplementation::Mean(
         WorkScheduler scheduler,
         TensorF* inputTn,
@@ -411,7 +402,7 @@ TensorF* CpuImplementation::Mean(
         bool mean_axis1,
         bool mean_axis2,
         bool mean_axis3){
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Mean","",0,"",0,"",0,inputTn->getShape(),{},{mean_axis0,mean_axis1,mean_axis2,mean_axis3});
     unsigned dim0 = inputTn->getShape()[0],
         dim1 = inputTn->getShape()[1],
@@ -419,25 +410,11 @@ TensorF* CpuImplementation::Mean(
         dim3 = inputTn->getShape()[3];
     int rank = inputTn->getRank();
 
-    //cout      <<"**LA_Mean: Rank: "<< rank << "  dims: "<<dim0<<","<<dim1<<","<<dim2<<","<<dim3<<
-    //            "  overaxes: "<<mean_axis0<<","<<mean_axis1<<","<<mean_axis2<<","<<mean_axis3<<";\n";
-
     if(rank==4){
         if(!mean_axis3 && mean_axis0 && mean_axis1 && mean_axis2){
             ///TODO: Change method call for LA_Sum4D: ******************DONE
             TensorF* reduced = ReduceSum4D(scheduler,inputTn, mean_axis0, mean_axis1, mean_axis2, mean_axis3);
             float* sum = reduced->_buff;
-            /*
-            float* sum =
-            LA_Sum4D(mat,
-                          mean_axis0,
-                          mean_axis1,
-                          mean_axis2,
-                          mean_axis3,
-                          dim0,
-                          dim1,
-                          dim2,
-                          dim3);*/
 
             float *mean = new float[dim3];
 
@@ -447,60 +424,35 @@ TensorF* CpuImplementation::Mean(
             //delete(reduced);
 
             TensorF* rsltTn = new TensorF({dim3}, mean);
+            SPDLOG_LOGGER_DEBUG(reporter,"Finished");
             return rsltTn;
         }
-        cout<<"Mean: ERROR_UNIMPLEMENTED_AXES_COMB"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"Mean: ERROR_UNIMPLEMENTED_AXES_COMB");
         return nullptr;
     }
 
     if(rank==2){ //dim0 is batch, dim1 is fc layer output, ex.: for B=1 --> output=[1,256]
         if(!mean_axis1 && mean_axis0 ){
-            ///TODO: CHANGE LA_Sum method call: **********************DONE
-            /*float* sum = LA_Sum(mat,false,true,false,1,dim0,dim1);*/ //result is of shape dim1
             TensorF* reduced = ReduceSum(scheduler,inputTn, false, true, false);
-
-            ///TODO: CHANGE LA_MatMul method call:*******************DONE
-            //mean = LA_MatMul(sum,(1.0f/dim0),1,3,1,dim1); //B=1, Rank=3, H=0,W=dim1
             TensorF* mean = MatMul(scheduler,reduced,(1.0f/dim0));
-
             //delete(reduced);
-
+            SPDLOG_LOGGER_DEBUG(reporter,"Finished");
             return mean;
         }
-        cout<<"Mean: ERROR_UNIMPLEMENTED_AXES_COMB"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"Mean: ERROR_UNIMPLEMENTED_AXES_COMB");
         return nullptr;
     }
 
     if(rank==1){
-        ///TODO: Change LA_Sum method call: ***********************DONE
-        //float* sum = LA_Sum(mat,true,true,true,1,1,dim0);
         TensorF* reduced = ReduceSum(scheduler,inputTn,true,true,true);
         TensorF* mean = MatMul(scheduler,reduced,1.0f/(float)(dim0));
-        //float *mean = (float*)malloc(sizeof(float) * 1);
-        //*mean = (*sum)/(float)(dim0);
-        //free(sum);
-        //delete(reduced);
-
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return mean;
     }
-    cout<<"Mean: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"Mean: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
 
-/*
-float* CpuImplementation::Variance(
-        float* mat,
-        int rank,
-        bool variance_axis0,
-        bool variance_axis1,
-        bool variance_axis2,
-        bool variance_axis3,
-        int dim0,
-        int dim1,
-        int dim2,
-        int dim3
-
-){*/
 TensorF* CpuImplementation::Variance(
         WorkScheduler scheduler,
         TensorF* inputTn,
@@ -508,7 +460,7 @@ TensorF* CpuImplementation::Variance(
         bool variance_axis1,
         bool variance_axis2,
         bool variance_axis3){
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Variance","",0,"",0,"",0,inputTn->getShape(),{},{variance_axis0,variance_axis1,variance_axis2,variance_axis3});
     unsigned dim0 = inputTn->getShape()[0],
         dim1 = inputTn->getShape()[1],
@@ -516,22 +468,8 @@ TensorF* CpuImplementation::Variance(
         dim3 = inputTn->getShape()[3];
     int rank = inputTn->getRank();
 
-    //cout      <<"**LA_Variance: Rank: "<< rank << "  dims: "<<dim0<<","<<dim1<<","<<dim2<<","<<dim3<<
-    //          "  overaxes: "<<variance_axis0<<","<<variance_axis1<<","<<variance_axis2<<","<<variance_axis3<<";\n";
     if(rank==4){
         if(!variance_axis3 && variance_axis0 && variance_axis1 && variance_axis2) {
-            ///TODO: Change LA_Mean method call: *********************DONE
-            /*
-            float *mean = LA_Mean(mat,
-                                  rank,
-                                  variance_axis0,
-                                  variance_axis1,
-                                  variance_axis2,
-                                  false,
-                                  dim0,
-                                  dim1,
-                                  dim2,
-                                  dim3);*/
 
             TensorF* mean = Mean(scheduler,
                                  inputTn,
@@ -562,29 +500,16 @@ TensorF* CpuImplementation::Variance(
                 }
             }
 
-            ///TODO: CHANGE LA_MatMul method call: *****************DONE
             TensorF* variance_final = MatMul(scheduler,variance,(float)(1.0f/(dim0*dim1*dim2)));
-            
+            SPDLOG_LOGGER_DEBUG(reporter,"Finished");
             return variance_final;
         }
-        cout<<"Variance: ERROR_UNIMPLEMENTED_AXES_COMB"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"Variance: ERROR_UNIMPLEMENTED_AXES_COMB");
         return nullptr;
     }
 
     if(rank==2){
         if(!variance_axis1 && variance_axis0 ) {
-            ///TODO: Change LA_Mean method call: ******************DONE
-            /*
-            float *mean = LA_Mean(mat,
-                                  2,
-                                  true,
-                                  false,
-                                  false,
-                                  false,
-                                  dim0,
-                                  dim1,
-                                  0,
-                                  0);*/
             TensorF* mean = Mean(scheduler,inputTn,true,false,false,false);
             TensorF* variance = new TensorF({dim1});
 
@@ -599,31 +524,18 @@ TensorF* CpuImplementation::Variance(
                     variance->_buff[d1] += delta*delta;
                 }
             }
-            ///TODO: Change LA_Mean method call: **********************DONE
-            //float* variance_final = LA_MatMul(variance,(float)(1.0f/dim0),1,3,1,dim1);
-            TensorF* variance_final = MatMul(scheduler,variance,(float)(1.0f/dim0));
 
+            TensorF* variance_final = MatMul(scheduler,variance,(float)(1.0f/dim0));
             //delete(variance);
             //delete(mean);
-
+            SPDLOG_LOGGER_DEBUG(reporter,"Finished");
             return variance_final;
         }
-        cout<<"Variance: ERROR_UNIMPLEMENTED_AXES_COMB"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"Variance: ERROR_UNIMPLEMENTED_AXES_COMB");
         return nullptr;
     }
 
     if(rank==1){
-        ///TODO: Change LA_Mean method call: ********************DONE
-        /*float *mean = LA_Mean(mat,
-                              rank,
-                              true,
-                              true,
-                              true,
-                              true,
-                              dim0,
-                              1,
-                              1,
-                              1);*/
         TensorF* mean = Mean(scheduler, inputTn, true, true, true, true);
         TensorF* variance = new TensorF({1});
         //float *variance = (float*)malloc(sizeof(float) * 1);
@@ -633,29 +545,22 @@ TensorF* CpuImplementation::Variance(
             variance->_buff[0] += delta*delta;
         }
 
-        //*variance = *variance * (float)(dim0);
         TensorF* variance_final = MatMul(scheduler,variance,1.0f/(float)(dim0));
-
-        //delete(mean);
-        //delete(variance);
-
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return variance_final;
 
     }
-    cout<<"Variance: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"Variance: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
-/*
-float* CpuImplementation::MatAdd(
-        float* mat1,
-        float* mat2,
-        int    rank,
-        int    dim0,
-        int    dim1,
-        int    dim2){*/
+
 TensorF* CpuImplementation::MatAdd(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatAdd","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
-    if(inputTn1->getShape() != inputTn2->getShape()){cout<<"MatAdd: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
+    if(inputTn1->getShape() != inputTn2->getShape()){
+        SPDLOG_LOGGER_ERROR(logger,"MatAdd: ERROR_BAD_TENSOR_SHAPE");
+        return nullptr;
+    }
 
     unsigned limit = inputTn1->getLength();
     float* rslt=new float[limit];
@@ -665,27 +570,21 @@ TensorF* CpuImplementation::MatAdd(WorkScheduler scheduler, TensorF* inputTn1, T
     }
 
     TensorF* rsltTn = new TensorF(inputTn1->getShape(),rslt);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
-
-/*
-float* CpuImplementation::MatSub(
-        float* mat1,
-        float* mat2,
-        int    rank,
-        int    dim0,
-        int    dim1,
-        int    dim2,
-        int    dim3
-){*/
 
 TensorF* CpuImplementation::MatSub(
         WorkScheduler scheduler,
         TensorF* inputTn1,
         TensorF* inputTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatSub","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
     unsigned limit;
-    if(inputTn1->getShape() != inputTn2->getShape()){cout<<"MatSub: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
+    if(inputTn1->getShape() != inputTn2->getShape()){
+        SPDLOG_LOGGER_ERROR(logger,"MatSub: ERROR_BAD_TENSOR_SHAPE");
+        return nullptr;
+    }
     limit = inputTn1->getLength();
 
     float *rslt = new float[limit];
@@ -694,17 +593,24 @@ TensorF* CpuImplementation::MatSub(
         rslt[d0] = inputTn1->_buff[d0] - inputTn2->_buff[d0];
     }
     TensorF* rsltTn = new TensorF(inputTn1->getShape(),rslt);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 
-
-    cout<<"MatSub: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"MatSub: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
 
 TensorF* CpuImplementation::MatAddTiled(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputSmallTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatAddTiled","",0,"",0,"",0,inputTn1->getShape(),inputSmallTn2->getShape(),{});
-    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"MatAddTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
-    if(inputSmallTn2->getRank()!=1){cout<<"MatAddTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
+    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){
+        SPDLOG_LOGGER_ERROR(logger,"MatAddTiled: ERROR_BAD_TENSOR_RANK");
+        return nullptr;
+    }
+    if(inputSmallTn2->getRank()!=1){
+        SPDLOG_LOGGER_ERROR(logger,"MatAddTiled: ERROR_BAD_TENSOR_SHAPE");
+        return nullptr;
+    }
 
     unsigned indxS1,indxS2,indxD;
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
@@ -730,6 +636,7 @@ TensorF* CpuImplementation::MatAddTiled(WorkScheduler scheduler, TensorF* inputT
                 }
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
@@ -743,17 +650,25 @@ TensorF* CpuImplementation::MatAddTiled(WorkScheduler scheduler, TensorF* inputT
                 rsltTn->_buff[indxS1] = inputTn1->_buff[indxS1] + inputSmallTn2->_buff[d1];
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    cout<<"MatAddTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"MatAddTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
 
 TensorF* CpuImplementation::MatSubTiled(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputSmallTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatSubTiled","",0,"",0,"",0,inputTn1->getShape(),inputSmallTn2->getShape(),{});
-    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"MatAddTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
-    if(inputSmallTn2->getRank()!=1){cout<<"MatAddTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
+    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){
+        SPDLOG_LOGGER_ERROR(logger,"MatAddTiled: ERROR_BAD_TENSOR_RANK");
+        return nullptr;
+    }
+    if(inputSmallTn2->getRank()!=1){
+        SPDLOG_LOGGER_ERROR(logger,"MatAddTiled: ERROR_BAD_TENSOR_SHAPE");
+        return nullptr;
+    }
 
     unsigned indxS1;
     unsigned dim0, dim1, dim2, dim3;
@@ -777,6 +692,7 @@ TensorF* CpuImplementation::MatSubTiled(WorkScheduler scheduler, TensorF* inputT
                 }
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
@@ -790,34 +706,40 @@ TensorF* CpuImplementation::MatSubTiled(WorkScheduler scheduler, TensorF* inputT
                 rsltTn->_buff[indxS1] = inputTn1->_buff[indxS1] - inputSmallTn2->_buff[d1];
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    cout<<"MatAddTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"MatAddTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
 
 TensorF* CpuImplementation::MatAddTiled(WorkScheduler scheduler, TensorF* inputTn1, float scalar){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatAddTiled","",0,"",0,"scalar",scalar,inputTn1->getShape(),{},{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
     unsigned len = inputTn1->getLength();
     for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = inputTn1->_buff[d] + scalar;
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::MatSubTiled(WorkScheduler scheduler, TensorF* inputTn1, float scalar){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatSubTiled","",0,"",0,"scalar",scalar,inputTn1->getShape(),{},{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
     unsigned len = inputTn1->getLength();
     for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = inputTn1->_buff[d] - scalar;
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, TensorF *inputTn2, MAT_OPS mode) {
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatOps",
             "mode",(mode==MAT_OPS::ADD ? 0 :
                     mode==MAT_OPS::SUB ? 1 :
@@ -827,13 +749,13 @@ TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, T
     int rankDiff;
 
     if(!(inputTn1->getRank()<=4 && inputTn1->getRank()>=1 && inputTn2->getRank()<=4 && inputTn2->getRank()>=1 )){
-        cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E1"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"MatOps: ERROR_BAD_TENSOR_RANK-E1");
         return nullptr;
     }
 
     if(inputTn1->getRank() < inputTn2->getRank()){
-        cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E2"<<endl;
-    return nullptr;
+        SPDLOG_LOGGER_ERROR(logger,"MatOps: ERROR_BAD_TENSOR_RANK-E2");
+        return nullptr;
     }
 
     //forcing inputTn1 to be of rank 4. (always)
@@ -928,10 +850,12 @@ TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, T
         rsltTn->SqueezeDimZero();
     }
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, float scalar, MAT_OPS mode) {
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatOps-Scalar",
             "mode",(mode==MAT_OPS::ADD ? 0 :
                     mode==MAT_OPS::SUB ? 1 :
@@ -939,44 +863,59 @@ TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, f
                     3),
             "",0,"",0,inputTn1->getShape(),{},{});
     float* val = new float[1]; val[0] = scalar;
-    TensorF* tmpTn = new TensorF({1},val);
-    return MatOps(scheduler,inputTn1,tmpTn,mode);
+    TensorF *tmpTn = new TensorF({1},val);
+    TensorF *rsltTn = MatOps(scheduler,inputTn1,tmpTn,mode);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* CpuImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatSubTiled","",0,"",0,"",0,inputTn->getShape(),{},{});
     TensorF* rsltTn = new TensorF(inputTn->getShape());
     unsigned len = inputTn->getLength();
     for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = sqrt(inputTn->_buff[d]);
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::Multiply(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Multiply","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
     unsigned len = inputTn1->getLength();
     for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = (inputTn1->_buff[d]) * (inputTn2->_buff[d]);
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::Divide(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Divide","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
     TensorF* rsltTn = new TensorF(inputTn1->getShape());
     unsigned len = inputTn1->getLength();
     for(unsigned d=0;d<len;d++) {
         rsltTn->_buff[d] = (inputTn1->_buff[d]) / (inputTn2->_buff[d]);
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::MultiplyTiled(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MultiplyTiled","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
-    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"MultiplyTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
-    if(inputTn2->getRank()!=1){cout<<"MultiplyTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
+    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){
+        SPDLOG_LOGGER_ERROR(logger,"MultiplyTiled: ERROR_BAD_TENSOR_RANK");
+        return nullptr;
+    }
+    if(inputTn2->getRank()!=1){
+        SPDLOG_LOGGER_ERROR(logger,"MultiplyTiled: ERROR_BAD_TENSOR_SHAPE");
+        return nullptr;
+    }
 
     unsigned indxS1;
     int dim0, dim1, dim2, dim3;
@@ -1004,6 +943,7 @@ TensorF* CpuImplementation::MultiplyTiled(WorkScheduler scheduler, TensorF* inpu
                 }
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
@@ -1017,17 +957,25 @@ TensorF* CpuImplementation::MultiplyTiled(WorkScheduler scheduler, TensorF* inpu
                 rsltTn->_buff[indxS1] = inputTn1->_buff[indxS1] * inputTn2->_buff[d1];
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    cout<<"MultiplyTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"MultiplyTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
 
 TensorF* CpuImplementation::DivideTiled(WorkScheduler scheduler, TensorF* inputTn1, TensorF* inputTn2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("DivideTiled","",0,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
-    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){cout<<"DivideTiled: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
-    if(inputTn2->getRank()!=1){cout<<"DivideTiled: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
+    if(!(inputTn1->getRank()==4 || inputTn1->getRank()==2)){
+        SPDLOG_LOGGER_ERROR(logger,"DivideTiled: ERROR_BAD_TENSOR_RANK");
+        return nullptr;
+    }
+    if(inputTn2->getRank()!=1){
+        SPDLOG_LOGGER_ERROR(logger,"DivideTiled: ERROR_BAD_TENSOR_SHAPE");
+        return nullptr;
+    }
 
     unsigned indxS1;
     unsigned dim0, dim1, dim2, dim3;
@@ -1051,6 +999,7 @@ TensorF* CpuImplementation::DivideTiled(WorkScheduler scheduler, TensorF* inputT
                 }
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
@@ -1064,42 +1013,28 @@ TensorF* CpuImplementation::DivideTiled(WorkScheduler scheduler, TensorF* inputT
                 rsltTn->_buff[indxS1] = inputTn1->_buff[indxS1] / inputTn2->_buff[d1];
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    cout<<"DivideTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"DivideTiled: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
 
-///concat 2 matrices
-/// [matA, matB]
-/*
-float* CpuImplementation::Concat2(
-        float* matA,
-        float* matB,
-        int rank,
-        int concat_dim,
-        int dimA0,
-        int dimA1,
-        int dimA2,
-        int dimA3,
-        int dimB0,
-        int dimB1,
-        int dimB2,
-        int dimB3
-){*/
+// concat 2 matrices
+// [matA, matB]
 TensorF* CpuImplementation::Concat2(
         WorkScheduler scheduler,
         TensorF* inputTn1,
         TensorF* inputTn2,
         int concatDim){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Concat2","concatDim",concatDim,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
 
-    //cout      <<"**Concat2: Rank: "<< rank << "  concatDim: "<<concatDim<<
-    //          "  dimA: "<<dimA0<<","<<dimA1<<","<<dimA2<<","<<dimA3<<
-    //          "  dimB: "<<dimB0<<","<<dimB1<<","<<dimB2<<","<<dimB3<<";\n";
-
-    if(inputTn1->getRank() != inputTn2->getRank()){cout<<"Concat2: ERROR_BAD_TENSOR_RANK"<<endl;return nullptr;}
+    if(inputTn1->getRank() != inputTn2->getRank()){
+        SPDLOG_LOGGER_ERROR(logger,"Concat2: ERROR_BAD_TENSOR_RANK");
+        return nullptr;
+    }
 
     int rank  = inputTn1->getRank();
     unsigned dimA0 = inputTn1->getShape()[0];
@@ -1187,31 +1122,20 @@ TensorF* CpuImplementation::Concat2(
         }
 
         TensorF* rsltTn = new TensorF({dimR0,dimR1,dimR2,dimR3},rslt);
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    cout<<"Concat2: ERROR_UNIMPLEMENTED_TENSOR_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"Concat2: ERROR_UNIMPLEMENTED_TENSOR_RANK");
     return nullptr;
 }
-
-/*
-float* CpuImplementation::ReduceMax(
-        float* input,
-        int axis,
-        int rank,
-        int dim0,
-        int dim1,
-        int dim2,
-        int dim3){*/
 
 TensorF* CpuImplementation::ReduceMax(
         WorkScheduler scheduler,
         TensorF* inputTn,
         int reductionDim){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceMax","reductionDim",reductionDim,"",0,"",0,inputTn->getShape(),{},{});
-    
-    //cout<< "ReduceMax: "<< "Rank: " << rank << ", Axis: "<< reductionDim <<", Dim: "
-    // << dim0 << "x" << dim1 << "x" << dim2 << "x" << dim3 << endl;
 
     if(inputTn->getRank()==4){
         unsigned
@@ -1247,11 +1171,9 @@ TensorF* CpuImplementation::ReduceMax(
                 }
             }
             TensorF* rsltTn = new TensorF({dim0,dim1,dim2},rslt);
+            SPDLOG_LOGGER_DEBUG(reporter,"Finished");
             return rsltTn;
         }
-
-
-
 
         if(reductionDim==2){
             float* rslt= new float[dim0*dim1*dim3];
@@ -1282,6 +1204,7 @@ TensorF* CpuImplementation::ReduceMax(
                 }
             }
             TensorF* rsltTn = new TensorF({dim0,dim1,dim3},rslt);
+            SPDLOG_LOGGER_DEBUG(reporter,"Finished");
             return rsltTn;
         }
 
@@ -1315,28 +1238,39 @@ TensorF* CpuImplementation::ReduceMax(
                 }
             }
             TensorF* rsltTn = new TensorF({dim0,dim2,dim3},rslt);
+            SPDLOG_LOGGER_DEBUG(reporter,"Finished");
             return rsltTn;
         }
-        cout<<"ReduceMax: ERROR_UNIMPLEMENTED_REDUCTION_AXIS"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"ReduceMax: ERROR_UNIMPLEMENTED_REDUCTION_AXIS");
         return nullptr;
     }
 
-    cout<<"ReduceMax: ERROR_UNIMPLEMENTED_MATRIX_RANK"<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"ReduceMax: ERROR_UNIMPLEMENTED_MATRIX_RANK");
     return nullptr;
 }
 
 TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){
-    
-    ///TODO: VALIDATE THIS KERNEL!!!
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("TopK","axis",axis,"k",k,"",0,batchedMat->getShape(),{},{});
-    if(batchedMat->getRank() != 3){cout<<"TopK: ERROR_UNIMPLEMENTED_TENSOR_RANK"<<endl;return nullptr;}
-    if(axis != 2){cout<<"TopK: ERROR_UNIMPLEMENTED_AXIS"<<endl;return nullptr;}
-    if(k < 1 || k > batchedMat->getShape()[2]){cout<<"TopK: ERROR_BAD_K"<<endl;return nullptr;}
-    if(batchedMat->getShape()[1] != batchedMat->getShape()[2]){cout<<"TopK: ERROR_BAD_TENSOR_SHAPE"<<endl;return nullptr;}
+    if(batchedMat->getRank() != 3){
+        SPDLOG_LOGGER_ERROR(logger,"TopK: ERROR_UNIMPLEMENTED_TENSOR_RANK");
+        return nullptr;
+    }
+    if(axis != 2){
+        SPDLOG_LOGGER_ERROR(logger,"TopK: ERROR_UNIMPLEMENTED_AXIS");
+        return nullptr;
+    }
+    if(k < 1 || k > batchedMat->getShape()[2]){
+        SPDLOG_LOGGER_ERROR(logger,"TopK: ERROR_BAD_K");
+        return nullptr;
+    }
+    if(batchedMat->getShape()[1] != batchedMat->getShape()[2]){
+        SPDLOG_LOGGER_ERROR(logger,"TopK: ERROR_BAD_TENSOR_SHAPE");
+        return nullptr;
+    }
 
-    //batchedMat is considered as BxNxN
-    //we will use std::sort in ascending order.
+    // batchedMat is considered as BxNxN
+    // std::sort in ascending order:
     unsigned indxS=0;
     unsigned B = batchedMat->getShape()[0], N = batchedMat->getShape()[1], K = (unsigned)k;
 
@@ -1357,20 +1291,29 @@ TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, i
 
         std::copy(indices, indices+K, rslt->_buff+(b*K));
     }
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rslt;
 }
 
 TensorF* CpuImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, TensorI* indices, int indices_axis){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Gather","indices_axis",indices_axis,"",0,"",0,inputTn->getShape(),indices->getShape(),{});
-    if(inputTn->getRank() != 3){cout<<"Gather: ERROR_UNIMPLEMENTED_TENSOR_RANK"<<endl;return nullptr;}
-    if(indices->getRank() != 3){cout<<"Gather: ERROR_UNIMPLEMENTED_INDICES_RANK"<<endl;return nullptr;}
-    if(indices_axis != 1){cout<<"Gather: ERROR_UNIMPLEMENTED_INDICES_AXIS"<<endl;return nullptr;}
-    ///TODO: Check 2 tensor shape compatibility!
+    if(inputTn->getRank() != 3){
+        SPDLOG_LOGGER_ERROR(logger,"Gather: ERROR_UNIMPLEMENTED_TENSOR_RANK");
+        return nullptr;
+    }
+    if(indices->getRank() != 3){
+        SPDLOG_LOGGER_ERROR(logger,"Gather: ERROR_UNIMPLEMENTED_INDICES_RANK");
+        return nullptr;
+    }
+    if(indices_axis != 1){
+        SPDLOG_LOGGER_ERROR(logger,"Gather: ERROR_UNIMPLEMENTED_INDICES_AXIS");
+        return nullptr;
+    }
+
     //inputTn       is considered as BxNxD
     //indices       is considered as BxNxK
     //indices_axis  is considered to be 1 (the dimension that is equal to 'N')
-
 
     //Gather knn's indices from input array.
     unsigned indxS1, indxS2, indxD;
@@ -1396,10 +1339,12 @@ TensorF* CpuImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, Te
         }
     }
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return point_cloud_neighbors;
 }
 
 TensorF* CpuImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn, TensorF* weights, TensorF* biases, int overrideDim2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Conv2D","overrideDim2",overrideDim2,"",0,"",0,inputTn->getShape(),weights->getShape(),{});
     unsigned B,N,K,D,OverridedK,ch_out;
     unsigned indxS1,indxS2,indxD;
@@ -1428,10 +1373,12 @@ TensorF* CpuImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn, Te
             }
         }
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReLU","",0,"",0,"",0,inputTn->getShape(),{},{});
     unsigned dim = inputTn->getLength();
     TensorF* tmp = new TensorF(inputTn->getShape());
@@ -1439,6 +1386,7 @@ TensorF* CpuImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
     for(unsigned i=0;i<dim;i++){
         tmp->_buff[i] = (inputTn->_buff[i]>0)?inputTn->_buff[i]:0;
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return tmp;
 }
 
@@ -1448,6 +1396,7 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
     // BxN     ----> BxNxK          2               2
     // BxN     ----> BxKxN          1               2
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Tile","tileAxis",tileAxis,"tileCount",tileCount,"",0,inputTn->getShape(),{},{});
     unsigned indxS1,indxD;
     if(inputTn->getRank()==3 && tileAxis==2) {
@@ -1457,7 +1406,7 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
         D = inputTn->getShape()[2];
         K = (unsigned)tileCount;
 
-        //tile ing input of shape BxNxD into BxNxKxD.
+        //tiling input of shape BxNxD into BxNxKxD.
         TensorF* rsltTn = new TensorF({B, N, K, D});
 
         for (int b = 0; b < B; b++) {
@@ -1471,10 +1420,11 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
                 }
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    if(inputTn->getRank()==2 && tileAxis==2) { //BxN = BxNx1   ------->  BxNxK  (PAGE 221 of my design notebook)
+    if(inputTn->getRank()==2 && tileAxis==2) { //BxN = BxNx1   ------->  BxNxK  (PAGE 221 of my notebook)
         unsigned B,N,K,D;
         B = inputTn->getShape()[0];
         N = inputTn->getShape()[1];
@@ -1492,10 +1442,11 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
                 }
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 
-    if(inputTn->getRank()==2 && tileAxis==1) { //BxN = Bx1xN   ------->  BxKxN  (PAGE 221 of my design notebook)
+    if(inputTn->getRank()==2 && tileAxis==1) { //BxN = Bx1xN   ------->  BxKxN  (PAGE 221 of my notebook)
         unsigned B,N,K,D;
         B = inputTn->getShape()[0];
         N = inputTn->getShape()[1];
@@ -1513,30 +1464,22 @@ TensorF* CpuImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int 
                 }
             }
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
-/*
-template<typename T> int CpuImplementation::DumpMatrix(
-        string npy_fname,
-        int rank,
-        T* mat,
-        int dim0,
-        int dim1,
-        int dim2,
-        int dim3,
-        int dim4,
-        string npy_dir){*/
 void CpuImplementation::DumpMatrix(
         WorkScheduler scheduler,
         string npy_fname,
         TensorF* inputTn,
         string npy_dir){
     if(globalDumpTensors){
+        SPDLOG_LOGGER_DEBUG(reporter,"Started");
         vector<unsigned> shape = inputTn->getShape();
         vector<unsigned long> shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<float>(npy_dir+npy_fname,inputTn->_buff, shape_size_t,"w");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     }
 }
 
@@ -1546,35 +1489,43 @@ void CpuImplementation::DumpMatrix(
         TensorI* inputTn,
         string npy_dir){
     if(globalDumpTensors){
+        SPDLOG_LOGGER_DEBUG(reporter,"Started");
         vector<unsigned> shape = inputTn->getShape();
         vector<unsigned long> shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<int>(npy_dir+npy_fname,inputTn->_buff ,shape_size_t,"w");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     }
 }
 
 bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn1, TensorF *inputTn2) {
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     float totalDiff=0;
     float currentDiff=0;
     if(inputTn1->getShape() == inputTn2->getShape()){
         unsigned _len = inputTn1->getLength();
         for(unsigned i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
-            cout<< "CurrentDiff "<<i<<" :"<<currentDiff<<endl;
-            cout<< "Gold "<<i<<" :"<<inputTn1->_buff[i]<<endl;
-            cout<< "UDT  "<<i<<" :"<<inputTn2->_buff[i]<<endl;
+            SPDLOG_LOGGER_INFO(logger, "CurrentDiff {} : {}", i, currentDiff);
+            SPDLOG_LOGGER_INFO(logger, "Gold {} : {}", i, inputTn1->_buff[i]);
+            SPDLOG_LOGGER_INFO(logger, "UDT {} : {}", i, inputTn2->_buff[i]);
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }
-        if(totalDiff!=0)cout<< "totalDiff: "<<totalDiff<<endl;
+        if(totalDiff!=0){
+            SPDLOG_LOGGER_WARN(logger, "TotalDiff: {}", totalDiff);
+        }
         if((totalDiff> 0 &&totalDiff > 50.0f) || (totalDiff<= 0 &&totalDiff < -50.0f) ) {
             return false;
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return true;
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return false;
 }
 
 bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *inputTn1, TensorI *inputTn2) {
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     float totalDiff=0;
     int currentDiff=0;
     if(inputTn1->getShape() == inputTn2->getShape()){
@@ -1584,18 +1535,26 @@ bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }
-        if(totalDiff!=0)cout<< "totalDiff: "<<totalDiff<<endl;
+        if(totalDiff!=0){
+            SPDLOG_LOGGER_WARN(logger, "TotalDiff: {}", totalDiff);
+        }
         if((totalDiff!=0) ) {
             return false;
         }
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return true;
     }
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return false;
 }
 
 TensorF* CpuImplementation::PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("PadLastDim","lastDimPadded",lastDimPadded,"",0,"",0,inputTn->getShape(),{},{});
-    if(lastDimPadded<=inputTn->getShape()[inputTn->getRank()-1]){cout<<"PadLastDim: ERROR_BAD_PARAM"<<endl;return nullptr;}
+    if(lastDimPadded<=inputTn->getShape()[inputTn->getRank()-1]){
+        SPDLOG_LOGGER_ERROR(logger,"PadLastDim: ERROR_BAD_PARAM");
+        return nullptr;
+    }
     
     unsigned dim0, dim1, lcm, _gcd, argcnt;
     std::vector<unsigned> shape = inputTn->getShape();
@@ -1629,12 +1588,17 @@ TensorF* CpuImplementation::PadLastDim(WorkScheduler scheduler, TensorF* inputTn
         }
     }
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
 TensorF* CpuImplementation::UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("UnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
-    if(lastDimUnpadded>=inputTn->getShape()[inputTn->getRank()-1]){cout<<"UnpadLastDim: ERROR_BAD_PARAM"<<endl;return nullptr;}
+    if(lastDimUnpadded>=inputTn->getShape()[inputTn->getRank()-1]){
+        SPDLOG_LOGGER_ERROR(logger,"UnpadLastDim: ERROR_BAD_PARAM");
+        return nullptr;
+    }
 
     unsigned dim0, dim1, argcnt;
     std::vector<unsigned> shape = inputTn->getShape();
@@ -1660,5 +1624,6 @@ TensorF* CpuImplementation::UnpadLastDim(WorkScheduler scheduler, TensorF* input
         }
     }
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }

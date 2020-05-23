@@ -1,6 +1,7 @@
+#include "build_config.h"
 #include "argparse.h"
 #include "ClassifierMultiPlatform.h"
-#include <ocl_imp/xilinx/XilinxImpUnitTests.h>
+#include "ocl_imp/xilinx/XilinxImpUnitTests.h"
 #include <iostream>
 #include <execinfo.h>
 #include <unistd.h>
@@ -10,6 +11,8 @@
 using namespace std;
 using namespace argparse;
 
+spdlog::logger *logger;
+spdlog::logger *reporter;
 string globalArgXclBin;
 string globalArgDataPath;
 unsigned globalBatchsize;
@@ -84,59 +87,115 @@ int main(int argc, const char* argv[]){
         return 0;
     }
 
+    {
+        // HOST LOGGER
+        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        console_sink->set_level(spdlog::level::trace);
+        console_sink->set_pattern("[%H:%M:%S.%e][%^%l%$] %v");
+
+        auto file_sink1 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("hostlog_0trace.log", true);
+        file_sink1->set_level(spdlog::level::trace);
+        file_sink1->set_pattern("[%H:%M:%S.%f][%^%l%$][source %s][function %!][line %#] %v");
+
+        auto file_sink0 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("hostlog_1debug.log", true);
+        file_sink0->set_level(spdlog::level::debug);
+        file_sink0->set_pattern("[%H:%M:%S.%f][%^%l%$][source %s][function %!][line %#] %v");
+
+        auto file_sink2 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("hostlog_2info.log", true);
+        file_sink2->set_level(spdlog::level::info);
+        file_sink2->set_pattern("[%H:%M:%S.%f][%^%l%$][source %s][function %!][line %#] %v");
+
+        auto file_sink3 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("hostlog_3wraning.log", true);
+        file_sink3->set_level(spdlog::level::warn);
+        file_sink3->set_pattern("[%H:%M:%S.%f][%^%l%$][source %s][function %!][line %#] %v");
+
+        logger = new spdlog::logger("DP1FPGA Host-logger", {console_sink, file_sink0, file_sink1, file_sink2, file_sink3});
+        logger->set_level(spdlog::level::trace); 
+
+
+        // PERFORMANCE REPORTER
+        auto file_sink4 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("report_kernel.log", true); //Kernels are reported
+        file_sink4->set_level(spdlog::level::info);
+        file_sink4->set_pattern("[%H:%M:%S.%f][%^%l%$] %v");
+
+        auto file_sink5 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("report_host_kernel.log", true); //kernels and host
+        file_sink5->set_level(spdlog::level::debug);
+        file_sink5->set_pattern("[%H:%M:%S.%f][%^%l%$][source %s][function %!][line %#] %v");
+
+        // this is strictly used to log host and device performance.
+        reporter = new spdlog::logger("DP1FPGA Host-reporter", {file_sink4,file_sink5});
+        reporter->set_level(spdlog::level::trace); 
+
+        //SPDLOG_LOGGER_TRACE(logger,"test log ::: trace");
+        //SPDLOG_LOGGER_DEBUG(logger,"test log ::: debug");
+        //SPDLOG_LOGGER_INFO(logger,"test log ::: info");
+        //SPDLOG_LOGGER_WARN(logger,"test log ::: warn");
+        //SPDLOG_LOGGER_ERROR(logger,"test log ::: error");
+        //SPDLOG_LOGGER_CRITICAL(logger,"test log ::: critical");
+
+        //SPDLOG_LOGGER_INFO(reporter,"test log ::: info");
+        //SPDLOG_LOGGER_DEBUG(reporter,"test log ::: debug");
+        
+    }
+
     if(parser.exists("b")) {
         globalBatchsize = parser.get<unsigned>("b");
     }else{
         globalBatchsize = 5;
     }
-    std::cout<<"Batch-size: "<<globalBatchsize<<std::endl;
+    SPDLOG_LOGGER_INFO(logger,"Batch-size: {}", globalBatchsize);
 
     if(parser.exists("i")) {
         globalArgXclBin = parser.get<string>("i").c_str();
-        std::cout<<"FPGA Image: "<<globalArgXclBin<<std::endl;
+        SPDLOG_LOGGER_INFO(logger,"FPGA Image: {}", globalArgXclBin);
     }
 
     if(parser.exists("d")) {
         globalArgDataPath = parser.get<string>("d");
-        std::cout<<"Data Directory: "<<globalArgDataPath<<std::endl;
+        SPDLOG_LOGGER_INFO(logger,"Data Directory: {}", globalArgDataPath);
     }
 
     if(parser.exists("e")) {
         const char *forcedMode = parser.get<string>("e").c_str();
-        std::cout<<"Forced Emulation Mode: "<<forcedMode<<std::endl;
+        SPDLOG_LOGGER_INFO(logger,"Forced Emulation Mode: {}", forcedMode);
         if (setenv("XCL_EMULATION_MODE", forcedMode, 1) < 0) {
-            std::cerr <<"Error setting XCL_MODE env. var."<<std::endl;
+            std::cerr <<""<<std::endl;
+            SPDLOG_LOGGER_ERROR(logger,"Can not set env var XCL_MODE.");
         }
     }
 
     if(parser.exists("testsonly")) {
         globalRunClassifier = false;
-        globalRunTests = true;
-        std::cout<<"Only OCl tests are going to be run."<<std::endl;
+        globalRunTests = true; 
+        SPDLOG_LOGGER_INFO(logger,"Only OCl tests are going to be run.");
     }
 
     if(parser.exists("classifieronly")) {
         globalRunClassifier = true;
         globalRunTests = false;
-        std::cout<<"Only OCl classifier is going to be run."<<std::endl;
+        SPDLOG_LOGGER_INFO(logger,"Only OCl classifier is going to be run.");
     }
 
     if(parser.exists("dumptensors")) {
         globalDumpTensors = true;
-        std::cout<<"Tensors will be dumped into separate numpy files in the data directory."<<std::endl;
+        SPDLOG_LOGGER_INFO(logger,"Tensors will be dumped into separate numpy files in the data directory.");
     }
 
     if(globalRunTests){
-        cout<< "======================================================" <<endl;
-        cout<< "Running Kernel Unit Tests ...\n" <<endl;
+        SPDLOG_LOGGER_INFO(logger,"======================================================");
+        SPDLOG_LOGGER_INFO(logger,"Running Kernel Unit Tests ...");
         XilinxImpUnitTests xilinxImpUnitTests;
         xilinxImpUnitTests.RunAll();
     }
 
     if(globalRunClassifier){
-        cout<< "======================================================" <<endl;
-        cout<< "Running Selected ModelArch ...\n" <<endl;
+        SPDLOG_LOGGER_INFO(logger,"======================================================");
+        SPDLOG_LOGGER_INFO(logger,"Running Selected ModelArch ...");
         ClassifierMultiplatform();
-
     }
+
+
+
+
+
 }

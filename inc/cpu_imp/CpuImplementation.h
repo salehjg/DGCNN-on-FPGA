@@ -59,7 +59,7 @@ public:
     TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded);
 
 private:
-    void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,
+    inline void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,
             const string &setting3, float val3, vector<unsigned> shape1, vector<unsigned> shape2, vector<bool> comb={});
 
 };

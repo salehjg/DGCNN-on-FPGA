@@ -1,3 +1,4 @@
+#include "build_config.h"
 #include "ocl_imp/DataMover.h"
 #include "TensorF.h"
 #include "ocl_imp/OclTensorF.h"
@@ -11,6 +12,25 @@
 #include <iostream>
 #include <vector>
 
+static cl_ulong get_duration_ns (const cl::Event &event) {
+    cl_int err;
+    uint64_t nstimestart, nstimeend;
+    OCL_CHECK(err,err = event.getProfilingInfo<uint64_t>(CL_PROFILING_COMMAND_START,&nstimestart));
+    OCL_CHECK(err,err = event.getProfilingInfo<uint64_t>(CL_PROFILING_COMMAND_END,&nstimeend));
+    return(nstimeend-nstimestart);
+}
+
+static void ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event){
+    uint64_t ns = get_duration_ns(event);
+        SPDLOG_LOGGER_INFO(reporter, 
+            "** {}{}(us): {}, (ms): {}, (s): {}", 
+            name, 
+            (isNDRange?"(ndrange):: ":"(task):: "),
+            ns/1000.0f,
+            ns/1000000.0f,
+            ns/1000000000.0f);
+}
+
 int LaunchDataMover( 
     cl::Program *program,
     cl::CommandQueue *queue,
@@ -21,6 +41,8 @@ int LaunchDataMover(
     const unsigned dstBank, 
     const unsigned len,
     const unsigned vectorWords){
+
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
 
     cl_int error;
 #ifdef USEMEMORYBANK0
@@ -36,8 +58,14 @@ int LaunchDataMover(
     OclTensorF *tnDummyBank3 = new OclTensorF(context, queue, {len}, 3, true);
 #endif
 
-    if(!(srcBank>=0 && srcBank<=3)){cout<< "Invalid or unsupported srcBank." <<endl; std::exit(3);}
-    if(!(dstBank>=0 && dstBank<=3)){cout<< "Invalid or unsupported dstBank." <<endl; std::exit(3);}
+    if(!(srcBank>=0 && srcBank<=3)){
+        SPDLOG_LOGGER_ERROR(logger,"Invalid or unsupported srcBank");
+        std::exit(1);
+    }
+    if(!(dstBank>=0 && dstBank<=3)){
+        SPDLOG_LOGGER_ERROR(logger,"Invalid or unsupported dstBank");
+        std::exit(1);
+    }
     assert(vectorWords>0);
 
     OCL_CHECK(error,cl::Kernel kernel_datamover(*program, "task_datamover", &error));
@@ -108,7 +136,8 @@ int LaunchDataMover(
     exeEvt.wait();
     //queue->finish();
 
-    cout<< "_-_-_-_-_-_-_-_- Internal data-mover kernel executed successfully -_-_-_-_-_-_-_-_"<<endl;
+    ReportDuration(__func__, false, exeEvt);
+    SPDLOG_LOGGER_DEBUG(logger,"Internal data-mover kernel executed successfully");
 
 #ifdef USEMEMORYBANK0
     delete(tnDummyBank0);
@@ -122,4 +151,5 @@ int LaunchDataMover(
 #ifdef USEMEMORYBANK3
     delete(tnDummyBank3);
 #endif
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
 }

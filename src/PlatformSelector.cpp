@@ -45,13 +45,13 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
     }
 
     weightsLoader = new WeightsLoader(neededPlatforms);
-    if(!loadWeights) cout<<"/!\\ Weight are not loaded into device memory."<<endl;
+    if(!loadWeights) SPDLOG_LOGGER_WARN(logger,"Weight are not loaded into device memory");
 #ifdef USE_OCL
     if(loadWeights){
         std::string wDir = globalArgDataPath; wDir.append("/weights/");
         std::string wFileList = globalArgDataPath; wFileList.append("/weights/filelist.txt");
-        cout<< "Weights Dir: " << wDir << endl;
-        cout<< "Weights File List Path: " << wFileList << endl;
+        SPDLOG_LOGGER_TRACE(logger,"Weights Dir: {}", wDir);
+        SPDLOG_LOGGER_TRACE(logger,"Weights File List Path: {}", wFileList);
         weightsLoader->LoadFromDisk(wDir.c_str() ,
                                     wFileList.c_str() ,
                                     openclPlatformClass->getContext(),
@@ -66,7 +66,7 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
 }
 
 PlatformSelector::~PlatformSelector(){
-    cout<<"~PlatformSelector"<<endl;
+    SPDLOG_LOGGER_TRACE(logger,"~PlatformSelector");
     delete(weightsLoader);
     delete(cpuPlatformClass);
     delete(openclPlatformClass);

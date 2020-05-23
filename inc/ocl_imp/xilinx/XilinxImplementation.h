@@ -13,9 +13,6 @@
 #include <cnpy.h>
 #include <ocl_imp/xilinx/AxiHelper.h>
 
-#define REPORT_EXECUTION_DURATION
-//#undef REPORT_EXECUTION_DURATION
-
 enum class RUN_MODE{
     SwEmu,
     HwEmu,
@@ -103,7 +100,7 @@ public:
 
 private:
     int a;
-    void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,
+    inline void PrintInfo(string opName, const string &setting1, int val1, const string &setting2, int val2,
                    const string &setting3, float val3, vector<unsigned int> shape1, vector<unsigned int> shape2, vector<bool> comb={});
     cl_ulong get_duration_ns (const cl::Event &event);
     void ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event);

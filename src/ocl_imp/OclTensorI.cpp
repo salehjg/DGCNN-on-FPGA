@@ -35,7 +35,7 @@ OclTensorI::OclTensorI( std::vector<unsigned> shape, cl::Buffer clBuff, int bank
 void OclTensorI::Init(cl::Context *context, cl::CommandQueue *queue, std::vector<unsigned> shape, int bank, int vectorWords, bool initToZero) {
     cl_int ocl_stat;
     if(initialized){
-        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        SPDLOG_LOGGER_DEBUG(logger,"OclTensorI: buffer deleted");
         //delete(ocl_buff);
     }
     this->vectorWords = vectorWords;
@@ -73,9 +73,9 @@ void OclTensorI::Init(cl::Context *context, cl::CommandQueue *queue, std::vector
 
 void OclTensorI::Init(std::vector<unsigned> shape, cl::Buffer clBuff, int bank){
     cl_int ocl_stat;
-    std::cout<<"--- OclTensorF: Warning: No padding\n";
+    SPDLOG_LOGGER_DEBUG(logger,"OclTensorI: Warning: No padding");
     if(initialized){
-        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        SPDLOG_LOGGER_DEBUG(logger,"OclTensorI: buffer deleted"); 
         //delete(ocl_buff);
     }
     this->shape = shape;
@@ -92,7 +92,7 @@ void OclTensorI::Init(std::vector<unsigned> shape, cl::Buffer clBuff, int bank){
 void OclTensorI::InitWithHostData(cl::Context *context, cl::CommandQueue *queue, std::vector<unsigned> shape, int *hostBuff, int bank, int vectorWords) {
     cl_int ocl_stat;
     if(initialized){
-        std::cout<<"--- OclTensorF: buffer deleted.\n";
+        SPDLOG_LOGGER_DEBUG(logger,"OclTensorI: buffer deleted"); 
         //delete(ocl_buff);
     }
     this->vectorWords = vectorWords;
@@ -139,7 +139,10 @@ void OclTensorI::ChangeDDRBank(cl::Program *program, cl::Context *context, cl::C
         //The tensor has been initialized and DOES contain a clBuffer within a different bank.
         //We will run a kernel to read data from old bank and simelteneously write it to the new bank.
 
-        if(bank == dramBank){cout<<"Trying to change to the same bank (OclTensorF)."<<endl; std::exit(3);}
+        if(bank == dramBank){
+            SPDLOG_LOGGER_ERROR(logger,"Trying to change to the same bank (OclTensorI)");
+            std::exit(3);
+        }
         assert(this->vectorWords>0);
 
         cl_mem_ext_ptr_t extPtr = CreateExtendedPointer(nullptr, TranslateBankIndex(bank));
@@ -211,7 +214,7 @@ TensorI* OclTensorI::CloneToDDRBank(cl::Program *program, cl::Context *context, 
 
     }else{
         //The tensor has not yet been initialized!
-        cout<<"Trying to clone an uninitialized tensor(OclTensorI)" << endl;
+        SPDLOG_LOGGER_ERROR(logger,"Trying to clone an uninitialized tensor(OclTensorI)");
         assert(false);
     }
 }
@@ -220,7 +223,7 @@ TensorI* OclTensorI::CloneIfNeededToDDRBank(cl::Program *program, cl::Context *c
     try{
         return CloneToDDRBank(program, context, queue, bank);
     } catch(SameBankException& e) {
-        std::cout<<"CloneIfNeededToDDRBank: same banks detected, returning the original tensor(OclTensorI)."<< std::endl;
+        SPDLOG_LOGGER_DEBUG(logger,"CloneIfNeededToDDRBank: same banks detected, returning the original tensor(OclTensorI)");
         return this;
     }
 }

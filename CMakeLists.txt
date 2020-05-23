@@ -66,6 +66,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/inc 
     ${CMAKE_SOURCE_DIR}/hlslib/include 
     ${CMAKE_SOURCE_DIR}/argparse
+    ${CMAKE_SOURCE_DIR}/spdlog/include
     ${CMAKE_BINARY_DIR} 
     ${SDAccel_INCLUDE_DIRS})
 add_definitions(-DREPO_DIR=\"${CMAKE_SOURCE_DIR}\")
@@ -412,6 +413,8 @@ add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh)
 #==========================================================================================================================================
 
 
+add_subdirectory(spdlog)
+
 set(HOSTSIDE_SRC
     src/cnpy.cpp
     src/PlatformImplementation.cpp
@@ -436,10 +439,8 @@ set(HOSTSIDE_MAIN_SRC
     src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
-set(CMAKE_BUILD_TYPE Debug)
-
 add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
-target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z stdc++fs)
+target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z stdc++fs spdlog)
 
 add_executable(HostTest src/HostTest.cpp src/ocl_imp/xilinx/xcl2.cpp)
 target_link_libraries(HostTest ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)

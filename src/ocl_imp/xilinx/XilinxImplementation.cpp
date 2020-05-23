@@ -20,29 +20,29 @@ XilinxImplementation::XilinxImplementation(int aa){
     {
         const RUN_MODE mode = GetModeEnvVar();
         if(mode==RUN_MODE::Unknown){
-            cout<<"WARNING: XCL_EMULATION_MODE is not set. System run(real FPGA) is considered.";
+            SPDLOG_LOGGER_WARN(logger,"XCL_EMULATION_MODE is not set. System run(real FPGA) is considered.");
             //assert(SetModeEnvVar(RUN_MODE::SwEmu)==0);
         }else{
-            cout << "Mode: " << (
-                mode==RUN_MODE::SwEmu?"Sw-emulation":
+            SPDLOG_LOGGER_TRACE(logger,"Mode: {}",
+                (mode==RUN_MODE::SwEmu?"Sw-emulation":
                 mode==RUN_MODE::HwEmu?"Hw-emulation":
-                "Hardware(FPGA)" ) << endl;
+                "Hardware(FPGA)"));
         }
     }
 
     //======================================================================================================================
     {
         auto devices = xcl::get_xil_devices();
-        cout<<"Xilinx Devices Found: "<< devices.size()<<endl;
+        SPDLOG_LOGGER_TRACE(logger,"Xilinx Devices Found: {}", devices.size());
         assert(devices.size()>0);
 
-        cout<<"Using device index 0"<<endl;
+        SPDLOG_LOGGER_TRACE(logger,"Using device index 0");
         device = devices[0];
 
         OCL_CHECK(err, context = new cl::Context(device, NULL, NULL, NULL, &err));
         OCL_CHECK(err,queue = new cl::CommandQueue(*context, device, CL_QUEUE_PROFILING_ENABLE, &err));
         deviceName = device.getInfo<CL_DEVICE_NAME>();
-        cout << "Found Device=" << deviceName.c_str() << endl;
+        SPDLOG_LOGGER_TRACE(logger,"Found Device: {}", deviceName.c_str());
 
         auto fileBuf = xcl::read_binary_file(globalArgXclBin);
         cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
@@ -160,14 +160,11 @@ XilinxImplementation::XilinxImplementation(int aa){
             OCL_CHECK(err,kernelObject->kernel_task = new cl::Kernel(*program, kernelObject->kernelName_task, &err));
         }
     }
-
-    std::cout<<"- - - - - - - - - - -"<<std::endl;
     
-    //======================================================================================================================
 }
 
 XilinxImplementation::~XilinxImplementation(){
-    cout<<"~XilinxImplementation"<<endl;
+    SPDLOG_LOGGER_TRACE(logger, "~XilinxImplementation");
     /*
     delete(queue);
     delete(program);
@@ -194,7 +191,7 @@ cl::CommandQueue* XilinxImplementation::getQueue() {
     return queue;
 }
 
-void XilinxImplementation::PrintInfo(
+inline void XilinxImplementation::PrintInfo(
         string opName,
         const string &setting1, int val1,
         const string &setting2, int val2,
@@ -205,13 +202,13 @@ void XilinxImplementation::PrintInfo(
 
     string finalStr ;
     if(!setting1.empty() && !setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting1+ "=" + to_string(val1)+ ", " + setting2+ "=" + to_string(val2);
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1)+ ", " + setting2+ "=" + to_string(val2);
     }else if(!setting1.empty() && setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting1+ "=" + to_string(val1);
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1);
     }else if(setting1.empty() && !setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting2+ "=" + to_string(val2);
+        finalStr = "## " + opName + ": " + setting2+ "=" + to_string(val2);
     }else if(setting1.empty() && setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " ;
+        finalStr = "## " + opName + ": " ;
     }
 
     if(!setting3.empty()){
@@ -233,11 +230,12 @@ void XilinxImplementation::PrintInfo(
         for(bool i : comb){ finalStr += to_string(i) + "-"; }
         finalStr += ", ";
     }
-    finalStr+="\n";
-    cout<<finalStr;
+    //finalStr+="\n";
+    SPDLOG_LOGGER_INFO(reporter, "{}", finalStr);
 }
 
 TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedMat){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Transpose","",0,"",0,"",0,batchedMat->getShape(),{});
 
     cl_int error;
@@ -272,12 +270,14 @@ TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batch
         ReportDuration(__func__, kernelObject->use_ndrange_kernel, exeEvt);
 
         if(rankDiff) batchedMat->SqueezeDimZero();
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
                                    TensorF* batchedMat1, TensorF* batchedMat2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatMul","",0,"",0,"",0,batchedMat1->getShape(),batchedMat2->getShape());
 
     assert(batchedMat1->getRank()==3 || batchedMat1->getRank()==2);
@@ -342,13 +342,17 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
             rsltTn->SqueezeDimZero();
         }
 
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::Square(WorkScheduler scheduler, TensorF* batchedMat){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Square","",0,"",0,"",0,batchedMat->getShape(),{});
-    return _ReluSqrtSquare(scheduler, batchedMat, false, false, true);
+    TensorF *rsltTn = _ReluSqrtSquare(scheduler, batchedMat, false, false, true);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
@@ -356,8 +360,11 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
                                       bool over_axis0,
                                       bool over_axis1,
                                       bool over_axis2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceSum","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2});
-    return _Reduce_Task(inputTn, true, false, 0, over_axis0, over_axis1, over_axis2, false);
+    TensorF *rsltTn = _Reduce_Task(inputTn, true, false, 0, over_axis0, over_axis1, over_axis2, false);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::_Reduce_Task(
@@ -369,7 +376,7 @@ TensorF* XilinxImplementation::_Reduce_Task(
         bool overaxis1,
         bool overaxis2,
         bool overaxis3){
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     assert( !(reduceSum && reduceMax) && (reduceSum || reduceMax) );
     const unsigned rank = inputTn->getRank();
     unsigned _dim0,_dim1,_dim2,_dim3;
@@ -409,7 +416,7 @@ TensorF* XilinxImplementation::_Reduce_Task(
         );
 
         if(reduceMaxFTFF && inputTn->getShape()[2]!=1){
-            cout<<"ReduceMax: For reductionDim=1, Dim2 should be equals 1."<<endl;
+            SPDLOG_LOGGER_ERROR(logger,"ReduceMax: For reductionDim=1, Dim2 should be equal 1");
             return nullptr;
         }
 
@@ -459,6 +466,7 @@ TensorF* XilinxImplementation::_Reduce_Task(
 
     ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
@@ -470,7 +478,10 @@ TensorF* XilinxImplementation::_ReduceSum4D_Task(
         bool overaxis2,
         bool overaxis3,
         int pow_y){
-    return _Reduce_Task(inputTn, true, false, (unsigned)pow_y, overaxis0, overaxis1, overaxis2, overaxis3);
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    TensorF* rsltTn = _Reduce_Task(inputTn, true, false, (unsigned)pow_y, overaxis0, overaxis1, overaxis2, overaxis3);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 ///[axis0,axis1,axis2,axis3] //Not a batch op, uses data as is
@@ -480,8 +491,11 @@ TensorF* XilinxImplementation::ReduceSum4D(WorkScheduler scheduler,
                                         bool over_axis1,
                                         bool over_axis2,
                                         bool over_axis3){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
-    return _ReduceSum4D(scheduler, inputTn, over_axis0, over_axis1, over_axis2, over_axis3, 1);
+    TensorF* rsltTn = _ReduceSum4D(scheduler, inputTn, over_axis0, over_axis1, over_axis2, over_axis3, 1);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
@@ -491,10 +505,12 @@ TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
                                         bool over_axis2,
                                         bool over_axis3,
                                         int pow_y){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
     assert(over_axis0&&over_axis1&&over_axis2&&!over_axis3); // TTTF ONLY
-
-    return _ReduceSum4D_Task(inputTn,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
+    TensorF* rsltTn = _ReduceSum4D_Task(inputTn,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 
@@ -510,8 +526,11 @@ TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
 TensorF* XilinxImplementation::PadLastDim(WorkScheduler scheduler,
                                         TensorF* inputTn,
                                         unsigned int lastDimPadded){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("PadLastDim","lastDimPadded",lastDimPadded,"",0,"",0,inputTn->getShape(),{},{});
-    return _PadUnpadLastDim(inputTn, true, false, lastDimPadded, 0);
+    TensorF* rsltTn = _PadUnpadLastDim(inputTn, true, false, lastDimPadded, 0);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 
@@ -529,8 +548,11 @@ TensorF* XilinxImplementation::PadLastDim(WorkScheduler scheduler,
 TensorF* XilinxImplementation::UnpadLastDim(WorkScheduler scheduler,
                                         TensorF* inputTn,
                                         unsigned int lastDimUnpadded){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("UnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
-    return _PadUnpadLastDim(inputTn, false, true, 0, lastDimUnpadded);
+    TensorF* rsltTn = _PadUnpadLastDim(inputTn, false, true, 0, lastDimUnpadded);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::_PadUnpadLastDim(
@@ -539,7 +561,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
         bool unpad,
         unsigned lastDimPadded,
         unsigned lastDimUnpadded){
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskPadUnpad::BankIndex_inputTn);
 
     cl_int error; 
@@ -576,7 +598,6 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
     }else if(unpad){ //UNPAD
         shape[rank-1] = lastDimUnpadded;
         outputTn = new OclTensorF(context, queue, shape, ConfigTaskPadUnpad::BankIndex_outputTn);
-        //std::cout<<"dim0:"<<dim0<<", dim1:"<<dim1<<std::endl;
         mode=2;
     
     }else{
@@ -584,11 +605,10 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
     }
 
     OclKernelObject *kernelObject = oclKernels[9];
-    std::cout<<"dim0:"<<dim0<<", dim1:"<<dim1<<
-                ", lastDimPadded:"<<lastDimPadded<<
-                ", lcm:"<<lcm<<
-                ", lastDimUnpadded:"<<lastDimUnpadded<<
-                std::endl;
+
+    SPDLOG_LOGGER_DEBUG(logger,"dim0: {}, dim1: {}, lastDimPadded: {}, lcm: {}, lastDimUnpadded: {}", 
+        dim0, dim1,
+        lastDimPadded, lcm, lastDimUnpadded);
 
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)outputTn)->ocl_buff));
@@ -606,6 +626,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
 
     ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return outputTn;
 }
 
@@ -616,6 +637,7 @@ TensorF* XilinxImplementation::Mean(
         bool mean_axis1,
         bool mean_axis2,
         bool mean_axis3){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Mean","",0,"",0,"",0,inputTn->getShape(),{},{mean_axis0,mean_axis1,mean_axis2,mean_axis3});
 
     assert(inputTn->getRank()==2 || inputTn->getRank()==4);
@@ -651,6 +673,7 @@ TensorF* XilinxImplementation::Mean(
         inputTn->SqueezeDimZero();
     }
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
@@ -661,6 +684,7 @@ TensorF* XilinxImplementation::Variance(
         bool variance_axis1,
         bool variance_axis2,
         bool variance_axis3){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Variance","",0,"",0,"",0,inputTn->getShape(),{},{variance_axis0,variance_axis1,variance_axis2,variance_axis3});
 
     assert(inputTn->getRank()==2 || inputTn->getRank()==4);
@@ -706,6 +730,8 @@ TensorF* XilinxImplementation::Variance(
     delete(tmp3Tn);
     delete(varianceXi2Tn);
     delete(meanTn);
+
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
@@ -723,6 +749,7 @@ TensorF* XilinxImplementation::Variance(
  * @return     Returns the results which is a tensor with the same shape and rank of inputTn1.
  */
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, TensorF *inputTn2, MAT_OPS mode){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatOps",
               "mode",(mode==MAT_OPS::ADD ? 0 :
                       mode==MAT_OPS::SUB ? 1 :
@@ -737,12 +764,12 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
     rank2 = inputTn2->getRank();
 
     if(!(inputTn1->getRank()<=4 && inputTn1->getRank()>=1 && inputTn2->getRank()<=4 && inputTn2->getRank()>=1 )){
-        cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E1"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"MatOps: ERROR_BAD_TENSOR_RANK-E1");
         return nullptr;
     }
 
     if(inputTn1->getRank() < inputTn2->getRank()){
-        cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E2"<<endl;
+        SPDLOG_LOGGER_ERROR(logger, "MatOps: ERROR_BAD_TENSOR_RANK-E2");
         return nullptr;
     }
 
@@ -834,11 +861,13 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
             rsltTn->SqueezeDimZero();
         }
 
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, float scalar, MAT_OPS mode){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatOps",
               "mode",(mode==MAT_OPS::ADD ? 0 :
                       mode==MAT_OPS::SUB ? 1 :
@@ -848,12 +877,17 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
     float* val = new float[1]; val[0] = scalar;
     OclTensorF* tmpTn = new OclTensorF();
     tmpTn->InitWithHostData(context, queue, {1}, val, ConfigTaskMatOps::BankIndex_outputTn);
-    return MatOps(scheduler,inputTn1,tmpTn,mode);
+    TensorF* rsltTn = MatOps(scheduler,inputTn1,tmpTn,mode);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Sqrt","",0,"",0,"",0,inputTn->getShape(),{});
-    return _ReluSqrtSquare(scheduler, inputTn, false, true, false);
+    TensorF* rsltTn = _ReluSqrtSquare(scheduler, inputTn, false, true, false);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::Concat2(
@@ -861,6 +895,7 @@ TensorF* XilinxImplementation::Concat2(
         TensorF* inputTn1,
         TensorF* inputTn2,
         int concatDim){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Concat2","concatDim",concatDim,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
 
     TensorF* _inputTn1 = ((OclTensorF*)inputTn1)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskConcat::BankIndex_inputTn1);
@@ -903,6 +938,7 @@ TensorF* XilinxImplementation::Concat2(
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -911,12 +947,15 @@ TensorF* XilinxImplementation::ReduceMax(
         WorkScheduler scheduler,
         TensorF* inputTn,
         int reductionDim){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceMax","reductionDim",reductionDim,"",0,"",0,inputTn->getShape(),{},{});
     bool overaxis0=(reductionDim==0), 
         overaxis1=(reductionDim==1), 
         overaxis2=(reductionDim==2), 
         overaxis3=(reductionDim==3);
-    return _Reduce_Task(inputTn, false, true, 0, overaxis0, overaxis1, overaxis2, overaxis3);
+    TensorF* rsltTn = _Reduce_Task(inputTn, false, true, 0, overaxis0, overaxis1, overaxis2, overaxis3);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 
@@ -941,6 +980,7 @@ TensorF* XilinxImplementation::ReduceMax(
  * @return     The tensor with top k / least k elements' indices as its data.
  */
 TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("TopK","axis",axis,"k",k,"",0,batchedMat->getShape(),{},{});
     assert(batchedMat->getRank()==3);
     assert(batchedMat->getShape()[2]%CONFIG_M_AXI_WIDTH==0);
@@ -964,11 +1004,11 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
         const unsigned vecsPerOutputSlice = DivCeil<unsigned>(k, CONFIG_M_AXI_WIDTH);
         const unsigned _dim2 = batchedMat->getShape()[2];
 
-        cout<<"BatchSize: "<<batchSize<<endl;
-        cout<<"vecsPerSlice: "<<vecsPerSlice<<endl;
-        cout<<"vecsPerOutputSlice: "<<vecsPerOutputSlice<<endl;
-        cout<<"_dim2: "<<_dim2<<endl;
-        cout<<"k: "<<k<<endl;
+        SPDLOG_LOGGER_DEBUG(logger, "BatchSize: {}", batchSize);
+        SPDLOG_LOGGER_DEBUG(logger, "vecsPerSlice: {}", vecsPerSlice);
+        SPDLOG_LOGGER_DEBUG(logger, "vecsPerOutputSlice: {}", vecsPerOutputSlice);
+        SPDLOG_LOGGER_DEBUG(logger, "_dim2: {}", _dim2);
+        SPDLOG_LOGGER_DEBUG(logger, "k: {}", k);
 
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_batchedMat)->ocl_buff));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorI*)rsltIndicesSplitedTn)->ocl_buff));
@@ -984,11 +1024,13 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
         //queue->finish();
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltIndicesSplitedTn;
     }
 }
 
 TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, TensorI* indices, int indices_axis){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Gather","indices_axis",indices_axis,"",0,"",0,inputTn->getShape(),indices->getShape(),{});
 
     assert(inputTn->getRank()==3);
@@ -1014,7 +1056,7 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
     }else{
         cl_int error; int argcnt=0;
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_indices)->ocl_buff));
+        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorI*)_indices)->ocl_buff));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)rsltTn)->ocl_buff));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, indicesAxis));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, B));
@@ -1030,7 +1072,7 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
         //queue->finish();
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -1050,6 +1092,7 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
  * @return     
  */
 TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn, TensorF* weights, TensorF* biases, int overrideDim2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Conv2D","overrideDim2",overrideDim2,"",0,"",0,inputTn->getShape(),weights->getShape(),{});
 
     unsigned int B  = inputTn->getShape()[0];
@@ -1061,7 +1104,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
     unsigned int D2Padded=-1;
 
     const unsigned int vecSizeTranspose = ConfigTaskConv2::kTransposeWidthBytes / CONFIG_DTYPE_SIZE;
-    std::cout<<"vecSizeTranspose: "<< vecSizeTranspose << std::endl;
+    SPDLOG_LOGGER_DEBUG(logger, "vecSizeTranspose: {}", vecSizeTranspose);
 
     //-----------------------------------------------------------------
     // Block 1. Padding inputTn
@@ -1088,11 +1131,12 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
 
         // The kernel is modified to not require the weight tensor to be 
         // padded in dimension-zero.
-        std::cout<< "Padding weightTn(super-vec padding):" << std::endl;
-        std::cout<<"\tD2: "<< D2 << std::endl;
-        std::cout<<"\tD2Padded: "<< D2Padded << std::endl;
+        SPDLOG_LOGGER_DEBUG(logger, "Padding weightTn(super-vec padding):");
+        SPDLOG_LOGGER_DEBUG(logger, "D2: {}", D2);
+        SPDLOG_LOGGER_DEBUG(logger, "D2Padded: {}", D2Padded);
+
     }else{
-        std::cout<< "Bypassing super-vec padding for weightTn" << std::endl;
+        SPDLOG_LOGGER_DEBUG(logger, "Bypassing super-vec padding for weightTn");
         _weightPadded = weights;
         D2Padded = D2;
     }
@@ -1133,8 +1177,8 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, size_k));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, size_m));
 
-        std::cout << "Launching Conv2 gemmHLS\n";
-        std::cout << "[N K M] = ["<< size_n << " " << size_k << " " << size_m <<"]\n";
+        SPDLOG_LOGGER_DEBUG(logger, "Launching Conv2 gemmHLS");
+        SPDLOG_LOGGER_DEBUG(logger, "[N K M] = [{}, {}, {}]", size_n, size_k, size_m);
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
@@ -1142,7 +1186,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         //queue->finish();
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-        std::cout << "Launching Conv2 gemmHLS...DONE\n";
+        SPDLOG_LOGGER_DEBUG(logger, "Launching Conv2 gemmHLS...DONE");
 
         //-----------------------------------------------------------------
         // Block 5. Unpadding rsltTnPadded
@@ -1150,23 +1194,28 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         if(D2%ConfigTaskConv2::kOuterTileSizeM!=0){ //same as Block2
             //Super-vec Unpadding( 128->64 )
             rsltTn = UnpadLastDim(scheduler, rsltTnPadded, D2);
-            std::cout<< "Unpadding results(super-vec unpadding)." << std::endl;
+            SPDLOG_LOGGER_DEBUG(logger, "Unpadding results(super-vec unpadding)");
         }else{
             rsltTn = rsltTnPadded;
-            std::cout<< "Bypassing super-vec unpadding of results." << std::endl;
+            SPDLOG_LOGGER_DEBUG(logger, "Bypassing super-vec unpadding of results");
         }        
 
         //-----------------------------------------------------------------
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReLU","",0,"",0,"",0,inputTn->getShape(),{},{});
-    return _ReluSqrtSquare(scheduler, inputTn, true, false, false);
+    TensorF *rsltTn = _ReluSqrtSquare(scheduler, inputTn, true, false, false);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReluSqrtSquare","runRelu",runRelu,"runSqrt",runSqrt,"runSquare",runSquare,inputTn->getShape(),{},{});
     assert(
         (runRelu&& !runSqrt&& !runSquare)||
@@ -1201,6 +1250,7 @@ TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF*
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -1221,6 +1271,7 @@ TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF*
  * @return     
  */
 TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int tileAxis, int tileCount) {
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Tile","tileAxis",tileAxis,"tileCount",tileCount,"",0,inputTn->getShape(),{},{});
 
     unsigned rank = inputTn->getRank();
@@ -1291,6 +1342,7 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -1300,12 +1352,15 @@ void XilinxImplementation::DumpMatrix(
         string npy_fname,
         TensorF* inputTn,
         string npy_dir){
-    TensorF *_inputTn = ((OclTensorF*)inputTn)->TransferToHost(queue);
     if(globalDumpTensors){
+        SPDLOG_LOGGER_DEBUG(reporter,"Started");
+        TensorF *_inputTn = ((OclTensorF*)inputTn)->TransferToHost(queue);
         vector<unsigned int> shape = _inputTn->getShape();
         vector<unsigned long > shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<float>(npy_dir+npy_fname,_inputTn->_buff ,shape_size_t,"w");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     }
+    
 }
 
 void XilinxImplementation::DumpMatrix(
@@ -1313,11 +1368,13 @@ void XilinxImplementation::DumpMatrix(
         string npy_fname,
         TensorI* inputTn,
         string npy_dir){
-    TensorI *_inputTn = ((OclTensorI*)inputTn)->TransferToHost(queue);
     if(globalDumpTensors){
+        SPDLOG_LOGGER_DEBUG(reporter,"Started");
+        TensorI *_inputTn = ((OclTensorI*)inputTn)->TransferToHost(queue);
         vector<unsigned int> shape = _inputTn->getShape();
         vector<unsigned long> shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<int>(npy_dir+npy_fname,_inputTn->_buff ,shape_size_t,"w");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     }
 }
 
@@ -1415,13 +1472,13 @@ cl_ulong XilinxImplementation::get_duration_ns (const cl::Event &event) {
 
 void XilinxImplementation::ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event){
     uint64_t ns = get_duration_ns(event);
-#ifdef REPORT_EXECUTION_DURATION
-        std::cout<< "\t** "<< name << (isNDRange?"(ndrange)":"(task)")<<":: "<<
-                "\t(us): " << ns/1000.0f <<
-                "\t(ms): " << ns/1000000.0f <<
-                "\t( s): " << ns/1000000000.0f <<
-                std::endl;
-#endif
+        SPDLOG_LOGGER_INFO(reporter, 
+            "** {}{}(us): {}, (ms): {}, (s): {}", 
+            name, 
+            (isNDRange?"(ndrange):: ":"(task):: "),
+            ns/1000.0f,
+            ns/1000000.0f,
+            ns/1000000000.0f);
 }
 
 int XilinxImplementation::SetModeEnvVar(const RUN_MODE mode){

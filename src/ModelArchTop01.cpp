@@ -1,9 +1,5 @@
-//
-// Created by saleh on 8/28/18.
-//
-
+#include "build_config.h"
 #include "ModelArchTop01.h"
-
 
 ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::CPU,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
@@ -12,7 +8,7 @@ ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount
     N = (unsigned)pointcount;
     K = (unsigned)knn_k;
 #ifndef USE_OCL
-    cout<<"This ModelArch needs OpenCL enabled.\nTerminating..."<<endl;
+    SPDLOG_LOGGER_ERROR(logger,"This ModelArch needs OpenCL enabled, Terminating...");
     exit(1);
 #endif
 }
@@ -20,7 +16,7 @@ ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount
 ModelInfo ModelArchTop01::GetModelInfo() {
     ModelInfo tmplt;
     tmplt.ModelType="Classifier";
-    tmplt.Version="2.0";
+    tmplt.Version="1.0";
     tmplt.DesignNotes=
             "1) CPU only.\n"
             "2) Weights are on CPU.";
@@ -519,9 +515,9 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     float accu =0;
 
     //----------------------------------------------------------------------------------------
-    cout<<"Starting Process..."<<endl;
-    cout<<"Batch Size  = "<< B << endl;
-    cout<<"Point Count = "<< N << endl;
+    SPDLOG_LOGGER_INFO(logger,"Starting Process...");
+    SPDLOG_LOGGER_INFO(logger,"Batch Size: {}", B);
+    SPDLOG_LOGGER_INFO(logger,"Point Count: {}", N);
 
     //----------------------------------------------------------------------------------------
     // TransferNet(net_BxNx3 is this layer's input)
@@ -557,7 +553,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
 
     //----------------------------------------------------------------------------------------
     // DGCNN Layer #0
-    cout<<"STATUS: "<<"DGCCN0 Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"DGCCN0 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
         TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
@@ -601,7 +597,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
 
     //----------------------------------------------------------------------------------------
     // DGCNN Layer #1
-    cout<<"STATUS: "<<"DGCCN1 Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"DGCCN1 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
         TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
@@ -643,10 +639,10 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
 
     //----------------------------------------------------------------------------------------
     // DGCNN Layer #2
-    cout<<"STATUS: "<<"DGCCN2 Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"DGCCN2 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU, scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,
                                                  edge_features,
@@ -685,7 +681,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
 
     //----------------------------------------------------------------------------------------
     // DGCNN Layer #3
-    cout<<"STATUS: "<<"DGCCN3 Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"DGCCN3 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
         TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
@@ -726,8 +722,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     }
 
     //----------------------------------------------------------------------------------------
-    // concat layer
-    cout<<"STATUS: "<<"Agg Layer Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"Agg Layer Started...");
     {
         endpoint_0->ExpandDims(2);
         endpoint_1->ExpandDims(2);
@@ -794,7 +789,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     //----------------------------------------------------------------------------------------
     //FC1
     //net is of shape Bx1x1x1024
-    cout<<"STATUS: "<<"FC Layer1 Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"FC Layer1 Started...");
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
                                              platformSelector->weightsLoader->AccessWeights(
@@ -827,7 +822,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     //----------------------------------------------------------------------------------------
     //FC2
     //net is of shape Bx1x1x512
-    cout<<"STATUS: "<<"FC Layer2 Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"FC Layer2 Started...");
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
                                              platformSelector->weightsLoader->AccessWeights(
@@ -861,7 +856,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     //----------------------------------------------------------------------------------------
     //FC3
     //net is of shape Bx1x1x256
-    cout<<"STATUS: "<<"FC Layer3 Started"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"FC Layer3 Started...");
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
                                              platformSelector->weightsLoader->AccessWeights(
@@ -880,7 +875,7 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
         if(net->getPlatform()==PLATFORMS::GPU_CUDA) return ((CudaTensorF*)net)->TransferToHost();
 #endif
 #ifdef USE_OCL
-        if(net->getPlatform()==PLATFORMS::CPU) return platformSelector->CrossThePlatform(net,PLATFORMS::CPU);
+        if(net->getPlatform()==PLATFORMS::GPU_OCL) return platformSelector->CrossThePlatform(net,PLATFORMS::CPU);
 #endif
     }
 
