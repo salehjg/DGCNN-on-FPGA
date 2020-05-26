@@ -80,6 +80,7 @@ Considering that steps one, two and three are already done, current directory is
 ```
 sh LaunchDeepPointV1FPGA.sh
 ```
+The launcher script forwards its arguments to the host program.
 
 ## Extra. Setting Kernel Clock Frequencies 
 Refer to `CMakeLists.txt` script to change kernel clock frequency.
@@ -96,7 +97,10 @@ ModelArch01 | CPU         | CPU | CPU Only
 ModelArch02 | CPU, FPGA   | Xilinx SDAccel Platform | FPGA Only
 
 # UnitTests for The Platforms
-This repository has only one main executable(MainExecutable.cpp) that handles both the classifier and the unit tests while you can enable or disable each phase in the source code.
+To run OCl unittests:
+```
+sh LaunchDeepPointV1FPGA.sh -t
+```
 
 # UnitTests for The Kernels
 In order to make debugging of the kernels much more easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
