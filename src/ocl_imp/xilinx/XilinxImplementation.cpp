@@ -868,7 +868,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
 
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, float scalar, MAT_OPS mode){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
-    PrintInfo("MatOps",
+    PrintInfo("MatOps-scalar",
               "mode",(mode==MAT_OPS::ADD ? 0 :
                       mode==MAT_OPS::SUB ? 1 :
                       mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
@@ -1216,7 +1216,7 @@ TensorF* XilinxImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
 
 TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
-    PrintInfo("ReluSqrtSquare","runRelu",runRelu,"runSqrt",runSqrt,"runSquare",runSquare,inputTn->getShape(),{},{});
+    //PrintInfo("ReluSqrtSquare","runRelu",runRelu,"runSqrt",runSqrt,"runSquare",runSquare,inputTn->getShape(),{},{});
     assert(
         (runRelu&& !runSqrt&& !runSquare)||
         (!runRelu&& runSqrt&& !runSquare)||

@@ -856,7 +856,7 @@ TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, T
 
 TensorF* CpuImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, float scalar, MAT_OPS mode) {
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
-    PrintInfo("MatOps-Scalar",
+    PrintInfo("MatOps-scalar",
             "mode",(mode==MAT_OPS::ADD ? 0 :
                     mode==MAT_OPS::SUB ? 1 :
                     mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
