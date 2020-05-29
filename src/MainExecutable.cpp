@@ -116,7 +116,7 @@ int main(int argc, const char* argv[]){
         // PERFORMANCE REPORTER
         auto file_sink4 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("report_kernel.log", true); //Kernels are reported
         file_sink4->set_level(spdlog::level::info);
-        file_sink4->set_pattern("[%H:%M:%S.%f][%^%l%$] %v");
+        file_sink4->set_pattern("[%H:%M:%S.%f][%^%l%$][source %s][function %!][line %#] %v");
 
         auto file_sink5 = std::make_shared<spdlog::sinks::basic_file_sink_mt>("report_host_kernel.log", true); //kernels and host
         file_sink5->set_level(spdlog::level::debug);
@@ -126,6 +126,7 @@ int main(int argc, const char* argv[]){
         reporter = new spdlog::logger("DP1FPGA Host-reporter", {file_sink4,file_sink5});
         reporter->set_level(spdlog::level::trace); 
 
+        spdlog::flush_every(std::chrono::seconds(5));
         //SPDLOG_LOGGER_TRACE(logger,"test log ::: trace");
         //SPDLOG_LOGGER_DEBUG(logger,"test log ::: debug");
         //SPDLOG_LOGGER_INFO(logger,"test log ::: info");
