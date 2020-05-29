@@ -31,12 +31,24 @@ void handler(int sig) {
     cerr<<"The host program has crashed, printing call stack:\n";
     cerr<<"Error: signal "<< sig<<"\n";
     backtrace_symbols_fd(array, size, STDERR_FILENO);
-    exit(1);
+    
+    SPDLOG_LOGGER_CRITICAL(logger,"The host program has crashed.");
+    spdlog::shutdown();
+    
+    exit(SIGSEGV);
+}
+
+void handlerInt(int sig_no)
+{
+    SPDLOG_LOGGER_CRITICAL(logger,"CTRL+C pressed, terminating...");
+    spdlog::shutdown();
+    exit(SIGINT);
 }
 
 int main(int argc, const char* argv[]){
     signal(SIGSEGV, handler);
     signal(SIGABRT, handler);
+    signal(SIGINT, handlerInt);
 
     ArgumentParser parser("ArgParse");
     parser.add_argument()

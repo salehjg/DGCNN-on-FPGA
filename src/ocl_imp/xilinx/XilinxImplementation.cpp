@@ -377,6 +377,13 @@ TensorF* XilinxImplementation::_Reduce_Task(
         bool overaxis2,
         bool overaxis3){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("_Reduce_Task",
+        "pow_y",pow_y,
+        "reduceSum",reduceSum,
+        "reduceMax",reduceMax,
+        inputTn->getShape(),
+        {},
+        {overaxis0,overaxis1,overaxis2,overaxis3});
     assert( !(reduceSum && reduceMax) && (reduceSum || reduceMax) );
     const unsigned rank = inputTn->getRank();
     unsigned _dim0,_dim1,_dim2,_dim3;
@@ -479,6 +486,7 @@ TensorF* XilinxImplementation::_ReduceSum4D_Task(
         bool overaxis3,
         int pow_y){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("_ReduceSum4D_Task","pow_y",pow_y,"",0,"",0,inputTn->getShape(),{},{overaxis0,overaxis1,overaxis2,overaxis3});
     TensorF* rsltTn = _Reduce_Task(inputTn, true, false, (unsigned)pow_y, overaxis0, overaxis1, overaxis2, overaxis3);
     SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
@@ -506,7 +514,7 @@ TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
                                         bool over_axis3,
                                         int pow_y){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
-    PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
+    PrintInfo("_ReduceSum4D","pow_y",pow_y,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
     assert(over_axis0&&over_axis1&&over_axis2&&!over_axis3); // TTTF ONLY
     TensorF* rsltTn = _ReduceSum4D_Task(inputTn,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
     SPDLOG_LOGGER_DEBUG(reporter,"Finished");
@@ -562,6 +570,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
         unsigned lastDimPadded,
         unsigned lastDimUnpadded){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("_PadUnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
     TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskPadUnpad::BankIndex_inputTn);
 
     cl_int error; 
@@ -1216,7 +1225,7 @@ TensorF* XilinxImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
 
 TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
-    //PrintInfo("ReluSqrtSquare","runRelu",runRelu,"runSqrt",runSqrt,"runSquare",runSquare,inputTn->getShape(),{},{});
+    PrintInfo("ReluSqrtSquare","runRelu",runRelu,"runSqrt",runSqrt,"runSquare",runSquare,inputTn->getShape(),{},{});
     assert(
         (runRelu&& !runSqrt&& !runSquare)||
         (!runRelu&& runSqrt&& !runSquare)||

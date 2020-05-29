@@ -970,22 +970,22 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(TensorPadUnpadCpuInteger());
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
-    PrintReport(KernelConv2Mlp());
-    PrintReport(KernelTopK());
-    PrintReport(KernelMatops());
+    //PrintReport(KernelConv2Mlp());
+    //PrintReport(KernelTopK());
+    //PrintReport(KernelMatops());
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
-    PrintReport(KernelMatmul());
+    //PrintReport(KernelMatmul());
     PrintReport(KernelTile());
     PrintReport(KernelGather());
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());
-    PrintReport(KernelTranspose());
+    //PrintReport(KernelTranspose());
     
 }
 
