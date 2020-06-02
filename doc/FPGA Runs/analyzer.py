@@ -361,6 +361,89 @@ class ReportGenerator:
 
         writer.save()
 
+    def generate_xilinximplementaion_datamover_deviceonly(self):
+        # Targets:
+        #       - Device kernel datamover only
+        #
+        # This method generates layer based report for total execution-time per kernel.
+        _layers = self.layers.copy()
+        writer = pd.ExcelWriter("xilinximplementaion_datamover_deviceonly.xlsx", engine='xlsxwriter')
+
+        def get_all_kernels(src_layer: analyzer.Layer):
+            kernels = []
+            if src_layer.is_fpga and src_layer.device_elapsed_us != 0:
+                kernels.append(src_layer)
+            subs = len(src_layer.sub_layers)
+            for i in range(subs):
+                kernels.extend(get_all_kernels(src_layer.sub_layers[i]))
+            return kernels
+
+        # ---------------------------------------------------
+        # 0. Get all of the device layers (is_fpga=true)
+        print("WARN01: Filtering out non kernel layers by the device_elapsed_us param.")
+        _device_kernels = []
+        for layer in _layers:
+            _device_kernels.extend(get_all_kernels(layer))
+
+        # ---------------------------------------------------
+        # 1. Sort by layer name...
+        sorted_by_layername = {}
+
+        for layer in _device_kernels:
+            assert layer.is_fpga
+            is_already_added = False
+            keys = sorted_by_layername.keys()
+            for key in keys:
+                if key == layer.layer_name:
+                    is_already_added = True
+
+            if layer.layer_name != "LaunchDataMover":
+                continue
+
+            if is_already_added:
+                sorted_by_layername[layer.layer_name].append(layer)
+            else:
+                sorted_by_layername[layer.layer_name] = [layer]
+
+        layer_names = list(sorted_by_layername.keys())
+
+        # ---------------------------------------------------
+        # 2. Generate the per layer sheets...
+        for name in layer_names:
+            perlayer_dataframe = {}
+            perlayer_dataframe['Shape1'] = []
+            perlayer_dataframe['Shape2'] = []
+            perlayer_dataframe['DeviceOnly(us)'] = []
+
+            for layer in sorted_by_layername[name]:
+                perlayer_dataframe['Shape1'].append(str(layer.shape1))
+                perlayer_dataframe['Shape2'].append(str(layer.shape2))
+                perlayer_dataframe['DeviceOnly(us)'].append(layer.device_elapsed_us)
+
+            df = pd.DataFrame(perlayer_dataframe)
+            df.to_excel(writer, sheet_name=name)
+
+        # ---------------------------------------------------
+        # 3. Generate the summary sheet...
+        summary_dataframe = {}
+        summary_dataframe['Name'] = []
+        summary_dataframe['Launch Count'] = []
+        summary_dataframe['DeviceOnly(us)'] = []
+        for name in layer_names:
+            launch_cnt = 0
+            total_device_usec = 0
+            for layer in sorted_by_layername[name]:
+                launch_cnt += 1
+                total_device_usec += layer.device_elapsed_us
+            summary_dataframe['Name'].append(name)
+            summary_dataframe['Launch Count'].append(launch_cnt)
+            summary_dataframe['DeviceOnly(us)'].append(total_device_usec)
+
+        df = pd.DataFrame(summary_dataframe)
+        df.to_excel(writer, sheet_name="Summary")
+
+        writer.save()
+
 
 def main():
     if len(sys.argv) != 2:
@@ -373,6 +456,7 @@ def main():
     obj.generate_xilinximplementaion_layerbased_host_device()
     obj.generate_xilinximplementaion_kernelbased_deviceonly()
     obj.generate_anyimplementaion_layerbased_host_device()
+    obj.generate_xilinximplementaion_datamover_deviceonly()
 
 
 main()

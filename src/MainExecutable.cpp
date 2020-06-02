@@ -84,6 +84,11 @@ int main(int argc, const char* argv[]){
     parser.add_argument()
         .names({"-k", "--dumptensors"})
         .description("Dump tensors into *.npy files in the data directory(no value is needed for this argument)")
+        .required(false);     
+
+    parser.add_argument()
+        .names({"-n", "--nolog"})
+        .description("Disable logging.(no value is needed for this argument)")
         .required(false);      
 
     parser.enable_help();
@@ -138,7 +143,11 @@ int main(int argc, const char* argv[]){
         reporter = new spdlog::logger("DP1FPGA Host-reporter", {file_sink4,file_sink5});
         reporter->set_level(spdlog::level::trace); 
 
-        spdlog::flush_every(std::chrono::seconds(5));
+
+        if(parser.exists("n")) {
+            logger->set_level(spdlog::level::off); 
+            reporter->set_level(spdlog::level::off); 
+        }
         //SPDLOG_LOGGER_TRACE(logger,"test log ::: trace");
         //SPDLOG_LOGGER_DEBUG(logger,"test log ::: debug");
         //SPDLOG_LOGGER_INFO(logger,"test log ::: info");
