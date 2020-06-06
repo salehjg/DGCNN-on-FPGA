@@ -885,7 +885,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
               "",0,"",0,inputTn1->getShape(),{},{});
     float* val = new float[1]; val[0] = scalar;
     OclTensorF* tmpTn = new OclTensorF();
-    tmpTn->InitWithHostData(context, queue, {1}, val, ConfigTaskMatOps::BankIndex_outputTn);
+    tmpTn->InitWithHostData(context, queue, {1}, val, ConfigTaskMatOps::BankIndex_inputTn2);
     TensorF* rsltTn = MatOps(scheduler,inputTn1,tmpTn,mode);
     SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
