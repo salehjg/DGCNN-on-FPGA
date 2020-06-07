@@ -1,15 +1,18 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include "Helper.h"
+
+using namespace std;
 
 class TensorF {
 public:
     TensorF();
-    TensorF(std::vector<unsigned> shape);
-    TensorF(std::vector<unsigned> shape, float* buff);
-    virtual void Init(std::vector<unsigned> shape);
-    virtual void Init(std::vector<unsigned> shape, float* buff);
+    TensorF(std::vector<unsigned> shape, int bank, string _tag);
+    TensorF(std::vector<unsigned> shape, float* buff, int bank, string _tag);
+    virtual void Init(std::vector<unsigned> shape, int bank, string _tag);
+    virtual void Init(std::vector<unsigned> shape, float* buff, int bank, string _tag);
     std::vector<unsigned> getShape();
     int getRank();
     void ExpandDims(int axis);
@@ -27,6 +30,8 @@ public:
     virtual ~TensorF();
 
     float* _buff;
+    int bank;
+    string tag;
 
 protected:
     std::vector<unsigned> shape;

@@ -1,7 +1,7 @@
 #include <cassert>
 #include <vector>
 #include <iostream>
-#include "TensorF.h"
+#include "FakeTensorF.h"
 #include "Helper.h"
 
 TensorF::TensorF() {
@@ -9,28 +9,32 @@ TensorF::TensorF() {
     platform = PLATFORMS::DEFAULT; //Till it's not initialized, keep it general
 }
 
-TensorF::TensorF(std::vector<unsigned> shape) {
-    Init(shape);
+TensorF::TensorF(std::vector<unsigned> shape, int bank, string _tag) {
+    Init(shape, bank, _tag);
 }
 
-TensorF::TensorF(std::vector<unsigned> shape, float *buff) {
-    Init(shape,buff);
+TensorF::TensorF(std::vector<unsigned> shape, float *buff, int bank, string _tag) {
+    Init(shape,buff, bank, _tag);
 }
 
-void TensorF::Init(std::vector<unsigned> shape) {
+void TensorF::Init(std::vector<unsigned> shape, int bank, string _tag) {
     if(initialized){
         //delete(_buff);
     }
+    this->bank = bank;
+    this->tag = _tag;
     this->shape = shape;
     this->rank = (int)(shape.size());
     initialized = true;
     platform = PLATFORMS::CPU;
 }
 
-void TensorF::Init(std::vector<unsigned> shape, float* buff){
+void TensorF::Init(std::vector<unsigned> shape, float* buff, int bank, string _tag){
     if(initialized){
         //delete(_buff);
     }
+    this->bank = bank;
+    this->tag = _tag;
     this->shape = shape;
     this->rank = (int)(shape.size());
     initialized = true;
@@ -84,7 +88,6 @@ void TensorF::Reshape(std::vector<unsigned> newShape){
     for (int i = 0; i < newShape.size(); i++) {
         len = len * newShape[i];
     }
-    assert(len==getLength());
 
     shape = newShape;
     rank = (int)shape.size();

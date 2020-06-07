@@ -1,7 +1,8 @@
 
 
-#include "ModelArchTop01.h"
+#include "FakeModelArchTop.h"
 #include "Layers.h"
+#include "config.h"
 
 ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new Layers(PLATFORMS::CPU,{PLATFORMS::CPU},true);
@@ -9,35 +10,9 @@ ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount
     B = (unsigned)batchsize;
     N = (unsigned)pointcount;
     K = (unsigned)knn_k;
-}
 
-ModelInfo ModelArchTop01::GetModelInfo() {
-    ModelInfo tmplt;
-    tmplt.ModelType="Classifier";
-    tmplt.Version="1.0";
-    tmplt.DesignNotes=
-            "1) CPU only.\n"
-            "2) Weights are on CPU.";
-    tmplt.ExperimentNotes="";
-    tmplt.ToDo=""
-               "";
-    tmplt.Date="99.3.2";
-    return tmplt;
-}
-
-void ModelArchTop01::SetModelInput_data(string npy_pcl) {
-    _npy_pcl = cnpy::npy_load(npy_pcl);
-    input_pcl_BxNxD = new TensorF({B,N,3}, _npy_pcl.data<float>());
-    input_pcl_BxNxD += DB_OFFSET*N*3;///TODO: CHECK COMPATIBILITY FOR GPU TENSOR(CUDA & OCL)
-    assert( N == (int)(_npy_pcl.shape[1]) );
-}
-
-void ModelArchTop01::SetModelInput_labels(string npy_labels) {
-    // dataType of npy file should be int32, NOT uchar8!
-    // use dataset_B5_labels_int32.npy
-    _npy_labels = cnpy::npy_load(npy_labels);
-    input_labels_B = new TensorI({B},_npy_labels.data<int>());
-    input_labels_B->_buff += DB_OFFSET;
+    input_pcl_BxNxD = platformSelector->CreateDummyTensorF(1, "x0");
+    input_labels_B = platformSelector->CreateDummyTensorI(1, "x0");
 }
 
 TensorF* ModelArchTop01::FullyConnected_Forward(WorkScheduler scheduler, TensorF* input_BxD, TensorF* weights, TensorF* biases){
@@ -48,7 +23,7 @@ TensorF* ModelArchTop01::FullyConnected_Forward(WorkScheduler scheduler, TensorF
     return rsltTn;
 }
 
-TensorF* ModelArchTop01::Batchnorm_Forward(WorkScheduler scheduler, TensorF* input, TensorF* gamma, TensorF* beta, TensorF* ema_ave, TensorF* ema_var){
+TensorF* ModelArchTop01::Batchnorm_Forward(WorkScheduler scheduler, TensorF* input, TensorF* gamma, TensorF* beta, TensorF* ema_ave, TensorF* ema_var, int rankOverride){
     int rank;
     float bn_decay = 0.5f;
 
@@ -56,17 +31,15 @@ TensorF* ModelArchTop01::Batchnorm_Forward(WorkScheduler scheduler, TensorF* inp
     TensorF* mu;
     TensorF* var;
 
-    rank = input->getRank();
-
     ///TODO: Rank4 and Rank2 branches could be merged into 1 branch with just mu and var lines conditioned!
-    if(rank==4){
+    if(rankOverride==4){
         /*
         {// JUST FOR DEBUGGING --- STILL RAISES EXCEPTION ON COMPARE TENSORS FOR REDUCESUM4D
-                platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg4d_src.npy",input);
+                //platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg4d_src.npy",input);
                 TensorF * dbgTnCPU = platformSelector->ReduceSum4D(PLATFORMS::CPU, scheduler, input, true, true, true, false);
                 TensorF * dbgTn = platformSelector->ReduceSum4D(PLATFORMS::CPU, scheduler, input, true, true, true, false);
                 assert(platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,dbgTnCPU,dbgTn));
-                platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg4d_dst.npy",dbgTn);
+                //platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg4d_dst.npy",dbgTn);
         }*/
 
         //mu and var is of shape (dim3)
@@ -115,10 +88,10 @@ TensorF* ModelArchTop01::Batchnorm_Forward(WorkScheduler scheduler, TensorF* inp
         return rsltTn;
     }
 
-    if(rank==2){
+    if(rankOverride==2){
         /*
         {// JUST FOR DEBUGGING
-            platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg2d_src.npy",input);
+            //platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg2d_src.npy",input);
             input->ExpandDimZero();
             input->ExpandDimZero();
             TensorF * dbgTnCPU = platformSelector->ReduceSum4D(PLATFORMS::CPU, scheduler, input, true, true, true, false);
@@ -126,7 +99,7 @@ TensorF* ModelArchTop01::Batchnorm_Forward(WorkScheduler scheduler, TensorF* inp
             assert(platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,dbgTnCPU,dbgTn));
             input->SqueezeDimZero();
             input->SqueezeDimZero();
-            platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg2d_dst.npy",dbgTn);
+            //platformSelector->DumpMatrix(PLATFORMS::CPU,scheduler,"dbg2d_dst.npy",dbgTn);
         }*/
 
         //mu and var is of shape (dim1)
@@ -246,27 +219,22 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 PLATFORMS::CPU,
                 scheduler,
                 edgeFeatures,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv1.weights.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv1.biases.npy")
-                        );
+                platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
+                );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A01_tnet_conv.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A01_tnet_conv.npy",net1);
 
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv1.bn.gamma.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv1.bn.beta.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                4
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A02_tnet_bn.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A02_tnet_bn.npy",net2);
 
 
         TensorF *net3 = platformSelector->ReLU(
@@ -274,7 +242,7 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 scheduler,
                 net2);
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A03_tnet_relu.npy",net3);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A03_tnet_relu.npy",net3);
 
         net = net3;
 
@@ -288,27 +256,22 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 PLATFORMS::CPU,
                 scheduler,
                 net,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv2.weights.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv2.biases.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A04_tnet_conv.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A04_tnet_conv.npy",net1);
 
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv2.bn.gamma.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv2.bn.beta.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                4
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A05_tnet_bn.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A05_tnet_bn.npy",net2);
 
 
         TensorF *net3 = platformSelector->ReLU(
@@ -316,7 +279,7 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 scheduler,
                 net2);
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A06_tnet_relu.npy",net3);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A06_tnet_relu.npy",net3);
         delete(net);
         net = net3;
 
@@ -330,7 +293,7 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 PLATFORMS::CPU,
                 scheduler,net,2);
         net1->ExpandDims(2);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A07_tnet_pool.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A07_tnet_pool.npy",net1);
         delete(net);
         net = net1;
     }
@@ -341,27 +304,22 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 PLATFORMS::CPU,
                 scheduler,
                 net,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv3.weights.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv3.biases.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A08_tnet_conv.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A08_tnet_conv.npy",net1);
 
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv3.bn.gamma.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv3.bn.beta.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                4
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A09_tnet_bn.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A09_tnet_bn.npy",net2);
 
 
         TensorF *net3 = platformSelector->ReLU(
@@ -369,7 +327,7 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 scheduler,
                 net2);
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A10_tnet_relu.npy",net3);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A10_tnet_relu.npy",net3);
         delete(net);
         net = net3;
 
@@ -383,7 +341,7 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
                 PLATFORMS::CPU,
                 scheduler,net,1);
         net1->SqueezeDims();
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A11_tnet_pool.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A11_tnet_pool.npy",net1);
         delete(net);
         net = net1;
     }
@@ -395,34 +353,29 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         TensorF* net1 = FullyConnected_Forward(
                 scheduler,
                 net,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc1.weights.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc1.biases.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskMatMul::BankIndex_inputTn1,"matmul_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2")
                 );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A12_tnet_fc.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A12_tnet_fc.npy",net1);
 
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc1.bn.gamma.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc1.bn.beta.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                2
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A13_tnet_bn.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A13_tnet_bn.npy",net2);
 
         TensorF *net3 = platformSelector->ReLU(
                 PLATFORMS::CPU,
                 scheduler,
                 net2);
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A13_tnet_relu.npy",net3);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A13_tnet_relu.npy",net3);
         delete(net);
         net = net3;
 
@@ -437,34 +390,29 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
         TensorF* net1 = FullyConnected_Forward(
                 scheduler,
                 net,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc2.weights.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc2.biases.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskMatMul::BankIndex_inputTn1,"matmul_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2")
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A14_tnet_fc.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A14_tnet_fc.npy",net1);
 
         TensorF* net2 = Batchnorm_Forward(
                 scheduler,net1,
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc2.bn.gamma.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc2.bn.beta.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::CPU,"transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                2
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A15_tnet_bn.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A15_tnet_bn.npy",net2);
 
         TensorF *net3 = platformSelector->ReLU(
                 PLATFORMS::CPU,
                 scheduler,
                 net2);
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A16_tnet_relu.npy",net3);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A16_tnet_relu.npy",net3);
         delete(net);
         net = net3;
 
@@ -474,29 +422,27 @@ TensorF* ModelArchTop01::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
 
     //----------------------------------------------------------------------------
     {
-        TensorF* weights = platformSelector->weightsLoader->AccessWeights(
-                PLATFORMS::CPU,"transform_net1.transform_XYZ.weights.npy");
-        TensorF* _biases = platformSelector->weightsLoader->AccessWeights(
-                PLATFORMS::CPU,"transform_net1.transform_XYZ.biases.npy");
+        TensorF* weights = platformSelector->CreateDummyTensorF(ConfigTaskMatMul::BankIndex_inputTn1,"matmul_in2");
+        TensorF* _biases = platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1");
 
         float eyeData[] = {1,0,0,
                            0,1,0,
                            0,0,1};
-        TensorF* eye = new TensorF({9},eyeData);
+        TensorF* eye = new TensorF({9},eyeData,ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2");
 
         TensorF* biases = platformSelector->MatOps(PLATFORMS::CPU,scheduler,_biases,eye, MAT_OPS::ADD);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A17_biass_added.npy",biases);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A17_biass_added.npy",biases);
 
         TensorF* transformTn = platformSelector->MatMul(PLATFORMS::CPU,scheduler,net,weights);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A18_transform_batch.npy",transformTn);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A18_transform_batch.npy",transformTn);
 
         TensorF* transformFinalTn = platformSelector->MatOps(PLATFORMS::CPU,scheduler,transformTn,biases, MAT_OPS::ADD);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A19_transform_batch_bias.npy",transformFinalTn);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A19_transform_batch_bias.npy",transformFinalTn);
 
         delete(biases);
         delete(transformTn);
 
-        return platformSelector->CrossThePlatform(transformFinalTn, PLATFORMS::CPU); // Force CPU
+        return transformFinalTn;
     }
 }
 
@@ -522,26 +468,26 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     {
         net_BxNx3 = input_pcl_BxNxD;
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B00_input_pcl_BxNxD.npy",input_pcl_BxNxD);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B00_input_pcl_BxNxD.npy",input_pcl_BxNxD);
 
         TensorF *adj_matrix = PairwiseDistance(scheduler, net_BxNx3);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B01_tnet_adj_matrix.npy",adj_matrix);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B01_tnet_adj_matrix.npy",adj_matrix);
 
         TensorI *nn_idx = platformSelector->TopK(PLATFORMS::CPU,scheduler,adj_matrix,2,K);
 
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B02_tnet_nn_idx.npy",nn_idx);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B02_tnet_nn_idx.npy",nn_idx);
 
 
         TensorF *edge_features = GetEdgeFeatures(scheduler,net_BxNx3, nn_idx);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B03_tnet_edgef.npy",edge_features);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B03_tnet_edgef.npy",edge_features);
 
         TensorF *transform = TransformNet(scheduler,edge_features);
         transform->Reshape({B,3,3});
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B04_tnet_3x3.npy",transform);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B04_tnet_3x3.npy",transform);
 
         net = platformSelector->MatMul(PLATFORMS::CPU, scheduler, net_BxNx3, transform);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C01_pcl.npy",net);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C01_pcl.npy",net);
 
         delete(adj_matrix);
         delete(nn_idx);
@@ -558,29 +504,24 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,
                                                  edge_features,
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn1.weights.npy"),
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn1.biases.npy")
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
         );
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C02_dg1_conv.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C02_dg1_conv.npy",net1);
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn1.bn.gamma.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn1.bn.beta.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn1.bn.dgcnn1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn1.bn.dgcnn1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          4
         );
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C03_dg1_bn.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C03_dg1_bn.npy",net2);
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::CPU,scheduler,net2);
 
         TensorF* net4 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,net3,2);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B05_dg1_pool.npy",net4);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B05_dg1_pool.npy",net4);
 
         net = net4;
         endpoint_0 = net;
@@ -602,27 +543,22 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,
                                                  edge_features,
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn2.weights.npy"),
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn2.biases.npy")
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
         );
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn2.bn.gamma.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn2.bn.beta.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn2.bn.dgcnn2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn2.bn.dgcnn2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          4
         );
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::CPU,scheduler,net2);
 
         TensorF* net4 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,net3,2);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B06_dg2_pool.npy",net4);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B06_dg2_pool.npy",net4);
 
         net = net4;
         endpoint_1 = net;
@@ -644,27 +580,22 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,
                                                  edge_features,
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn3.weights.npy"),
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn3.biases.npy")
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
         );
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn3.bn.gamma.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn3.bn.beta.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn3.bn.dgcnn3.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn3.bn.dgcnn3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          4
         );
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::CPU,scheduler,net2);
 
         TensorF* net4 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,net3,2);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B07_dg3_pool.npy",net4);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B07_dg3_pool.npy",net4);
 
         net = net4;
         endpoint_2 = net;
@@ -686,27 +617,22 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
         TensorF* net1 = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,
                                                  edge_features,
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn4.weights.npy"),
-                                                 platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::CPU,"dgcnn4.biases.npy")
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
         );
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn4.bn.gamma.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn4.bn.beta.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn4.bn.dgcnn4.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"dgcnn4.bn.dgcnn4.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          4
         );
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::CPU,scheduler,net2);
 
         TensorF* net4 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,net3,2);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B08_dg4_pool.npy",net4);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B08_dg4_pool.npy",net4);
 
         net = net4;
         endpoint_3 = net;
@@ -736,36 +662,30 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
         delete(endpoint_3);
         delete(concatB);
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B09_agg_concat.npy",concatC);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B09_agg_concat.npy",concatC);
 
         // DIM2(K) of concatenated matrix is ONE, NOT 'K'
-        TensorF* net1 = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,
-                 concatC,
-                 platformSelector->weightsLoader->AccessWeights(
-                         PLATFORMS::CPU,"agg.weights.npy"),
-                 platformSelector->weightsLoader->AccessWeights(
-                         PLATFORMS::CPU,"agg.biases.npy")
+        TensorF* net1 = platformSelector->Conv2D(PLATFORMS::CPU,scheduler,concatC,
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_weightTn,"conv_w"),
+                                                 platformSelector->CreateDummyTensorF(ConfigTaskConv2::BankIndex_biasTn,"conv_b")
                  );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B10_agg_conv.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B10_agg_conv.npy",net1);
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"agg.bn.gamma.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"agg.bn.beta.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"agg.bn.agg.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"agg.bn.agg.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          4
         );
 
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B11_agg_bn.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B11_agg_bn.npy",net2);
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::CPU,scheduler,net2);
 
         TensorF* net4 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,net3,1);
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B12_agg_pool.npy",net4);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B12_agg_pool.npy",net4);
 
         net = net4;
 
@@ -790,25 +710,20 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     //SPDLOG_LOGGER_INFO(logger,"FC Layer1 Started...");
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
-                                             platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::CPU,"fc1.weights.npy"),
-                                             platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::CPU,"fc1.biases.npy")
+                                               platformSelector->CreateDummyTensorF(ConfigTaskMatMul::BankIndex_inputTn1,"matmul_in2"),
+                                               platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2")
         );
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B13_fc.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B13_fc.npy",net1);
 
         //net1 is of shape Bx1x1x512
         TensorF *net2 = Batchnorm_Forward(scheduler,net1,
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc1.bn.gamma.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc1.bn.beta.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc1.bn.fc1.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc1.bn.fc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          4
         );
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B14_fc.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B14_fc.npy",net2);
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::CPU,scheduler,net2);
         net = net3;
@@ -823,26 +738,21 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     //SPDLOG_LOGGER_INFO(logger,"FC Layer2 Started...");
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
-                                             platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::CPU,"fc2.weights.npy"),
-                                             platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::CPU,"fc2.biases.npy")
+                                               platformSelector->CreateDummyTensorF(ConfigTaskMatMul::BankIndex_inputTn1,"matmul_in2"),
+                                               platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2")
         );
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B15_fc.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B15_fc.npy",net1);
 
         //net1 is of shape Bx1x1x512
         TensorF *net2 = Batchnorm_Forward(scheduler,net1,
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc2.bn.gamma.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc2.bn.beta.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc2.bn.fc2.bn.moments.Squeeze.ExponentialMovingAverage.npy"),
-                                          platformSelector->weightsLoader->AccessWeights(
-                                                  PLATFORMS::CPU,"fc2.bn.fc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy")
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in1"),
+                                          2
         );
 
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B16_fc.npy",net2);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B16_fc.npy",net2);
 
         TensorF* net3 = platformSelector->ReLU(PLATFORMS::CPU,scheduler,net2);
         net = net3;
@@ -857,12 +767,10 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     //SPDLOG_LOGGER_INFO(logger,"FC Layer3 Started...");
     {
         TensorF *net1 = FullyConnected_Forward(scheduler,net,
-                                             platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::CPU,"fc3.weights.npy"),
-                                             platformSelector->weightsLoader->AccessWeights(
-                                                     PLATFORMS::CPU,"fc3.biases.npy")
+                                               platformSelector->CreateDummyTensorF(ConfigTaskMatMul::BankIndex_inputTn1,"matmul_in2"),
+                                               platformSelector->CreateDummyTensorF(ConfigTaskMatOps::BankIndex_inputTn1,"matops_in2")
         );
-        platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B17_fc.npy",net1);
+        //platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B17_fc.npy",net1);
         net = net1;
     }
 
@@ -880,10 +788,6 @@ TensorF* ModelArchTop01::Execute(WorkScheduler scheduler) {
     return net;
 }
 
-TensorI* ModelArchTop01::GetLabels(){
-    return input_labels_B;
-}
-
-int ModelArchTop01::GetBatchSize(){
-    return B;
+int ModelArchTop01::GetDataMoverLaunches(){
+    return platformSelector->dataMoverLaunches;
 }

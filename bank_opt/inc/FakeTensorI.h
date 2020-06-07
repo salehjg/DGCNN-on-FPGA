@@ -1,15 +1,18 @@
 #pragma once
 
 #include <vector>
+#include <string>
 #include "Helper.h"
+
+using namespace std;
 
 class TensorI {
 public:
     TensorI();
-    TensorI(std::vector<unsigned> shape);
-    TensorI(std::vector<unsigned> shape, int* buff);
-    virtual void Init(std::vector<unsigned> shape);
-    virtual void Init(std::vector<unsigned> shape, int* buff);
+    TensorI(std::vector<unsigned> shape, int bank, string _tag);
+    TensorI(std::vector<unsigned> shape, int* buff, int bank, string _tag);
+    virtual void Init(std::vector<unsigned> shape, int bank, string _tag);
+    virtual void Init(std::vector<unsigned> shape, int* buff, int bank, string _tag);
     std::vector<unsigned> getShape();
     int getRank();
     void ExpandDims(int axis);
@@ -27,6 +30,8 @@ public:
     virtual ~TensorI();
 
     int* _buff;
+    int bank;
+    string tag;
 
 protected:
     std::vector<unsigned> shape;             // AfloatfloatENfloatION: Dim0 of 'shape' is ALWAYS batch size

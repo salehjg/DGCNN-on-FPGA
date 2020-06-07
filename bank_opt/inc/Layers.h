@@ -1,9 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
-#include "TensorF.h"
-#include "TensorI.h"
+#include "FakeTensorF.h"
+#include "FakeTensorI.h"
 #include "Helper.h"
 
 using namespace std;
@@ -37,6 +38,14 @@ public:
     TensorF* PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded);
     TensorF* UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded);
 
+    TensorF* CreateDummyTensorF(int bank, string tag);
+    TensorI* CreateDummyTensorI(int bank, string tag);
+    int dataMoverLaunches=0;
+    vector<string> objective;
+
 private:
+    void ChangeBankIfNeeded(TensorF* tn, int dstBank);
+    void ChangeBankIfNeeded(TensorI* tn, int dstBank);
+
 
 };

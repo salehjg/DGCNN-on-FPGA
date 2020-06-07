@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "TensorI.h"
+#include "FakeTensorI.h"
 #include "Helper.h"
 
 TensorI::TensorI() {
@@ -8,28 +8,32 @@ TensorI::TensorI() {
     platform = PLATFORMS::DEFAULT; //Till it's not initialized, keep it general
 }
 
-TensorI::TensorI(std::vector<unsigned> shape) {
-    Init(shape);
+TensorI::TensorI(std::vector<unsigned> shape, int bank, string _tag) {
+    Init(shape, bank, _tag);
 }
 
-TensorI::TensorI(std::vector<unsigned> shape, int *buff) {
-    Init(shape,buff);
+TensorI::TensorI(std::vector<unsigned> shape, int *buff, int bank, string _tag) {
+    Init(shape,buff, bank, _tag);
 }
 
-void TensorI::Init(std::vector<unsigned> shape) {
+void TensorI::Init(std::vector<unsigned> shape, int bank, string _tag) {
     if(initialized){
         //delete(_buff);
     }
+    this->bank = bank;
+    this->tag = _tag;
     this->shape = shape;
     this->rank = (int)shape.size();
     initialized = true;
     platform = PLATFORMS::CPU;
 }
 
-void TensorI::Init(std::vector<unsigned> shape, int* buff){
+void TensorI::Init(std::vector<unsigned> shape, int* buff, int bank, string _tag){
     if(initialized){
         //delete(_buff);
     }
+    this->bank = bank;
+    this->tag = _tag;
     this->shape = shape;
     this->rank = (int)shape.size();
     initialized = true;
