@@ -1,8 +1,6 @@
-
-
 #include "FakeModelArchTop.h"
 #include "Layers.h"
-#include "config.h"
+#include "xilinx/config.h"
 
 ModelArchTop01::ModelArchTop01(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new Layers(PLATFORMS::CPU,{PLATFORMS::CPU},true);

@@ -1,5 +1,5 @@
 #include "Layers.h"
-#include "config.h"
+#include "xilinx/config.h"
 
 Layers::Layers(PLATFORMS defaultPlatform, vector<PLATFORMS> neededPlatforms, bool loadWeights) {
 
