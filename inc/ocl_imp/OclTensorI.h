@@ -9,6 +9,7 @@
 #include <ocl_imp/xilinx/xcl2.hpp>
 #include "ocl_imp/xilinx/AxiHelper.h"
 #include "xilinx/config.h"
+#include <string>
 
 class OclTensorI: public TensorI {
 public:
@@ -26,6 +27,8 @@ public:
     static int* PadHostBuffer(std::vector<unsigned> actualShape, int *hostSrcBuff, int vectorWords);
     static int* UnPadHostBuffer(std::vector<unsigned> actualShape, int *hostSrcBuff, int vectorWords);
     unsigned getPaddedLastDim();
+    std::string GetTensorTag();
+    void SetTensorTag(std::string tag);
     virtual ~OclTensorI();
     cl::Buffer ocl_buff;
 
@@ -54,4 +57,5 @@ private:
     #endif  
 #endif 
     int vectorWords = -1;
+    std::string tensorTag = "unknownTag";
 };

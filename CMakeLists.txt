@@ -435,7 +435,7 @@ set(HOSTSIDE_MAIN_SRC
     ${HOSTSIDE_SRC}
     src/ClassifierMultiPlatform.cpp
     src/MainExecutable.cpp
-    src/ModelArchTop01.cpp
+    src/ModelArchTop02.cpp
     src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 

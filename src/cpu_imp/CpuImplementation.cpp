@@ -1505,9 +1505,11 @@ bool CpuImplementation::CompareTensors(WorkScheduler scheduler, TensorF *inputTn
         unsigned _len = inputTn1->getLength();
         for(unsigned i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
-            SPDLOG_LOGGER_INFO(logger, "CurrentDiff {} : {}", i, currentDiff);
-            SPDLOG_LOGGER_INFO(logger, "Gold {} : {}", i, inputTn1->_buff[i]);
-            SPDLOG_LOGGER_INFO(logger, "UDT {} : {}", i, inputTn2->_buff[i]);
+            if(currentDiff>0.0f){
+                SPDLOG_LOGGER_INFO(logger, "CurrentDiff {} : {}", i, currentDiff);
+                SPDLOG_LOGGER_INFO(logger, "Gold {} : {}", i, inputTn1->_buff[i]);
+                SPDLOG_LOGGER_INFO(logger, "UDT {} : {}", i, inputTn2->_buff[i]);
+            }
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }
@@ -1532,6 +1534,11 @@ bool CpuImplementation::CompareTensorsInteger(WorkScheduler scheduler, TensorI *
         unsigned _len = inputTn1->getLength();
         for(unsigned i =0 ; i<_len;i++){
             currentDiff = inputTn1->_buff[i] - inputTn2->_buff[i];
+            if(currentDiff>0){
+                SPDLOG_LOGGER_INFO(logger, "CurrentDiff {} : {}", i, currentDiff);
+                SPDLOG_LOGGER_INFO(logger, "Gold {} : {}", i, inputTn1->_buff[i]);
+                SPDLOG_LOGGER_INFO(logger, "UDT {} : {}", i, inputTn2->_buff[i]);
+            }
             //totalDiff += (currentDiff>=0)?currentDiff:-1*currentDiff;
             totalDiff += currentDiff;
         }

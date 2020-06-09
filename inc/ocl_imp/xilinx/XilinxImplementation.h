@@ -12,6 +12,8 @@
 #include <ocl_imp/OclTensorI.h>
 #include <cnpy.h>
 #include <ocl_imp/xilinx/AxiHelper.h>
+#include <string>
+#include <vector>
 
 enum class RUN_MODE{
     SwEmu,
@@ -147,4 +149,6 @@ private:
     cl::Program *program;
     cl::CommandQueue *queue;
     cl_int err;
+
+    std::vector<string> datamoverLaunches;
 };

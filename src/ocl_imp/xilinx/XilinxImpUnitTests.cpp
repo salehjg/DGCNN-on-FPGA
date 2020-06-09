@@ -548,6 +548,23 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     bool comparisonResult=true;
     bool printLog=true;
 
+    {
+        cout<<"debug, manual test...\n";
+        //Ranks: 4,1
+        vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
+        TensorF* tensorSrc1 = GenerateTensor(0,{10,1024,20,128});
+        TensorF* tensorSrc2 = GenerateTensor(0,{128});
+
+        for(MAT_OPS op : ops){
+            TensorF* tensorCpu = platformSelector->MatOps(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,op);
+            TensorF* tensorGpu = platformSelector->MatOps(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,op);
+            comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+            cout<<comparisonResult<<" ";
+        }
+
+        comparisonResult=true;
+    }
+
     if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_4_4)");
     {
         //Ranks: 4,4
@@ -960,7 +977,7 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    
+    /*
     PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
@@ -970,22 +987,23 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(TensorPadUnpadCpuInteger());
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
-    //PrintReport(KernelConv2Mlp());
-    //PrintReport(KernelTopK());
-    //PrintReport(KernelMatops());
+    PrintReport(KernelConv2Mlp());
+    PrintReport(KernelTopK());*/
+    PrintReport(KernelMatops());
+    /*
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum());
     PrintReport(KernelMean());
     PrintReport(KernelVariance());
-    //PrintReport(KernelMatmul());
+    PrintReport(KernelMatmul());
     PrintReport(KernelTile());
     PrintReport(KernelGather());
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());
-    //PrintReport(KernelTranspose());
+    PrintReport(KernelTranspose());*/
     
 }
 

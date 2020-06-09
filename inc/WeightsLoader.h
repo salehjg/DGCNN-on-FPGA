@@ -44,6 +44,7 @@ private:
     
     int ResolveMemoryBank(PLATFORMS platform, string name);
     int _ResolveMemoryBankOclXilinx(string name);
+    string _ResolveTensorTagOclXilinx(string name);
 
     map<string,int> strToIndexMap;
     vector<cnpy::NpyArray> _cnpyBuff;

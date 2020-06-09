@@ -36,9 +36,9 @@ inline double seconds()
 }
 
 
-class ModelArchTop04 {
+class ModelArchTop02 {
 public:
-    ModelArchTop04(int dataset_offset, int batchsize, int pointcount, int knn_k);
+    ModelArchTop02(int dataset_offset, int batchsize, int pointcount, int knn_k);
     ModelInfo   GetModelInfo();
     void        SetModelInput_data(string npy_pcl);
     void        SetModelInput_labels(string npy_labels);

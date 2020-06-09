@@ -1,6 +1,9 @@
 #include "build_config.h"
 #include "ModelArchTop02.h"
 
+auto CONV_PLAT = PLATFORMS::CPU;
+auto TOPK_PLAT = PLATFORMS::CPU;
+
 ModelArchTop02::ModelArchTop02(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
     DB_OFFSET = dataset_offset;
@@ -245,13 +248,13 @@ TensorF* ModelArchTop02::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
     TensorF* net;
     {
         TensorF* net1 = platformSelector->Conv2D(
-                PLATFORMS::GPU_OCL,
+                CONV_PLAT,
                 scheduler,
                 edgeFeatures,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv1.weights.npy"),
+                        CONV_PLAT,"transform_net1.tconv1.weights.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv1.biases.npy")
+                        CONV_PLAT,"transform_net1.tconv1.biases.npy")
                         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A01_tnet_conv.npy",net1);
@@ -287,13 +290,13 @@ TensorF* ModelArchTop02::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
     //----------------------------------------------------------------------------
     {
         TensorF* net1 = platformSelector->Conv2D(
-                PLATFORMS::GPU_OCL,
+                CONV_PLAT,
                 scheduler,
                 net,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv2.weights.npy"),
+                        CONV_PLAT,"transform_net1.tconv2.weights.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv2.biases.npy")
+                        CONV_PLAT,"transform_net1.tconv2.biases.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A04_tnet_conv.npy",net1);
@@ -340,13 +343,13 @@ TensorF* ModelArchTop02::TransformNet(WorkScheduler scheduler, TensorF* edgeFeat
     //----------------------------------------------------------------------------
     {
         TensorF* net1 = platformSelector->Conv2D(
-                PLATFORMS::GPU_OCL,
+                CONV_PLAT,
                 scheduler,
                 net,
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv3.weights.npy"),
+                        CONV_PLAT,"transform_net1.tconv3.weights.npy"),
                 platformSelector->weightsLoader->AccessWeights(
-                        PLATFORMS::GPU_OCL,"transform_net1.tconv3.biases.npy")
+                        CONV_PLAT,"transform_net1.tconv3.biases.npy")
         );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"A08_tnet_conv.npy",net1);
@@ -529,7 +532,7 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
         TensorF *adj_matrix = PairwiseDistance(scheduler, net_BxNx3);
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B01_tnet_adj_matrix.npy",adj_matrix);
 
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(TOPK_PLAT,scheduler,adj_matrix,2,K);
 
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B02_tnet_nn_idx.npy",nn_idx);
@@ -556,14 +559,14 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     SPDLOG_LOGGER_INFO(logger,"DGCCN0 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(TOPK_PLAT,scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
-        TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
+        TensorF* net1 = platformSelector->Conv2D(CONV_PLAT,scheduler,
                                                  edge_features,
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn1.weights.npy"),
+                                                         CONV_PLAT,"dgcnn1.weights.npy"),
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn1.biases.npy")
+                                                         CONV_PLAT,"dgcnn1.biases.npy")
         );
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"C02_dg1_conv.npy",net1);
 
@@ -600,14 +603,14 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     SPDLOG_LOGGER_INFO(logger,"DGCCN1 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(TOPK_PLAT,scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
-        TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
+        TensorF* net1 = platformSelector->Conv2D(CONV_PLAT,scheduler,
                                                  edge_features,
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn2.weights.npy"),
+                                                         CONV_PLAT,"dgcnn2.weights.npy"),
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn2.biases.npy")
+                                                         CONV_PLAT,"dgcnn2.biases.npy")
         );
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
@@ -642,14 +645,14 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     SPDLOG_LOGGER_INFO(logger,"DGCCN2 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(TOPK_PLAT, scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
-        TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
+        TensorF* net1 = platformSelector->Conv2D(CONV_PLAT,scheduler,
                                                  edge_features,
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn3.weights.npy"),
+                                                         CONV_PLAT,"dgcnn3.weights.npy"),
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn3.biases.npy")
+                                                         CONV_PLAT,"dgcnn3.biases.npy")
         );
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
@@ -684,14 +687,14 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
     SPDLOG_LOGGER_INFO(logger,"DGCCN3 Started...");
     {
         TensorF *adj_matrix = PairwiseDistance(scheduler,net);
-        TensorI *nn_idx = platformSelector->TopK(PLATFORMS::GPU_OCL,scheduler,adj_matrix,2,K);
+        TensorI *nn_idx = platformSelector->TopK(TOPK_PLAT,scheduler,adj_matrix,2,K);
         TensorF* edge_features = GetEdgeFeatures(scheduler,net,nn_idx);
-        TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
+        TensorF* net1 = platformSelector->Conv2D(CONV_PLAT,scheduler,
                                                  edge_features,
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn4.weights.npy"),
+                                                         CONV_PLAT,"dgcnn4.weights.npy"),
                                                  platformSelector->weightsLoader->AccessWeights(
-                                                         PLATFORMS::GPU_OCL,"dgcnn4.biases.npy")
+                                                         CONV_PLAT,"dgcnn4.biases.npy")
         );
 
         TensorF* net2 = Batchnorm_Forward(scheduler,net1,
@@ -741,12 +744,12 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B09_agg_concat.npy",concatC);
 
         // DIM2(K) of concatenated matrix is ONE, NOT 'K'
-        TensorF* net1 = platformSelector->Conv2D(PLATFORMS::GPU_OCL,scheduler,
+        TensorF* net1 = platformSelector->Conv2D(CONV_PLAT,scheduler,
                  concatC,
                  platformSelector->weightsLoader->AccessWeights(
-                         PLATFORMS::GPU_OCL,"agg.weights.npy"),
+                         CONV_PLAT,"agg.weights.npy"),
                  platformSelector->weightsLoader->AccessWeights(
-                         PLATFORMS::GPU_OCL,"agg.biases.npy")
+                         CONV_PLAT,"agg.biases.npy")
                  );
 
         platformSelector->DumpMatrix(platformSelector->defaultPlatform,scheduler,"B10_agg_conv.npy",net1);

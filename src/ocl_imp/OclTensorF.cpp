@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -349,4 +350,12 @@ cl_mem_ext_ptr_t OclTensorF::CreateExtendedPointer(void *hostPtr, cl_mem_flags m
     extendedPointer.obj = hostPtr;
     extendedPointer.param = 0;
     return extendedPointer;
+}
+
+std::string OclTensorF::GetTensorTag(){
+    return tensorTag;
+}
+
+void OclTensorF::SetTensorTag(std::string tag){
+    tensorTag = tag;
 }
