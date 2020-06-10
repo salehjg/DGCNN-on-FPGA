@@ -977,7 +977,7 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    /*
+    
     PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
@@ -988,9 +988,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelPadLastDimFloat());
     PrintReport(KernelUnpadLastDimFloat());
     PrintReport(KernelConv2Mlp());
-    PrintReport(KernelTopK());*/
+    PrintReport(KernelTopK());
     PrintReport(KernelMatops());
-    /*
     PrintReport(KernelReduceSum4D());
     PrintReport(KernelReduceMax());
     PrintReport(KernelReduceSum());
@@ -1003,7 +1002,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());
-    PrintReport(KernelTranspose());*/
+    PrintReport(KernelTranspose());
     
 }
 
