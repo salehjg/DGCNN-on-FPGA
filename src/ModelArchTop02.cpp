@@ -871,6 +871,10 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
         net = net1;
     }
 
+    SPDLOG_LOGGER_INFO(logger,"Dumping Optimization Objective Started...");
+    platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
+    SPDLOG_LOGGER_INFO(logger,"Dumping Optimization Objective Finished.");
+
     //----------------------------------------------------------------------------------------
     //force output tensor platform to be CPU
     {
@@ -881,11 +885,6 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
         if(net->getPlatform()==PLATFORMS::GPU_OCL) return platformSelector->CrossThePlatform(net,PLATFORMS::CPU);
 #endif
     }
-
-    SPDLOG_LOGGER_INFO(logger,"Dumping Optimization Objective Started...");
-    platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
-    SPDLOG_LOGGER_INFO(logger,"Dumping Optimization Objective Finished.");
-
     return net;
 }
 
