@@ -168,7 +168,7 @@ void XilinxImplementation::DumpDataMoverLaunchLogs(){
     for(string &tag:datamoverLaunches){
         optimizationObjective += tag + " + ";
     }
-    SPDLOG_LOGGER_TRACE(logger, optimizationObjective);
+    SPDLOG_LOGGER_TRACE(logger, "{}", optimizationObjective);
 }
 
 XilinxImplementation::~XilinxImplementation(){
