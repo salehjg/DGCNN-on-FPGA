@@ -66,5 +66,5 @@ private:
     #endif  
 #endif    
     int vectorWords = -1;
-    std::string tensorTag = "unknownTag";
+    std::string tensorTag = "defaultBankTag";
 };
