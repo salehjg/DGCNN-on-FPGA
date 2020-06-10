@@ -87,6 +87,7 @@ public:
     bool     CompareTensorsInteger(WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
     TensorF* PadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimPadded);
     TensorF* UnpadLastDim(WorkScheduler scheduler, TensorF* inputTn, unsigned int lastDimUnpadded);
+    void     DumpDataMoverLaunchLogs();
 
     const char *getErrorString(cl_int error);
     int SetModeEnvVar(const RUN_MODE mode);

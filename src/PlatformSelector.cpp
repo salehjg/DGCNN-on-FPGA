@@ -772,3 +772,24 @@ TensorF* PlatformSelector::UnpadLastDim(PLATFORMS platform, WorkScheduler schedu
     }
     return nullptr;
 }
+
+void PlatformSelector::DumpImplementationSpecificLogs(PLATFORMS platform){
+    switch(platform){
+        case PLATFORMS::CPU :{
+            assert(0);
+            break;
+        }
+#ifdef USE_CUDA
+        case PLATFORMS::GPU_CUDA :{
+            assert(0);
+            break;
+        }
+#endif
+#ifdef USE_OCL
+        case PLATFORMS::GPU_OCL :{
+            openclPlatformClass->DumpDataMoverLaunchLogs();
+            break;
+        }
+#endif
+    }
+}

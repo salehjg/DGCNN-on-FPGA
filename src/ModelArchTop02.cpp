@@ -1,8 +1,8 @@
 #include "build_config.h"
 #include "ModelArchTop02.h"
 
-auto CONV_PLAT = PLATFORMS::GPU_OCL;
-auto TOPK_PLAT = PLATFORMS::GPU_OCL;
+auto CONV_PLAT = PLATFORMS::CPU;
+auto TOPK_PLAT = PLATFORMS::CPU;
 
 ModelArchTop02::ModelArchTop02(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
@@ -882,6 +882,7 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
 #endif
     }
 
+    platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
     return net;
 }
 

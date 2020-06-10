@@ -163,14 +163,16 @@ XilinxImplementation::XilinxImplementation(int aa){
     
 }
 
-XilinxImplementation::~XilinxImplementation(){
-    SPDLOG_LOGGER_TRACE(logger, "~XilinxImplementation");
-    
+void XilinxImplementation::DumpDataMoverLaunchLogs(){
     string optimizationObjective = "";
     for(string &tag:datamoverLaunches){
         optimizationObjective += tag + " + ";
     }
     SPDLOG_LOGGER_TRACE(logger, optimizationObjective);
+}
+
+XilinxImplementation::~XilinxImplementation(){
+    SPDLOG_LOGGER_TRACE(logger, "~XilinxImplementation");
 
     /*
     delete(queue);
