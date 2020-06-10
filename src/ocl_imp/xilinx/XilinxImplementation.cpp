@@ -164,10 +164,12 @@ XilinxImplementation::XilinxImplementation(int aa){
 }
 
 void XilinxImplementation::DumpDataMoverLaunchLogs(){
+    cout << "DumpDataMoverLaunchLogs: \n" ;
     string optimizationObjective = "";
     for(string &tag:datamoverLaunches){
         optimizationObjective += tag + " + ";
     }
+    cout << optimizationObjective << "\n";
     SPDLOG_LOGGER_TRACE(logger, "{}", optimizationObjective);
 }
 
