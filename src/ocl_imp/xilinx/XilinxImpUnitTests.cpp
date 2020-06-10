@@ -1003,7 +1003,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelSqrt());
     PrintReport(KernelSquare());
     PrintReport(KernelTranspose());
-    
+
+    platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
 }
 
 XilinxImpUnitTests::~XilinxImpUnitTests(){

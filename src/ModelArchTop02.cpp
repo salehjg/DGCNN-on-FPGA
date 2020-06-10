@@ -1,8 +1,8 @@
 #include "build_config.h"
 #include "ModelArchTop02.h"
 
-auto CONV_PLAT = PLATFORMS::CPU;
-auto TOPK_PLAT = PLATFORMS::CPU;
+auto CONV_PLAT = PLATFORMS::GPU_OCL;
+auto TOPK_PLAT = PLATFORMS::GPU_OCL;
 
 ModelArchTop02::ModelArchTop02(int dataset_offset, int batchsize, int pointcount, int knn_k) {
     platformSelector = new PlatformSelector(PLATFORMS::GPU_OCL,{PLATFORMS::CPU,PLATFORMS::GPU_OCL},true);
@@ -882,7 +882,10 @@ TensorF* ModelArchTop02::Execute(WorkScheduler scheduler) {
 #endif
     }
 
+    SPDLOG_LOGGER_INFO(logger,"Dumping Optimization Objective Started...");
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
+    SPDLOG_LOGGER_INFO(logger,"Dumping Optimization Objective Finished.");
+
     return net;
 }
 
