@@ -462,4 +462,3 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/gather_results.sh ${CMAKE_BINARY_DIR}
 
 include(CTest)
 add_subdirectory("test")
-add_subdirectory("bank_opt")

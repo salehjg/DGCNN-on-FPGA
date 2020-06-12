@@ -98,9 +98,13 @@ class ReportGenerator:
             total_host_usec = 0
             for layer in sorted_by_layername[name]:
                 launch_cnt += 1
+                __device_usec = accumulate_device_times(layer)
+                __usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
+                __host_usec = __usec - __device_usec
                 total_device_usec += accumulate_device_times(layer)
                 total_usec += layer.host_elapsed / datetime.timedelta(microseconds=1)
-                total_host_usec += total_usec - total_device_usec
+                total_host_usec += __host_usec
+
             summary_dataframe['Name'].append(name)
             summary_dataframe['Launch Count'].append(launch_cnt)
             summary_dataframe['AccumulatedHostOnly(us)'].append(total_host_usec)
@@ -347,9 +351,13 @@ class ReportGenerator:
             total_host_usec = 0
             for layer in sorted_by_layername[name]:
                 launch_cnt += 1
-                total_device_usec += accumulate_device_times(layer)
-                total_usec += layer.host_elapsed / datetime.timedelta(microseconds=1)
-                total_host_usec += total_usec - total_device_usec
+                __device_usec = accumulate_device_times(layer)
+                __usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
+                __host_usec = __usec - __device_usec
+                total_device_usec += __device_usec
+                total_usec += __usec
+                total_host_usec += __host_usec
+
             summary_dataframe['Name'].append(name)
             summary_dataframe['Launch Count'].append(launch_cnt)
             summary_dataframe['AccumulatedHostOnly(us)'].append(total_host_usec)
