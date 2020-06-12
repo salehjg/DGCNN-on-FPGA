@@ -82,12 +82,6 @@ sh LaunchDeepPointV1FPGA.sh
 ```
 The launcher script forwards its arguments to the host program.
 
-## Extra. Setting Kernel Clock Frequencies 
-Refer to `CMakeLists.txt` script to change kernel clock frequency.
-
-## Extra. Setting Kernel Arguments' DDR Banks 
-Refer to `CMakeLists.txt` script to assign DDR bank for each kernel's arguments.
-
 # Platforms
 Refer to the table below.
 
