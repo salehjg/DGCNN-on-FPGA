@@ -106,9 +106,8 @@ This repository contains multiple branches as described below:
 
 Branch | AXI Width | DType | Tool | Notes
 ---  |  --- |  --- |  --- |  ---
-master | 512-bits | float32 | SDx2019.1 | main branch to be used
+master | 512-bits | float32 | SDx2019.1 | the main branch to be used
 axi32 | 32-bits | float32 | SDx2019.1 | DEPRECATED
-axi512 | 512-bits | float32 | SDx2019.1 | Soon will be removed
 vitis20192_axi512 | 512-bits | float32 | Vitis2019.2 | HW build fails with clock partitioning error
 
 # Debugging Host-side in CLion
