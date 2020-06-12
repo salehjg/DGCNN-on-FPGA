@@ -6,6 +6,7 @@
 #include "Utility.h"
 #include "Conv2D.h"
 #include "Conv2Helper.h"
+#include "xilinx/config.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -31,7 +32,7 @@ int main(int argc, char **argv) {
     unsigned conv_n = 1;
     unsigned conv_k = 256;
     unsigned conv_din = 6;
-    unsigned conv_dout = 128;
+    unsigned conv_dout = ConfigTaskConv2::kOuterTileSizeM;
 
     if (argc < 6 || argc > 6) {
         std::cout << "Usage: ./TestSimulation Conv_B Conv_N Conv_K Conv_Din Conv_Dout" << std::endl;

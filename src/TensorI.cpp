@@ -38,7 +38,7 @@ TensorI::TensorI(std::vector<unsigned> shape, int *buff) {
 
 void TensorI::Init(std::vector<unsigned> shape) {
     if(initialized){
-        std::cout<<"--- TensorI: buffer deleted.\n";
+        SPDLOG_LOGGER_DEBUG(logger,"TensorI: buffer deleted");
         delete(_buff);
     }
     this->shape = shape;
@@ -50,7 +50,7 @@ void TensorI::Init(std::vector<unsigned> shape) {
 
 void TensorI::Init(std::vector<unsigned> shape, int* buff){
     if(initialized){
-        std::cout<<"--- TensorI: buffer deleted.\n";
+        SPDLOG_LOGGER_DEBUG(logger,"TensorI: buffer deleted");
         delete(_buff);
     }
     this->shape = shape;
@@ -189,7 +189,6 @@ unsigned TensorI::getVectorCountPadded(int vectorWords){
 TensorI::~TensorI() {
     if(platform == PLATFORMS::CPU){
         if(initialized){
-            //std::cout<<"--- TensorI: destructed.\n";
             delete(_buff);
         }
     }/*else if(platform == PLATFORMS::GPU_CUDA){

@@ -6,6 +6,7 @@
 #include <cassert>
 #include <ocl_imp/xilinx/XilinxImplementation.h>
 #include "xilinx/config.h"
+#include "build_config.h"
 #include <algorithm>
 #include <vector>
 
@@ -19,32 +20,31 @@ XilinxImplementation::XilinxImplementation(int aa){
     {
         const RUN_MODE mode = GetModeEnvVar();
         if(mode==RUN_MODE::Unknown){
-            cout<<"WARNING: XCL_EMULATION_MODE is not set. System run(real FPGA) is considered.";
+            SPDLOG_LOGGER_WARN(logger,"XCL_EMULATION_MODE is not set. System run(real FPGA) is considered.");
             //assert(SetModeEnvVar(RUN_MODE::SwEmu)==0);
         }else{
-            cout << "Mode: " << (
-                mode==RUN_MODE::SwEmu?"Sw-emulation":
+            SPDLOG_LOGGER_TRACE(logger,"Mode: {}",
+                (mode==RUN_MODE::SwEmu?"Sw-emulation":
                 mode==RUN_MODE::HwEmu?"Hw-emulation":
-                "Hardware(FPGA)" ) << endl;
+                "Hardware(FPGA)"));
         }
     }
 
     //======================================================================================================================
     {
         auto devices = xcl::get_xil_devices();
-        cout<<"Xilinx Devices Found: "<< devices.size()<<endl;
+        SPDLOG_LOGGER_TRACE(logger,"Xilinx Devices Found: {}", devices.size());
         assert(devices.size()>0);
 
-        cout<<"Using device index 0"<<endl;
+        SPDLOG_LOGGER_TRACE(logger,"Using device index 0");
         device = devices[0];
 
         OCL_CHECK(err, context = new cl::Context(device, NULL, NULL, NULL, &err));
         OCL_CHECK(err,queue = new cl::CommandQueue(*context, device, CL_QUEUE_PROFILING_ENABLE, &err));
         deviceName = device.getInfo<CL_DEVICE_NAME>();
-        cout << "Found Device=" << deviceName.c_str() << endl;
+        SPDLOG_LOGGER_TRACE(logger,"Found Device: {}", deviceName.c_str());
 
-        string strPath(globalArgXclBin);
-        auto fileBuf = xcl::read_binary_file(strPath);
+        auto fileBuf = xcl::read_binary_file(globalArgXclBin);
         cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
         OCL_CHECK(err,program = new cl::Program(*context, {device}, bins, NULL, &err));
     }
@@ -68,124 +68,87 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false,
-                DISABLED_KERNEL),
+                false),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
-                "/xilinx/reducemax.cpp",
+                "/xilinx/reduce.cpp",
                 "binary_container_1.xclbin",
                 "",
-                "task_reducemax",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 2 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/reducesum4d.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_reducesum4d",
+                "task_reduce",
                 false),
-        /* IDX 3 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/reducesum.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_reducesum",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 4 :*/
+        /* IDX 2 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/matops.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 5 :*/
+                false),
+        /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/tile.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 6 :*/
+                false),
+        /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/matmul.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 7 :*/
+                false),
+        /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/transpose.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_transpose",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 8 :*/
+                false),
+        /* IDX 6 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/gather.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 9 :*/
+                false),
+        /* IDX 7 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/conv2_1x1_direct.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 10 :*/
+                false),
+        /* IDX 8 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/topk.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 11 :*/
+                false),
+        /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
-                "/xilinx/padding.cpp",
+                "/xilinx/pad_unpad.cpp",
                 "binary_container_1.xclbin",
                 "",
-                "task_pad_last_dim",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 12 :*/
-        new OclKernelObject(
-                KERNEL_DIR,
-                "/xilinx/unpadding.cpp",
-                "binary_container_1.xclbin",
-                "",
-                "task_unpad_last_dim",
-                false,
-                DISABLED_KERNEL),
-        /* IDX 13 :*/
+                "task_pad_unpad",
+                false),
+        /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
                 "/xilinx/relu_sqrt_square.cpp",
                 "binary_container_1.xclbin",
                 "",
                 "task_relu_sqrt_square",
-                false,
-                DISABLED_KERNEL)
+                false)
     };
     
     //======================================================================================================================
@@ -197,14 +160,22 @@ XilinxImplementation::XilinxImplementation(int aa){
             OCL_CHECK(err,kernelObject->kernel_task = new cl::Kernel(*program, kernelObject->kernelName_task, &err));
         }
     }
-
-    std::cout<<"- - - - - - - - - - -"<<std::endl;
     
-    //======================================================================================================================
+}
+
+void XilinxImplementation::DumpDataMoverLaunchLogs(){
+    //cout << "DumpDataMoverLaunchLogs: \n" ;
+    string optimizationObjective = "";
+    for(string &tag:datamoverLaunches){
+        optimizationObjective += tag + " + ";
+    }
+    //cout << optimizationObjective << "\n";
+    SPDLOG_LOGGER_TRACE(logger, "{}", optimizationObjective);
 }
 
 XilinxImplementation::~XilinxImplementation(){
-    cout<<"~XilinxImplementation"<<endl;
+    SPDLOG_LOGGER_TRACE(logger, "~XilinxImplementation");
+
     /*
     delete(queue);
     delete(program);
@@ -231,7 +202,7 @@ cl::CommandQueue* XilinxImplementation::getQueue() {
     return queue;
 }
 
-void XilinxImplementation::PrintInfo(
+inline void XilinxImplementation::PrintInfo(
         string opName,
         const string &setting1, int val1,
         const string &setting2, int val2,
@@ -242,13 +213,13 @@ void XilinxImplementation::PrintInfo(
 
     string finalStr ;
     if(!setting1.empty() && !setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting1+ "=" + to_string(val1)+ ", " + setting2+ "=" + to_string(val2);
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1)+ ", " + setting2+ "=" + to_string(val2);
     }else if(!setting1.empty() && setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting1+ "=" + to_string(val1);
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1);
     }else if(setting1.empty() && !setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " + setting2+ "=" + to_string(val2);
+        finalStr = "## " + opName + ": " + setting2+ "=" + to_string(val2);
     }else if(setting1.empty() && setting2.empty()){
-        finalStr = "\t\t** " + opName + ": " ;
+        finalStr = "## " + opName + ": " ;
     }
 
     if(!setting3.empty()){
@@ -270,12 +241,14 @@ void XilinxImplementation::PrintInfo(
         for(bool i : comb){ finalStr += to_string(i) + "-"; }
         finalStr += ", ";
     }
-    finalStr+="\n";
-    cout<<finalStr;
+    //finalStr+="\n";
+    SPDLOG_LOGGER_INFO(reporter, "{}", finalStr);
 }
 
 TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batchedMat){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Transpose","",0,"",0,"",0,batchedMat->getShape(),{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)batchedMat)->GetTensorTag() +"-transpose_in)");
 
     cl_int error;
     assert(batchedMat->getRank()==2 || batchedMat->getRank()==3);
@@ -289,7 +262,7 @@ TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batch
 
     TensorF* _batchedMat = ((OclTensorF*)batchedMat)->CloneIfNeededToDDRBank(program,context,queue, ConfigTaskTranspose::BankIndex_inputTn);
     OclTensorF *rsltTn = new OclTensorF(context, queue, {dim0,dim2,dim1}, ConfigTaskTranspose::BankIndex_outputTn);
-    OclKernelObject *kernelObject = oclKernels[7];
+    OclKernelObject *kernelObject = oclKernels[5];
 
     if(kernelObject->use_ndrange_kernel){
         return nullptr;
@@ -309,13 +282,18 @@ TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batch
         ReportDuration(__func__, kernelObject->use_ndrange_kernel, exeEvt);
 
         if(rankDiff) batchedMat->SqueezeDimZero();
+        rsltTn->SetTensorTag("transpose_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
                                    TensorF* batchedMat1, TensorF* batchedMat2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatMul","",0,"",0,"",0,batchedMat1->getShape(),batchedMat2->getShape());
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)batchedMat1)->GetTensorTag() +"-matmul_in1)");
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)batchedMat2)->GetTensorTag() +"-matmul_in2)");
 
     assert(batchedMat1->getRank()==3 || batchedMat1->getRank()==2);
     assert(batchedMat2->getRank()==3 || batchedMat2->getRank()==2);
@@ -346,7 +324,7 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
     TensorF* _batchedMat2 = ((OclTensorF*)batchedMat2)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskMatMul::BankIndex_inputTn2);
 
     OclTensorF* rsltTn = new OclTensorF(context, queue, {dim0A,dim1A,dim2B}, ConfigTaskMatMul::BankIndex_outputTn);
-    OclKernelObject *kernelObject = oclKernels[6];
+    OclKernelObject *kernelObject = oclKernels[4];
 
     if(kernelObject->use_ndrange_kernel){
         for(int i=0;i<rankDiff;i++){
@@ -379,13 +357,18 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
             rsltTn->SqueezeDimZero();
         }
 
+        rsltTn->SetTensorTag("matmul_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::Square(WorkScheduler scheduler, TensorF* batchedMat){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Square","",0,"",0,"",0,batchedMat->getShape(),{});
-    return _ReluSqrtSquare(scheduler, batchedMat, false, false, true);
+    TensorF *rsltTn = _ReluSqrtSquare(scheduler, batchedMat, false, false, true);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
@@ -393,49 +376,125 @@ TensorF* XilinxImplementation::ReduceSum(WorkScheduler scheduler,
                                       bool over_axis0,
                                       bool over_axis1,
                                       bool over_axis2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceSum","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2});
+    TensorF *rsltTn = _Reduce_Task(inputTn, true, false, 0, over_axis0, over_axis1, over_axis2, false);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
+}
 
-    assert(inputTn->getRank()==3);
-    assert(!over_axis0 && !over_axis1 && over_axis2);
+TensorF* XilinxImplementation::_Reduce_Task(
+        TensorF* inputTn,
+        bool reduceSum,
+        bool reduceMax,
+        unsigned pow_y,
+        bool overaxis0,
+        bool overaxis1,
+        bool overaxis2,
+        bool overaxis3){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("_Reduce_Task",
+        "pow_y",pow_y,
+        "reduceSum",reduceSum,
+        "reduceMax",reduceMax,
+        inputTn->getShape(),
+        {},
+        {overaxis0,overaxis1,overaxis2,overaxis3});
 
-    unsigned _dim0,_dim1,_dim2;
-    int _overAxis0, _overAxis1, _overAxis2;
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn)->GetTensorTag() +"-reduce_in)");
 
-    _dim0 = inputTn->getShape()[0];
-    _dim1 = inputTn->getShape()[1];
-    _dim2 = inputTn->getShape()[2];
+    assert( !(reduceSum && reduceMax) && (reduceSum || reduceMax) );
+    const unsigned rank = inputTn->getRank();
+    unsigned _dim0,_dim1,_dim2,_dim3;
+    cl_int error;
+    int argcnt=0;
+    unsigned mode=0;
+    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskReduce::BankIndex_inputTn);
+    OclTensorF* rsltTn;
 
-    _overAxis0 = over_axis0;
-    _overAxis1 = over_axis1;
-    _overAxis2 = over_axis2;
+    if(reduceSum && rank==3){
+        assert(!overaxis0&&!overaxis1&&overaxis2); // ReduceSum3D FFT
+        _dim0 = inputTn->getShape()[0];
+        _dim1 = inputTn->getShape()[1];
+        _dim2 = inputTn->getShape()[2];
+        mode = 1;
+        rsltTn = new OclTensorF(context, queue, {_dim0,_dim1}, ConfigTaskReduce::BankIndex_outputTn);
+    }else if(reduceSum && rank==4){
+        assert(overaxis0&&overaxis1&&overaxis2&&!overaxis3); // ReduceSum4D TTTF
+        assert(pow_y<=ConfigTaskReduce::Sum4D::MaxPowY);
+        _dim0 = inputTn->getShape()[0];
+        _dim1 = inputTn->getShape()[1];
+        _dim2 = inputTn->getShape()[2];
+        _dim3 = inputTn->getShape()[3];
+        mode = 2;
+        rsltTn = new OclTensorF(context, queue, {_dim3}, ConfigTaskReduce::BankIndex_outputTn);
+    }else if(reduceMax && rank==4){
 
-    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskReduceSum::BankIndex_inputTn);
-    OclTensorF* rsltTn = new OclTensorF(context, queue, {_dim0,_dim1}, ConfigTaskReduceSum::BankIndex_outputTn);
-    
-    OclKernelObject *kernelObject = oclKernels[3];
+        // ReduceMax4D FTF (ReduceMax3D kernel will be used on FTF mode)
+        const bool reduceMaxFTFF = (!overaxis0&& overaxis1&& !overaxis2&& !overaxis3);
 
-    if(kernelObject->use_ndrange_kernel){
-        return nullptr;
+        // ReduceMax4D FTF (ReduceMax3D kernel will be used on FTF mode)
+        const bool reduceMaxFFTF = (!overaxis0&& !overaxis1&& overaxis2&& !overaxis3);
+
+        assert(
+            !(reduceMaxFTFF && reduceMaxFFTF) &&
+            (reduceMaxFTFF || reduceMaxFFTF)  
+        );
+
+        if(reduceMaxFTFF && inputTn->getShape()[2]!=1){
+            SPDLOG_LOGGER_ERROR(logger,"ReduceMax: For reductionDim=1, Dim2 should be equal 1");
+            return nullptr;
+        }
+
+        if(reduceMaxFTFF){
+            _dim0 = inputTn->getShape()[0];
+            _dim1 = inputTn->getShape()[1];
+            _dim2 = inputTn->getShape()[3];
+            rsltTn = new OclTensorF(
+                context, 
+                queue, 
+                {inputTn->getShape()[0], inputTn->getShape()[2], inputTn->getShape()[3]}, 
+                ConfigTaskReduce::BankIndex_outputTn);
+
+        }else if(reduceMaxFFTF){
+            _dim0 = inputTn->getShape()[0]*inputTn->getShape()[1];
+            _dim1 = inputTn->getShape()[2];
+            _dim2 = inputTn->getShape()[3];
+            rsltTn = new OclTensorF(
+                context, 
+                queue, 
+                {inputTn->getShape()[0], inputTn->getShape()[1], inputTn->getShape()[3]}, 
+                ConfigTaskReduce::BankIndex_outputTn);
+
+        }
+
+        mode = 3;
+
     }else{
-        cl_int error; int argcnt=0;
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)rsltTn)->ocl_buff));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim0));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim1));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim2));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _overAxis0));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _overAxis1));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _overAxis2));
-
-        cl::Event exeEvt;
-        OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
-        exeEvt.wait();
-        //queue->finish();
-
-        ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
-        return rsltTn;
+        assert(false); //NYI
     }
+
+    OclKernelObject *kernelObject = oclKernels[1];
+
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)rsltTn)->ocl_buff));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, mode));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, pow_y));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim0));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim1));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim2));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim3));
+
+    cl::Event exeEvt;
+    OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+    exeEvt.wait();
+    //queue->finish();
+
+    ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+    rsltTn->SetTensorTag("reduce_out");
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 //Task
@@ -446,60 +505,25 @@ TensorF* XilinxImplementation::_ReduceSum4D_Task(
         bool overaxis2,
         bool overaxis3,
         int pow_y){
-
-    assert(inputTn->getRank()==4);
-    assert(pow_y<=ConfigTaskReduceSum4D::MaxPowY);
-
-    OclKernelObject *kernelObject = oclKernels[2];
-
-    unsigned _dim0,_dim1,_dim2,_dim3;
-    _dim0 = inputTn->getShape()[0];
-    _dim1 = inputTn->getShape()[1];
-    _dim2 = inputTn->getShape()[2];
-    _dim3 = inputTn->getShape()[3];
-
-    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskReduceSum4D::BankIndex_inputTn);
-    OclTensorF* rsltTn = new OclTensorF(context, queue, {_dim3}, ConfigTaskReduceSum4D::BankIndex_outputTn);
-
-    cl_int error;int argcnt=0;
-    
-    cl_int _overAxis0,_overAxis1,_overAxis2,_overAxis3;
-    _overAxis0 = overaxis0;
-    _overAxis1 = overaxis1;
-    _overAxis2 = overaxis2;
-    _overAxis3 = overaxis3;
-
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)rsltTn)->ocl_buff));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, pow_y));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim0));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim1));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim2));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _dim3));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _overAxis0));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _overAxis1));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _overAxis2));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, _overAxis3));
-
-    cl::Event exeEvt;
-    OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
-    exeEvt.wait();
-    //queue->finish();
-
-    ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("_ReduceSum4D_Task","pow_y",pow_y,"",0,"",0,inputTn->getShape(),{},{overaxis0,overaxis1,overaxis2,overaxis3});
+    TensorF* rsltTn = _Reduce_Task(inputTn, true, false, (unsigned)pow_y, overaxis0, overaxis1, overaxis2, overaxis3);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
-///[axis0,axis1,axis2,axis3] //No batch op, uses data as is
+///[axis0,axis1,axis2,axis3] //Not a batch op, uses data as is
 TensorF* XilinxImplementation::ReduceSum4D(WorkScheduler scheduler,
                                         TensorF* inputTn,
                                         bool over_axis0,
                                         bool over_axis1,
                                         bool over_axis2,
                                         bool over_axis3){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
-    return _ReduceSum4D(scheduler, inputTn, over_axis0, over_axis1, over_axis2, over_axis3, 1);
+    TensorF* rsltTn = _ReduceSum4D(scheduler, inputTn, over_axis0, over_axis1, over_axis2, over_axis3, 1);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
@@ -509,10 +533,12 @@ TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
                                         bool over_axis2,
                                         bool over_axis3,
                                         int pow_y){
-    PrintInfo("ReduceSum4D","",0,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("_ReduceSum4D","pow_y",pow_y,"",0,"",0,inputTn->getShape(),{},{over_axis0,over_axis1,over_axis2,over_axis3});
     assert(over_axis0&&over_axis1&&over_axis2&&!over_axis3); // TTTF ONLY
-
-    return _ReduceSum4D_Task(inputTn,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
+    TensorF* rsltTn = _ReduceSum4D_Task(inputTn,over_axis0,over_axis1,over_axis2,over_axis3,pow_y);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 
@@ -528,56 +554,11 @@ TensorF* XilinxImplementation::_ReduceSum4D(WorkScheduler scheduler,
 TensorF* XilinxImplementation::PadLastDim(WorkScheduler scheduler,
                                         TensorF* inputTn,
                                         unsigned int lastDimPadded){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("PadLastDim","lastDimPadded",lastDimPadded,"",0,"",0,inputTn->getShape(),{},{});
-    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskPadding::BankIndex_inputTn);
- 
-    unsigned int dim0, dim1, lcm, _gcd;
-    std::vector<unsigned int> shape = inputTn->getShape();
-    const unsigned int rank = inputTn->getRank();
-
-    if(rank!=1){
-        dim0=1;
-        for(int i=0; i<rank-1; i++){
-            dim0*=shape[i];
-        }
-        dim1=shape[rank-1];
-    }else{
-        dim0 = 1;
-        dim1 = shape[0];
-    }
-
-    if(shape[rank-1]<CONFIG_M_AXI_WIDTH){
-        //sub-vector padding
-        _gcd = __gcd(dim1, CONFIG_M_AXI_WIDTH);
-        lcm = (dim1*CONFIG_M_AXI_WIDTH)/(_gcd);
-    }else{
-        lcm=0;
-    }
-    
-    shape[rank-1] = lastDimPadded;
-
-    
-    OclTensorF* outputTn = new OclTensorF(context, queue, shape, ConfigTaskPadding::BankIndex_outputTn);
-    OclKernelObject *kernelObject = oclKernels[11];
-
-    cl_int error; int argcnt=0;
-    std::cout<<"dim0:"<<dim0<<", dim1:"<<dim1<<", lastDimPadded:"<<lastDimPadded<<std::endl;
-
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)outputTn)->ocl_buff));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, dim0));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, dim1));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lastDimPadded));
-    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lcm));
-
-    cl::Event exeEvt;
-    OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
-    exeEvt.wait();
-    //queue->finish();
-
-    ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
-    return outputTn;
+    TensorF* rsltTn = _PadUnpadLastDim(inputTn, true, false, lastDimPadded, 0);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 
@@ -595,12 +576,32 @@ TensorF* XilinxImplementation::PadLastDim(WorkScheduler scheduler,
 TensorF* XilinxImplementation::UnpadLastDim(WorkScheduler scheduler,
                                         TensorF* inputTn,
                                         unsigned int lastDimUnpadded){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("UnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
-    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskUnpadding::BankIndex_inputTn);
+    TensorF* rsltTn = _PadUnpadLastDim(inputTn, false, true, 0, lastDimUnpadded);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
+}
 
-    unsigned int dim0, dim1, argcnt;
-    std::vector<unsigned int> shape = inputTn->getShape();
-    const unsigned int rank = inputTn->getRank();
+TensorF* XilinxImplementation::_PadUnpadLastDim(
+        TensorF* inputTn, 
+        bool pad,
+        bool unpad,
+        unsigned lastDimPadded,
+        unsigned lastDimUnpadded){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("_PadUnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn)->GetTensorTag() +"-padunpad_in)");
+
+    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskPadUnpad::BankIndex_inputTn);
+
+    cl_int error; 
+    int argcnt=0;
+    unsigned dim0, dim1, lcm=0, _gcd;
+    unsigned mode;
+    OclTensorF* outputTn;
+    std::vector<unsigned> shape = inputTn->getShape();
+    const unsigned rank = inputTn->getRank();
 
     if(rank!=1){
         dim0=1;
@@ -612,18 +613,41 @@ TensorF* XilinxImplementation::UnpadLastDim(WorkScheduler scheduler,
         dim0 = 1;
         dim1 = shape[0];
     }
+
+    if(pad){ //PAD
+        if(shape[rank-1]<CONFIG_M_AXI_WIDTH){
+            //sub-vector padding
+            _gcd = __gcd(dim1, CONFIG_M_AXI_WIDTH);
+            lcm = (dim1*CONFIG_M_AXI_WIDTH)/(_gcd);
+        }else{
+            lcm=0;
+        }
+        shape[rank-1] = lastDimPadded;
+        outputTn = new OclTensorF(context, queue, shape, ConfigTaskPadUnpad::BankIndex_outputTn);
+        mode=1;
+
+    }else if(unpad){ //UNPAD
+        shape[rank-1] = lastDimUnpadded;
+        outputTn = new OclTensorF(context, queue, shape, ConfigTaskPadUnpad::BankIndex_outputTn);
+        mode=2;
     
-    shape[rank-1] = lastDimUnpadded;
-    OclTensorF* outputTn = new OclTensorF(context, queue, shape, ConfigTaskUnpadding::BankIndex_outputTn);
+    }else{
+        assert(false);//NYI
+    }
 
-    OclKernelObject *kernelObject = oclKernels[12];
-    cl_int error;
+    OclKernelObject *kernelObject = oclKernels[9];
 
-    argcnt=0;
+    SPDLOG_LOGGER_DEBUG(logger,"dim0: {}, dim1: {}, lastDimPadded: {}, lcm: {}, lastDimUnpadded: {}", 
+        dim0, dim1,
+        lastDimPadded, lcm, lastDimUnpadded);
+
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)outputTn)->ocl_buff));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, mode));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, dim0));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, dim1));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lastDimPadded));
+    OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lcm));
     OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, lastDimUnpadded));
 
     cl::Event exeEvt;
@@ -633,6 +657,8 @@ TensorF* XilinxImplementation::UnpadLastDim(WorkScheduler scheduler,
 
     ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+    outputTn->SetTensorTag("padunpad_out");
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return outputTn;
 }
 
@@ -643,6 +669,7 @@ TensorF* XilinxImplementation::Mean(
         bool mean_axis1,
         bool mean_axis2,
         bool mean_axis3){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Mean","",0,"",0,"",0,inputTn->getShape(),{},{mean_axis0,mean_axis1,mean_axis2,mean_axis3});
 
     assert(inputTn->getRank()==2 || inputTn->getRank()==4);
@@ -678,6 +705,7 @@ TensorF* XilinxImplementation::Mean(
         inputTn->SqueezeDimZero();
     }
 
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
@@ -688,6 +716,7 @@ TensorF* XilinxImplementation::Variance(
         bool variance_axis1,
         bool variance_axis2,
         bool variance_axis3){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Variance","",0,"",0,"",0,inputTn->getShape(),{},{variance_axis0,variance_axis1,variance_axis2,variance_axis3});
 
     assert(inputTn->getRank()==2 || inputTn->getRank()==4);
@@ -733,6 +762,8 @@ TensorF* XilinxImplementation::Variance(
     delete(tmp3Tn);
     delete(varianceXi2Tn);
     delete(meanTn);
+
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
     return rsltTn;
 }
 
@@ -750,6 +781,7 @@ TensorF* XilinxImplementation::Variance(
  * @return     Returns the results which is a tensor with the same shape and rank of inputTn1.
  */
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, TensorF *inputTn2, MAT_OPS mode){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("MatOps",
               "mode",(mode==MAT_OPS::ADD ? 0 :
                       mode==MAT_OPS::SUB ? 1 :
@@ -757,6 +789,8 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
                       3),
               "",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
 
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn1)->GetTensorTag() +"-matops_in1)");
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn2)->GetTensorTag() +"-matops_in2)");
 
     int rankDiff;
     int rank1, rank2;
@@ -764,12 +798,12 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
     rank2 = inputTn2->getRank();
 
     if(!(inputTn1->getRank()<=4 && inputTn1->getRank()>=1 && inputTn2->getRank()<=4 && inputTn2->getRank()>=1 )){
-        cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E1"<<endl;
+        SPDLOG_LOGGER_ERROR(logger,"MatOps: ERROR_BAD_TENSOR_RANK-E1");
         return nullptr;
     }
 
     if(inputTn1->getRank() < inputTn2->getRank()){
-        cout<<"MatOps: ERROR_BAD_TENSOR_RANK-E2"<<endl;
+        SPDLOG_LOGGER_ERROR(logger, "MatOps: ERROR_BAD_TENSOR_RANK-E2");
         return nullptr;
     }
 
@@ -822,7 +856,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
                         mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
                         3;
 
-    OclKernelObject *kernelObject = oclKernels[4];
+    OclKernelObject *kernelObject = oclKernels[2];
     if(kernelObject->use_ndrange_kernel){
 
         // NOT IMPLEMENTED YET
@@ -861,12 +895,15 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
             rsltTn->SqueezeDimZero();
         }
 
+        rsltTn->SetTensorTag("matops_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1, float scalar, MAT_OPS mode){
-    PrintInfo("MatOps",
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
+    PrintInfo("MatOps-scalar",
               "mode",(mode==MAT_OPS::ADD ? 0 :
                       mode==MAT_OPS::SUB ? 1 :
                       mode==MAT_OPS::MUL_ELEMENTWISE ? 2 :
@@ -874,13 +911,18 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
               "",0,"",0,inputTn1->getShape(),{},{});
     float* val = new float[1]; val[0] = scalar;
     OclTensorF* tmpTn = new OclTensorF();
-    tmpTn->InitWithHostData(context, queue, {1}, val, ConfigTaskMatOps::BankIndex_outputTn);
-    return MatOps(scheduler,inputTn1,tmpTn,mode);
+    tmpTn->InitWithHostData(context, queue, {1}, val, ConfigTaskMatOps::BankIndex_inputTn2);
+    TensorF* rsltTn = MatOps(scheduler,inputTn1,tmpTn,mode);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::Sqrt(WorkScheduler scheduler, TensorF* inputTn){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Sqrt","",0,"",0,"",0,inputTn->getShape(),{});
-    return _ReluSqrtSquare(scheduler, inputTn, false, true, false);
+    TensorF* rsltTn = _ReluSqrtSquare(scheduler, inputTn, false, true, false);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::Concat2(
@@ -888,7 +930,10 @@ TensorF* XilinxImplementation::Concat2(
         TensorF* inputTn1,
         TensorF* inputTn2,
         int concatDim){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Concat2","concatDim",concatDim,"",0,"",0,inputTn1->getShape(),inputTn2->getShape(),{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn1)->GetTensorTag() +"-concat_in1)");
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn2)->GetTensorTag() +"-concat_in2)");
 
     TensorF* _inputTn1 = ((OclTensorF*)inputTn1)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskConcat::BankIndex_inputTn1);
     TensorF* _inputTn2 = ((OclTensorF*)inputTn2)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskConcat::BankIndex_inputTn2);
@@ -930,6 +975,8 @@ TensorF* XilinxImplementation::Concat2(
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+        rsltTn->SetTensorTag("concat_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -938,72 +985,15 @@ TensorF* XilinxImplementation::ReduceMax(
         WorkScheduler scheduler,
         TensorF* inputTn,
         int reductionDim){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReduceMax","reductionDim",reductionDim,"",0,"",0,inputTn->getShape(),{},{});
-
-    assert(inputTn->getRank()==4 && (reductionDim==1 || reductionDim==2));
-
-    int kDim0,kDim1,kDim2;
-    int overAxis0, overAxis1, overAxis2;
-    unsigned _dim0,_dim1,_dim2,_dim3;
-    _dim0 = inputTn->getShape()[0];
-    _dim1 = inputTn->getShape()[1];
-    _dim2 = inputTn->getShape()[2];
-    _dim3 = inputTn->getShape()[3];
-
-    TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskReduceMax::BankIndex_inputTn);
-    OclTensorF* rsltTn = nullptr;
-    if(inputTn->getRank()==4 &&  reductionDim==1)rsltTn= new OclTensorF(context, queue, {_dim0,_dim2,_dim3}, ConfigTaskReduceMax::BankIndex_outputTn);
-    if(inputTn->getRank()==4 &&  reductionDim==2)rsltTn= new OclTensorF(context, queue, {_dim0,_dim1,_dim3}, ConfigTaskReduceMax::BankIndex_outputTn);
-
-    if(reductionDim==2){
-        kDim0 = _dim0*_dim1;
-        kDim1 = _dim2;
-        kDim2 = _dim3;
-
-        overAxis0 = 0;
-        overAxis1 = 1;
-        overAxis2 = 0;
-    }
-
-    if(reductionDim==1){
-        if(_dim2!=1){
-            cout<<"ReduceMax: For reductionDim=1, Dim2 should be equals 1."<<endl;
-            return nullptr;
-        }
-        kDim0 = _dim0;
-        kDim1 = _dim1;
-        kDim2 = _dim3;
-
-        overAxis0 = 0;
-        overAxis1 = 1;
-        overAxis2 = 0;
-    }
-
-    OclKernelObject *kernelObject = oclKernels[1];
-    
-    if(kernelObject->use_ndrange_kernel){
-        return nullptr;
-    }else{
-        cl_int error;
-        int argcnt=0;
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)rsltTn)->ocl_buff));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, kDim0));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, kDim1));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, kDim2));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, overAxis0));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, overAxis1));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, overAxis2));
-
-        cl::Event exeEvt;
-        OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
-        exeEvt.wait();
-        //queue->finish();
-
-        ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
-        return rsltTn;
-    }
+    bool overaxis0=(reductionDim==0), 
+        overaxis1=(reductionDim==1), 
+        overaxis2=(reductionDim==2), 
+        overaxis3=(reductionDim==3);
+    TensorF* rsltTn = _Reduce_Task(inputTn, false, true, 0, overaxis0, overaxis1, overaxis2, overaxis3);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 
@@ -1028,7 +1018,10 @@ TensorF* XilinxImplementation::ReduceMax(
  * @return     The tensor with top k / least k elements' indices as its data.
  */
 TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, int axis, int k){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("TopK","axis",axis,"k",k,"",0,batchedMat->getShape(),{},{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)batchedMat)->GetTensorTag() +"-topk_in)");
+
     assert(batchedMat->getRank()==3);
     assert(batchedMat->getShape()[2]%CONFIG_M_AXI_WIDTH==0);
     assert(axis==2);
@@ -1040,7 +1033,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
     TensorF* _batchedMat = 
         ((OclTensorF*)batchedMat)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskTopK::BankIndex_inputTn);
     OclTensorI* rsltIndicesSplitedTn = new OclTensorI(context, queue, outputShape, ConfigTaskTopK::BankIndex_indicesSplitedTn);
-    OclKernelObject *kernelObject = oclKernels[10];
+    OclKernelObject *kernelObject = oclKernels[8];
     
     if(kernelObject->use_ndrange_kernel){
         return nullptr;
@@ -1051,11 +1044,11 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
         const unsigned vecsPerOutputSlice = DivCeil<unsigned>(k, CONFIG_M_AXI_WIDTH);
         const unsigned _dim2 = batchedMat->getShape()[2];
 
-        cout<<"BatchSize: "<<batchSize<<endl;
-        cout<<"vecsPerSlice: "<<vecsPerSlice<<endl;
-        cout<<"vecsPerOutputSlice: "<<vecsPerOutputSlice<<endl;
-        cout<<"_dim2: "<<_dim2<<endl;
-        cout<<"k: "<<k<<endl;
+        SPDLOG_LOGGER_DEBUG(logger, "BatchSize: {}", batchSize);
+        SPDLOG_LOGGER_DEBUG(logger, "vecsPerSlice: {}", vecsPerSlice);
+        SPDLOG_LOGGER_DEBUG(logger, "vecsPerOutputSlice: {}", vecsPerOutputSlice);
+        SPDLOG_LOGGER_DEBUG(logger, "_dim2: {}", _dim2);
+        SPDLOG_LOGGER_DEBUG(logger, "k: {}", k);
 
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_batchedMat)->ocl_buff));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorI*)rsltIndicesSplitedTn)->ocl_buff));
@@ -1071,12 +1064,18 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
         //queue->finish();
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
+
+        rsltIndicesSplitedTn->SetTensorTag("topk_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltIndicesSplitedTn;
     }
 }
 
 TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn, TensorI* indices, int indices_axis){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Gather","indices_axis",indices_axis,"",0,"",0,inputTn->getShape(),indices->getShape(),{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn)->GetTensorTag() +"-gather_in1)");
+    datamoverLaunches.push_back("abs("+ ((OclTensorI*)indices)->GetTensorTag() +"-gather_in2)");
 
     assert(inputTn->getRank()==3);
     assert(indices->getRank()==3);
@@ -1094,14 +1093,14 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
     TensorI* _indices = ((OclTensorI*)indices)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskGather::BankIndex_indicesTn);
 
     OclTensorF* rsltTn = new OclTensorF(context, queue, {B,N,K,D}, ConfigTaskGather::BankIndex_outputTn);
-    OclKernelObject *kernelObject = oclKernels[8];
+    OclKernelObject *kernelObject = oclKernels[6];
 
     if(kernelObject->use_ndrange_kernel){
         return nullptr;
     }else{
         cl_int error; int argcnt=0;
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_inputTn)->ocl_buff));
-        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)_indices)->ocl_buff));
+        OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorI*)_indices)->ocl_buff));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, ((OclTensorF*)rsltTn)->ocl_buff));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, indicesAxis));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, B));
@@ -1117,7 +1116,8 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
         //queue->finish();
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-
+        rsltTn->SetTensorTag("gather_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -1137,7 +1137,11 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
  * @return     
  */
 TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn, TensorF* weights, TensorF* biases, int overrideDim2){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Conv2D","overrideDim2",overrideDim2,"",0,"",0,inputTn->getShape(),weights->getShape(),{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn)->GetTensorTag() +"-conv_in)");
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)weights)->GetTensorTag() +"-conv_w)");
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)biases)->GetTensorTag() +"-conv_b)");
 
     unsigned int B  = inputTn->getShape()[0];
     unsigned int N  = inputTn->getShape()[1];
@@ -1148,7 +1152,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
     unsigned int D2Padded=-1;
 
     const unsigned int vecSizeTranspose = ConfigTaskConv2::kTransposeWidthBytes / CONFIG_DTYPE_SIZE;
-    std::cout<<"vecSizeTranspose: "<< vecSizeTranspose << std::endl;
+    SPDLOG_LOGGER_DEBUG(logger, "vecSizeTranspose: {}", vecSizeTranspose);
 
     //-----------------------------------------------------------------
     // Block 1. Padding inputTn
@@ -1175,11 +1179,12 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
 
         // The kernel is modified to not require the weight tensor to be 
         // padded in dimension-zero.
-        std::cout<< "Padding weightTn(super-vec padding):" << std::endl;
-        std::cout<<"\tD2: "<< D2 << std::endl;
-        std::cout<<"\tD2Padded: "<< D2Padded << std::endl;
+        SPDLOG_LOGGER_DEBUG(logger, "Padding weightTn(super-vec padding):");
+        SPDLOG_LOGGER_DEBUG(logger, "D2: {}", D2);
+        SPDLOG_LOGGER_DEBUG(logger, "D2Padded: {}", D2Padded);
+
     }else{
-        std::cout<< "Bypassing super-vec padding for weightTn" << std::endl;
+        SPDLOG_LOGGER_DEBUG(logger, "Bypassing super-vec padding for weightTn");
         _weightPadded = weights;
         D2Padded = D2;
     }
@@ -1202,7 +1207,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
                                              D2Padded},
                                              ConfigTaskConv2::BankIndex_outputTn);
 
-    OclKernelObject *kernelObject = oclKernels[9];
+    OclKernelObject *kernelObject = oclKernels[7];
 
     if(kernelObject->use_ndrange_kernel){
         //NYI
@@ -1220,8 +1225,8 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, size_k));
         OCL_CHECK(error, error = kernelObject->kernel_task->setArg(argcnt++, size_m));
 
-        std::cout << "Launching Conv2 gemmHLS\n";
-        std::cout << "[N K M] = ["<< size_n << " " << size_k << " " << size_m <<"]\n";
+        SPDLOG_LOGGER_DEBUG(logger, "Launching Conv2 gemmHLS");
+        SPDLOG_LOGGER_DEBUG(logger, "[N K M] = [{}, {}, {}]", size_n, size_k, size_m);
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
@@ -1229,7 +1234,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         //queue->finish();
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
-        std::cout << "Launching Conv2 gemmHLS...DONE\n";
+        SPDLOG_LOGGER_DEBUG(logger, "Launching Conv2 gemmHLS...DONE");
 
         //-----------------------------------------------------------------
         // Block 5. Unpadding rsltTnPadded
@@ -1237,24 +1242,32 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         if(D2%ConfigTaskConv2::kOuterTileSizeM!=0){ //same as Block2
             //Super-vec Unpadding( 128->64 )
             rsltTn = UnpadLastDim(scheduler, rsltTnPadded, D2);
-            std::cout<< "Unpadding results(super-vec unpadding)." << std::endl;
+            SPDLOG_LOGGER_DEBUG(logger, "Unpadding results(super-vec unpadding)");
         }else{
             rsltTn = rsltTnPadded;
-            std::cout<< "Bypassing super-vec unpadding of results." << std::endl;
+            SPDLOG_LOGGER_DEBUG(logger, "Bypassing super-vec unpadding of results");
         }        
 
         //-----------------------------------------------------------------
+        ((OclTensorF*)rsltTn)->SetTensorTag("conv_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
 
 TensorF* XilinxImplementation::ReLU(WorkScheduler scheduler, TensorF* inputTn){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReLU","",0,"",0,"",0,inputTn->getShape(),{},{});
-    return _ReluSqrtSquare(scheduler, inputTn, true, false, false);
+    TensorF *rsltTn = _ReluSqrtSquare(scheduler, inputTn, true, false, false);
+    SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    return rsltTn;
 }
 
 TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF* inputTn, bool runRelu, bool runSqrt, bool runSquare){
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("ReluSqrtSquare","runRelu",runRelu,"runSqrt",runSqrt,"runSquare",runSquare,inputTn->getShape(),{},{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn)->GetTensorTag() +"-relusqrtsquare_in)");
+    
     assert(
         (runRelu&& !runSqrt&& !runSquare)||
         (!runRelu&& runSqrt&& !runSquare)||
@@ -1269,7 +1282,7 @@ TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF*
     TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskReluSqrtSquare::BankIndex_inputTn);
     OclTensorF *rsltTn = new OclTensorF(context, queue, inputTn->getShape(),ConfigTaskReluSqrtSquare::BankIndex_outputTn);
     
-    OclKernelObject *kernelObject = oclKernels[13];
+    OclKernelObject *kernelObject = oclKernels[10];
 
     if(kernelObject->use_ndrange_kernel){
         return nullptr;
@@ -1288,6 +1301,8 @@ TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF*
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+        rsltTn->SetTensorTag("relusqrtsquare_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -1308,7 +1323,9 @@ TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF*
  * @return     
  */
 TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, int tileAxis, int tileCount) {
+    SPDLOG_LOGGER_DEBUG(reporter,"Started");
     PrintInfo("Tile","tileAxis",tileAxis,"tileCount",tileCount,"",0,inputTn->getShape(),{},{});
+    datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn)->GetTensorTag() +"-tile_in)");
 
     unsigned rank = inputTn->getRank();
    
@@ -1356,7 +1373,7 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
         assert(false);
     }
 
-    OclKernelObject *kernelObject = oclKernels[5];
+    OclKernelObject *kernelObject = oclKernels[3];
 
     if(kernelObject->use_ndrange_kernel){
         return nullptr;
@@ -1378,6 +1395,8 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
 
         ReportDuration(__func__,kernelObject->use_ndrange_kernel,exeEvt);
 
+        rsltTn->SetTensorTag("tile_out");
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
         return rsltTn;
     }
 }
@@ -1387,12 +1406,15 @@ void XilinxImplementation::DumpMatrix(
         string npy_fname,
         TensorF* inputTn,
         string npy_dir){
-    TensorF *_inputTn = ((OclTensorF*)inputTn)->TransferToHost(queue);
-#ifdef DUMP_ENABLED
+    if(globalDumpTensors){
+        SPDLOG_LOGGER_DEBUG(reporter,"Started");
+        TensorF *_inputTn = ((OclTensorF*)inputTn)->TransferToHost(queue);
         vector<unsigned int> shape = _inputTn->getShape();
         vector<unsigned long > shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<float>(npy_dir+npy_fname,_inputTn->_buff ,shape_size_t,"w");
-#endif
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    }
+    
 }
 
 void XilinxImplementation::DumpMatrix(
@@ -1400,12 +1422,14 @@ void XilinxImplementation::DumpMatrix(
         string npy_fname,
         TensorI* inputTn,
         string npy_dir){
-    TensorI *_inputTn = ((OclTensorI*)inputTn)->TransferToHost(queue);
-#ifdef DUMP_ENABLED
+    if(globalDumpTensors){
+        SPDLOG_LOGGER_DEBUG(reporter,"Started");
+        TensorI *_inputTn = ((OclTensorI*)inputTn)->TransferToHost(queue);
         vector<unsigned int> shape = _inputTn->getShape();
-        vector<unsigned long  > shape_size_t(shape.begin(), shape.end());
+        vector<unsigned long> shape_size_t(shape.begin(), shape.end());
         cnpy::npy_save<int>(npy_dir+npy_fname,_inputTn->_buff ,shape_size_t,"w");
-#endif
+        SPDLOG_LOGGER_DEBUG(reporter,"Finished");
+    }
 }
 
 bool XilinxImplementation::CompareTensors(WorkScheduler scheduler,TensorF *inputTn1, TensorF *inputTn2) {
@@ -1502,13 +1526,13 @@ cl_ulong XilinxImplementation::get_duration_ns (const cl::Event &event) {
 
 void XilinxImplementation::ReportDuration(const std::string &name, const bool &isNDRange, const cl::Event &event){
     uint64_t ns = get_duration_ns(event);
-#ifdef REPORT_EXECUTION_DURATION
-        std::cout<< "\t** "<< name << (isNDRange?"(ndrange)":"(task)")<<":: "<<
-                "\t(us): " << ns/1000.0f <<
-                "\t(ms): " << ns/1000000.0f <<
-                "\t( s): " << ns/1000000000.0f <<
-                std::endl;
-#endif
+        SPDLOG_LOGGER_INFO(reporter, 
+            "** {}{}(us): {}, (ms): {}, (s): {}", 
+            name, 
+            (isNDRange?"(ndrange):: ":"(task):: "),
+            ns/1000.0f,
+            ns/1000000.0f,
+            ns/1000000000.0f);
 }
 
 int XilinxImplementation::SetModeEnvVar(const RUN_MODE mode){

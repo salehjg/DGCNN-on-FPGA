@@ -40,7 +40,7 @@ TensorF::TensorF(std::vector<unsigned> shape, float *buff) {
 
 void TensorF::Init(std::vector<unsigned> shape) {
     if(initialized){
-        std::cout<<"--- TensorF: buffer deleted.\n";
+        SPDLOG_LOGGER_DEBUG(logger,"TensorF: buffer deleted");
         delete(_buff);
     }
     this->shape = shape;
@@ -52,7 +52,7 @@ void TensorF::Init(std::vector<unsigned> shape) {
 
 void TensorF::Init(std::vector<unsigned> shape, float* buff){
     if(initialized){
-        std::cout<<"--- TensorF: buffer deleted.\n";
+        SPDLOG_LOGGER_DEBUG(logger,"TensorF: buffer deleted");
         delete(_buff);
     }
     this->shape = shape;
@@ -194,7 +194,6 @@ unsigned TensorF::getVectorCountPadded(int vectorWords){
 TensorF::~TensorF() {
     if(platform == PLATFORMS::CPU){
         if(initialized){
-            //std::cout<<"--- TensorF: destructed.\n";
             delete(_buff);
         }
     } /*else if(platform == PLATFORMS::GPU_CUDA){

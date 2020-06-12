@@ -20,13 +20,13 @@ constexpr unsigned kPipeDepth = 4;
 // Memory bus in K-dimension
 constexpr int kMemoryWidthK = kMemoryWidthBytesK / sizeof(CONFIG_DTYPE);
 static_assert(kMemoryWidthBytesK % sizeof(CONFIG_DTYPE) == 0,
-                            "Memory width in K not divisable by size of data type.");
+                            "Memory width in K not divisible by size of data type.");
 using MemoryPackK_t = hlslib::DataPack<CONFIG_DTYPE, kMemoryWidthK>;
 
 // Memory bus in M-dimension
 constexpr int kMemoryWidthM = kMemoryWidthBytesM / sizeof(CONFIG_DTYPE);
 static_assert(kMemoryWidthBytesM % sizeof(CONFIG_DTYPE) == 0,
-                            "Memory width in M not divisable by size of data type.");
+                            "Memory width in M not divisible by size of data type.");
 using MemoryPackM_t = hlslib::DataPack<CONFIG_DTYPE, kMemoryWidthM>;
 
 // Internal compute buses
@@ -37,9 +37,9 @@ using OutputPack_t = hlslib::DataPack<CONFIG_DTYPE, kComputeTileSizeM>;
 // On-chip transpose of A
 constexpr int kTransposeWidth = kTransposeWidthBytes / sizeof(CONFIG_DTYPE);
 static_assert(kTransposeWidthBytes % sizeof(CONFIG_DTYPE) == 0,
-                            "Transpose width must be divisable by data size.");
+                            "Transpose width must be divisible by data size.");
 static_assert(kTransposeWidthBytes % kMemoryWidthBytesK == 0,
-                            "Transpose width must be divisable by memory port width.");
+                            "Transpose width must be divisible by memory port width.");
 
 using MemoryPackA_t = MemoryPackK_t;
 constexpr decltype(kMemoryWidthK) kMemoryWidthA = kMemoryWidthK;
@@ -47,19 +47,19 @@ constexpr decltype(kMemoryWidthK) kMemoryWidthA = kMemoryWidthK;
 constexpr unsigned long kOuterTileSizeMMemory = kOuterTileSizeM / kMemoryWidthM;
 static_assert(
         kOuterTileSizeM % kMemoryWidthM == 0,
-        "Outer memory tile size in M must be divisable by memory port width.");
+        "Outer memory tile size in M must be divisible by memory port width.");
 
 constexpr unsigned long kInnerTilesN = kOuterTileSizeN / kInnerTileSizeN;
 static_assert(kOuterTileSizeN % kInnerTileSizeN == 0,
-                            "Outer tile size must be divisable by the inner tile size.");
+                            "Outer tile size must be divisible by the inner tile size.");
 
 constexpr unsigned long kInnerTilesM = kOuterTileSizeM / kComputeTileSizeM;
 static_assert(kOuterTileSizeM % kComputeTileSizeM == 0,
-                            "Outer tile size must be divisable by compute tile size in M.");
+                            "Outer tile size must be divisible by compute tile size in M.");
 
 constexpr unsigned long kComputeTilesN = kInnerTileSizeN / kComputeTileSizeN;
 static_assert(kInnerTileSizeN % kComputeTileSizeN == 0,
-                            "Inner tile size must be divisable by compute tile size.");
+                            "Inner tile size must be divisible by compute tile size.");
 
 inline unsigned SizeKMemory(unsigned k) {
     #pragma HLS INLINE

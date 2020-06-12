@@ -25,6 +25,8 @@ message("CMake Version: ${CMAKE_VERSION}")
 #-DKERNEL_LOGS -DHLSLIB_SYNTHESIS
 
 # $ENV{AWS_PLATFORM}   OR    xilinx_kcu1500_dynamic_5_0
+
+set(BuildRelease ON CACHE BOOL "Build the host application and CpuTests with release mode.")
 set(DSA_NAME "$ENV{AWS_PLATFORM}" CACHE STRING "Known SDAccel platform name or xpfm file path")
 set(SYNTH_PART_NAME "xcvu9p-flga2104-2-e" CACHE STRING "Part name for synthesis only.")
 set(SYNTH_FLAGS "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I${CMAKE_SOURCE_DIR}/inc/ocl_imp/xilinx -I${CMAKE_SOURCE_DIR}/config/output -I${CMAKE_SOURCE_DIR}/hlslib/include" CACHE STRING "CFlags for synthesis only.")
@@ -59,10 +61,24 @@ include(CheckTypeSize)
 
 
 
-include_directories(config/output inc hlslib/include ${CMAKE_BINARY_DIR} ${SDAccel_INCLUDE_DIRS})
+include_directories(
+    ${CMAKE_SOURCE_DIR}/config/output 
+    ${CMAKE_SOURCE_DIR}/inc 
+    ${CMAKE_SOURCE_DIR}/hlslib/include 
+    ${CMAKE_SOURCE_DIR}/argparse
+    ${CMAKE_SOURCE_DIR}/spdlog/include
+    ${CMAKE_BINARY_DIR} 
+    ${SDAccel_INCLUDE_DIRS})
 add_definitions(-DREPO_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_definitions(-DBIN_DIR=\"${CMAKE_BINARY_DIR}\")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+
+if(BuildRelease)
+    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3")
+else()
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -g")
+endif()
 
 #add_definitions("-DHLSLIB_STREAM_TIMEOUT=16")
 if(((${SDAccel_MAJOR_VERSION} LESS 2018) AND (${SDAccel_MINOR_VERSION} LESS 3)) OR ${SDAccel_MAJOR_VERSION} LESS 2017)
@@ -272,9 +288,9 @@ set(SP_TAG_MATOPS
  --sp task_matops_1.inputTn2:bank${CFG3_MatOps_DDRBANK_inputTn2}\
  --sp task_matops_1.outputTn:bank${CFG3_MatOps_DDRBANK_outputTn}")
 
-set(SP_TAG_REDUCESUM4D
-"--sp task_reducesum4d_1.inputTn:bank${CFG4_ReduceSum4D_DDRBANK_inputTn}\
- --sp task_reducesum4d_1.outputTn:bank${CFG4_ReduceSum4D_DDRBANK_outputTn}")
+set(SP_TAG_REDUCE
+"--sp task_reduce_1.inputTn:bank${CFG4_Reduce_DDRBANK_inputTn}\
+ --sp task_reduce_1.outputTn:bank${CFG4_Reduce_DDRBANK_outputTn}")
 
 set(SP_TAG_MATMUL
 "--sp task_matmul_1.inputTn1:bank${CFG5_MatMul_DDRBANK_inputTn1}\
@@ -295,17 +311,9 @@ set(SP_TAG_CONCAT
  --sp task_concat_1.inputTn2:bank${CFG8_Concat_DDRBANK_inputTn2}\
  --sp task_concat_1.outputTn:bank${CFG8_Concat_DDRBANK_outputTn}")
 
-set(SP_TAG_REDUCEMAX
-"--sp task_reducemax_1.inputTn:bank${CFG9_ReduceMax_DDRBANK_inputTn}\
- --sp task_reducemax_1.outputTn:bank${CFG9_ReduceMax_DDRBANK_outputTn}")
-
 set(SP_TAG_TRANSPOSE
 "--sp task_transpose_1.inputTn:bank${CFG10_Transpose_DDRBANK_inputTn}\
  --sp task_transpose_1.outputTn:bank${CFG10_Transpose_DDRBANK_outputTn}")
-
-set(SP_TAG_REDUCESUM
-"--sp task_reducesum_1.inputTn:bank${CFG11_ReduceSum_DDRBANK_inputTn}\
- --sp task_reducesum_1.outputTn:bank${CFG11_ReduceSum_DDRBANK_outputTn}")
 
 set(SP_TAG_RELUSQRTSQUARE
 "--sp task_relu_sqrt_square_1.inputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_inputTn}\
@@ -327,33 +335,26 @@ endif()
 string(REPLACE ";" " " SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER}" )
 message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
 
-set(SP_TAG_PADDING
-"--sp task_pad_last_dim_1.inputTn:bank${CFG13_Padding_DDRBANK_inputTn}\
- --sp task_pad_last_dim_1.outputTn:bank${CFG13_Padding_DDRBANK_outputTn}")
-
-set(SP_TAG_UNPADDING
-"--sp task_unpad_last_dim_1.inputTn:bank${CFG14_Unpadding_DDRBANK_inputTn}\
- --sp task_unpad_last_dim_1.outputTn:bank${CFG14_Unpadding_DDRBANK_outputTn}")
+set(SP_TAG_PADUNPAD
+"--sp task_pad_unpad_1.inputTn:bank${CFG13_PadUnpad_DDRBANK_inputTn}\
+ --sp task_pad_unpad_1.outputTn:bank${CFG13_PadUnpad_DDRBANK_outputTn}")
 
 
 
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/conv2_1x1_direct.cpp"    "conv2_1x1_direct"  "task_conv2_1x1_direct"     FALSE TRUE ${SP_TAG_CONV2D} "" )
 ##sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_selectionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
 ##sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_insertionsort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
-sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp"         "reducesum4d"       "task_reducesum4d"          FALSE TRUE ${SP_TAG_REDUCESUM4D} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducemax.cpp"           "reducemax"         "task_reducemax"            FALSE TRUE ${SP_TAG_REDUCEMAX} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reducesum.cpp"           "reducesum"         "task_reducesum"            FALSE TRUE ${SP_TAG_REDUCESUM} "" )
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp"    "relu_sqrt_square"  "task_relu_sqrt_square"     FALSE TRUE ${SP_TAG_RELUSQRTSQUARE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp"      "topk"              "task_topk"                 FALSE TRUE ${SP_TAG_TOPK} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matops.cpp"              "matops"            "task_matops"               FALSE TRUE ${SP_TAG_MATOPS} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/reduce.cpp"              "reduce"            "task_reduce"               FALSE TRUE ${SP_TAG_REDUCE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/matmul.cpp"              "matmul"            "task_matmul"               FALSE TRUE ${SP_TAG_MATMUL} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/tile.cpp"                "tile"              "task_tile"                 FALSE TRUE ${SP_TAG_TILE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/gather.cpp"              "gather"            "task_gather"               FALSE TRUE ${SP_TAG_GATHER} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/concat.cpp"              "concat"            "task_concat"               FALSE TRUE ${SP_TAG_CONCAT} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/transpose.cpp"           "transpose"         "task_transpose"            FALSE TRUE ${SP_TAG_TRANSPOSE} "" )
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/relu_sqrt_square.cpp"    "relu_sqrt_square"  "task_relu_sqrt_square"     FALSE TRUE ${SP_TAG_RELUSQRTSQUARE} "" )
 sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/datamover.cpp"           "datamover"         "task_datamover"            FALSE TRUE ${SP_TAG_DATAMOVER} "")
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/padding.cpp"             "padding"           "task_pad_last_dim"         FALSE TRUE ${SP_TAG_PADDING} "")
-#sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp"           "unpadding"         "task_unpad_last_dim"       FALSE TRUE ${SP_TAG_UNPADDING} "")
+sdaccel_target("${CMAKE_SOURCE_DIR}/src/kernels/xilinx/pad_unpad.cpp"           "padunpad"          "task_pad_unpad"            FALSE TRUE ${SP_TAG_PADUNPAD} "")
 
 #==========================================================================================================================================
 
@@ -364,7 +365,7 @@ add_custom_target(compile_hw COMMAND sh Compile_Hw_Batch.sh)
 add_custom_target(compile_hwemu COMMAND sh Compile_HwEmu_Batch.sh)
 add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh)
 
-set(SlrUtilOutputFile ${CMAKE_BINARY_DIR}/SLR_UTILIZATION_REPORT.txt)
+set(SlrUtilOutputFile ${CMAKE_BINARY_DIR}/SLR_UTILIZATION.log)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 set(SlrUtilFilePath ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
@@ -412,11 +413,10 @@ add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh)
 #==========================================================================================================================================
 
 
+add_subdirectory(spdlog)
+
 set(HOSTSIDE_SRC
-    #src/ClassifierMultiPlatform.cpp
     src/cnpy.cpp
-    #src/MainExecutable.cpp
-    #src/ModelArchTop05.cpp
     src/PlatformImplementation.cpp
     src/PlatformSelector.cpp
     src/TensorF.cpp
@@ -429,21 +429,18 @@ set(HOSTSIDE_SRC
     src/ocl_imp/DataMover.cpp
     src/ocl_imp/xilinx/xcl2.cpp
     src/ocl_imp/xilinx/XilinxImplementation.cpp
-    #src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
 set(HOSTSIDE_MAIN_SRC
     ${HOSTSIDE_SRC}
     src/ClassifierMultiPlatform.cpp
     src/MainExecutable.cpp
-    src/ModelArchTop04.cpp
+    src/ModelArchTop02.cpp
     src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
-set(CMAKE_BUILD_TYPE Debug)
-
 add_executable(${HostExecutableName} ${HOSTSIDE_MAIN_SRC})
-target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
+target_link_libraries(${HostExecutableName} ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z stdc++fs spdlog)
 
 add_executable(HostTest src/HostTest.cpp src/ocl_imp/xilinx/xcl2.cpp)
 target_link_libraries(HostTest ${SDAccel_LIBRARIES} ${SDAccel_FLOATING_POINT_LIBRARY} z)
@@ -461,6 +458,7 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hwemu.sh ${CMAKE_BINARY_DIR
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hw.sh ${CMAKE_BINARY_DIR}/autobuild_hw.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/PasteBinAgentForAutoBuilds.py ${CMAKE_BINARY_DIR}/PasteBinAgentForAutoBuilds.py @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/sdaccel.ini ${CMAKE_BINARY_DIR}/sdaccel.ini COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/gather_results.sh ${CMAKE_BINARY_DIR}/gather_results.sh COPYONLY)
 
 include(CTest)
 add_subdirectory("test")

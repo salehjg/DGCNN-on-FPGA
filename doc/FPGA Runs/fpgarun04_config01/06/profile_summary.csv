@@ -1,0 +1,183 @@
+Profile Summary
+Generated on: 2020-06-10 19:33:57
+Msec since Epoch: 1591817637843
+Profiled application: DeepPointV1FPGA
+Target platform: Xilinx
+Tool version: 2019.1
+Target devices: xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0
+Flow mode: System Run
+
+OpenCL API Calls
+API Name,Number Of Calls,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),
+clWaitForEvents,237,57742.6,0.093672,243.64,3002.92,
+clCreateBuffer,526,16997.7,0.017092,32.3151,750.617,
+clEnqueueReadBuffer,28,5994.86,0.142902,214.102,824.99,
+clSetKernelArg,2501,1447.87,0.004403,0.578915,103.389,
+clReleaseMemObject,227,1172.8,0.00441,5.16651,87.1599,
+clCreateProgramWithBinary,1,221.837,221.837,221.837,221.837,
+clEnqueueTask,237,183.102,0.075054,0.77258,16.7751,
+clEnqueueWriteBuffer,236,58.1201,0.046406,0.246272,4.52944,
+clCreateKernel,37,46.008,1.19233,1.24346,1.29036,
+clGetEventProfilingInfo,474,2.86334,0.004461,0.0060408,0.048306,
+clReleaseEvent,237,2.23057,0.006848,0.00941169,0.043492,
+clReleaseKernel,26,0.168603,0.005716,0.00648473,0.007518,
+clGetExtensionFunctionAddress,2,0.085621,0.015896,0.0428105,0.069725,
+clGetPlatformInfo,14,0.067249,0.004349,0.0048035,0.007407,
+clRetainDevice,4,0.0235,0.004405,0.005875,0.00869,
+clReleaseDevice,3,0.018208,0.00476,0.00606933,0.008404,
+clGetExtensionFunctionAddressForPlatform,2,0.017059,0.005665,0.0085295,0.011394,
+clGetDeviceIDs,2,0.0164,0.004829,0.0082,0.011571,
+clGetDeviceInfo,2,0.015265,0.006704,0.0076325,0.008561,
+clCreateContext,1,0.012603,0.012603,0.012603,0.012603,
+clCreateCommandQueue,1,0.01215,0.01215,0.01215,0.01215,
+
+
+Kernel Execution
+Kernel,Number Of Enqueues,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),
+task_concat,3,4875.66,942.681,1625.22,1966.5,
+task_conv2_1x1_direct,5,7015.13,557.347,1403.03,2786.25,
+task_datamover,2,338.919,5.3132,169.46,333.606,
+task_datamover,1,104.295,104.295,104.295,104.295,
+task_datamover,1,5.40467,5.40467,5.40467,5.40467,
+task_datamover,3,443.327,5.30786,147.776,333.669,
+task_datamover,2,338.906,5.32291,169.453,333.583,
+task_datamover,1,5.31344,5.31344,5.31344,5.31344,
+task_datamover,1,333.455,333.455,333.455,333.455,
+task_datamover,3,0.374107,0.098891,0.124702,0.173809,
+task_datamover,2,0.429854,0.17076,0.214927,0.259094,
+task_datamover,2,5.41154,0.101798,2.70577,5.30975,
+task_datamover,2,0.681268,0.25484,0.340634,0.426428,
+task_datamover,3,375.194,20.9555,125.065,333.266,
+task_datamover,2,437.992,20.9621,218.996,417.03,
+task_datamover,1,333.654,333.654,333.654,333.654,
+task_gather,3,727.437,120.272,242.479,486.677,
+task_matmul,7,2584.21,5.83667,369.173,2097.97,
+task_matops,127,14886.3,0.078237,117.215,961.192,
+task_pad_unpad,8,2433.3,0.108236,304.162,965.475,
+task_reduce,27,8668.1,0.131089,321.041,1048.78,
+task_relu_sqrt_square,16,2203.06,0.084321,137.691,902.476,
+task_tile,9,1154.84,66.8423,128.315,368.961,
+task_topk,3,5285.36,1761.78,1761.79,1761.79,
+task_transpose,3,1157.83,85.4313,385.945,986.971,
+
+
+Compute Unit Utilization
+Device,Compute Unit,Kernel,Global Work Size,Local Work Size,Number Of Calls,Dataflow Execution,Max Overlapping Executions,Dataflow Acceleration,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),Clock Frequency (MHz),
+
+
+Data Transfer: Host to Global Memory
+Context:Number of Devices,Transfer Type,Number Of Buffer Transfers,Transfer Rate (MB/s),Average Bandwidth Utilization (%),Average Buffer Size (KB),Total Time (ms),Average Time (ms),
+context0:1,READ,28,1281.217978,13.346021,274129,5990.874463,213.959802,
+context0:1,WRITE,237,9600.000000,100.000000,170744,4215.243440,17.785837,
+
+
+Data Transfer: Kernels to Global Memory
+Device,Compute Unit/Port Name,Kernel Arguments,Memory Resources,Transfer Type,Number Of Transfers,Transfer Rate (MB/s),Average Bandwidth Utilization (%),Average Size (KB),Average Latency (ns),
+
+
+Top Data Transfer: Kernels to Global Memory
+Device,Compute Unit,Number of Transfers,Average Bytes per Transfer,Transfer Efficiency (%),Total Data Transfer (MB),Total Write (MB),Total Read (MB),Total Transfer Rate (MB/s),
+
+
+Top Kernel Execution
+Kernel Instance Address,Kernel,Context ID,Command Queue ID,Device,Start Time (ms),Duration (ms),Global Work Size,Local Work Size,
+31945024,task_conv2_1x1_direct,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,80657.7,2786.25,1:1:1,1:1:1,
+31941472,task_matmul,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,66674.4,2097.97,1:1:1,1:1:1,
+31936336,task_concat,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,8757.41,1966.5,1:1:1,1:1:1,
+31936336,task_concat,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,53448.4,1966.48,1:1:1,1:1:1,
+31945024,task_conv2_1x1_direct,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,21247.2,1766.94,1:1:1,1:1:1,
+31946368,task_topk,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,5870.63,1761.79,1:1:1,1:1:1,
+31946368,task_topk,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,50553.9,1761.79,1:1:1,1:1:1,
+31946368,task_topk,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,73046.4,1761.78,1:1:1,1:1:1,
+31937120,task_reduce,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,38141.6,1048.78,1:1:1,1:1:1,
+31942528,task_transpose,0,0,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,65401,986.971,1:1:1,1:1:1,
+
+
+Top Memory Writes: Host to Global Memory
+Buffer Address,Context ID,Command Queue ID,Start Time (ms),Duration (ms),Buffer Size (KB),Writing Rate(MB/s),
+17183911936,0,0,80441.1,216.563217,2.09715e+06,9683.787880,
+17189883904,0,0,11610.1,211.314454,2.09715e+06,9924.319971,
+17183854592,0,0,56315.1,211.209553,2.09715e+06,9929.249062,
+17189941248,0,0,21036.1,211.007232,2.09715e+06,9938.770781,
+27086888960,0,0,35847.6,106.008344,1.04858e+06,9891.447790,
+27086888960,0,0,30117.1,105.902006,1.04858e+06,9901.379961,
+26038312960,0,0,23395.7,105.806990,1.04858e+06,9910.271524,
+22368296960,0,0,28624.6,105.708358,1.04858e+06,9919.518379,
+29498613760,0,0,78573.9,105.549780,1.04858e+06,9934.421464,
+17189965824,0,0,31553.8,105.463637,1.04858e+06,9942.540783,
+
+
+Top Memory Reads: Host to Global Memory
+Buffer Address,Context ID,Command Queue ID,Start Time (ms),Duration (ms),Buffer Size (KB),Reading Rate(MB/s),
+26038312960,0,0,24467.3,824.804344,1.04858e+06,1271.302713,
+27086888960,0,0,36856.4,821.468440,1.04858e+06,1276.465350,
+29184040960,0,0,34230.7,811.092797,1.04858e+06,1292.794122,
+23416872960,0,0,18314.9,412.261979,524288,1271.735029,
+18344386560,0,0,58213.1,408.300446,524288,1284.074032,
+28659752960,0,0,63022.6,408.225263,524288,1284.310520,
+18475458560,0,0,13508,406.607376,524288,1289.420780,
+21844008960,0,0,19648.3,405.601612,524288,1292.618137,
+19327426560,0,0,4433.29,333.174934,419430,1258.889422,
+18475458560,0,0,40056.8,328.975571,419430,1274.959106,
+
+
+Guidance Parameters
+Parameter,Element,Value,
+DEVICE_EXEC_TIME,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,86846.306416,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_concat_1,3,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_conv2_1x1_direct_1,5,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_datamover_1,26,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_gather_1,3,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_matmul_1,7,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_matops_1,127,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_pad_unpad_1,8,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_reduce_1,27,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_relu_sqrt_square_1,16,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_tile_1,9,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_topk_1,3,
+CU_CALLS,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0|task_transpose_1,3,
+MEMORY_BIT_WIDTH,xilinx_aws-vu9p-f1-04261818_dynamic_5_0-0,512,
+MIGRATE_MEM,host,0,
+MEMORY_USAGE,DDR[1],13,
+MEMORY_USAGE,DDR[2],9,
+PLRAM_DEVICE,all,1,
+HBM_DEVICE,all,0,
+KDMA_DEVICE,all,0,
+P2P_DEVICE,all,0,
+P2P_HOST_TRANSFERS,host,0,
+PORT_BIT_WIDTH,task_pad_unpad_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_relu_sqrt_square_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_transpose_1/m_axi_gmem1,32,
+PORT_BIT_WIDTH,task_concat_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_gather_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_gather_1/m_axi_gmem2,32,
+PORT_BIT_WIDTH,task_gather_1/m_axi_gmem3,512,
+PORT_BIT_WIDTH,task_topk_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_topk_1/m_axi_gmem2,512,
+PORT_BIT_WIDTH,task_matops_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_matops_1/m_axi_gmem2,512,
+PORT_BIT_WIDTH,task_matops_1/m_axi_gmem3,512,
+PORT_BIT_WIDTH,task_reduce_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_tile_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_datamover_1/m_axi_gmem2,512,
+PORT_BIT_WIDTH,task_datamover_1/m_axi_gmem3,512,
+PORT_BIT_WIDTH,task_conv2_1x1_direct_1/m_axi_gmem0,512,
+PORT_BIT_WIDTH,task_conv2_1x1_direct_1/m_axi_gmem1,512,
+PORT_BIT_WIDTH,task_conv2_1x1_direct_1/m_axi_gmem2,512,
+PORT_BIT_WIDTH,task_conv2_1x1_direct_1/m_axi_gmem3,512,
+PORT_BIT_WIDTH,task_matmul_1/m_axi_gmem1,32,
+PORT_BIT_WIDTH,task_matmul_1/m_axi_gmem2,512,
+KERNEL_COUNT,task_concat,1,
+KERNEL_COUNT,task_conv2_1x1_direct,1,
+KERNEL_COUNT,task_datamover,1,
+KERNEL_COUNT,task_gather,1,
+KERNEL_COUNT,task_matmul,1,
+KERNEL_COUNT,task_matops,1,
+KERNEL_COUNT,task_pad_unpad,1,
+KERNEL_COUNT,task_reduce,1,
+KERNEL_COUNT,task_relu_sqrt_square,1,
+KERNEL_COUNT,task_tile,1,
+KERNEL_COUNT,task_topk,1,
+KERNEL_COUNT,task_transpose,1,
+OBJECTS_RELEASED,all,0,
+

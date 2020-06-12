@@ -7,7 +7,7 @@ include_directories(
 
 add_executable(CpuTestReduceSum4D
     src/CpuTestReduceSum4D.cpp 
-    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/reducesum4d.cpp)
+    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/reduce.cpp)
 
 target_link_libraries(CpuTestReduceSum4D
     ${SDAccel_LIBRARIES} 

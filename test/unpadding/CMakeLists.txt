@@ -7,7 +7,7 @@ include_directories(
 
 add_executable(CpuTestUnpadding
     src/CpuTestUnpadding.cpp 
-    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/unpadding.cpp)
+    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/pad_unpad.cpp)
 
 target_link_libraries(CpuTestUnpadding 
     ${SDAccel_LIBRARIES} 

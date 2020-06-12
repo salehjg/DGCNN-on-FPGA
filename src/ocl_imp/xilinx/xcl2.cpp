@@ -27,6 +27,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **********/
 
+#include "build_config.h"
 #include "ocl_imp/xilinx/xcl2.hpp"
 #include <limits.h>
 #include <sys/stat.h>
@@ -45,13 +46,13 @@ std::vector<cl::Device> get_devices(const std::string &vendor_name) {
                   std::string platformName =
                       platform.getInfo<CL_PLATFORM_NAME>(&err));
         if (platformName == vendor_name) {
-            std::cout << "Found Platform" << std::endl;
-            std::cout << "Platform Name: " << platformName.c_str() << std::endl;
+            SPDLOG_LOGGER_TRACE(logger,"Found Platform");
+            SPDLOG_LOGGER_TRACE(logger,"Platform Name: {}", platformName.c_str());
             break;
         }
     }
     if (i == platforms.size()) {
-        std::cout << "Error: Failed to find Xilinx platform" << std::endl;
+        SPDLOG_LOGGER_ERROR(logger,"Failed to find Xilinx platform");
         exit(EXIT_FAILURE);
     }
     //Getting ACCELERATOR Devices and selecting 1st such device
@@ -65,15 +66,14 @@ std::vector<cl::Device> get_xil_devices() { return get_devices("Xilinx"); }
 
 
 std::vector<unsigned char> read_binary_file(const std::string &xclbin_file_name) {
-    std::cout << "INFO: Reading " << xclbin_file_name << std::endl;
+    SPDLOG_LOGGER_TRACE(logger,"Reading {}", xclbin_file_name);
 
     if (access(xclbin_file_name.c_str(), R_OK) != 0) {
-        printf("ERROR: %s xclbin not available please build\n",
-               xclbin_file_name.c_str());
+        SPDLOG_LOGGER_ERROR(logger,"{} xclbin does not exist", xclbin_file_name.c_str());
         exit(EXIT_FAILURE);
     }
     //Loading XCL Bin into char buffer
-    std::cout << "Loading: '" << xclbin_file_name.c_str() << "'\n";
+    SPDLOG_LOGGER_TRACE(logger,"Loading {}", xclbin_file_name.c_str());
     std::ifstream bin_file(xclbin_file_name.c_str(), std::ifstream::binary);
     bin_file.seekg(0, bin_file.end);
     auto nb = bin_file.tellg();

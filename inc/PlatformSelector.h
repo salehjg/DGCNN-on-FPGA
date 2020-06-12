@@ -49,6 +49,8 @@ public:
     bool     CompareTensorsInteger(PLATFORMS platform, WorkScheduler scheduler, TensorI* inputTn1, TensorI* inputTn2);
     TensorF* PadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimPadded);
     TensorF* UnpadLastDim(PLATFORMS platform, WorkScheduler scheduler, TensorF* inputTn, unsigned lastDimUnpadded);
+    void     DumpImplementationSpecificLogs(PLATFORMS platform);
+    
     ~PlatformSelector();
 
     WeightsLoader* weightsLoader;

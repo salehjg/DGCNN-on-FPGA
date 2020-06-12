@@ -1,8 +1,10 @@
 //
 // Created by saleh on 9/3/18.
 //
-#include <ModelArchTop04.h>
+#include <ModelArchTop02.h>
 #include <iostream>
+#include "build_config.h"
+
 using namespace std;
 
 void CalculateAccuracy(TensorF* scores, TensorI* labels, int B, int classCount){
@@ -10,7 +12,7 @@ void CalculateAccuracy(TensorF* scores, TensorI* labels, int B, int classCount){
     bool *correct = new bool[B];
     float accu =0;
 
-    cout<<"STATUS: "<<"Computing Accuracy..."<<endl;
+    SPDLOG_LOGGER_INFO(logger,"Computing Accuracy...");
     {
         float max_cte = -numeric_limits<float>::infinity();
         float max = 0;
@@ -52,28 +54,27 @@ void CalculateAccuracy(TensorF* scores, TensorI* labels, int B, int classCount){
         }
         accu = correct_cnt / (float)B;
 
-        cout<<"Correct Count: "<< correct_cnt <<endl;
-        cout<<"Accuracy: "<< accu<<endl;
+        SPDLOG_LOGGER_INFO(logger,"Correct Count: {}", correct_cnt);
+        SPDLOG_LOGGER_INFO(logger,"Accuracy: {}", accu);
     }
     
 }
 
 void ClassifierMultiplatform(){
     WorkScheduler scheduler;
-    int batchsize=5;
-    ModelArchTop04 modelArchTop(0,batchsize,1024,20);
-    std::string pclPath(globalArgDataPath); pclPath.append("/dataset/dataset_B5_pcl.npy");
-    std::string labelPath(globalArgDataPath); labelPath.append("/dataset/dataset_B5_labels_int32.npy");
+    ModelArchTop02 modelArchTop(0,globalBatchsize,1024,20);
+    std::string pclPath = globalArgDataPath; pclPath.append("/dataset/dataset_B2048_pcl.npy");
+    std::string labelPath = globalArgDataPath; labelPath.append("/dataset/dataset_B2048_labels_int32.npy");
 
-    cout<<"PCL NPY PATH: "<<pclPath<<endl;
-    cout<<"LBL NPY PATH: "<<labelPath<<endl;
+    SPDLOG_LOGGER_INFO(logger,"PCL NPY PATH: {}", pclPath);
+    SPDLOG_LOGGER_INFO(logger,"LBL NPY PATH: {}", labelPath);
 
     modelArchTop.SetModelInput_data(pclPath.c_str());
     modelArchTop.SetModelInput_labels(labelPath.c_str());
 
     double timerStart = seconds();
     TensorF* classScores = modelArchTop.Execute(scheduler);
-    cout<< "Total model execution time with "<< batchsize <<" as batchsize: " << seconds() -timerStart<<" S"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"Model execution time with batchsize({}): {} Seconds", globalBatchsize, (seconds() -timerStart));
 
     CalculateAccuracy(classScores,modelArchTop.GetLabels(),modelArchTop.GetBatchSize(),40);
 }

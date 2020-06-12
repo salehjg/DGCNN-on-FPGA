@@ -1,6 +1,8 @@
+#include "build_config.h"
 #include "ocl_imp/xilinx/xcl2.hpp"
 
 using namespace std;
+spdlog::logger *logger;
 
 cl_mem_ext_ptr_t CreateExtendedPointer(void *hostPtr, cl_mem_flags memoryBank){
     cl_mem_ext_ptr_t extendedPointer;
@@ -36,24 +38,26 @@ void CreateBufferAndTest(cl::Context *context, cl::CommandQueue *queue, int len,
         testArrayHost[i] =  (float)i;
         testArrayUDT[i] = 0;
     }
-    cout<<"\n===================================\nBANK "<<bankIndex<<" TEST:"<<endl;
-    cout<<"\nPHASE 1: SEND DATA TO THE DEVICE...\n"<<endl;
+
+    SPDLOG_LOGGER_INFO(logger,"===================================");
+    SPDLOG_LOGGER_INFO(logger,"BANK {} Test...", bankIndex);
+    SPDLOG_LOGGER_INFO(logger,"PHASE 1: TRANSFERING DATA TO THE DEVICE...");
 
     //-------------------------------------------------------------------------------------
     cl_mem_ext_ptr_t extPtr = CreateExtendedPointer(nullptr, TranslateBankIndex(bankIndex));
     cl_mem_flags  flags = CL_MEM_READ_WRITE;
     //flags |= CL_MEM_USE_HOST_PTR;
     flags |= CL_MEM_EXT_PTR_XILINX;
-    cout<<"Created xilinx extended ptr."<<endl;
+    SPDLOG_LOGGER_DEBUG(logger,"Created xilinx extended ptr");
 
     //-------------------------------------------------------------------------------------
     OCL_CHECK(ocl_stat, ocl_buff = cl::Buffer(*context, flags, len*sizeof(float), &extPtr, &ocl_stat));
-    cout<<"Created cl::Buffer."<<endl;
+    SPDLOG_LOGGER_DEBUG(logger,"Created cl::Buffer");
     OCL_CHECK(ocl_stat, ocl_stat = queue->enqueueWriteBuffer(ocl_buff, CL_TRUE, 0, len*sizeof(float), testArrayHost, nullptr, nullptr));
-    cout<<"Added enqueueWriteBuffer to transfer data to the device memory."<<endl;
+    SPDLOG_LOGGER_DEBUG(logger,"Added enqueueWriteBuffer to transfer data to the device memory");
 
     //-------------------------------------------------------------------------------------
-    cout<<"\nPHASE 2: READ BACK THE DATA FROM DEVICE...\n"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"PHASE 2: READING BACK THE DATA FROM THE DEVICE...");
 
     OCL_CHECK(ocl_stat,ocl_stat = queue->enqueueReadBuffer(
             ocl_buff,
@@ -63,13 +67,13 @@ void CreateBufferAndTest(cl::Context *context, cl::CommandQueue *queue, int len,
             testArrayUDT,
             nullptr,
             nullptr));
-    cout<<"Added enqueueReadBuffer to transfer data back from the device to the host."<<endl;
+    SPDLOG_LOGGER_DEBUG(logger,"Added enqueueReadBuffer to transfer data back from the device to the host");
 
     //-------------------------------------------------------------------------------------
-    cout<<"\nPHASE 3: COMPARE RESULTS...\n"<<endl;
+    SPDLOG_LOGGER_INFO(logger,"PHASE 3: COMPARE RESULTS...");
     for(int i=0; i<len; i++){
-        cout<<"HostGold["<<i<<"]= "<< testArrayHost[i]<<endl;
-        cout<<"DeviceUDT["<<i<<"]= "<< testArrayUDT[i]<<endl;
+        SPDLOG_LOGGER_INFO(logger,"HostGold[{}]= {}", i, testArrayHost[i]);
+        SPDLOG_LOGGER_INFO(logger,"DeviceUDT[{}]= {}", i, testArrayUDT[i]);
     }
 }
 
@@ -79,8 +83,14 @@ int main(int argc, char **argv) {
     cl::Program *program;
     cl::CommandQueue *queue;
 
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    console_sink->set_level(spdlog::level::trace);
+    console_sink->set_pattern("[%H:%M:%S.%e][%^%l%$] %v");
+    logger = new spdlog::logger("HostTest-logger", {console_sink});
+    logger->set_level(spdlog::level::trace); 
 
-    cout<< "This program checks out some host side operations on the real device."<<endl;
+    SPDLOG_LOGGER_INFO(logger,"This program checks out some host side operations on the real device");
+
     if(argc!=2){
         cerr<<"Please enter the abs path for the *.xclbin or *.awsxclbin file as the first and only argument.\nAborting...\n";
         exit(1);
@@ -91,9 +101,9 @@ int main(int argc, char **argv) {
     OCL_CHECK(err, context  = new cl::Context(device, NULL, NULL, NULL, &err));
     OCL_CHECK(err,queue = new cl::CommandQueue(*context, device, CL_QUEUE_PROFILING_ENABLE, &err));
     std::string device_name = device.getInfo<CL_DEVICE_NAME>();
-    std::cout << "Found Device=" << device_name.c_str() << std::endl;
-
-    printf("INFO: loading the fpga image...\n");
+    SPDLOG_LOGGER_INFO(logger, "Found Device: {}", device_name.c_str());
+    
+    SPDLOG_LOGGER_INFO(logger, "Loading the fpga image...");
     auto fileBuf = xcl::read_binary_file(BinaryFile);
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
     OCL_CHECK(err,program = new cl::Program(*context, {device}, bins, NULL, &err));

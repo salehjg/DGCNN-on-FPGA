@@ -2,6 +2,7 @@
 // Created by saleh on 8/22/18.
 //
 
+#include "build_config.h"
 #include "../inc/PlatformSelector.h"
 #include "../inc/cpu_imp/CpuImplementation.h"
 
@@ -44,13 +45,13 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
     }
 
     weightsLoader = new WeightsLoader(neededPlatforms);
-    if(!loadWeights) cout<<"/!\\ Weight are not loaded into device memory."<<endl;
+    if(!loadWeights) SPDLOG_LOGGER_WARN(logger,"Weights are not loaded to the device memory");
 #ifdef USE_OCL
     if(loadWeights){
-        std::string wDir(globalArgDataPath); wDir.append("/weights/");
-        std::string wFileList(globalArgDataPath); wFileList.append("/weights/filelist.txt");
-        cout<< "Weights Dir: " << wDir << endl;
-        cout<< "Weights File List Path: " << wFileList << endl;
+        std::string wDir = globalArgDataPath; wDir.append("/weights/");
+        std::string wFileList = globalArgDataPath; wFileList.append("/weights/filelist.txt");
+        SPDLOG_LOGGER_TRACE(logger,"Weights Dir: {}", wDir);
+        SPDLOG_LOGGER_TRACE(logger,"Weights File List Path: {}", wFileList);
         weightsLoader->LoadFromDisk(wDir.c_str() ,
                                     wFileList.c_str() ,
                                     openclPlatformClass->getContext(),
@@ -65,7 +66,7 @@ PlatformSelector::PlatformSelector(PLATFORMS defaultPlatform, vector<PLATFORMS> 
 }
 
 PlatformSelector::~PlatformSelector(){
-    cout<<"~PlatformSelector"<<endl;
+    SPDLOG_LOGGER_TRACE(logger,"~PlatformSelector");
     delete(weightsLoader);
     delete(cpuPlatformClass);
     delete(openclPlatformClass);
@@ -770,4 +771,25 @@ TensorF* PlatformSelector::UnpadLastDim(PLATFORMS platform, WorkScheduler schedu
 #endif
     }
     return nullptr;
+}
+
+void PlatformSelector::DumpImplementationSpecificLogs(PLATFORMS platform){
+    switch(platform){
+        case PLATFORMS::CPU :{
+            assert(0);
+            break;
+        }
+#ifdef USE_CUDA
+        case PLATFORMS::GPU_CUDA :{
+            assert(0);
+            break;
+        }
+#endif
+#ifdef USE_OCL
+        case PLATFORMS::GPU_OCL :{
+            openclPlatformClass->DumpDataMoverLaunchLogs();
+            break;
+        }
+#endif
+    }
 }

@@ -9,6 +9,7 @@
 #include "ocl_imp/xilinx/AxiHelper.h"
 #include "ocl_imp/xilinx/xcl2.hpp"
 #include "xilinx/config.h"
+#include <string>
 
 struct SameBankException : public std::exception {
    const char * what () const throw () {
@@ -35,6 +36,8 @@ public:
     static float* PadHostBuffer(std::vector<unsigned> actualShape, float *hostSrcBuff, int vectorWords);
     static float* UnPadHostBuffer(std::vector<unsigned> actualShape, float *hostSrcBuff, int vectorWords);
     unsigned getPaddedLastDim();
+    std::string GetTensorTag();
+    void SetTensorTag(std::string tag);
     virtual ~OclTensorF();
     cl::Buffer ocl_buff;
     
@@ -63,4 +66,5 @@ private:
     #endif  
 #endif    
     int vectorWords = -1;
+    std::string tensorTag = "defaultBankTag";
 };

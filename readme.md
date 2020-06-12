@@ -80,24 +80,21 @@ Considering that steps one, two and three are already done, current directory is
 ```
 sh LaunchDeepPointV1FPGA.sh
 ```
-
-## Extra. Setting Kernel Clock Frequencies 
-Refer to `CMakeLists.txt` script to change kernel clock frequency.
-
-## Extra. Setting Kernel Arguments' DDR Banks 
-Refer to `CMakeLists.txt` script to assign DDR bank for each kernel's arguments.
+The launcher script forwards its arguments to the host program.
 
 # Platforms
 Refer to the table below.
 
 Name | Supported Platform | Implementation | Notes
 ---  | ---                | --- | ---
-ModelArch01 | CPU                   | CPU | Review's needed
-ModelArch05 | CPU, FPGA             | Xilinx SDAccel Platform | Review's needed
-ModelArch04 | CPU             | CPU | Compatible with new `Tile` layer
+ModelArch01 | CPU         | CPU | CPU Only
+ModelArch02 | CPU, FPGA   | Xilinx SDAccel Platform | FPGA Only
 
 # UnitTests for The Platforms
-This repository has only one main executable(MainExecutable.cpp) that handles both the classifier and the unit tests while you can enable or disable each phase in the source code.
+To run OCl unittests:
+```
+sh LaunchDeepPointV1FPGA.sh -t
+```
 
 # UnitTests for The Kernels
 In order to make debugging of the kernels much more easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
@@ -129,7 +126,8 @@ These repositories are used in this project:
 * [cnpy](https://github.com/rogersce/cnpy)
 * [PointNet](https://github.com/charlesq34/pointnet)
 * [PointNet++](https://github.com/charlesq34/pointnet2)
-
+* [argparse](https://github.com/jamolnng/argparse)
+* [spdlog](https://github.com/gabime/spdlog)
 
 
 
