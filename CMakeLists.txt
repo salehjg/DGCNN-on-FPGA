@@ -77,7 +77,7 @@ if(BuildRelease)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3")
 else()
     set(CMAKE_BUILD_TYPE Debug)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -g -O0")
 endif()
 
 #add_definitions("-DHLSLIB_STREAM_TIMEOUT=16")
@@ -435,7 +435,7 @@ set(HOSTSIDE_MAIN_SRC
     ${HOSTSIDE_SRC}
     src/ClassifierMultiPlatform.cpp
     src/MainExecutable.cpp
-    src/ModelArchTop02.cpp
+    src/ModelArchTop01.cpp
     src/ocl_imp/xilinx/XilinxImpUnitTests.cpp
 )
 
