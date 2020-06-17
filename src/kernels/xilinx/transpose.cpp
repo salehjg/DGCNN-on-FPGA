@@ -80,14 +80,14 @@ void BatchTranspose_V3_UnitTranspose(
 
             LoopDim2:
             for(unsigned id2=0; id2<itersDim2; id2++){
-                #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                #pragma HLS LOOP_TRIPCOUNT min=32 max=32
 
                 LoopDim1_2:
                 for(unsigned dd1=0; dd1<CONFIG_M_AXI_WIDTH; dd1++){ 
 
                     LoopDim2_2:
                     for(unsigned iid2=0; iid2<vecsPerPipeDepth; iid2++){
-                        #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                        #pragma HLS LOOP_TRIPCOUNT min=2 max=2
 
                         //#pragma HLS UNROLL
                         //cout<<"-------------"<<endl;
@@ -142,14 +142,14 @@ void BatchTranspose_V3_UnitWrite(
 
             LoopDim2:
             for(unsigned id2=0; id2<itersDim2; id2++){
-                #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                #pragma HLS LOOP_TRIPCOUNT min=32 max=32
 
                 LoopDim1_2:
                 for(unsigned dd1=0; dd1<CONFIG_M_AXI_WIDTH; dd1++){ 
 
                     LoopDim2_2:
                     for(unsigned iid2=0; iid2<vecsPerPipeDepth; iid2++){
-                        #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                        #pragma HLS LOOP_TRIPCOUNT min=2 max=2
                         #pragma HLS PIPELINE II=1
 
                         const unsigned d1 = id1*CONFIG_M_AXI_WIDTH + dd1;
@@ -170,6 +170,9 @@ void BatchTranspose_V3_UnitWrite(
 /**
  * @brief      Calculates transpose of inputTn and writes it in outputTn.
  *             This kernel complies with the padded last dim policy.
+ *             The latency is reported for:
+ *                  -PipeDepth1=32
+ *                  -inputTn of shape 5x1024x64
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
