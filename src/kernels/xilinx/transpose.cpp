@@ -14,8 +14,8 @@ using namespace std;
 using hlslib::Stream;
 using namespace ConfigTaskTranspose;
 
-constexpr int PIPEDEPTH = 32;
-constexpr int PIPEDEPTH2 = 4;
+constexpr int PIPEDEPTH = 32; //should be divisable by axi width(16), higher val means better burst writes in outputTn.
+constexpr int PIPEDEPTH2 = 4; //should be at least vecsPerPipeDepth=PIPEDEPTH/(axi width, 16)
 
 
 void BatchTranspose_V3_UnitRead(
