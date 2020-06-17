@@ -11,85 +11,136 @@
 #include "xilinx/config.h"
 
 using namespace std;
+using hlslib::Stream;
 using namespace ConfigTaskTranspose;
 
-/**
- * @brief      Batch transpose of the input tensor of rank 3.
- *             This kernel uses Axi32 for the input and the output tensors.
- *             This kernel complies with the padded last dim policy:
- *               1) inputTn and outputTn is considered to be padded in the last dim to 
- *                  be divisible by m_axi512's width.
- *               2) inputTn of shape axbx1 will be considered to be padded as axbx16(for m_axi512).
- *             The latency will be reported for an input tensor of shape 5x1024x64 and TileWidth and TileHeight of 16,64.
- *
- * @param[in]  inputTn   The input tn (row-major)
- * @param      outputTn  The output tn (row-major)
- * @param[in]  dim0      The dim 0 (batchSize)
- * @param[in]  dim1      The dim 1 (rows)
- * @param[in]  dim2      The dim 2 (cols)
- */
-void BatchTransposeAXI32(
-    const CONFIG_DTYPE* inputTn,
-    CONFIG_DTYPE* outputTn,
-    const unsigned dim0,               //batch
-    const unsigned dim1,               //rows
-    const unsigned dim2){                //columns
+constexpr int PIPEDEPTH = 16;
 
-    const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
-    const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
+void BatchTranspose_V2_UnitRead(
+    const MemoryPackF_t *inputTn,
+    Stream<CONFIG_DTYPE, PIPEDEPTH> streamWords[CONFIG_M_AXI_WIDTH],
+    const unsigned _dim0,
+    const unsigned _dim1,
+    const unsigned _dim2){
 
-    CONFIG_DTYPE buff[TileHeight][TileWidth];
-    unsigned indxS,indxD;
-    unsigned tmp1, tmp2;
-    // *******************************************
-    // * inputTn must be row-major.
-    // * dim0 = batch
-    // * dim1 = rows
-    // * dim2 = columns
-    // *******************************************
-    LoopBatch:for(unsigned batch=0; batch<dim0; batch++){
-#pragma HLS LOOP_TRIPCOUNT min=5 max=5
-        LoopTiles1:for(unsigned d2=0; d2<dim2; d2+=TileWidth){
-#pragma HLS LOOP_TRIPCOUNT min=4 max=4
-            LoopTiles2:for(unsigned d1=0; d1<dim1; d1+=TileHeight){
-#pragma HLS LOOP_TRIPCOUNT min=16 max=16
-                //Sec.1: Read current block into local buffer
-                LoopReadJ:for(unsigned j=0; j<TileHeight; j++){
-                    LoopReadI:for(unsigned i=0; i<TileWidth; i++){
-                        tmp1 = d1+j;
-                        tmp2 = d2+i;
-                        if(tmp1<dim1 && tmp2<dim2){
-                            indxS = (batch)*dim1*dim2Padded +
-                                    (tmp1)*dim2Padded +
-                                    (tmp2);
-                            buff[j][i] = inputTn[indxS];
-                        }
-                    }
+    const unsigned dim0 = _dim0;
+    const unsigned dim1 = _dim1;
+    const unsigned dim2 = _dim2;
+    const unsigned vecsPerSlice = DivCeil<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
+
+    LoopDim0:
+    for(unsigned d0=0; d0<dim0; d0++){
+        LoopDim2:
+        for(unsigned id2=0; id2<vecsPerSlice; id2++){
+            LoopDim1:
+            for(unsigned d1=0; d1<dim1; d1++){
+                #pragma HLS PIPELINE II=1
+
+                const unsigned indxS = d0*dim1*vecsPerSlice + d1*vecsPerSlice + id2;
+                MemoryPackF_t vec = inputTn[indxS];
+
+                LoopWords:
+                for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                    #pragma HLS UNROLL
+                    CONFIG_DTYPE val = vec[i];
+                    //cout<<"Pushed Val: "<<val<<endl;
+                    streamWords[i].Push(val);
                 }
 
-                //Sec.2: Write current block's data into output tensor
-                LoopWriteI:for(unsigned i=0; i<TileWidth; i++){
-                    LoopWriteJ:for(unsigned j=0; j<TileHeight; j++){
-                        tmp1 = d2+i;
-                        tmp2 = d1+j;
-                        if(tmp1<dim2 && tmp2<dim1){
-                            indxD = (batch)*dim2*dim1Padded +
-                                    (tmp1)*dim1Padded+
-                                    (tmp2);
-                            outputTn[indxD] = buff[j][i];
-                            //cout<<"IndexD = " << indxD << endl;
-                        }
-                    }
-                }
             }
         }
     }
+
 }
+
+void BatchTranspose_V2_UnitWrite(
+    Stream<CONFIG_DTYPE, PIPEDEPTH> streamWords[CONFIG_M_AXI_WIDTH],
+    MemoryPackF_t *outputTn,
+    const unsigned _dim0,
+    const unsigned _dim1,
+    const unsigned _dim2){
+
+    const unsigned dim0 = _dim0;
+    const unsigned dim1 = _dim2;
+    const unsigned dim2 = _dim1;
+
+    const unsigned vecsPerSlice = DivCeil<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
+    const unsigned dim1ByAxiWidth = DivCeil<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
+
+    LoopDim0:
+    for(unsigned d0=0; d0<dim0; d0++){
+        LoopiDim1:
+        for(unsigned id1=0; id1<dim1ByAxiWidth; id1++){
+            LoopDim2:
+            for(unsigned id2=0; id2<vecsPerSlice; id2++){
+                LoopDim1:
+                for(unsigned dd1=0; dd1<CONFIG_M_AXI_WIDTH; dd1++){ 
+                    #pragma HLS UNROLL
+                    //cout<<"-------------"<<endl;
+                    const unsigned d1 = id1*CONFIG_M_AXI_WIDTH + dd1;
+                    MemoryPackF_t vec;
+
+                    LoopTranspose01:
+                    for(unsigned i=0; i<PIPEDEPTH; i++){
+                        #pragma HLS PIPELINE II=1
+                        CONFIG_DTYPE val = streamWords[dd1].Pop();
+                        //cout<<"Popped Val: "<<val<<endl;
+                        vec[i] = val;
+                    }
+
+                    const bool cond = d1<dim1;
+                    const unsigned indxD = (cond)? d0*dim1*vecsPerSlice + d1*vecsPerSlice + id2 : 0;
+                    if(cond){
+                        outputTn[indxD] = vec;
+                    }
+                }
+            }
+
+        }
+    }
+
+}
+
+void BatchTranspose_V2(
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2){
+#pragma HLS DATAFLOW
+
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+    assert(PIPEDEPTH==CONFIG_M_AXI_WIDTH);
+    assert(dim1%CONFIG_M_AXI_WIDTH==0);
+
+    Stream<CONFIG_DTYPE, PIPEDEPTH> streamWords[CONFIG_M_AXI_WIDTH];
+#pragma HLS STREAM variable=streamWords depth=PIPEDEPTH
+
+#ifndef HLSLIB_SYNTHESIS
+    for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; ++i) {
+        streamWords[i].set_name(("streamWords[" + std::to_string(i) + "]").c_str());
+    }
+#endif
+
+    HLSLIB_DATAFLOW_INIT();
+
+    HLSLIB_DATAFLOW_FUNCTION(BatchTranspose_V2_UnitRead, 
+        inputTn, streamWords, dim0, dim1, dim2);
+    HLSLIB_DATAFLOW_FUNCTION(BatchTranspose_V2_UnitWrite, 
+        streamWords, outputTn, dim0, dim1, dim2);
+
+    HLSLIB_DATAFLOW_FINALIZE();
+}
+
+
+
 
 extern "C"{
 void task_transpose(
-        const float *inputTn,
-        float *outputTn,
+        const MemoryPackF_t *inputTn,
+        MemoryPackF_t *outputTn,
         const unsigned dim0,
         const unsigned dim1,
         const unsigned dim2){
@@ -102,6 +153,6 @@ void task_transpose(
 #pragma HLS INTERFACE s_axilite port=dim2      bundle=control
 #pragma HLS INTERFACE s_axilite port=return    bundle=control
 
-    BatchTransposeAXI32(inputTn, outputTn, dim0, dim1, dim2);
+    BatchTranspose_V2(inputTn, outputTn, dim0, dim1, dim2);
 }
 }
