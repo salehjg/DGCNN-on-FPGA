@@ -518,10 +518,19 @@ ReportObject* XilinxImpUnitTests::KernelTile(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelTranspose(){
-    TensorF* tensorSrc = GenerateTensor(0,{5,32,8});
-    TensorF* tensorCpu = platformSelector->Transpose(PLATFORMS::CPU,scheduler,tensorSrc);
-    TensorF* tensorGpu = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
-    bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    bool comparisonResult = true;
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{1,1024,3});
+        TensorF* tensorCpu = platformSelector->Transpose(PLATFORMS::CPU,scheduler,tensorSrc);
+        TensorF* tensorGpu = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+    {
+        TensorF* tensorSrc = GenerateTensor(0,{1,1024,64});
+        TensorF* tensorCpu = platformSelector->Transpose(PLATFORMS::CPU,scheduler,tensorSrc);
+        TensorF* tensorGpu = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -977,7 +986,7 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    
+    /*
     PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
@@ -1001,7 +1010,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());
     PrintReport(KernelRelu());
     PrintReport(KernelSqrt());
-    PrintReport(KernelSquare());
+    PrintReport(KernelSquare());*/
     PrintReport(KernelTranspose());
 
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);

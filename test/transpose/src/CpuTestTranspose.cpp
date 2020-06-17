@@ -15,8 +15,8 @@ using namespace ConfigTaskTranspose;
 
 extern "C"
 void task_transpose(
-        const float *inputTn,
-        float *outputTn,
+        const MemoryPackF_t *inputTn,
+        MemoryPackF_t *outputTn,
         const unsigned dim0,
         const unsigned dim1,
         const unsigned dim2);
@@ -74,31 +74,36 @@ int TestTranspose(
     std::vector<CONFIG_DTYPE> hostUdtPadded(lenOutputUdt);
     std::vector<CONFIG_DTYPE> hostUdtUnpadded(lenOutput);
 
+    /*
     std::default_random_engine rng(kSeed);
     typename std::conditional<
         std::is_integral<CONFIG_DTYPE>::value, std::uniform_int_distribution<unsigned long>,
         std::uniform_real_distribution<double>>::type dist(1, 10);
 
     std::for_each(hostInputTn.begin(), hostInputTn.end(),
-        [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });
+        [&dist, &rng](CONFIG_DTYPE &in) { in = CONFIG_DTYPE(dist(rng)); });*/
+
+    for(unsigned idx = 0; idx < lenInput; idx++){
+        hostInputTn[idx] = idx;
+    }
 
     PadTensor<CONFIG_DTYPE>(hostInputTn, hostInputTnPadded, lenInput/dim2, dim2, dim2Padded);
 
-    //auto deviceInputTn = Pack<vecSize, CONFIG_DTYPE>(hostInputTnPadded);
-    //auto deviceOutputTn = Pack<vecSize, CONFIG_DTYPE>(hostUDT);
+    auto deviceInputTn = Pack<vecSize, CONFIG_DTYPE>(hostInputTnPadded);
+    auto deviceOutputTn = Pack<vecSize, CONFIG_DTYPE>(hostUdtPadded);
 
     task_transpose(
-        hostInputTnPadded.data(),
-        hostUdtPadded.data(),
-        dim0,dim1,dim2);
+            deviceInputTn.data(),
+            deviceOutputTn.data(),
+            dim0,dim1,dim2);
 
     GoldTranspose(
         hostInputTn.data(), 
         hostGold.data(), 
         dim0,dim1,dim2);
 
-    //const auto hostUdtPadded = Unpack<vecSize, CONFIG_DTYPE>(deviceOutputTn);
-    UnpadTensor<CONFIG_DTYPE>(hostUdtPadded, hostUdtUnpadded, lenOutput/dim1, dim1Padded, dim1);
+    const auto hostUdtPadded2 = Unpack<vecSize, CONFIG_DTYPE>(deviceOutputTn);
+    UnpadTensor<CONFIG_DTYPE>(hostUdtPadded2, hostUdtUnpadded, lenOutput/dim1, dim1Padded, dim1);
     bool rslt = true;
 
     for(unsigned d0=0; d0<dim0; d0++){ 
@@ -128,6 +133,7 @@ int TestTranspose(
 
 int main(int argc, char **argv) {
     int rslt = 0;
-    rslt += TestTranspose<16>("Transpose", {1,2,17});
+    rslt += TestTranspose<16>("Transpose", {5,1024,64});
+    rslt += TestTranspose<16>("Transpose", {5,1024,3});
     return rslt;
 }

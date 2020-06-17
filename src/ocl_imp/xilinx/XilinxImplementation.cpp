@@ -68,7 +68,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -76,7 +77,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_reduce",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 2 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -84,7 +86,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -92,7 +95,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -100,7 +104,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -116,7 +121,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_gather",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 7 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -124,7 +130,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_conv2_1x1_direct",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 8 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -132,7 +139,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_topk",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 9 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -140,7 +148,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_pad_unpad",
-                false),
+                false,
+                DISABLED_KERNEL),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -148,7 +157,8 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_relu_sqrt_square",
-                false)
+                false,
+                DISABLED_KERNEL)
     };
     
     //======================================================================================================================
