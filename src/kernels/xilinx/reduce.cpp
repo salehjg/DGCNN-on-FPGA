@@ -343,7 +343,7 @@ void task_reduce(
         const unsigned dim3){
 
 #pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem2
 #pragma HLS INTERFACE s_axilite port=inputTn bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn bundle=control
 #pragma HLS INTERFACE s_axilite port=mode bundle=control

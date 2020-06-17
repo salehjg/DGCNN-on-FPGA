@@ -209,8 +209,8 @@ void task_concat(
     const unsigned dimB3,
     const int concatDim){
 #pragma HLS INTERFACE m_axi     port=inputTn1  offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=inputTn2  offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=outputTn  offset=slave bundle=gmem1
+#pragma HLS INTERFACE m_axi     port=inputTn2  offset=slave bundle=gmem2
+#pragma HLS INTERFACE m_axi     port=outputTn  offset=slave bundle=gmem3
 #pragma HLS INTERFACE s_axilite port=inputTn1  bundle=control
 #pragma HLS INTERFACE s_axilite port=inputTn2  bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn  bundle=control
