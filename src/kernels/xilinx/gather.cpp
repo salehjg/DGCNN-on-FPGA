@@ -147,7 +147,8 @@ void GatherAxis1_V2(
     unsigned indicesDim1,
     unsigned indicesDim2){
 
-    #pragma HLS INLINE
+    // DO NOT use inline pragma for a sub-function with dataflow pragma, as it might cause the kernel to get stuck.
+    //#pragma HLS INLINE
 
 #pragma HLS DATAFLOW
     
