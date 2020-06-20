@@ -34,6 +34,9 @@ void TileRank2Axis2(
     const unsigned dim0,
     const unsigned dim1,   
     const unsigned tileSize){
+
+    #pragma HLS INLINE
+
     // input: BxN, tileAxis=2 ===> output: BxNxT ===> lastDim: T,(tileSize)
 
     CONFIG_DTYPE buff[MaxSliceLen];
@@ -114,6 +117,9 @@ void TileRank2Axis1(
         const unsigned dim0,
         const unsigned dim1,
         const unsigned tileSize){
+
+    #pragma HLS INLINE
+    
     // input: BxN, tileAxis=1 ===> output: BxTxN ===> lastDim: N,(dim1)
 
     CONFIG_DTYPE buff[MaxSliceLen];

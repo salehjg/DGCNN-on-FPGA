@@ -49,7 +49,9 @@ void MatOpsRank4Rankx(
         const int rankA,
         const int rankB, //should be 1 for a constant
         const int mode){
-   
+    
+    #pragma HLS INLINE
+    
     unsigned indxS1,indxS2;
     const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerLastDim = dim3Padded / CONFIG_M_AXI_WIDTH;
@@ -149,7 +151,7 @@ void task_matops(
 
 #pragma HLS INTERFACE m_axi port=inputTn1 offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi port=inputTn2 offset=slave bundle=gmem2
-#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem3
+#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem1
 #pragma HLS INTERFACE s_axilite port=inputTn1 bundle=control
 #pragma HLS INTERFACE s_axilite port=inputTn2 bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn bundle=control

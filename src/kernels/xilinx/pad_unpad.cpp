@@ -31,6 +31,8 @@ void PadLastDimSuperVec(
     const unsigned int dim1,
     const unsigned int dim1Padded){
 
+    #pragma HLS INLINE
+
 #ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
 #endif
@@ -227,6 +229,8 @@ void UnpadLastDimSuperVec(
     const unsigned int dim1,
     const unsigned int dim1Unpadded){
 
+    #pragma HLS INLINE
+    
 #ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
 #endif

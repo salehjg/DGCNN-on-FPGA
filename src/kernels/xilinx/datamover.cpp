@@ -22,7 +22,8 @@ void _DataMoverV1(
         const unsigned srcBank,
         const unsigned destBank,
         const unsigned vecCount){
-#pragma HLS inline
+    
+#pragma HLS INLINE
    
 #ifndef USEMEMORYBANK0 
     assert(srcBank!=0 && destBank!=0);

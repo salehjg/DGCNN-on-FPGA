@@ -41,6 +41,8 @@ void MatmulReorderedVectorized_V1(
     const unsigned sizeK,
     const unsigned sizeM){
 
+    #pragma HLS INLINE
+
     // MatA's  shape = [dim0, dim1, dim2] = [batchSize, sizeN, sizeK] = [Batch, Height, Width]; Row-major
     // MatB's  shape = [dim0, dim1, dim2] = [batchSize, sizeK, sizeM] = [Batch, Height, Width]; Row-major
     // MatC=AB shape = [dim0, dim1, dim2] = [batchSize, sizeN, sizeM] = [Batch, Height, Width]; Row-major

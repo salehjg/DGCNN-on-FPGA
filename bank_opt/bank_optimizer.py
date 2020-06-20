@@ -78,7 +78,7 @@ def brute_force():
                                                 val = get_objective(transpose,transpose, matmul,matmul,matmul, matops,matops,matops, rss,rss, _reduce,_reduce, tile,tile, topk,topk, gather,gather,gather, concat,concat,concat, padunpad,padunpad, conv,conv,conv,conv)
                                                 values.append(val)
                                                 # m_axi's per kernel are considered here:
-                                                currentparams = [transpose,transpose, matmul,matmul, matops,matops,matops, rss,rss, _reduce,_reduce, tile, topk,topk , gather,gather,gather, concat,concat,concat, padunpad, conv,conv,conv,conv]
+                                                currentparams = [transpose,transpose, matmul,matmul, matops,matops, rss,rss, _reduce,_reduce, tile, topk,topk , gather,gather,gather, concat,concat, padunpad, conv,conv,conv,conv]
                                                 currentparams = np.array(currentparams)
                                                 bank0 = np.sum(currentparams==0)
                                                 bank1 = np.sum(currentparams==1)

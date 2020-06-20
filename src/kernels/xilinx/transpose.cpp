@@ -186,6 +186,9 @@ void BatchTranspose_V3(
     const unsigned dim0,
     const unsigned dim1,
     const unsigned dim2){
+    
+    #pragma HLS INLINE
+
 #pragma HLS DATAFLOW
 
 #ifdef KERNEL_LOGS

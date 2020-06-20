@@ -44,6 +44,8 @@ void ConcatLastDimSubVec_V1(
     const unsigned dimB3,
     const unsigned dimR3){
 
+    #pragma HLS INLINE
+
     assert(dimR3<CONFIG_M_AXI_WIDTH); // sub vec
     constexpr unsigned vecsPerSliceA = 1; // sub vec
     constexpr unsigned vecsPerSliceB = 1; // sub vec
@@ -121,6 +123,8 @@ void ConcatLastDimSuperVec_V1(
     const unsigned dimB3,
     const unsigned dimR3){
 
+    #pragma HLS INLINE
+
     assert(dimA3%CONFIG_M_AXI_WIDTH==0);
     assert(dimB3%CONFIG_M_AXI_WIDTH==0);
 
@@ -170,7 +174,9 @@ void ConcatLastDim_V1(
     const unsigned dim2,
     const unsigned dimA3,
     const unsigned dimB3){
+
 #pragma HLS INLINE
+    
     const unsigned dimR3 = dimA3 + dimB3;
     if(dimR3<CONFIG_M_AXI_WIDTH){
         ConcatLastDimSubVec_V1(
@@ -210,7 +216,7 @@ void task_concat(
     const int concatDim){
 #pragma HLS INTERFACE m_axi     port=inputTn1  offset=slave bundle=gmem1
 #pragma HLS INTERFACE m_axi     port=inputTn2  offset=slave bundle=gmem2
-#pragma HLS INTERFACE m_axi     port=outputTn  offset=slave bundle=gmem3
+#pragma HLS INTERFACE m_axi     port=outputTn  offset=slave bundle=gmem1
 #pragma HLS INTERFACE s_axilite port=inputTn1  bundle=control
 #pragma HLS INTERFACE s_axilite port=inputTn2  bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn  bundle=control

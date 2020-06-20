@@ -382,13 +382,25 @@ ReportObject* XilinxImpUnitTests::KernelUnpadLastDimFloat(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelConcat2(){
-    TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,3});
-    TensorF* tensorSrc2 = GenerateTensor(0,{2,2,2,3});
+    bool rslt = true;
+    {
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,3});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2,2,2,3});
 
-    TensorF* tensorCpu = platformSelector->Concat2(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,3);
-    TensorF* tensorGpu = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,3);
+        TensorF* tensorCpu = platformSelector->Concat2(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,3);
+        TensorF* tensorGpu = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,3);
 
-    bool rslt = platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu, tensorGpu);
+        rslt &= platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu, tensorGpu);
+    }
+    {
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,2,64});
+        TensorF* tensorSrc2 = GenerateTensor(0,{2,2,2,128});
+
+        TensorF* tensorCpu = platformSelector->Concat2(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2,3);
+        TensorF* tensorGpu = platformSelector->Concat2(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2,3);
+
+        rslt &= platformSelector->CompareTensors(PLATFORMS::CPU, scheduler, tensorCpu, tensorGpu);
+    }
     ReportObject* obj = new ReportObject(__FUNCTION__, rslt);
     return obj;
 }
@@ -536,7 +548,7 @@ ReportObject* XilinxImpUnitTests::KernelTranspose(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelRelu(){
-    TensorF* tensorSrc = GenerateTensor(7,{2,2,2});
+    TensorF* tensorSrc = GenerateTensor(7,{2,2,1024});
     TensorF* tensorCpu = platformSelector->ReLU(PLATFORMS::CPU,scheduler,tensorSrc);
     TensorF* tensorGpu = platformSelector->ReLU(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
     bool comparisonResult = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -872,6 +884,13 @@ ReportObject* XilinxImpUnitTests::KernelVariance(){
 ReportObject* XilinxImpUnitTests::KernelMatmul(){
     bool comparisonResult = true;
     {
+        TensorF* tensorSrc1 = GenerateTensor(0,{5,3,64});
+        TensorF* tensorSrc2 = GenerateTensor(0,{5,64,5});
+        TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
+        TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+    {
         TensorF* tensorSrc1 = GenerateTensor(0,{1,4,16});
         TensorF* tensorSrc2 = GenerateTensor(0,{1,16,16});
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
@@ -881,13 +900,6 @@ ReportObject* XilinxImpUnitTests::KernelMatmul(){
     {
         TensorF* tensorSrc1 = GenerateTensor(3,{3,4});
         TensorF* tensorSrc2 = GenerateTensor(3,{4,5});
-        TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
-        TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
-        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
-    }
-    {
-        TensorF* tensorSrc1 = GenerateTensor(0,{5,3,64});
-        TensorF* tensorSrc2 = GenerateTensor(0,{5,64,5});
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
         TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -986,32 +998,32 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    /*
-    PrintReport(TensorFloat());
-    PrintReport(TensorBankFloat());
-    PrintReport(TensorBankInteger());
-    PrintReport(TensorCloneBankFloat());
-    PrintReport(TensorCloneBankInteger());
-    PrintReport(TensorPadUnpadCpuFloat());
-    PrintReport(TensorPadUnpadCpuInteger());
-    PrintReport(KernelPadLastDimFloat());
-    PrintReport(KernelUnpadLastDimFloat());
-    PrintReport(KernelConv2Mlp());
-    PrintReport(KernelTopK());
-    PrintReport(KernelMatops());
-    PrintReport(KernelReduceSum4D());
-    PrintReport(KernelReduceMax());
-    PrintReport(KernelReduceSum());
-    PrintReport(KernelMean());
-    PrintReport(KernelVariance());
-    PrintReport(KernelMatmul());
-    PrintReport(KernelTile());
-    PrintReport(KernelGather());
-    PrintReport(KernelConcat2());
-    PrintReport(KernelRelu());
-    PrintReport(KernelSqrt());
-    PrintReport(KernelSquare());*/
-    PrintReport(KernelTranspose());
+    
+    //PrintReport(TensorFloat());
+    //PrintReport(TensorBankFloat());
+    //PrintReport(TensorBankInteger());
+    //PrintReport(TensorCloneBankFloat());
+    //PrintReport(TensorCloneBankInteger());
+    //PrintReport(TensorPadUnpadCpuFloat());
+    //PrintReport(TensorPadUnpadCpuInteger());
+    //PrintReport(KernelPadLastDimFloat());
+    //PrintReport(KernelUnpadLastDimFloat());
+    //PrintReport(KernelConv2Mlp());
+    //PrintReport(KernelTopK());
+    //PrintReport(KernelMatops());                  //BROKEN, NO BURST R/W!!
+    //PrintReport(KernelReduceSum4D());             //BROKEN, NO BURST WRITES!!
+    //PrintReport(KernelReduceMax());               //BROKEN, NO BURST WRITES!!
+    //PrintReport(KernelReduceSum());               //BROKEN, NO BURST WRITES!!
+    //PrintReport(KernelMean());
+    //PrintReport(KernelVariance());
+    //PrintReport(KernelMatmul());                  //BROKEN, NO BURST R/W!!
+    //PrintReport(KernelTile());                    //OK
+    //PrintReport(KernelGather());                  //BROKEN, MAYBE STUCK???
+    //PrintReport(KernelConcat2());                 //OK
+    //PrintReport(KernelRelu());                    //OK
+    //PrintReport(KernelSqrt());                    //OK
+    //PrintReport(KernelSquare());                  //OK
+    //PrintReport(KernelTranspose());               //BROKEN, NO BURST W!!
 
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
 }

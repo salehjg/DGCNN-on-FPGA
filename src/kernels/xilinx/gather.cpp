@@ -146,10 +146,15 @@ void GatherAxis1_V2(
     unsigned indicesDim0,
     unsigned indicesDim1,
     unsigned indicesDim2){
+
+    #pragma HLS INLINE
+
+#pragma HLS DATAFLOW
+    
 #ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
 #endif
-#pragma HLS DATAFLOW
+
     Stream<unsigned, PipeDepth> streamIndices;
 #pragma HLS STREAM variable=streamIndices depth=PipeDepth
 #ifndef HLSLIB_SYNTHESIS

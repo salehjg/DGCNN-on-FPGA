@@ -35,6 +35,8 @@ void ReduceSum3Axis2_V1(
     const unsigned dim1,
     const unsigned dim2){
     
+    #pragma HLS INLINE
+
     const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
     const unsigned vecsPerSliceIn = dim2Padded/CONFIG_M_AXI_WIDTH;
     const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
@@ -246,6 +248,8 @@ void ReduceMax3Axis1_V2(
     const unsigned dim0,
     const unsigned dim1,
     const unsigned dim2){
+
+    #pragma HLS INLINE
 
 #ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
