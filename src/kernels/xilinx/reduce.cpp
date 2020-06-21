@@ -15,12 +15,14 @@ using hlslib::Stream;
 
 constexpr unsigned MAX_POW_Y_MINUS_ONE = (ConfigTaskReduce::Sum4D::MaxPowY-1);
 
+
 /**
  * @brief      Reduces the input tensor of rank 3 over the axis 2.(FFT) 
  *             This kernel complies with the padded last dim policy:
  *                  1) For the input tensor, last dimension should be padded to be divisible by m_axi_width
  *                  2) For the output tensor which should be rank 2 of shape dim0xdim1Padded, the allocated 
  *                     memory should cover the padded elements(dim1 to dim1Padded).
+ *             The latency will be reported for an input of shape 5x1024x64.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
@@ -50,13 +52,14 @@ void ReduceSum3Axis2_V1(
 
     LoopBatch0:
     for(unsigned batchD0=0; batchD0<dim0; batchD0++){
-		#pragma HLS LOOP_TRIPCOUNT min=5 max=5
+        #pragma HLS LOOP_TRIPCOUNT min=5 max=5
         LoopBatch1:
         for(unsigned batchD1=0; batchD1<dim1; batchD1++){
             #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
-
+            
             LoopSlice0:
             for(unsigned iVec=0; iVec<buffVecCount; iVec++){
+                #pragma HLS UNROLL
                 const bool validAddress = iVec<vecsPerSliceIn;
                 const unsigned indxS =  batchD0*dim1*vecsPerSliceIn+
                                         batchD1*vecsPerSliceIn+
@@ -65,6 +68,7 @@ void ReduceSum3Axis2_V1(
         
                 LoopSlice1Unrolled:
                 for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                    #pragma HLS UNROLL
                     buffResult1[iVec*CONFIG_M_AXI_WIDTH+i] = (validAddress)?vec[i]:0;
                 }
             }
@@ -346,8 +350,8 @@ void task_reduce(
         const unsigned dim2,
         const unsigned dim3){
 
-#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem2
+#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1 max_read_burst_length=64 max_write_burst_length=2
+#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem2 max_read_burst_length=2 max_write_burst_length=16
 #pragma HLS INTERFACE s_axilite port=inputTn bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn bundle=control
 #pragma HLS INTERFACE s_axilite port=mode bundle=control
@@ -368,21 +372,21 @@ void task_reduce(
 #ifdef KERNEL_LOGS
         cout<<"ReduceSum3Axis2_V1 is selected."<<endl;
 #endif
-        ReduceSum3Axis2_V1(inputTn, outputTn, dim0, dim1, dim2);
+        ReduceSum3Axis2_V1(inputTn, outputTn, dim0, dim1, dim2); // Non-dataflow
     }
 
     if(mode==2){
 #ifdef KERNEL_LOGS
         cout<<"ReduceSumRank4Axes012_V3 is selected."<<endl;
 #endif
-        ReduceSumRank4Axes012_V3(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3); 
+        ReduceSumRank4Axes012_V3(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3); // Dataflow
     }
 
     if(mode==3){
 #ifdef KERNEL_LOGS
         cout<<"ReduceMax3Axis1_V2 is selected."<<endl;
 #endif
-        ReduceMax3Axis1_V2(inputTn, outputTn, dim0, dim1, dim2);
+        ReduceMax3Axis1_V2(inputTn, outputTn, dim0, dim1, dim2); // Non-dataflow
     }
     
 }
