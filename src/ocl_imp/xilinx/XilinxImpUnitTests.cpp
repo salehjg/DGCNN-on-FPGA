@@ -1006,17 +1006,21 @@ void XilinxImpUnitTests::RunAll(){
     //PrintReport(TensorCloneBankInteger());
     //PrintReport(TensorPadUnpadCpuFloat());
     //PrintReport(TensorPadUnpadCpuInteger());
+
     //PrintReport(KernelPadLastDimFloat());
     //PrintReport(KernelUnpadLastDimFloat());
     //PrintReport(KernelConv2Mlp());
     //PrintReport(KernelTopK());
-    PrintReport(KernelMatops());                  //BROKEN, NO BURST R/W!!
+    //
+    //PrintReport(KernelMatops());                  //OK
     //PrintReport(KernelReduceSum4D());             //OK
     //PrintReport(KernelReduceMax());               //OK
     //PrintReport(KernelReduceSum());               //OK, No burst R/W!
-    //PrintReport(KernelMean());
-    //PrintReport(KernelVariance());
-    //PrintReport(KernelMatmul());                  //BROKEN, NO BURST R/W!!
+    //PrintReport(KernelMean());                    //OK
+    //PrintReport(KernelVariance());                //OK
+    
+    PrintReport(KernelMatmul());                  //BROKEN, NO BURST R/W!!
+    
     //PrintReport(KernelTile());                    //OK
     //PrintReport(KernelGather());                  //OK
     //PrintReport(KernelConcat2());                 //OK
