@@ -569,7 +569,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
     bool comparisonResult=true;
     bool printLog=true;
 
-    {
+    /*{
         cout<<"debug, manual test...\n";
         //Ranks: 4,1
         vector<MAT_OPS> ops = {MAT_OPS::ADD, MAT_OPS::SUB, MAT_OPS::MUL_ELEMENTWISE, MAT_OPS::DIV_ELEMENTWISE};
@@ -584,7 +584,7 @@ ReportObject* XilinxImpUnitTests::KernelMatops(){
         }
 
         comparisonResult=true;
-    }
+    }*/
 
     if(printLog) SPDLOG_LOGGER_INFO(logger,"TEST(Rank_4_4)");
     {
