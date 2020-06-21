@@ -76,7 +76,7 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_reduce",
-                false),
+                false,DISABLED_KERNEL),
         /* IDX 2 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -84,7 +84,7 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_matops",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 3 :*/
         new OclKernelObject(
                 KERNEL_DIR,
