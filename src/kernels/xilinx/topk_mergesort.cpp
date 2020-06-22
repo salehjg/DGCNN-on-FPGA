@@ -102,15 +102,35 @@ void UnitReadInput(
     assert(dim1%CONFIG_M_AXI_WIDTH==0);
 
     unsigned indxS;
+    const unsigned safeDim0 = dim0 - dim0 % UnitCount;
+    const unsigned remDim0 = dim0 % UnitCount;
 
+    // 1. Handle safe part of data and write out data in burst.
     For_Main: 
-    for(unsigned batch=0; batch<dim0; batch+=UnitCount){
+    for(unsigned batch=0; batch<safeDim0; batch+=UnitCount){
         LoopVecsPerPE:
         for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
             LoopPEs:
             for(unsigned iPE=0; iPE<UnitCount; iPE++){
+                #pragma HLS PIPELINE II=1
+
                 const unsigned d0 = batch+iPE;
-                MemoryPackF_t vec(0.0f);
+                indxS = (d0)*vecsPerSlice + iVec;
+                streamInputTn.Push(inputTn[indxS]);
+            }
+        }
+    }
+
+    // 2. Handle remainder of data without burst writes.
+    if(remDim0!=0){
+        LoopVecsPerPE_Rem:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            LoopPEs_Rem:
+            for(unsigned iPE=0; iPE<UnitCount; iPE++){
+                #pragma HLS PIPELINE II=1
+                
+                const unsigned d0 = safeDim0+iPE;
+                MemoryPackF_t vec;
                 if(d0<dim0){
                     indxS = (d0)*vecsPerSlice + iVec;
                     vec = inputTn[indxS];
@@ -120,6 +140,7 @@ void UnitReadInput(
                 streamInputTn.Push(vec);
             }
         }
+
     }
 
 }
@@ -141,11 +162,10 @@ void UnitWriteOutput(
     const unsigned dim1,
     const unsigned vecsPerOutputSlice){
 
+    /*
     // FIFO depth should be greater or equal to 'vecsPerOutputSlice' for PE's not to stall.
     assert(PipeDepth>=vecsPerOutputSlice);
-
     unsigned indxD;
-
     For_Main: 
     for(unsigned batch=0; batch<dim0; batch+=UnitCount){
         LoopPEs:
@@ -161,9 +181,48 @@ void UnitWriteOutput(
             }
         }
     }
-}
+    */
 
-//latency reported for [5x1024]x1024, k=20, unitcount=8, m_axi_width=16, pipe_depth=2
+
+    // FIFO depth should be greater or equal to 'vecsPerOutputSlice' for PE's not to stall.
+    assert(PipeDepth>=vecsPerOutputSlice);
+    unsigned indxD;
+    const unsigned safeDim0 = dim0 - dim0 % UnitCount;
+    const unsigned remDim0 = dim0 % UnitCount;
+
+    // 1. Handle safe part of data and write out data in burst.
+    For_Main: 
+    for(unsigned batch=0; batch<safeDim0; batch+=UnitCount){
+        LoopPEs:
+        for(unsigned iPE=0; iPE<UnitCount; iPE++){
+            LoopVecsPerPE:
+            for(unsigned iVec=0; iVec<vecsPerOutputSlice; iVec++){
+                #pragma HLS PIPELINE II=1
+
+                const unsigned d0 = batch+iPE;
+                indxD = (d0)*vecsPerOutputSlice + iVec;
+                indicesSplitedTn[indxD] = streamIndices.Pop();
+            }
+        }
+    }
+
+    // 2. Handle remainder of data without burst writes.
+    if(remDim0!=0){
+        LoopPEs_Rem:
+        for(unsigned iPE=0; iPE<UnitCount; iPE++){
+            LoopVecsPerPE_Rem:
+            for(unsigned iVec=0; iVec<vecsPerOutputSlice; iVec++){
+                const unsigned d0 = safeDim0+iPE;
+                MemoryPackI_t vec = streamIndices.Pop();
+                if(d0<dim0){
+                    indxD = (d0)*vecsPerOutputSlice + iVec;
+                    indicesSplitedTn[indxD] = vec;
+                }
+            }
+        }
+    }
+
+}
 
 /**
  * @brief      The sub-function for PEs.
@@ -220,7 +279,7 @@ void UnitProcessingElement(
     LoopMain: for(unsigned batch=0; batch<dim0; batch+=UnitCount){
 #pragma HLS LOOP_TRIPCOUNT min=640 max=640
         //--------------------------------------------------
-        // 1. Read current slice and indices into local memory.
+        // 1. Read the current slice and indices into the local memory.
         LoopReadSlice: for(unsigned idx=0; idx<vecsPerSlice; idx++){
             #pragma HLS LOOP_TRIPCOUNT min=64 max=64
             
@@ -291,7 +350,8 @@ extern "C"{
 
 /**
  * @brief      The top-function of the kernel.
- *             Supports handling an input tensor with "dim0 % UnitCount != 0"
+ *             Supports handling an input tensor with "dim0 % UnitCount != 0".
+ *             The latency will be reported for [5x1024]x1024, k=20, unitcount=8, m_axi_width=16, pipe_depth=2
  *
  * @param[in]  inputTn             The input tn
  * @param[out] indicesSplitedTn    The indices splited tn (the tensor with a buffer of length of batchsize x kValue)

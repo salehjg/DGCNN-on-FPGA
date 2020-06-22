@@ -947,12 +947,17 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
         SPDLOG_LOGGER_WARN(logger,"Skipping KernelTopK, only HwEmu mode is supported");
         return obj;
     }
-    const unsigned kVal=20 , N=ConfigTaskTopK::MaxSliceLen , B=ConfigTaskTopK::UnitCount+2;
-    SPDLOG_LOGGER_INFO(logger,"Please confirm that TOPK kernel is configured for K={} and N={}, Press ESC to skip...",kVal,N);    
-    if(cin.get()==27) return nullptr;
-    assert(N==ConfigTaskTopK::MaxSliceLen);
+    const unsigned kVal=20;
+    const unsigned B = 1; //ConfigTaskTopK::UnitCount+2
+    const unsigned N1 = ConfigTaskTopK::MaxSliceLen;
+    const unsigned N2 = ConfigTaskTopK::MaxSliceLen;
 
-    TensorF *tensorSrc = GenerateTensor(0, {B, N, N});
+    SPDLOG_LOGGER_INFO(logger,"Please confirm that TOPK kernel is configured for K={} and N={}, Press ESC to skip...",kVal,N2);   
+
+    if(cin.get()==27) return nullptr;
+    assert(N2==ConfigTaskTopK::MaxSliceLen);
+
+    TensorF *tensorSrc = GenerateTensor(0, {B, N1, N2});
     TensorI *tensorCpu = platformSelector->TopK(PLATFORMS::CPU, scheduler, tensorSrc, 2, kVal);
     TensorI *tensorGpu = platformSelector->TopK(PLATFORMS::GPU_OCL, scheduler, tensorSrc, 2, kVal);
     TensorI *tensorGpuTransfered = platformSelector->CrossThePlatform(tensorGpu,PLATFORMS::CPU);
@@ -964,9 +969,9 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
     else{
 
         for(int b=0;b<B;b++){
-            for(int n1=0;n1<N;n1++){
+            for(int n1=0;n1<N1;n1++){
                 for(int kk=0;kk<kVal;kk++){
-                    unsigned int i = b*N*kVal + n1*kVal + kk;
+                    unsigned int i = b*N1*kVal + n1*kVal + kk;
                     int rCpu = tensorCpu->_buff[i];
                     int rUdt = tensorGpuTransfered->_buff[i];
                     SPDLOG_LOGGER_INFO(
@@ -974,7 +979,7 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
                         "Index(B,N,K)= ({},{},{}), rCPU={}, rUDT={}, Value[rCPU]={}, Value[rUDT]={}",
                         b,n1,kk,
                         rCpu,rUdt,
-                        tensorSrc->_buff[b*N*N+ n1*N+ rCpu], tensorSrc->_buff[b*N*N+ n1*N+ rUdt]);
+                        tensorSrc->_buff[b*N1*N2+ n1*N2+ rCpu], tensorSrc->_buff[b*N1*N2+ n1*N2+ rUdt]);
 
                     /*cout <<
                             "Index(B,N,K)= ("<< b <<", "<<n1<<", "<<kk<<")   " <<
@@ -1017,7 +1022,7 @@ void XilinxImpUnitTests::RunAll(){
     //PrintReport(KernelPadLastDimFloat());         //OK
     //PrintReport(KernelUnpadLastDimFloat());       //OK
     //PrintReport(KernelConv2Mlp());
-    //PrintReport(KernelTopK());
+    PrintReport(KernelTopK());
     //PrintReport(KernelMatops());                  //OK
     //PrintReport(KernelReduceSum4D());             //OK
     //PrintReport(KernelReduceMax());               //OK

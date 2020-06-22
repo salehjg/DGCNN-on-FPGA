@@ -121,7 +121,7 @@ int TestTopk(
 
 int main(int argc, char **argv) {
     int rslt0 = 0;
-    rslt0 += TestTopk<16>("Topk", 3, 1024, 20);
-    rslt0 += TestTopk<16>("Topk", 8000, 1024, 20);
+    rslt0 += TestTopk<16>("Topk", 4, MaxSliceLen, 20);
+    rslt0 += TestTopk<16>("Topk", 8000, MaxSliceLen, 20);
     return rslt0;
 }
