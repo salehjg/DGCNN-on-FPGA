@@ -884,6 +884,13 @@ ReportObject* XilinxImpUnitTests::KernelVariance(){
 ReportObject* XilinxImpUnitTests::KernelMatmul(){
     bool comparisonResult = true;
     {
+        TensorF* tensorSrc1 = GenerateTensor(0,{1,64,64});
+        TensorF* tensorSrc2 = GenerateTensor(0,{1,64,64});
+        TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
+        TensorF* tensorGpu = platformSelector->MatMul(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,tensorSrc2);
+        comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
+    }
+    {
         TensorF* tensorSrc1 = GenerateTensor(0,{5,3,64});
         TensorF* tensorSrc2 = GenerateTensor(0,{5,64,5});
         TensorF* tensorCpu = platformSelector->MatMul(PLATFORMS::CPU,scheduler,tensorSrc1,tensorSrc2);
@@ -1007,20 +1014,17 @@ void XilinxImpUnitTests::RunAll(){
     //PrintReport(TensorPadUnpadCpuFloat());
     //PrintReport(TensorPadUnpadCpuInteger());
 
-    //PrintReport(KernelPadLastDimFloat());
-    //PrintReport(KernelUnpadLastDimFloat());
+    //PrintReport(KernelPadLastDimFloat());         //OK
+    //PrintReport(KernelUnpadLastDimFloat());       //OK
     //PrintReport(KernelConv2Mlp());
     //PrintReport(KernelTopK());
-    //
     //PrintReport(KernelMatops());                  //OK
     //PrintReport(KernelReduceSum4D());             //OK
     //PrintReport(KernelReduceMax());               //OK
     //PrintReport(KernelReduceSum());               //OK, No burst R/W!
     //PrintReport(KernelMean());                    //OK
     //PrintReport(KernelVariance());                //OK
-    
-    PrintReport(KernelMatmul());                  //BROKEN, NO BURST R/W!!
-    
+    //PrintReport(KernelMatmul());                  //OK
     //PrintReport(KernelTile());                    //OK
     //PrintReport(KernelGather());                  //OK
     //PrintReport(KernelConcat2());                 //OK

@@ -18,7 +18,7 @@ using namespace ConfigTaskMatMul;
 /**
  * @brief      Computes batch-matmul operation of C=AB
  *             The inputs should be of rank three and be padded in the last dimension.
- *             The latency will be reported for Shape1=5x1024x64 and Shape2=5x64x1024 and D=4.
+ *             The latency will be reported for Shape1=5x1024x64 and Shape2=5x64x1024 and RowTileSizeD=4.
  *             This kernel complies with the padded last dim policy.
  *
  * @param[in]  A          The Input Matrix A (Rank3, RowMajor, Batch*N*K)
@@ -29,9 +29,7 @@ using namespace ConfigTaskMatMul;
  * @param[in]  sizeK      K
  * @param[in]  sizeM      M
  *
- * @tparam     D          Row-tile Size(in C)
  */
-template<unsigned D>
 void MatmulReorderedVectorized_V1(
     const CONFIG_DTYPE* A,
     const MemoryPackF_t* B,
@@ -60,7 +58,7 @@ void MatmulReorderedVectorized_V1(
     const unsigned vecsPerSliceB = lastDimPaddedB/CONFIG_M_AXI_WIDTH;
     const unsigned vecsPerSliceC = lastDimPaddedC/CONFIG_M_AXI_WIDTH;
 
-    const unsigned boundLoopN = DivCeil<unsigned>(sizeN, D);
+    const unsigned boundLoopN = DivCeil<unsigned>(sizeN, RowTileSizeD);
 
     LoopBatch:
     for(unsigned batch=0; batch<sizeBatch; batch++) {
@@ -68,19 +66,19 @@ void MatmulReorderedVectorized_V1(
         LoopN:
         for (unsigned n = 0; n < boundLoopN; n++) {
             #pragma HLS LOOP_TRIPCOUNT min=256 max=256
-            MemoryPackF_t acc[D][MaxM / CONFIG_M_AXI_WIDTH];
+            MemoryPackF_t acc[RowTileSizeD][MaxM / CONFIG_M_AXI_WIDTH];
             #pragma HLS ARRAY_PARTITION variable=acc dim=1 complete
 
             LoopK:
             for (unsigned k = 0; k < sizeK; k++) {
                 #pragma HLS LOOP_TRIPCOUNT min=64 max=64
                 const unsigned kVecIndex = k / CONFIG_M_AXI_WIDTH;
-                CONFIG_DTYPE a_buffer[D];
+                CONFIG_DTYPE a_buffer[RowTileSizeD];
                 LoopReadA:
-                for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); nd++) {
+                for (unsigned nd = 0; (nd<RowTileSizeD)&&((n*RowTileSizeD+nd)<sizeN); nd++) {
                     #pragma HLS PIPELINE II=1
                     // matrix A is padded on the last dimension but it is accessed by axi-32bits.
-                    const unsigned indxS1 = (batch)*sizeN*lastDimPaddedA + (n*D+nd)*lastDimPaddedA + (k);
+                    const unsigned indxS1 = (batch)*sizeN*lastDimPaddedA + (n*RowTileSizeD+nd)*lastDimPaddedA + (k);
                     a_buffer[nd] = A[indxS1];
                 }
                 LoopM:
@@ -90,7 +88,7 @@ void MatmulReorderedVectorized_V1(
                     const unsigned indxS2 = (batch)*sizeK*vecsPerSliceB + k*vecsPerSliceB + m;
                     const auto b_val = B[indxS2];
                     LoopUnrolled:
-                    for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
+                    for (unsigned nd = 0; (nd<RowTileSizeD)&&((n*RowTileSizeD+nd)<sizeN); ++nd) {
                         #pragma HLS UNROLL
                         const auto prev = (k > 0) ? acc[nd][m] : MemoryPackF_t(0.);
                         acc[nd][m] = prev + a_buffer[nd] * b_val;
@@ -99,13 +97,13 @@ void MatmulReorderedVectorized_V1(
                 }
             }
             LoopWriteD:
-            for (unsigned nd = 0; (nd<D)&&((n*D+nd)<sizeN); ++nd) {
+            for (unsigned nd = 0; (nd<RowTileSizeD)&&((n*RowTileSizeD+nd)<sizeN); ++nd) {
                 LoopWriteM:
                 for (unsigned m = 0; m < vecsPerSliceB; ++m) {
                     #pragma HLS LOOP_TRIPCOUNT min=64 max=64
                     #pragma HLS LOOP_FLATTEN
                     #pragma HLS PIPELINE II=1
-                    const unsigned indxD = (batch)*sizeN*vecsPerSliceC + (n*D+nd)*vecsPerSliceC + m;
+                    const unsigned indxD = (batch)*sizeN*vecsPerSliceC + (n*RowTileSizeD+nd)*vecsPerSliceC + m;
                     C[indxD] = acc[nd][m];
                 }
             }
@@ -134,7 +132,7 @@ void task_matmul(
 #pragma HLS INTERFACE s_axilite port=sizeM bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
-    MatmulReorderedVectorized_V1<RowTileSizeD>(
+    MatmulReorderedVectorized_V1(
         inputTn1, inputTn2, outputTn, 
         sizeBatch, sizeN, sizeK, sizeM);
 

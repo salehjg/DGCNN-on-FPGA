@@ -100,7 +100,7 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_matmul",
-                false),
+                false,DISABLED_KERNEL),
         /* IDX 5 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -140,7 +140,7 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_pad_unpad",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 10 :*/
         new OclKernelObject(
                 KERNEL_DIR,
