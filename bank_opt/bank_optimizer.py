@@ -64,6 +64,10 @@ def brute_force():
     values = []
     minval = 9999999999999
     minparams = []
+    result_bank0 = 0
+    result_bank1 = 0
+    result_bank2 = 0
+    result_bank3 = 0
     for transpose in banks_transpose:
         for matmul in banks_matmul:
             for matops in banks_matops:
@@ -78,58 +82,69 @@ def brute_force():
                                                 val = get_objective(transpose,transpose, matmul,matmul,matmul, matops,matops,matops, rss,rss, _reduce,_reduce, tile,tile, topk,topk, gather,gather,gather, concat,concat,concat, padunpad,padunpad, conv,conv,conv,conv)
                                                 values.append(val)
                                                 # m_axi's per kernel are considered here:
-                                                currentparams = [transpose,transpose, matmul,matmul, matops,matops, rss,rss, _reduce,_reduce, tile, topk,topk , gather,gather,gather, concat,concat, padunpad, conv,conv,conv,conv]
+                                                currentparams = [transpose,transpose, matmul,matmul, matops,matops, rss, _reduce,_reduce, tile, topk,topk , gather,gather,gather, concat,concat, padunpad, conv,conv,conv,conv]
                                                 currentparams = np.array(currentparams)
                                                 bank0 = np.sum(currentparams==0)
                                                 bank1 = np.sum(currentparams==1)
                                                 bank2 = np.sum(currentparams==2)
+                                                bank3 = np.sum(currentparams==3)
 
-                                                if minval > val and bank0<15 and bank1<15 and bank2<15:
+                                                if minval > val and bank0<15 and bank1<15 and bank2<15 and abs(bank1-bank2)<4:
+                                                    result_bank0 = bank0
+                                                    result_bank1 = bank1
+                                                    result_bank2 = bank2
+                                                    result_bank3 = bank3
                                                     minval = val
                                                     minparams = [transpose,matmul,matops,rss,_reduce,tile,topk,gather,concat,padunpad,conv]
 
-    return minval, minparams
+    return minval, minparams, [result_bank0,result_bank1,result_bank2,result_bank3]
 
-minval, minparams = brute_force()
-
+minval, minparams, banks = brute_force()
+print('=============================================')
 print('Required DataMover Launches: ' + str(minval))
+print('m_axi s on bank0: ' + str(banks[0]))
+print('m_axi s on bank1: ' + str(banks[1]))
+print('m_axi s on bank2: ' + str(banks[2]))
+print('m_axi s on bank3: ' + str(banks[3]))
+print('=============================================')
+print('Memory Banks Per Kernel(each layer is limited to use only one memory bank):')
 print('---------------------------------------------')
-print('Memory Banks Per Kernel:(each layer is limited to use only one memory bank)')
 print('transpose_in: ' + str(minparams[0]))
 print('transpose_out: ' + str(minparams[0]))
-
+print('---------------------------------------------')
 print('matmul_in1: ' + str(minparams[1]))
 print('matmul_in2: ' + str(minparams[1]))
 print('matmul_out: ' + str(minparams[1]))
-
+print('---------------------------------------------')
 print('matops_in1: ' + str(minparams[2]))
 print('matops_in2: ' + str(minparams[2]))
 print('matops_out: ' + str(minparams[2]))
-
+print('---------------------------------------------')
 print('relusqrtsquare_in: ' + str(minparams[3]))
 print('relusqrtsquare_out: ' + str(minparams[3]))
-
+print('---------------------------------------------')
 print('reduce_in: ' + str(minparams[4]))
 print('reduce_out: ' + str(minparams[4]))
-
+print('---------------------------------------------')
 print('tile_in: ' + str(minparams[5]))
 print('tile_out: ' + str(minparams[5]))
-
+print('---------------------------------------------')
 print('topk_in: ' + str(minparams[6]))
 print('topk_out: ' + str(minparams[6]))
-
+print('---------------------------------------------')
 print('gather_in1: ' + str(minparams[7]))
 print('gather_in2: ' + str(minparams[7]))
 print('gather_out: ' + str(minparams[7]))
-
+print('---------------------------------------------')
 print('concat_in1: ' + str(minparams[8]))
 print('concat_in2: ' + str(minparams[8]))
 print('concat_out: ' + str(minparams[8]))
-
+print('---------------------------------------------')
 print('padunpad_in: ' + str(minparams[9]))
 print('padunpad_out: ' + str(minparams[9]))
-
+print('---------------------------------------------')
 print('conv_in: ' + str(minparams[10]))
 print('conv_w: ' + str(minparams[10]))
 print('conv_b: ' + str(minparams[10]))
 print('conv_out: ' + str(minparams[10]))
+print('=============================================')
