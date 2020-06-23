@@ -108,10 +108,10 @@ void UnitReadInput(
     // 1. Handle safe part of data and write out data in burst.
     For_Main: 
     for(unsigned batch=0; batch<safeDim0; batch+=UnitCount){
-        LoopVecsPerPE:
-        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-            LoopPEs:
-            for(unsigned iPE=0; iPE<UnitCount; iPE++){
+        LoopPEs:
+        for(unsigned iPE=0; iPE<UnitCount; iPE++){
+            LoopVecsPerPE:
+            for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
                 #pragma HLS PIPELINE II=1
 
                 const unsigned d0 = batch+iPE;
@@ -123,10 +123,10 @@ void UnitReadInput(
 
     // 2. Handle remainder of data without burst writes.
     if(remDim0!=0){
-        LoopVecsPerPE_Rem:
-        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-            LoopPEs_Rem:
-            for(unsigned iPE=0; iPE<UnitCount; iPE++){
+        LoopPEs_Rem:
+        for(unsigned iPE=0; iPE<UnitCount; iPE++){
+            LoopVecsPerPE_Rem:
+            for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
                 #pragma HLS PIPELINE II=1
                 
                 const unsigned d0 = safeDim0+iPE;
@@ -272,7 +272,7 @@ void UnitProcessingElement(
 //#pragma HLS RESOURCE variable=sliceIndices core=RAM_2P_URAM
     DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceIndices cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
 
-    MemoryPackF_t sliceSubVec;
+    //MemoryPackF_t sliceVec;
     MemoryPackI_t outputCache;
     unsigned outputCacheVecSubIdx;
 
@@ -280,7 +280,14 @@ void UnitProcessingElement(
 #pragma HLS LOOP_TRIPCOUNT min=640 max=640
         //--------------------------------------------------
         // 1. Read the current slice and indices into the local memory.
-        LoopReadSlice: for(unsigned idx=0; idx<vecsPerSlice; idx++){
+        
+
+        /*
+        // This method of data handling is not recommended as it forces 
+        // the data transfers in UnitRead to not be bursts.
+
+        LoopReadSlice: 
+        for(unsigned idx=0; idx<vecsPerSlice; idx++){
             #pragma HLS LOOP_TRIPCOUNT min=64 max=64
             
             LoopInputPass01:
@@ -292,18 +299,49 @@ void UnitProcessingElement(
                         streamDataOut.Push(vec);
                     }
                 }else{
-                    sliceSubVec = vec;
+                    sliceVec = vec;
                 }
             }
             
             const unsigned offsetLocal = idx*CONFIG_M_AXI_WIDTH;
+
             LoopReadUnroll1:
             for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
                 #pragma HLS UNROLL
                 const unsigned indxLocal = offsetLocal+i; 
-                sliceData[indxLocal] = sliceSubVec[i];
+                sliceData[indxLocal] = sliceVec[i];
                 sliceIndices[indxLocal] = indxLocal;
             }
+        }
+        */
+
+        LoopInputPass01:
+        for(unsigned iPE=0; iPE<UnitCount-unitIndex; iPE++){
+
+            // It's better to read the whole slice at once, this way memory accesses 
+            // in UnitRead will be burst transfers.
+            LoopReadSlice: 
+            for(unsigned idx=0; idx<vecsPerSlice; idx++){
+                #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+                #pragma HLS PIPELINE II=1
+
+                MemoryPackF_t vec = streamDataIn.Pop();
+                if(iPE>0){
+                    if(unitIndex<(UnitCount-1)){
+                        streamDataOut.Push(vec);
+                    }
+                }else{
+                    const unsigned offsetLocal = idx*CONFIG_M_AXI_WIDTH;
+                    LoopReadUnroll1:
+                    for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                        #pragma HLS UNROLL
+                        const unsigned indxLocal = offsetLocal+i; 
+                        sliceData[indxLocal] = vec[i];
+                        sliceIndices[indxLocal] = indxLocal;
+                    }
+                }
+            }
+            
         }
 
         //--------------------------------------------------
