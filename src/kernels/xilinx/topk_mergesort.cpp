@@ -84,6 +84,7 @@ void MergeSortWithIndices(
 
 /**
  * @brief      The sub-function to feed data from global memory into the PEs.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn        The input tn
  * @param      streamInputTn  The stream connected to the first PE
@@ -148,6 +149,7 @@ void UnitReadInput(
 /**
  * @brief      The sub-function to handle the data produced by PEs.
  *             The output tensor should be padded in the last dimnesion such that shape[-1]%m_axi_width=0
+ *             This kernel supports burst read/write.
  *
  * @param      indicesSplitedTn    The indices splited tn (batchsize x K)
  * @param      streamIndices       The stream connected to the first PE that outputs results produced by all the PEs.
@@ -390,6 +392,7 @@ extern "C"{
  * @brief      The top-function of the kernel.
  *             Supports handling an input tensor with "dim0 % UnitCount != 0".
  *             The latency will be reported for [5x1024]x1024, k=20, unitcount=8, m_axi_width=16, pipe_depth=2
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn             The input tn
  * @param[out] indicesSplitedTn    The indices splited tn (the tensor with a buffer of length of batchsize x kValue)

@@ -23,6 +23,7 @@ constexpr unsigned MAX_POW_Y_MINUS_ONE = (ConfigTaskReduce::Sum4D::MaxPowY-1);
  *                  2) For the output tensor which should be rank 2 of shape dim0xdim1Padded, the allocated 
  *                     memory should cover the padded elements(dim1 to dim1Padded).
  *             The latency will be reported for an input of shape 5x1024x64.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
@@ -194,6 +195,7 @@ void ReduceSumRank4Axes012_V3_UnitProcess(
  *             The latency is reported for inputTn of shape 5x1024x20x128
  *             This kernel complies with the padded last dim policy.
  *             This version(v3) alleviates external memory access stalls using dataflow scheme and FIFO depth.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
@@ -239,6 +241,7 @@ CONFIG_DTYPE _Max(CONFIG_DTYPE val1, CONFIG_DTYPE val2){
  * @brief      Reduces the input tensor of rank 3 in the middle axis(FTF) with the max op.
  *             Currently, 'LoopSlice0' achieves II=3.
  *             The latency will be reported for 5x1024x20x128.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
@@ -329,6 +332,7 @@ extern "C" {
  *             For mode(1) pow_y, dim3, and overaxis3 are don't cares.
  *             For mode(2) there is not any don't cares.
  *             For mode(3) pow_y, dim3, and overaxis3 are don't cares.
+ *             This kernel supports burst read/write.
  *             
  *
  * @param[in]  inputTn    The input tn

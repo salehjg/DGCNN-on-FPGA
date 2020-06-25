@@ -81,6 +81,15 @@ void Square_V1(
 }
 
 extern "C" {
+
+/**
+ * @brief      This kernel supports burst read/write.
+ *
+ * @param[in]  inputTn   The input tn
+ * @param      outputTn  The output tn
+ * @param[in]  len       The length
+ * @param[in]  mode      The mode
+ */
 void task_relu_sqrt_square(
         const MemoryPackF_t *inputTn,
         MemoryPackF_t *outputTn,

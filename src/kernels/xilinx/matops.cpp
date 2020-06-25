@@ -202,7 +202,7 @@ void MatOpsRank4Rankx_V2_UnitProcess(
  *             The shape of the second tensor should also be aligned by the last dimension like:
  *               rank=2 tensor 2x3: dim0B=0, dim1B=0, dim2B=2, dim3B=3
  *             The latency will be reported for an input tensor of shape 5x1024x1024.
- *             This version of kernel is developed to use burst read/writes to transfer data.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn1  The input tn 1
  * @param[in]  inputTn2  The input tn 2
@@ -262,6 +262,7 @@ void MatOpsRank4Rankx_V2(
  *               rank=2 tensor 2x3: dim0=1, dim1=1, dim2=2, dim3=3
  *             The shape of the second tensor should also be aligned by the last dimension like:
  *               rank=2 tensor 2x3: dim0B=0, dim1B=0, dim2B=2, dim3B=3
+ *             This kernel DOES NOT supports burst read/write.
  *
  * @param[in]  inputTn1  The input tn 1
  * @param[in]  inputTn2  The input tn 2
@@ -278,6 +279,7 @@ void MatOpsRank4Rankx_V2(
  * @param[in]  rankB     The rank b
  * @param[in]  mode      The mode
  */
+/*
 void MatOpsRank4Rankx(
         const MemoryPackF_t *inputTn1, //is always of rank4 (forced)
         const MemoryPackF_t *inputTn2, //rank4 or less
@@ -375,6 +377,7 @@ void MatOpsRank4Rankx(
         }
     }
 }
+*/
 
 extern "C" {
 void task_matops(

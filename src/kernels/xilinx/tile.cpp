@@ -13,14 +13,13 @@
 using namespace std;
 using namespace ConfigTaskTile; 
 
-// Latency 5x1024x1 --> 5x1024x1024 , axi512
-
 /**
  * @brief      Performs tile operation on the input tensor of rank 2 over the last axis 2.
  *             This kernel complies with the padded last dim policy:
  *               1) The input tensor of rank 2 should be padded over the last dimension(dim1).
  *               2) The output tensor of rank 3 will be padded over the last dimension(tileSize).
  *             The latency will be reported for an input tensor of shape 5x1024 and tileSize of 1024 with axi512.
+ *             To decrease resource utilization, burst read/writes are disbaled by commenting HLS INLINE pragma.
  *
  * @param[in]  inputTn   The input tn of shape dim0*dim1
  * @param      outputTn  The output tn of shape dim0*dim1*tileSize
@@ -35,7 +34,7 @@ void TileRank2Axis2(
     const unsigned dim1,   
     const unsigned tileSize){
 
-    #pragma HLS INLINE
+    //#pragma HLS INLINE
 
     // input: BxN, tileAxis=2 ===> output: BxNxT ===> lastDim: T,(tileSize)
 
@@ -104,6 +103,7 @@ void TileRank2Axis2(
  *               1) The input tensor of rank 2 should be padded over the last dimension(dim1).
  *               2) The output tensor of rank 3 will be padded over the last dimension(dim1).
  *             The latency will be reported for an input tensor of shape 5x1024 and tileSize of 1024 with axi512.
+ *             To decrease resource utilization, burst read/writes are disbaled by commenting HLS INLINE pragma.
  *
  * @param[in]  inputTn   The input tn of shape dim0*dim1
  * @param      outputTn  The output tn of shape dim0*tileSize*dim1
@@ -118,7 +118,7 @@ void TileRank2Axis1(
         const unsigned dim1,
         const unsigned tileSize){
 
-    #pragma HLS INLINE
+    //#pragma HLS INLINE
     
     // input: BxN, tileAxis=1 ===> output: BxTxN ===> lastDim: N,(dim1)
 
