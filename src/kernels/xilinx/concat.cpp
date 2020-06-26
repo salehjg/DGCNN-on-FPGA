@@ -102,7 +102,7 @@ void ConcatLastDimSubVec_V1(
  *             This kernel complies with the padded last dim policy:
  *                1) Both of the inputs and output tensors are considered to be padded in the last dim.
  *             The latency will be reported for the input tensors of Shape1=5x1024x1x192, Shape2=5x1024x1x128
- *             This kernel supports burst read/write.
+ *             To decrease resource utilization, burst read/writes are disbaled.
  *             
  * @param[in]  inputTn1  The input tn 1 of rank4
  * @param[in]  inputTn2  The input tn 2 of rank4
@@ -125,7 +125,7 @@ void ConcatLastDimSuperVec_V1(
     const unsigned dimB3,
     const unsigned dimR3){
 
-    #pragma HLS INLINE
+    //#pragma HLS INLINE
 
     assert(dimA3%CONFIG_M_AXI_WIDTH==0);
     assert(dimB3%CONFIG_M_AXI_WIDTH==0);
