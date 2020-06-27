@@ -4,8 +4,8 @@ Currently, only Xilinx devices are supported.
 ## Xilinx Kernels
 | # | Name | Sub | Bus | Bus Count | Burst R/W | PE | Dataflow |
 |---|------|-----|-----|-----------|-----------|----|----------|
-|1.1|concat2|ConcatLastDimSubVec_V1|512b|2|Yes|-|No|
-|1.2|concat2|ConcatLastDimSuperVec_V1|512b|2|No|-|No|
+|1.1|concat2|ConcatLastDimSubVec_V1|512b|**2**|Yes|-|No|
+|1.2|concat2|ConcatLastDimSuperVec_V1|512b|**2**|No|-|No|
 |2|conv2|-|512b|4|Yes|-|Yes|
 |3|datamover|-|512b|1<=N<=4|Yes|-|No|
 |4|gather|-|512b|3|Yes|-|Yes|
@@ -22,4 +22,4 @@ Currently, only Xilinx devices are supported.
 |10|tile|TileRank2Axis1|512b|1|No|-|No|
 |10|tile|TileRank2Axis2|512b|1|No|-|No|
 |11|topk_mergesort|-|512b|2|Yes|Multiple|Yes|
-|12|transpose|-|512b|2|No|-|Yes|
+|12|transpose|-|512b|**2**|No|-|Yes|
