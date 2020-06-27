@@ -15,7 +15,7 @@ Currently, only Xilinx devices are supported.
 |7.2|pad_unpad|UnpadLastDimSuperVec|512b|1|No|-|No|
 |8.1|reduce|ReduceSum3Axis2_V1|512b|2|Yes|**2**|No|
 |8.2|reduce|ReduceSumRank4Axes012_V3|512b|**2**|Yes|-|Yes|
-|8.3|reduce|ReduceMax3Axis1_V2|512b|2|Yes|****|No|
+|8.3|reduce|ReduceMax3Axis1_V2|512b|2|Yes|**2**|No|
 |9.1|relu_sqrt_square|Relu_V1|512b|1|Yes|-|No|
 |9.2|relu_sqrt_square|Sqrt_V1|512b|1|Yes|-|No|
 |9.3|relu_sqrt_square|Square_V1|512b|1|Yes|-|No|
