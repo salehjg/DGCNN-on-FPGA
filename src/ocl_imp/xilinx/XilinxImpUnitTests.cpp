@@ -1024,7 +1024,7 @@ void XilinxImpUnitTests::RunAll(){
     //PrintReport(KernelConv2Mlp());
     //PrintReport(KernelTopK());                    //OK
     //PrintReport(KernelMatops());                  //OK
-    //PrintReport(KernelReduceSum4D());             //OK
+    PrintReport(KernelReduceSum4D());             //OK
     //PrintReport(KernelReduceMax());               //OK
     //PrintReport(KernelReduceSum());               //OK, No burst R/W!
     //PrintReport(KernelMean());                    //OK
@@ -1032,7 +1032,7 @@ void XilinxImpUnitTests::RunAll(){
     //PrintReport(KernelMatmul());                  //OK
     //PrintReport(KernelTile());                    //OK
     //PrintReport(KernelGather());                  //OK
-    PrintReport(KernelConcat2());                 //OK
+    //PrintReport(KernelConcat2());                 //OK
     //PrintReport(KernelRelu());                    //OK
     //PrintReport(KernelSqrt());                    //OK
     //PrintReport(KernelSquare());                  //OK
