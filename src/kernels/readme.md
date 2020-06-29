@@ -11,8 +11,8 @@ Currently, only Xilinx devices are supported.
 |4|gather|-|512b|3|Yes|-|Yes|
 |5|matmul|-|512b|2|Yes|-|No|
 |6|matops|-|512b|2|Yes|-|Yes|
-|7.1|pad_unpad|PadLastDimSuperVec|512b|1|No|-|No|
-|7.2|pad_unpad|UnpadLastDimSuperVec|512b|1|No|-|No|
+|7.1|pad_unpad|PadLastDimSuperVec|512b|1|Yes|-|No|
+|7.2|pad_unpad|UnpadLastDimSuperVec|512b|1|Yes|-|No|
 |8.1|reduce|ReduceSum3Axis2_V1|512b|**1**|Yes|-|No|
 |8.2|reduce|ReduceSumRank4Axes012_V3|512b|**1**|Yes|-|Yes|
 |8.3|reduce|ReduceMax3Axis1_V2|512b|**1**|Yes|-|No|
