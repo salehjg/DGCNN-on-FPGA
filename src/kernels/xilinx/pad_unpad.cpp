@@ -16,7 +16,6 @@ using namespace std;
  * @brief      Pads the last dimension of the given tensor of rank two to the given value(dim1Padded) 
  *             Tensor of higher ranks should be flattened into two virtual dimensions for this kernel to be usable.
  *             Sub-vec padding is disabled, as Cpu last dim padding is decided to be enabled.
- *             //To decrease resource utilization, burst read/writes are disbaled by commenting HLS INLINE pragma.
  *
  * @param      inputTn     The input tensor
  * @param      outputTn    The output tensor
@@ -216,7 +215,6 @@ void PadLastDimSubVec(
  *                1)The input tensor's last dimension should be greater than m_axi_width and
  *                  should be divisible by m_axi_width.
  *                2)The same conditions as (1) are applied to 'dim1Unpadded'
- *             //To decrease resource utilization, burst read/writes are disbaled by commenting HLS INLINE pragma.
  *
  * @param[in]  inputTn       The input tn
  * @param      outputTn      The output tn
