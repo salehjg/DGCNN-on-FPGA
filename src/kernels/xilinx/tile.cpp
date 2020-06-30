@@ -19,7 +19,7 @@ using namespace ConfigTaskTile;
  *               1) The input tensor of rank 2 should be padded over the last dimension(dim1).
  *               2) The output tensor of rank 3 will be padded over the last dimension(tileSize).
  *             The latency will be reported for an input tensor of shape 5x1024 and tileSize of 1024 with axi512.
- *             To decrease resource utilization, burst read/writes are disbaled by commenting HLS INLINE pragma.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn   The input tn of shape dim0*dim1
  * @param      outputTn  The output tn of shape dim0*dim1*tileSize
@@ -103,7 +103,7 @@ void TileRank2Axis2(
  *               1) The input tensor of rank 2 should be padded over the last dimension(dim1).
  *               2) The output tensor of rank 3 will be padded over the last dimension(dim1).
  *             The latency will be reported for an input tensor of shape 5x1024 and tileSize of 1024 with axi512.
- *             To decrease resource utilization, burst read/writes are disbaled by commenting HLS INLINE pragma.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn   The input tn of shape dim0*dim1
  * @param      outputTn  The output tn of shape dim0*tileSize*dim1

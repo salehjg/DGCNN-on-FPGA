@@ -19,7 +19,7 @@ Currently, only Xilinx devices are supported.
 |9.1|relu_sqrt_square|Relu_V1|512b|1|Yes|-|No|
 |9.2|relu_sqrt_square|Sqrt_V1|512b|1|Yes|-|No|
 |9.3|relu_sqrt_square|Square_V1|512b|1|Yes|-|No|
-|10|tile|TileRank2Axis1|512b|1|No|-|No|
-|10|tile|TileRank2Axis2|512b|1|No|-|No|
+|10|tile|TileRank2Axis1|512b|1|Yes|-|No|
+|10|tile|TileRank2Axis2|512b|1|Yes|-|No|
 |11|topk_mergesort|-|512b|2|Yes|Multiple|Yes|
 |12|transpose|-|512b|1|No|-|Yes|

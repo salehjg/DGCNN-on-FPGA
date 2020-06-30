@@ -68,7 +68,7 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_concat",
-                false,DISABLED_KERNEL),
+                false),
         /* IDX 1 :*/
         new OclKernelObject(
                 KERNEL_DIR,
@@ -92,7 +92,7 @@ XilinxImplementation::XilinxImplementation(int aa){
                 "binary_container_1.xclbin",
                 "",
                 "task_tile",
-                false),
+                false,DISABLED_KERNEL),
         /* IDX 4 :*/
         new OclKernelObject(
                 KERNEL_DIR,

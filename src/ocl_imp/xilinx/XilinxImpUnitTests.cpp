@@ -1030,9 +1030,9 @@ void XilinxImpUnitTests::RunAll(){
     //PrintReport(KernelMean());                    //OK
     //PrintReport(KernelVariance());                //OK
     //PrintReport(KernelMatmul());                  //OK
-    PrintReport(KernelTile());                    //OK
+    //PrintReport(KernelTile());                    //OK
     //PrintReport(KernelGather());                  //OK
-    //PrintReport(KernelConcat2());                 //OK
+    PrintReport(KernelConcat2());                 //OK
     //PrintReport(KernelRelu());                    //OK
     //PrintReport(KernelSqrt());                    //OK
     //PrintReport(KernelSquare());                  //OK
