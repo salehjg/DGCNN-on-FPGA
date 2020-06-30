@@ -34,7 +34,7 @@ void TileRank2Axis2(
     const unsigned dim1,   
     const unsigned tileSize){
 
-    //#pragma HLS INLINE
+    #pragma HLS INLINE
 
     // input: BxN, tileAxis=2 ===> output: BxNxT ===> lastDim: T,(tileSize)
 
@@ -118,7 +118,7 @@ void TileRank2Axis1(
         const unsigned dim1,
         const unsigned tileSize){
 
-    //#pragma HLS INLINE
+    #pragma HLS INLINE
     
     // input: BxN, tileAxis=1 ===> output: BxTxN ===> lastDim: N,(dim1)
 
@@ -208,11 +208,16 @@ void task_tile(
         (rank==3 && tileAxis==2)
         );
 
-    if(rank==2 && tileAxis==1){
+    if((rank==2 && tileAxis==1) || (rank==3 && tileAxis==2)){
         //input: BxN ===> output: BxTxN ===> lastDim: N,(dim1)
-        TileRank2Axis1(inputTn, outputTn, dim0, dim1, tileSize);
+        TileRank2Axis1(
+            inputTn, 
+            outputTn, 
+            (rank==2 && tileAxis==1) ? dim0 : dim0*dim1, 
+            (rank==2 && tileAxis==1) ? dim1 : dim2, 
+            tileSize);
 #ifdef KERNEL_LOGS
-        cout<<"Selected SubFunc: TileRank2Axis1(1)"<<endl;
+        cout<<"Selected SubFunc: TileRank2Axis1(1 or 3)"<<endl;
 #endif
     }else if(rank==2 && tileAxis==2){
         //input: BxN ===> output: BxNxT ===> lastDim: T,(tileSize)
@@ -220,14 +225,6 @@ void task_tile(
 #ifdef KERNEL_LOGS
         cout<<"Selected SubFunc: TileRank2Axis2(2)"<<endl;
 #endif
-    }else if(rank==3 && tileAxis==2){
-        //input: BxNxD ===> output: BxNxTxD ===> lastDim: D,(dim2)
-        TileRank2Axis1(inputTn, outputTn, dim0*dim1, dim2, tileSize);
-#ifdef KERNEL_LOGS
-        cout<<"Selected SubFunc: TileRank2Axis1(3)"<<endl;
-#endif
     }
-
-
 }
 }
