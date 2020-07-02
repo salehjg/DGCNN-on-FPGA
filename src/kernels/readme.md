@@ -5,7 +5,7 @@ Currently, only Xilinx devices are supported.
 | # | Name | Sub | Bus | Bus Count | Burst R/W | PE | Dataflow |
 |---|------|-----|-----|-----------|-----------|----|----------|
 |1.1|concat2|ConcatLastDimSubVec_V1|512b|2|Yes|-|No|
-|1.2|concat2|ConcatLastDimSuperVec_V1|512b|2|No|-|No|
+|1.2|concat2|ConcatLastDimSuperVec_V1|512b|2|Yes|-|Yes|
 |2|conv2|-|512b|4|Yes|-|Yes|
 |3|datamover|-|512b|1<=N<=4|Yes|-|No|
 |4|gather|-|512b|3|Yes|-|Yes|

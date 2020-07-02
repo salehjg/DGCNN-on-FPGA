@@ -1011,32 +1011,32 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 
 void XilinxImpUnitTests::RunAll(){
     
-    //PrintReport(TensorFloat());
-    //PrintReport(TensorBankFloat());
-    //PrintReport(TensorBankInteger());
-    //PrintReport(TensorCloneBankFloat());
-    //PrintReport(TensorCloneBankInteger());
-    //PrintReport(TensorPadUnpadCpuFloat());
-    //PrintReport(TensorPadUnpadCpuInteger());
+    PrintReport(TensorFloat());
+    PrintReport(TensorBankFloat());
+    PrintReport(TensorBankInteger());
+    PrintReport(TensorCloneBankFloat());
+    PrintReport(TensorCloneBankInteger());
+    PrintReport(TensorPadUnpadCpuFloat());
+    PrintReport(TensorPadUnpadCpuInteger());
 
-    //PrintReport(KernelPadLastDimFloat());         //OK
-    //PrintReport(KernelUnpadLastDimFloat());       //OK
-    //PrintReport(KernelConv2Mlp());
-    //PrintReport(KernelTopK());                    //OK
-    //PrintReport(KernelMatops());                  //OK
-    //PrintReport(KernelReduceSum4D());             //OK
-    //PrintReport(KernelReduceMax());               //OK
-    //PrintReport(KernelReduceSum());               //OK, No burst R/W!
-    //PrintReport(KernelMean());                    //OK
-    //PrintReport(KernelVariance());                //OK
-    //PrintReport(KernelMatmul());                  //OK
-    //PrintReport(KernelTile());                    //OK
-    //PrintReport(KernelGather());                  //OK
+    PrintReport(KernelPadLastDimFloat());         //OK
+    PrintReport(KernelUnpadLastDimFloat());       //OK
+    PrintReport(KernelConv2Mlp());
+    PrintReport(KernelTopK());                    //OK
+    PrintReport(KernelMatops());                  //OK
+    PrintReport(KernelReduceSum4D());             //OK
+    PrintReport(KernelReduceMax());               //OK
+    PrintReport(KernelReduceSum());               //OK, No burst R/W!
+    PrintReport(KernelMean());                    //OK
+    PrintReport(KernelVariance());                //OK
+    PrintReport(KernelMatmul());                  //OK
+    PrintReport(KernelTile());                    //OK
+    PrintReport(KernelGather());                  //OK
     PrintReport(KernelConcat2());                 //OK
-    //PrintReport(KernelRelu());                    //OK
-    //PrintReport(KernelSqrt());                    //OK
-    //PrintReport(KernelSquare());                  //OK
-    //PrintReport(KernelTranspose());               //OK, No burst R/W!
+    PrintReport(KernelRelu());                    //OK
+    PrintReport(KernelSqrt());                    //OK
+    PrintReport(KernelSquare());                  //OK
+    PrintReport(KernelTranspose());               //OK, No burst R/W!
 
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
 }
