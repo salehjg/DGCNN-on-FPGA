@@ -451,8 +451,8 @@ void task_concat(
     const unsigned dimA3,
     const unsigned dimB3,
     const int concatDim){
-#pragma HLS INTERFACE m_axi     port=inputTn1  offset=slave bundle=gmem1
-#pragma HLS INTERFACE m_axi     port=inputTn2  offset=slave bundle=gmem2
+#pragma HLS INTERFACE m_axi     port=inputTn1  offset=slave bundle=gmem1 max_read_burst_length=32 max_write_burst_length=32
+#pragma HLS INTERFACE m_axi     port=inputTn2  offset=slave bundle=gmem2 max_read_burst_length=32 max_write_burst_length=2
 #pragma HLS INTERFACE m_axi     port=outputTn  offset=slave bundle=gmem1
 #pragma HLS INTERFACE s_axilite port=inputTn1  bundle=control
 #pragma HLS INTERFACE s_axilite port=inputTn2  bundle=control

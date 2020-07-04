@@ -396,8 +396,8 @@ void task_matops(
         const int rankB,
         const int mode){
 
-#pragma HLS INTERFACE m_axi port=inputTn1 offset=slave bundle=gmem1 max_read_burst_length=32 max_write_burst_length=32
-#pragma HLS INTERFACE m_axi port=inputTn2 offset=slave bundle=gmem2 max_read_burst_length=32 max_write_burst_length=2
+#pragma HLS INTERFACE m_axi port=inputTn1 offset=slave bundle=gmem1 max_read_burst_length=64 max_write_burst_length=64
+#pragma HLS INTERFACE m_axi port=inputTn2 offset=slave bundle=gmem2 max_read_burst_length=64 max_write_burst_length=2
 #pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem1
 #pragma HLS INTERFACE s_axilite port=inputTn1 bundle=control
 #pragma HLS INTERFACE s_axilite port=inputTn2 bundle=control
