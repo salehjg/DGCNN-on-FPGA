@@ -389,7 +389,8 @@ void UnitProcessingElement(
 extern "C"{
 
 /**
- * @brief      The top-function of the kernel.
+ * @brief      Finds the least k elements for every slice in batch.
+ *             The top-function of the kernel.
  *             Supports handling an input tensor with "dim0 % UnitCount != 0".
  *             The latency will be reported for [5x1024]x1024, k=20, unitcount=8, m_axi_width=16, pipe_depth=2
  *             This kernel supports burst read/write.
