@@ -25,9 +25,11 @@ void MergeSortWithIndices(
 
     CONFIG_DTYPE temp[MaxSliceLen];
 #pragma HLS RESOURCE variable=temp core=RAM_2P_URAM
+DO_PRAGMA(HLS ARRAY_PARTITION variable=temp cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
 
     ///TODO: Try implementing the algorithm without the need for indicesTemp.
     unsigned indicesTemp[MaxSliceLen];
+DO_PRAGMA(HLS ARRAY_PARTITION variable=indicesTemp cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
 //#pragma HLS RESOURCE variable=indicesTemp core=RAM_2P_URAM
 
     LoopStage:
@@ -43,6 +45,7 @@ void MergeSortWithIndices(
         for (int i = 0; i < MaxSliceLen; i++) {
             #pragma HLS pipeline II=1
             ///TODO: Try to fix the II-violation(currently II=2)
+            ///      II=1 is achievable for integer data types.
 
             CONFIG_DTYPE t1 = inLocalBuff[f1];
             CONFIG_DTYPE t2 = (f2 == i3) ? 0 : inLocalBuff[f2];
@@ -73,6 +76,7 @@ void MergeSortWithIndices(
         LoopCopy:
         for(int i = 0; i < MaxSliceLen; i++) {
             #pragma HLS pipeline II=1
+            #pragma HLS unroll factor=CONFIG_M_AXI_WIDTH
 
             inLocalBuff[i] = temp[i];
             inLocalIndices[i] = indicesTemp[i];
@@ -365,7 +369,7 @@ void UnitProcessingElement(
         
         //--------------------------------------------------
         
-        // 3. Handle incoming data of streamIndicesIn from other PEs.
+        // 3. Handle incoming data of streamIndicesIn from the other PEs.
         const unsigned _len2 = UnitCount-unitIndex-1;
         LoopHandleOtherPEsOutput:
         for(unsigned iPE=0; iPE<_len2; iPE++){
