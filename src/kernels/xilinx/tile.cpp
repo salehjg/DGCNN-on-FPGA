@@ -185,7 +185,7 @@ void task_tile(
         const unsigned rank,
         const unsigned tileAxis,
         const unsigned tileSize){
-#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1 max_read_burst_length=32 max_write_burst_length=32
+#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1 max_read_burst_length=16 max_write_burst_length=16
 #pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem1
 #pragma HLS INTERFACE s_axilite port=inputTn bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn bundle=control

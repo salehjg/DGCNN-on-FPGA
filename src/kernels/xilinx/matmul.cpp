@@ -120,9 +120,9 @@ void task_matmul(
         const unsigned sizeN,
         const unsigned sizeK,
         const unsigned sizeM){
-#pragma HLS INTERFACE m_axi port=inputTn1 offset=slave bundle=gmem1 max_read_burst_length=32 max_write_burst_length=2
-#pragma HLS INTERFACE m_axi port=inputTn2 offset=slave bundle=gmem2 max_read_burst_length=32 max_write_burst_length=32
-#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem2 max_read_burst_length=32 max_write_burst_length=32
+#pragma HLS INTERFACE m_axi port=inputTn1 offset=slave bundle=gmem1 max_read_burst_length=16 max_write_burst_length=2
+#pragma HLS INTERFACE m_axi port=inputTn2 offset=slave bundle=gmem2 max_read_burst_length=16 max_write_burst_length=16
+#pragma HLS INTERFACE m_axi port=outputTn offset=slave bundle=gmem2 max_read_burst_length=16 max_write_burst_length=16
 #pragma HLS INTERFACE s_axilite port=inputTn1 bundle=control
 #pragma HLS INTERFACE s_axilite port=inputTn2 bundle=control
 #pragma HLS INTERFACE s_axilite port=outputTn bundle=control

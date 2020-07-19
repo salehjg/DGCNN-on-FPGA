@@ -416,8 +416,8 @@ void task_topk(
         const unsigned vecsPerSlice,
         const unsigned vecsPerOutputSlice){
 
-#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1 max_read_burst_length=64 max_write_burst_length=2
-#pragma HLS INTERFACE m_axi port=indicesSplitedTn offset=slave bundle=gmem2 max_read_burst_length=2 max_write_burst_length=64
+#pragma HLS INTERFACE m_axi port=inputTn offset=slave bundle=gmem1 max_read_burst_length=16 max_write_burst_length=2
+#pragma HLS INTERFACE m_axi port=indicesSplitedTn offset=slave bundle=gmem2 max_read_burst_length=2 max_write_burst_length=16
 #pragma HLS INTERFACE s_axilite port=inputTn bundle=control
 #pragma HLS INTERFACE s_axilite port=indicesSplitedTn bundle=control
 #pragma HLS INTERFACE s_axilite port=dim0 bundle=control
