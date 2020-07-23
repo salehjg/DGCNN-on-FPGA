@@ -51,7 +51,7 @@ DO_PRAGMA(HLS ARRAY_PARTITION variable=indicesTemp cyclic factor=CONFIG_M_AXI_WI
             CONFIG_DTYPE t2 = (f2 == i3) ? 0 : inLocalBuff[f2];
 
             if(f2 == i3 || (f1 < i2 && t1 <= t2)) {
-				indicesTemp[i] = inLocalIndices[f1];
+                indicesTemp[i] = inLocalIndices[f1];
 
                 temp[i] = t1;
                 f1++;
