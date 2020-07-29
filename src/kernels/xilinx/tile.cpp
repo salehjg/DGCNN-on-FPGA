@@ -87,7 +87,7 @@ void TileRank2Axis2(
                 LoopFill2Unrolled:
                 for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; i++) {
                     #pragma HLS UNROLL
-                    vec[i] = ((i < tileSize) ? val : 0);
+                    vec[i] = (((id2*CONFIG_M_AXI_WIDTH + i) < tileSize) ? val : 0);
                 }
                 const unsigned indxD = d0*dim1*vecsPerSliceOut + d1*vecsPerSliceOut + id2;
                 outputTn[indxD] = vec;

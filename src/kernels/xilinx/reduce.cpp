@@ -23,7 +23,7 @@ constexpr unsigned MAX_POW_Y_MINUS_ONE = (ConfigTaskReduce::Sum4D::MaxPowY-1);
  *                  2) For the output tensor which should be rank 2 of shape dim0xdim1Padded, the allocated 
  *                     memory should cover the padded elements(dim1 to dim1Padded).
  *             The latency will be reported for an input of shape 5x1024x64.
- *             This kernel supports burst read/write.
+ *             This kernel does not support burst read/write.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
