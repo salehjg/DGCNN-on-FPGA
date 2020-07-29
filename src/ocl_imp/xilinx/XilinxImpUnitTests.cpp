@@ -538,7 +538,7 @@ ReportObject* XilinxImpUnitTests::KernelTranspose(){
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
     }*/
     {
-        TensorF* tensorSrc = GenerateTensor(0,{1,1024,64});
+        TensorF* tensorSrc = GenerateTensor(0,{1,1024,1024});
         TensorF* tensorCpu = platformSelector->Transpose(PLATFORMS::CPU,scheduler,tensorSrc);
         TensorF* tensorGpu = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
@@ -1010,7 +1010,7 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    
+    /*
     PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
@@ -1035,7 +1035,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());                 //OK
     PrintReport(KernelRelu());                    //OK
     PrintReport(KernelSqrt());                    //OK
-    PrintReport(KernelSquare());                  //OK
+    PrintReport(KernelSquare());                  //OK*/
     PrintReport(KernelTranspose());               //OK, No burst R/W!
 
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
