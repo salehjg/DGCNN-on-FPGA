@@ -40,19 +40,26 @@ void BatchTranspose_V4_UnitRead(
                 for(unsigned d1=0; d1<PipeDepth1; d1++){
                     LoopDim2:
                     for(unsigned d2=0; d2<vecsPerDepth2; d2++){
-                        #pragma HLS PIPELINE II=1        
+                        #pragma HLS PIPELINE II=1
 
                         const unsigned indxS = d0*dim1*vecsPerSlice+ 
                                                (id1*PipeDepth1+d1)*vecsPerSlice+ 
                                                (id2*vecsPerDepth2+d2);
-                        MemoryPackF_t vec = inputTn[indxS];
+                        bool isSafe = (id2*vecsPerDepth2+d2)<dim2;
 
-                        LoopWords:
-                        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
-                            #pragma HLS UNROLL
-                            CONFIG_DTYPE val = vec[i];
-                            //cout<<"Pushed Val: "<<val<<endl;
-                            streamWords[d2*CONFIG_M_AXI_WIDTH+i].Push(val);
+                        if(isSafe) {
+                            MemoryPackF_t vec = inputTn[indxS];
+
+                            LoopWords:
+                            for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; i++) {
+                                #pragma HLS UNROLL
+                                bool isNotPad = ((id2 * vecsPerDepth2 + d2) * CONFIG_M_AXI_WIDTH + i) < dim2;
+                                CONFIG_DTYPE val = vec[i];
+                                //cout<<"Pushed Val: "<<val<<endl;
+                                if (isNotPad) {
+                                    streamWords[d2 * CONFIG_M_AXI_WIDTH + i].Push(val);
+                                }
+                            }
                         }
                     }
                 }
@@ -93,16 +100,19 @@ void BatchTranspose_V4_UnitTranspose(
                         const unsigned indxD = d0*dim2*vecsPerSlice+ 
                                                (id1*PipeDepth2+d1)*vecsPerSlice+ 
                                                (id2*vecsPerDepth1+d2);
+                        bool isSafe = (id1*PipeDepth2+d1)<dim2;
                         MemoryPackF_t vec;
 
-                        LoopWords:
-                        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
-                            #pragma HLS UNROLL 
-                            //cout<<"Pushed Val: "<<val<<endl;
-                            vec[i] = streamWords[d1].Pop();
-                        }
+                        if(isSafe) {
+                            LoopWords:
+                            for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; i++) {
+                                #pragma HLS UNROLL
+                                //cout<<"Pushed Val: "<<val<<endl;
+                                vec[i] = streamWords[d1].Pop();
+                            }
 
-                        outputTn[indxD] = vec;
+                            outputTn[indxD] = vec;
+                        }
                     }
                 }
             }
