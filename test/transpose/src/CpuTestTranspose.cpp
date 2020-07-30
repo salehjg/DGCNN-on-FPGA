@@ -133,8 +133,8 @@ int TestTranspose(
 
 int main(int argc, char **argv) {
     int rslt = 0;
-    rslt += TestTranspose<16>("Transpose", {1,1024,6});
-    rslt += TestTranspose<16>("Transpose", {5,1024,64});
-    rslt += TestTranspose<16>("Transpose", {5,1024,3});
+    rslt += TestTranspose<16>("Transpose1", {5,128,128});
+    rslt += TestTranspose<16>("Transpose2", {5,1024,64});
+    rslt += TestTranspose<16>("Transpose3", {5,1024,3});
     return rslt;
 }

@@ -538,7 +538,7 @@ ReportObject* XilinxImpUnitTests::KernelTranspose(){
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
     }*/
     {
-        TensorF* tensorSrc = GenerateTensor(0,{1,1024,1024});
+        TensorF* tensorSrc = GenerateTensor(0,{1,64,64});
         TensorF* tensorCpu = platformSelector->Transpose(PLATFORMS::CPU,scheduler,tensorSrc);
         TensorF* tensorGpu = platformSelector->Transpose(PLATFORMS::GPU_OCL,scheduler,tensorSrc);
         comparisonResult &= platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu,tensorGpu);
