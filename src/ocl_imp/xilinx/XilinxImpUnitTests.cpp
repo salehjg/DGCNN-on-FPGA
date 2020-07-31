@@ -111,7 +111,7 @@ ReportObject* XilinxImpUnitTests::TensorFloat(){
 }
 
 ReportObject* XilinxImpUnitTests::TensorBankFloat(){
-    TensorF* tensorCpu = GenerateTensor(7,{5,5,2});
+    TensorF* tensorCpu = GenerateTensor(7,{5,8,64});
     OclTensorF* tensorSrc_defaultBank = (OclTensorF*) platformSelector->CrossThePlatform(tensorCpu, PLATFORMS::GPU_OCL);
 
     bool rslt_before_changing_bank = platformSelector->CompareTensors(
@@ -1010,9 +1010,9 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    /*
-    PrintReport(TensorFloat());
-    PrintReport(TensorBankFloat());
+    
+    //PrintReport(TensorFloat());
+    PrintReport(TensorBankFloat());/*
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
     PrintReport(TensorCloneBankInteger());
@@ -1035,8 +1035,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());                 //OK
     PrintReport(KernelRelu());                    //OK
     PrintReport(KernelSqrt());                    //OK
-    PrintReport(KernelSquare());                  //OK*/
-    PrintReport(KernelTranspose());               //OK, No burst R/W!
+    PrintReport(KernelSquare());                  //OK
+    PrintReport(KernelTranspose());               //OK, No burst R/W!*/
 
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
 }
