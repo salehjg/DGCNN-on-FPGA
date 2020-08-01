@@ -35,12 +35,16 @@ void BatchTranspose_V4_UnitRead(
         #pragma HLS LOOP_TRIPCOUNT min=5 max=5
         LoopDim2x:
         for(unsigned id2=0; id2<iDim2BoundSafe; id2++){
+            #pragma HLS LOOP_TRIPCOUNT min=2 max=2
             LoopDim1x:
             for(unsigned id1=0; id1<iDim1Bound; id1++){
+                #pragma HLS LOOP_TRIPCOUNT min=32 max=32
                 LoopDim1:
                 for(unsigned d1=0; d1<PipeDepth1; d1++){
+                    #pragma HLS LOOP_TRIPCOUNT min=32 max=32
                     LoopDim2:
                     for(unsigned d2=0; d2<vecsPerDepth2; d2++){
+                        #pragma HLS LOOP_TRIPCOUNT min=2 max=2
                         #pragma HLS PIPELINE II=1
                         const unsigned indxS = d0*dim1*vecsPerSlice+
                                                (id1*PipeDepth1+d1)*vecsPerSlice+
@@ -67,13 +71,16 @@ void BatchTranspose_V4_UnitRead(
         const unsigned id2 = iDim2BoundSafe;
         LoopDim0Rem:
         for(unsigned d0=0; d0<dim0; d0++){
-            #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+            #pragma HLS LOOP_TRIPCOUNT min=0 max=0
             LoopDim1xRem:
             for(unsigned id1=0; id1<iDim1Bound; id1++){
+                #pragma HLS LOOP_TRIPCOUNT min=0 max=0
                 LoopDim1Rem:
                 for(unsigned d1=0; d1<PipeDepth1; d1++){
+                    #pragma HLS LOOP_TRIPCOUNT min=0 max=0
                     LoopDim2Rem:
                     for(unsigned d2=0; d2<vecsPerDepth2Safe; d2++){
+                        #pragma HLS LOOP_TRIPCOUNT min=0 max=0
                         #pragma HLS PIPELINE II=1
                         const unsigned indxS = d0*dim1*vecsPerSlice+
                                                (id1*PipeDepth1+d1)*vecsPerSlice+
@@ -116,12 +123,16 @@ void BatchTranspose_V4_UnitTranspose(
         #pragma HLS LOOP_TRIPCOUNT min=5 max=5
         LoopDim1x:
         for(unsigned id1=0; id1<iDim1BoundSafe; id1++){
+            #pragma HLS LOOP_TRIPCOUNT min=2 max=2
             LoopDim2x:
             for(unsigned id2=0; id2<iDim2Bound; id2++){
+                #pragma HLS LOOP_TRIPCOUNT min=32 max=32
                 LoopDim1:
                 for(unsigned d1=0; d1<PipeDepth2; d1++){
+                    #pragma HLS LOOP_TRIPCOUNT min=32 max=32
                     LoopDim2:
                     for(unsigned d2=0; d2<vecsPerDepth1; d2++){
+                        #pragma HLS LOOP_TRIPCOUNT min=2 max=2
                         #pragma HLS PIPELINE II=1
                         const unsigned indxD = d0*dim2*vecsPerSlice+ 
                                                (id1*PipeDepth2+d1)*vecsPerSlice+ 
@@ -145,13 +156,16 @@ void BatchTranspose_V4_UnitTranspose(
         const unsigned PipeDepth2Safe = dim2 % PipeDepth2;
         LoopDim0Rem:
         for(unsigned d0=0; d0<dim0; d0++){
-            #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+            #pragma HLS LOOP_TRIPCOUNT min=0 max=0
             LoopDim2xRem:
             for(unsigned id2=0; id2<iDim2Bound; id2++){
+                #pragma HLS LOOP_TRIPCOUNT min=0 max=0
                 LoopDim1Rem:
                 for(unsigned d1=0; d1<PipeDepth2Safe; d1++){
+                    #pragma HLS LOOP_TRIPCOUNT min=0 max=0
                     LoopDim2Rem:
                     for(unsigned d2=0; d2<vecsPerDepth1; d2++){
+                        #pragma HLS LOOP_TRIPCOUNT min=0 max=0
                         #pragma HLS PIPELINE II=1
                         const unsigned indxD = d0*dim2*vecsPerSlice+
                                                (id1*PipeDepth2+d1)*vecsPerSlice+
