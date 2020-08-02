@@ -1011,8 +1011,8 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 
 void XilinxImpUnitTests::RunAll(){
     
-    //PrintReport(TensorFloat());
-    PrintReport(TensorBankFloat());/*
+    /*PrintReport(TensorFloat());
+    PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
     PrintReport(TensorCloneBankFloat());
     PrintReport(TensorCloneBankInteger());
@@ -1035,8 +1035,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());                 //OK
     PrintReport(KernelRelu());                    //OK
     PrintReport(KernelSqrt());                    //OK
-    PrintReport(KernelSquare());                  //OK
-    PrintReport(KernelTranspose());               //OK, No burst R/W!*/
+    PrintReport(KernelSquare());                  //OK*/
+    PrintReport(KernelTranspose());               //OK, No burst R/W!
 
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
 }
