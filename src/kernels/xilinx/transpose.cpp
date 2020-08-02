@@ -38,7 +38,8 @@ void BatchTranspose_V6_Burst(
     const unsigned vecsPerDepth2 = DivCeil<unsigned>(PipeDepth2, CONFIG_M_AXI_WIDTH);
 
     CONFIG_DTYPE buff[PipeDepth1][PipeDepth2];
-#pragma HLS ARRAY_PARTITION variable=buff complete dim=0
+#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=8 dim=1
+#pragma HLS ARRAY_PARTITION variable=buff cyclic factor=8 dim=2
 
     const unsigned iDim1Bound = DivCeil<unsigned>(dim1, PipeDepth1);
 
