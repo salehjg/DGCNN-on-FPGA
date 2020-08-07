@@ -10,7 +10,7 @@ banks_tile = [1,2]
 banks_topk = [2]
 banks_gather = [1,2]
 banks_concat = [1,2]
-banks_padunpad = [1]
+banks_padunpad = [1,2]
 banks_conv = [1]
 
 def get_objective(
@@ -82,14 +82,15 @@ def brute_force():
                                                 val = get_objective(transpose,transpose, matmul,matmul,matmul, matops,matops,matops, rss,rss, _reduce,_reduce, tile,tile, topk,topk, gather,gather,gather, concat,concat,concat, padunpad,padunpad, conv,conv,conv,conv)
                                                 values.append(val)
                                                 # m_axi's per kernel are considered here:
-                                                currentparams = [transpose, matmul,matmul, matops,matops, rss, _reduce,_reduce, tile, topk,topk , gather,gather,gather, concat,concat, padunpad, conv,conv,conv,conv]
+                                                currentparams = [transpose, matmul,matmul, matops,matops, rss, _reduce, tile, topk,topk , gather,gather,gather, concat,concat, padunpad, conv,conv,conv,conv]
                                                 currentparams = np.array(currentparams)
                                                 bank0 = np.sum(currentparams==0)
                                                 bank1 = np.sum(currentparams==1)
                                                 bank2 = np.sum(currentparams==2)
                                                 bank3 = np.sum(currentparams==3)
 
-                                                if minval > val and bank0<15 and bank1<15 and bank2<15 and abs(bank1-bank2)<4:
+                                                # 15 = 16 -1, 1 axi is reserved for Datamover
+                                                if minval > val and bank0<=15 and bank1<=15 and bank2<=15 and bank3<=15 and abs(bank1-bank2)<2:
                                                     result_bank0 = bank0
                                                     result_bank1 = bank1
                                                     result_bank2 = bank2
