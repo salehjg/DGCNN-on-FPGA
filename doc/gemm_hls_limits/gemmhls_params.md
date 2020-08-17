@@ -25,20 +25,20 @@
               kComputeTileSizeN = 1
 ```			  
 # Aliases in the paper
-	## OuterTileSize: 
+	## OuterTileSize
         ```
 		x_{tot}, y_{tot} = OuterTileSizeN, OuterTileSizeM
         OuterTileSizeN = x_b * x_t
         OuterTileSizeM = y_b * y_t
 	    ```
-	## Parallelisim Parameters:
+	## Parallelisim Parameters
         ```
         InnerTileSizeN = x_p
         1 = y_p
         kComputeTileSizeM = y_c
         1 = y_c
 		```
-	## Number of PE Dataflow Units:
+	## Number of PE Dataflow Units
         ```
 		N_p = (InnerTileSizeN/kComputeTileSizeN) = InnerTileSizeN / 1 = InnerTileSizeN = x_p
         So, N_p = x_p, and y_p = 1
