@@ -65,9 +65,9 @@ kComputeTileSizeM = y_c
 # Restrictions
 #### Code-side
 ```
-SizeN % OuterTileSizeN = 0
-SizeM % OuterTileSizeM = 0
-SizeM % 16 = 0
+SizeN % OuterTileSizeN = 0    :: {B*1024*20} % OuterTileSizeN = 0
+SizeM % OuterTileSizeM = 0    :: {64, 128, 1024} % OuterTileSizeM = 0
+SizeM % 16 = 0                :: {64, 128, 1024} % 16 = 0
 16 % kComputeTileSizeM = 0
 OuterTileSizeM % 16 = 0
 OuterTileSizeN % InnerTileSizeN = 0
