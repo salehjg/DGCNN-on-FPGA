@@ -1,28 +1,28 @@
 # Gemm HLS
 ```
-    C_{SizeN*SizeM}=A_{SizeN*SizeK}*B{SizeK*SizeM}
-    A_{SizeN*SizeK} = inputTn_{[B.N.K]*D1}
-    B_{SizeK*SizeM} = weightTn_{D1*D2}
+C_{SizeN*SizeM}=A_{SizeN*SizeK}*B{SizeK*SizeM}
+A_{SizeN*SizeK} = inputTn_{[B.N.K]*D1}
+B_{SizeK*SizeM} = weightTn_{D1*D2}
 ```
 *So*
 ```
-	SizeN = B.N.K
-	SizeK = D1
-	SizeM = D2
+SizeN = B.N.K
+SizeK = D1
+SizeM = D2
 ```	
 # Shapes
 ```
-	SizeN = B.N.K = B*1024*20
-	SizeK = D1 = 6, 64, 128, 320, 1024
-	SizeM = D2 = 64, 128, 1024
+SizeN = B.N.K = B*1024*20
+SizeK = D1 = 6, 64, 128, 320, 1024
+SizeM = D2 = 64, 128, 1024
 ```	
 # Parameters
 ```
-	x_M     = OuterTilesN (OuterTile Count!, NOT SIZE)
-	y_M     = OuterTilesM (OuterTile Count!, NOT SIZE)
-	x_{Pr}  = InnerTileSizeN (SIZE, NOT COUNT!)
-	y_{Pr}  = kComputeTileSizeM 
-              kComputeTileSizeN = 1
+x_M     = OuterTilesN (OuterTile Count!, NOT SIZE)
+y_M     = OuterTilesM (OuterTile Count!, NOT SIZE)
+x_{Pr}  = InnerTileSizeN (SIZE, NOT COUNT!)
+y_{Pr}  = kComputeTileSizeM 
+          kComputeTileSizeN = 1
 ```		
 	  
 # Aliases in The Paper
