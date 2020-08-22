@@ -28,7 +28,6 @@ y_{Pr}  = kComputeTileSizeM
 # Aliases in The Paper
 #### OuterTileSize
 ```
-x_{tot}, y_{tot} = OuterTileSizeN, OuterTileSizeM
 OuterTileSizeN = x_b * x_t
 OuterTileSizeM = y_b * y_t
 ```
@@ -44,6 +43,11 @@ kComputeTileSizeM = y_c
 N_p = (InnerTileSizeN/kComputeTileSizeN) = InnerTileSizeN / 1 = InnerTileSizeN = x_p
 So, N_p = x_p, and y_p = 1
 ```
+#### Others
+```
+x_{tot} = x_c * x_p * x_t * x_b
+y_{tot} = y_c * y_p * y_t * y_b
+```
 
 # Hierarchy
 ```
@@ -56,8 +60,8 @@ So, N_p = x_p, and y_p = 1
 
 # Editable Parameters
 ```
-OuterTileSizeN = x_tot = x_b * x_t
-OuterTileSizeM = y_tot = y_b * y_t
+OuterTileSizeN = x_b * x_t
+OuterTileSizeM = y_b * y_t
 InnerTileSizeN = x_p
 kComputeTileSizeM = y_c
 ```
