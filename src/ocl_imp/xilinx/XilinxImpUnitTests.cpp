@@ -1016,10 +1016,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelUnpadLastDimFloat());       //OK
     PrintReport(KernelConv2Mlp());
     PrintReport(KernelTopK());                    //OK
-    PrintReport(KernelMatops());                  //OK
-    PrintReport(KernelReduceSum4D());             //OK
-    PrintReport(KernelReduceMax());               //OK */
-    PrintReport(KernelReduceSum());               //OK, No burst R/W! 
+    PrintReport(KernelMatops());                  //OK*/
+    //PrintReport(KernelReduceSum4D());             //OK
+    PrintReport(KernelReduceMax());               //OK 
+    //PrintReport(KernelReduceSum());               //OK(No burst writes)
     /*
     PrintReport(KernelMean());                    //OK 
     PrintReport(KernelVariance());                //OK

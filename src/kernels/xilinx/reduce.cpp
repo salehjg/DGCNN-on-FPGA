@@ -223,7 +223,7 @@ void ReduceSumRank3Axis2_V2(
  * @param[in]  dim1      The dim 1
  * @param[in]  dim2      The dim 2
  */
-void ReduceSum3Axis2_V1(
+void ReduceSumRank3Axis2_V1(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
     const unsigned dim0,
@@ -441,7 +441,7 @@ CONFIG_DTYPE _Max(CONFIG_DTYPE val1, CONFIG_DTYPE val2){
  * @param[in]  dim1      The dim 1
  * @param[in]  dim2      The dim 2
  */
-void ReduceMax3Axis1_V2(
+void ReduceMaxRank3Axis1_V2(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
     const unsigned dim0,
@@ -580,9 +580,9 @@ void task_reduce(
 
     if(mode==3){
 #ifdef KERNEL_LOGS
-        cout<<"ReduceMax3Axis1_V2 is selected."<<endl;
+        cout<<"ReduceMaxRank3Axis1_V2 is selected."<<endl;
 #endif
-        ReduceMax3Axis1_V2(inputTn, outputTn, dim0, dim1, dim2); // Non-dataflow
+        ReduceMaxRank3Axis1_V2(inputTn, outputTn, dim0, dim1, dim2); // Non-dataflow
     }
     
 }
