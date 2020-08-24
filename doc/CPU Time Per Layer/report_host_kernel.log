@@ -1,0 +1,1137 @@
+[08:42:32.820739][debug][source CpuImplementation.cpp][function Transpose][line 60] Started
+[08:42:32.820788][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Transpose: , Shape1=5x1024x3x, 
+[08:42:32.820945][debug][source CpuImplementation.cpp][function Transpose][line 85] Finished
+[08:42:32.820951][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:32.820965][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x3x, , Shape2=5x3x1024x, 
+[08:42:33.024994][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:33.025033][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:33.025080][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=5x1024x1024x, 
+[08:42:33.025090][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:33.025102][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+[08:42:33.094619][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:33.094634][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:33.094640][debug][source CpuImplementation.cpp][function Square][line 191] Started
+[08:42:33.094654][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Square: , Shape1=5x1024x3x, 
+[08:42:33.094707][debug][source CpuImplementation.cpp][function Square][line 204] Finished
+[08:42:33.094711][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:33.094725][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x1024x3x, , Combination=0-0-1-, 
+[08:42:33.094787][debug][source CpuImplementation.cpp][function ReduceSum][line 331] Finished
+[08:42:33.094791][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:33.094798][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+[08:42:33.113170][debug][source CpuImplementation.cpp][function Tile][line 1445] Finished
+[08:42:33.113184][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:33.113200][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+[08:42:33.134923][debug][source CpuImplementation.cpp][function Tile][line 1467] Finished
+[08:42:33.134940][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:33.134956][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:33.176119][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:33.176144][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:33.176171][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:33.216689][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:33.217385][debug][source CpuImplementation.cpp][function TopK][line 1253] Started
+[08:42:33.217402][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+[08:42:34.252173][debug][source CpuImplementation.cpp][function TopK][line 1294] Finished
+[08:42:34.252197][debug][source CpuImplementation.cpp][function Gather][line 1299] Started
+[08:42:34.252216][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Gather: indices_axis=1, Shape1=5x1024x3x, , Shape2=5x1024x20x, 
+[08:42:34.254517][debug][source CpuImplementation.cpp][function Gather][line 1342] Finished
+[08:42:34.254523][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:34.254532][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=20, Shape1=5x1024x3x, 
+[08:42:34.257539][debug][source CpuImplementation.cpp][function Tile][line 1423] Finished
+[08:42:34.257575][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.257587][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+[08:42:34.260409][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.260422][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:42:34.260434][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+[08:42:34.264613][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:42:34.264633][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:42:34.264646][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x20x6x, , Shape2=1x1x6x64x, 
+[08:42:34.423592][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:42:34.423626][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:34.423643][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:34.423648][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:34.423656][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:34.504270][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:34.504285][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:34.504308][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:42:34.504325][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:34.504330][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:34.504337][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:34.504342][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:34.504350][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:34.584733][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:34.584743][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:34.711501][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:34.711544][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000010, Shape1=64x, 
+[08:42:34.711550][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:34.711553][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:42:34.711561][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.711567][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:34.711578][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.711595][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:34.711601][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:42:34.711619][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.711624][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:42:34.711632][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.711635][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:34.711638][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.711644][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:34.711690][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.711695][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:34.711701][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:42:34.711705][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.711711][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:42:34.711718][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.711721][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:34.711724][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.711730][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:34.711737][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.711741][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.711746][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:34.711753][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.711760][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.711766][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:34.763195][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.763207][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:34.763219][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=64x, 
+[08:42:34.763225][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.763230][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[08:42:34.763240][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.763243][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:34.763246][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:42:34.763251][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=64x, 
+[08:42:34.763267][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:42:34.763271][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.763277][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:34.820842][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.820853][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.820867][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:34.873401][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.873413][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:34.873426][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:34.922835][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:34.923393][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:42:34.923409][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x20x64x, 
+[08:42:34.971357][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:42:34.971623][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:42:34.971641][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x20x64x, , Shape2=1x1x64x128x, 
+[08:42:38.045468][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:42:38.045497][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:38.045513][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:42:38.045518][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:38.045526][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:42:38.203863][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:38.203876][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:38.203880][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:42:38.203897][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:42:38.203902][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:38.203911][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:42:38.203916][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:38.203923][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:42:38.357143][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:38.357154][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:38.605455][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:38.605476][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000010, Shape1=128x, 
+[08:42:38.605482][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:38.605485][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:42:38.605490][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.605496][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:42:38.605508][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.605511][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:38.605517][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=128x, 
+[08:42:38.605521][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.605527][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[08:42:38.605535][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.605538][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:38.605542][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.605547][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:42:38.605555][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.605559][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:38.605564][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=128x, 
+[08:42:38.605568][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.605573][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[08:42:38.605581][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.605584][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:38.605587][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.605592][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:42:38.605628][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.605634][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.605643][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:42:38.605653][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.605658][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.605669][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:42:38.707049][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.707065][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:38.707079][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=128x, 
+[08:42:38.707084][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.707091][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=128x, , Shape2=1x, 
+[08:42:38.707099][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.707103][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:38.707107][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:42:38.707113][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=128x, 
+[08:42:38.707118][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:42:38.707121][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.707127][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:42:38.813665][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.813678][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.813694][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:42:38.909473][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:38.909487][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:38.909504][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:42:39.004949][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:39.005520][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:42:39.005538][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x20x128x, 
+[08:42:39.098928][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:42:39.099287][debug][source CpuImplementation.cpp][function ReduceMax][line 1137] Started
+[08:42:39.099307][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
+[08:42:39.173599][debug][source CpuImplementation.cpp][function ReduceMax][line 1207] Finished
+[08:42:39.173719][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:42:39.173741][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x1x128x, , Shape2=1x1x128x1024x, 
+[08:42:43.120619][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:42:43.120648][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:43.120665][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:42:43.120670][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:43.120678][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:42:43.229575][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:43.229597][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:43.229602][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:42:43.229621][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:42:43.229627][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:43.229636][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:42:43.229642][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:43.229650][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:42:43.336647][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:43.336664][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:43.495307][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:43.495340][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000195, Shape1=1024x, 
+[08:42:43.495350][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:43.495354][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:42:43.495359][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.495366][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:42:43.495385][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.495389][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.495396][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[08:42:43.495401][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.495408][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[08:42:43.495424][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.495428][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.495432][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.495439][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:42:43.495456][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.495460][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.495466][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[08:42:43.495470][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.495476][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[08:42:43.495493][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.495496][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.495500][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.495506][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:42:43.495523][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.495527][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.495533][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:42:43.495550][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.495554][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.495589][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:42:43.535412][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.535437][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.535462][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=1024x, 
+[08:42:43.535468][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.535474][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=1024x, , Shape2=1x, 
+[08:42:43.535490][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.535493][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.535496][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:42:43.535501][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=1024x, 
+[08:42:43.535512][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:42:43.535515][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.535522][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:42:43.580858][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.580877][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.580894][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:42:43.622512][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.622525][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.622540][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:42:43.661302][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.661321][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:42:43.661334][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x1x1024x, 
+[08:42:43.705223][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:42:43.705924][debug][source CpuImplementation.cpp][function ReduceMax][line 1137] Started
+[08:42:43.705943][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
+[08:42:43.743026][debug][source CpuImplementation.cpp][function ReduceMax][line 1241] Finished
+[08:42:43.743047][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:43.743061][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x, , Shape2=1024x512x, 
+[08:42:43.764356][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:43.764364][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764375][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+[08:42:43.764402][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764414][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:43.764423][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x512x, , Combination=1-0-0-0-, 
+[08:42:43.764428][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:43.764435][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x512x, , Combination=0-1-0-, 
+[08:42:43.764451][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:42:43.764455][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:43.764463][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=512x, 
+[08:42:43.764494][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:43.764498][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:42:43.764516][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:42:43.764524][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x512x, , Combination=1-0-0-0-, 
+[08:42:43.764529][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:43.764536][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x512x, , Combination=1-0-0-0-, 
+[08:42:43.764540][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:43.764547][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x512x, , Combination=0-1-0-, 
+[08:42:43.764562][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:42:43.764565][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:43.764571][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=512x, 
+[08:42:43.764577][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:43.764580][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:42:43.764598][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:43.764618][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=512x, 
+[08:42:43.764637][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:43.764641][debug][source CpuImplementation.cpp][function Variance][line 531] Finished
+[08:42:43.764644][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764651][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:42:43.764663][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764666][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.764671][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=512x, 
+[08:42:43.764676][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764681][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[08:42:43.764692][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764695][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.764699][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764704][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:42:43.764716][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764719][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.764724][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=512x, 
+[08:42:43.764728][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764734][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[08:42:43.764744][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764747][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.764751][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764759][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:42:43.764770][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764774][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764789][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:42:43.764800][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764804][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764810][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x512x, , Shape2=512x, 
+[08:42:43.764834][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764838][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.764843][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=512x, 
+[08:42:43.764847][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764853][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=512x, , Shape2=1x, 
+[08:42:43.764864][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764867][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.764870][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:42:43.764875][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=512x, 
+[08:42:43.764883][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:42:43.764887][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764892][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x512x, , Shape2=512x, 
+[08:42:43.764919][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764923][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764929][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x512x, , Shape2=512x, 
+[08:42:43.764954][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.764958][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.764964][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+[08:42:43.765015][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.765022][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:42:43.765027][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x512x, 
+[08:42:43.765053][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:42:43.765063][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:43.765069][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x512x, , Shape2=512x256x, 
+[08:42:43.770121][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:43.770127][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770135][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+[08:42:43.770152][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770166][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:43.770175][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x256x, , Combination=1-0-0-0-, 
+[08:42:43.770179][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:43.770186][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x256x, , Combination=0-1-0-, 
+[08:42:43.770196][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:42:43.770199][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:43.770206][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=256x, 
+[08:42:43.770222][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:43.770226][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:42:43.770229][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:42:43.770237][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x256x, , Combination=1-0-0-0-, 
+[08:42:43.770241][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:43.770248][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x256x, , Combination=1-0-0-0-, 
+[08:42:43.770252][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:43.770258][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x256x, , Combination=0-1-0-, 
+[08:42:43.770269][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:42:43.770272][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:43.770278][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=256x, 
+[08:42:43.770283][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:43.770286][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:42:43.770297][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:43.770318][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=256x, 
+[08:42:43.770323][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:43.770326][debug][source CpuImplementation.cpp][function Variance][line 531] Finished
+[08:42:43.770330][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770336][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:42:43.770346][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770349][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.770354][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=256x, 
+[08:42:43.770358][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770364][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[08:42:43.770373][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770376][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.770379][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770385][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:42:43.770395][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770399][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.770404][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=256x, 
+[08:42:43.770408][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770413][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[08:42:43.770422][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770425][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.770429][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770434][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:42:43.770443][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770447][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770452][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:42:43.770467][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770472][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770478][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x256x, , Shape2=256x, 
+[08:42:43.770494][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770497][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.770502][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=256x, 
+[08:42:43.770506][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770512][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=256x, , Shape2=1x, 
+[08:42:43.770520][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770524][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.770527][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:42:43.770532][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=256x, 
+[08:42:43.770538][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:42:43.770541][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770547][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x256x, , Shape2=256x, 
+[08:42:43.770563][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770567][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770573][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x256x, , Shape2=256x, 
+[08:42:43.770604][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770607][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770613][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+[08:42:43.770628][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770635][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:42:43.770640][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x256x, 
+[08:42:43.770669][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:42:43.770678][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770684][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=9x, , Shape2=9x, 
+[08:42:43.770691][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770696][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:43.770702][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x256x, , Shape2=256x9x, 
+[08:42:43.770765][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:43.770770][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.770776][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x9x, , Shape2=9x, 
+[08:42:43.770783][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.770789][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:43.770796][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x3x, , Shape2=5x3x3x, 
+[08:42:43.771087][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:43.771362][debug][source CpuImplementation.cpp][function Transpose][line 60] Started
+[08:42:43.771370][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Transpose: , Shape1=5x1024x3x, 
+[08:42:43.771473][debug][source CpuImplementation.cpp][function Transpose][line 85] Finished
+[08:42:43.771487][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:43.771510][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x3x, , Shape2=5x3x1024x, 
+[08:42:43.867337][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:43.867351][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:43.867366][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=5x1024x1024x, 
+[08:42:43.867371][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.867378][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+[08:42:43.905881][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.905888][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:43.905893][debug][source CpuImplementation.cpp][function Square][line 191] Started
+[08:42:43.905902][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Square: , Shape1=5x1024x3x, 
+[08:42:43.905957][debug][source CpuImplementation.cpp][function Square][line 204] Finished
+[08:42:43.905961][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:43.905971][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x1024x3x, , Combination=0-0-1-, 
+[08:42:43.906031][debug][source CpuImplementation.cpp][function ReduceSum][line 331] Finished
+[08:42:43.906035][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:43.906043][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+[08:42:43.924100][debug][source CpuImplementation.cpp][function Tile][line 1445] Finished
+[08:42:43.924111][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:43.924124][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+[08:42:43.947215][debug][source CpuImplementation.cpp][function Tile][line 1467] Finished
+[08:42:43.947247][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.947264][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:43.989637][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:43.989654][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:43.989672][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:44.032048][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:44.032071][debug][source CpuImplementation.cpp][function TopK][line 1253] Started
+[08:42:44.032087][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+[08:42:45.075634][debug][source CpuImplementation.cpp][function TopK][line 1294] Finished
+[08:42:45.075653][debug][source CpuImplementation.cpp][function Gather][line 1299] Started
+[08:42:45.075671][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Gather: indices_axis=1, Shape1=5x1024x3x, , Shape2=5x1024x20x, 
+[08:42:45.077709][debug][source CpuImplementation.cpp][function Gather][line 1342] Finished
+[08:42:45.077715][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:45.077723][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=20, Shape1=5x1024x3x, 
+[08:42:45.080407][debug][source CpuImplementation.cpp][function Tile][line 1423] Finished
+[08:42:45.080412][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.080422][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+[08:42:45.082924][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.082930][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:42:45.082939][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x20x3x, , Shape2=5x1024x20x3x, 
+[08:42:45.086805][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:42:45.086836][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:42:45.086865][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x20x6x, , Shape2=1x1x6x64x, 
+[08:42:45.255150][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:42:45.255178][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:45.255195][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:45.255200][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:45.255208][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:45.341594][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:45.341605][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:45.341609][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:42:45.341638][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:45.341643][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:45.341651][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:45.341656][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:45.341663][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:45.423319][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:45.423335][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:45.547897][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:45.547927][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000010, Shape1=64x, 
+[08:42:45.547934][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:45.547937][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:42:45.547941][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.547948][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:45.547957][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.547961][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:45.547966][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:42:45.547970][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.547976][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:42:45.547983][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.547986][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:45.547990][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.547995][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:45.548003][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.548007][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:45.548059][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:42:45.548068][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.548077][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:42:45.548101][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.548106][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:45.548110][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.548119][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:45.548146][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.548152][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.548179][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:45.548190][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.548196][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.548206][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:45.597204][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.597213][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:45.597224][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=64x, 
+[08:42:45.597229][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.597235][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[08:42:45.597244][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.597247][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:45.597250][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:42:45.597255][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=64x, 
+[08:42:45.597260][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:42:45.597264][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.597270][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:45.651433][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.651447][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.651463][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:45.704020][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.704037][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:45.704054][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:45.754005][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:45.754024][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:42:45.754038][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x20x64x, 
+[08:42:45.805245][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:42:45.805253][debug][source CpuImplementation.cpp][function ReduceMax][line 1137] Started
+[08:42:45.805265][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+[08:42:45.846446][debug][source CpuImplementation.cpp][function ReduceMax][line 1207] Finished
+[08:42:45.848539][debug][source CpuImplementation.cpp][function Transpose][line 60] Started
+[08:42:45.848552][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Transpose: , Shape1=5x1024x64x, 
+[08:42:45.854006][debug][source CpuImplementation.cpp][function Transpose][line 85] Finished
+[08:42:45.854014][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:45.854025][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x64x, , Shape2=5x64x1024x, 
+[08:42:48.174416][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:48.174433][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:48.174448][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=5x1024x1024x, 
+[08:42:48.174453][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:48.174460][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+[08:42:48.216467][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:48.216480][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:48.216487][debug][source CpuImplementation.cpp][function Square][line 191] Started
+[08:42:48.216502][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Square: , Shape1=5x1024x64x, 
+[08:42:48.218090][debug][source CpuImplementation.cpp][function Square][line 204] Finished
+[08:42:48.218096][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:48.218106][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x1024x64x, , Combination=0-0-1-, 
+[08:42:48.219108][debug][source CpuImplementation.cpp][function ReduceSum][line 331] Finished
+[08:42:48.219113][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:48.219120][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+[08:42:48.237988][debug][source CpuImplementation.cpp][function Tile][line 1445] Finished
+[08:42:48.237999][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:48.238012][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+[08:42:48.259485][debug][source CpuImplementation.cpp][function Tile][line 1467] Finished
+[08:42:48.259511][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:48.259539][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:48.299073][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:48.299084][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:48.299098][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:48.339045][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:48.339063][debug][source CpuImplementation.cpp][function TopK][line 1253] Started
+[08:42:48.339076][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+[08:42:49.374246][debug][source CpuImplementation.cpp][function TopK][line 1294] Finished
+[08:42:49.374265][debug][source CpuImplementation.cpp][function Gather][line 1299] Started
+[08:42:49.374283][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Gather: indices_axis=1, Shape1=5x1024x64x, , Shape2=5x1024x20x, 
+[08:42:49.411265][debug][source CpuImplementation.cpp][function Gather][line 1342] Finished
+[08:42:49.411275][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:49.411287][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=20, Shape1=5x1024x64x, 
+[08:42:49.416030][debug][source CpuImplementation.cpp][function Tile][line 1423] Finished
+[08:42:49.416038][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:49.416109][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+[08:42:49.466440][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:49.466471][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:42:49.466489][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+[08:42:49.538290][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:42:49.538314][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:42:49.538332][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x20x128x, , Shape2=1x1x128x64x, 
+[08:42:52.659498][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:42:52.659527][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:52.659545][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:52.659550][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:52.659558][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:52.743907][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:52.743922][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:52.743927][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:42:52.743944][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:52.743949][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:42:52.743957][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:52.743962][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:42:52.743969][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:42:52.820610][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:42:52.820626][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:42:52.947035][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:42:52.947066][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000010, Shape1=64x, 
+[08:42:52.947071][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:42:52.947075][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:42:52.947080][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.947086][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:52.947096][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.947099][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:52.947104][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:42:52.947109][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.947115][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:42:52.947122][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.947125][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:52.947129][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.947134][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:52.947142][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.947172][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:52.947179][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:42:52.947184][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.947189][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:42:52.947197][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.947200][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:52.947203][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.947208][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:52.947216][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.947233][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.947239][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:42:52.947246][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.947250][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.947256][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:52.996540][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.996557][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:52.996572][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=64x, 
+[08:42:52.996578][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.996584][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[08:42:52.996592][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:52.996595][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:52.996598][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:42:52.996604][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=64x, 
+[08:42:52.996609][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:42:52.996612][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:52.996619][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:53.051064][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:53.051080][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:53.051096][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:53.100663][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:53.100681][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:53.100697][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:42:53.150248][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:53.150271][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:42:53.150286][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x20x64x, 
+[08:42:53.199478][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:42:53.199496][debug][source CpuImplementation.cpp][function ReduceMax][line 1137] Started
+[08:42:53.199513][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+[08:42:53.238085][debug][source CpuImplementation.cpp][function ReduceMax][line 1207] Finished
+[08:42:53.239294][debug][source CpuImplementation.cpp][function Transpose][line 60] Started
+[08:42:53.239331][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Transpose: , Shape1=5x1024x64x, 
+[08:42:53.244983][debug][source CpuImplementation.cpp][function Transpose][line 85] Finished
+[08:42:53.245007][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:42:53.245019][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x64x, , Shape2=5x64x1024x, 
+[08:42:55.565891][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:42:55.565907][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:42:55.565922][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=5x1024x1024x, 
+[08:42:55.565927][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:55.565934][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+[08:42:55.604594][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:55.604600][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:42:55.604605][debug][source CpuImplementation.cpp][function Square][line 191] Started
+[08:42:55.604614][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Square: , Shape1=5x1024x64x, 
+[08:42:55.605648][debug][source CpuImplementation.cpp][function Square][line 204] Finished
+[08:42:55.605653][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:42:55.605663][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x1024x64x, , Combination=0-0-1-, 
+[08:42:55.606665][debug][source CpuImplementation.cpp][function ReduceSum][line 331] Finished
+[08:42:55.606671][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:55.606679][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+[08:42:55.625129][debug][source CpuImplementation.cpp][function Tile][line 1445] Finished
+[08:42:55.625142][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:55.625156][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+[08:42:55.646230][debug][source CpuImplementation.cpp][function Tile][line 1467] Finished
+[08:42:55.646242][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:55.646256][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:55.686771][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:55.686789][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:55.686806][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:42:55.726870][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:55.726890][debug][source CpuImplementation.cpp][function TopK][line 1253] Started
+[08:42:55.726907][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+[08:42:56.758413][debug][source CpuImplementation.cpp][function TopK][line 1294] Finished
+[08:42:56.758432][debug][source CpuImplementation.cpp][function Gather][line 1299] Started
+[08:42:56.758450][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Gather: indices_axis=1, Shape1=5x1024x64x, , Shape2=5x1024x20x, 
+[08:42:56.794268][debug][source CpuImplementation.cpp][function Gather][line 1342] Finished
+[08:42:56.794278][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:42:56.794290][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=20, Shape1=5x1024x64x, 
+[08:42:56.798242][debug][source CpuImplementation.cpp][function Tile][line 1423] Finished
+[08:42:56.798276][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:42:56.798307][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+[08:42:56.846821][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:42:56.846832][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:42:56.846846][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+[08:42:56.917914][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:42:56.917933][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:42:56.917948][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x20x128x, , Shape2=1x1x128x64x, 
+[08:43:00.149829][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:43:00.149857][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:00.149874][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:43:00.149879][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:43:00.149887][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:43:00.232504][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:43:00.232520][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:43:00.232524][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:43:00.232542][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:43:00.232547][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:00.232555][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:43:00.232560][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:43:00.232568][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x64x, , Combination=1-1-1-0-, 
+[08:43:00.313824][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:43:00.313839][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:43:00.443877][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:00.443909][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000010, Shape1=64x, 
+[08:43:00.443915][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:00.443918][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:43:00.443923][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.443930][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:43:00.443940][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.443943][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:00.443949][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:43:00.443953][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.443959][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:43:00.443966][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.443969][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:00.443973][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.443978][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:43:00.444010][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.444015][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:00.444021][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=64x, 
+[08:43:00.444025][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.444030][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[08:43:00.444038][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.444055][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:00.444058][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.444064][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:43:00.444071][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.444075][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.444080][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[08:43:00.444087][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.444091][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.444097][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:43:00.493213][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.493226][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:00.493241][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=64x, 
+[08:43:00.493247][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.493253][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[08:43:00.493262][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.493265][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:00.493268][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:43:00.493274][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=64x, 
+[08:43:00.493279][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:43:00.493282][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.493289][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:43:00.548081][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.548093][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.548107][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:43:00.598042][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.598066][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:00.598093][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x20x64x, , Shape2=64x, 
+[08:43:00.647351][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:00.647388][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:43:00.647417][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x20x64x, 
+[08:43:00.698459][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:43:00.698477][debug][source CpuImplementation.cpp][function ReduceMax][line 1137] Started
+[08:43:00.698494][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceMax: reductionDim=2, Shape1=5x1024x20x64x, 
+[08:43:00.736454][debug][source CpuImplementation.cpp][function ReduceMax][line 1207] Finished
+[08:43:00.737553][debug][source CpuImplementation.cpp][function Transpose][line 60] Started
+[08:43:00.737582][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Transpose: , Shape1=5x1024x64x, 
+[08:43:00.743122][debug][source CpuImplementation.cpp][function Transpose][line 85] Finished
+[08:43:00.743129][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:43:00.743140][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x64x, , Shape2=5x64x1024x, 
+[08:43:03.071248][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:43:03.071264][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:03.071279][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=5x1024x1024x, 
+[08:43:03.071284][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:03.071292][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x1024x, , Shape2=1x, 
+[08:43:03.110710][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:03.110719][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:03.110725][debug][source CpuImplementation.cpp][function Square][line 191] Started
+[08:43:03.110737][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Square: , Shape1=5x1024x64x, 
+[08:43:03.111730][debug][source CpuImplementation.cpp][function Square][line 204] Finished
+[08:43:03.111735][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:43:03.111745][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x1024x64x, , Combination=0-0-1-, 
+[08:43:03.112689][debug][source CpuImplementation.cpp][function ReduceSum][line 331] Finished
+[08:43:03.112694][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:43:03.112701][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=1024, Shape1=5x1024x, 
+[08:43:03.130244][debug][source CpuImplementation.cpp][function Tile][line 1445] Finished
+[08:43:03.130256][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:43:03.130270][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=1, tileCount=1024, Shape1=5x1024x, 
+[08:43:03.151519][debug][source CpuImplementation.cpp][function Tile][line 1467] Finished
+[08:43:03.151537][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:03.151554][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:43:03.192261][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:03.192292][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:03.192309][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1024x, , Shape2=5x1024x1024x, 
+[08:43:03.232473][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:03.232495][debug][source CpuImplementation.cpp][function TopK][line 1253] Started
+[08:43:03.232511][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## TopK: axis=2, k=20, Shape1=5x1024x1024x, 
+[08:43:04.270279][debug][source CpuImplementation.cpp][function TopK][line 1294] Finished
+[08:43:04.270298][debug][source CpuImplementation.cpp][function Gather][line 1299] Started
+[08:43:04.270314][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Gather: indices_axis=1, Shape1=5x1024x64x, , Shape2=5x1024x20x, 
+[08:43:04.307000][debug][source CpuImplementation.cpp][function Gather][line 1342] Finished
+[08:43:04.307014][debug][source CpuImplementation.cpp][function Tile][line 1399] Started
+[08:43:04.307029][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Tile: tileAxis=2, tileCount=20, Shape1=5x1024x64x, 
+[08:43:04.311315][debug][source CpuImplementation.cpp][function Tile][line 1423] Finished
+[08:43:04.311323][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:04.311334][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+[08:43:04.360219][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:04.360236][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:43:04.360252][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x20x64x, , Shape2=5x1024x20x64x, 
+[08:43:04.431951][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:43:04.431976][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:43:04.431992][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x20x128x, , Shape2=1x1x128x128x, 
+[08:43:10.859712][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:43:10.859740][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:10.859759][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:43:10.859765][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:43:10.859773][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:43:11.019857][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:43:11.019870][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:43:11.019874][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:43:11.019888][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:43:11.019894][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:11.019902][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:43:11.019907][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:43:11.019915][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x20x128x, , Combination=1-1-1-0-, 
+[08:43:11.180549][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:43:11.180561][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:43:11.434761][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:11.434784][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000010, Shape1=128x, 
+[08:43:11.434790][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:11.434794][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:43:11.434799][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.434806][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:43:11.434818][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.434822][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:11.434827][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=128x, 
+[08:43:11.434832][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.434838][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[08:43:11.434847][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.434850][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:11.434854][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.434888][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:43:11.434898][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.434902][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:11.434907][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=128x, 
+[08:43:11.434911][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.434917][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[08:43:11.434925][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.434928][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:11.434932][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.434938][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:43:11.434946][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.434950][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.434955][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[08:43:11.434963][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.434967][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.434974][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:43:11.528530][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.528547][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:11.528563][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=128x, 
+[08:43:11.528569][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.528574][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=128x, , Shape2=1x, 
+[08:43:11.528582][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.528585][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:11.528589][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:43:11.528593][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=128x, 
+[08:43:11.528598][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:43:11.528601][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.528608][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:43:11.635700][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.635713][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.635730][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:43:11.749481][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.749499][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:11.749516][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x20x128x, , Shape2=128x, 
+[08:43:11.848134][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:11.848686][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:43:11.848703][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x20x128x, 
+[08:43:11.953613][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:43:11.953625][debug][source CpuImplementation.cpp][function ReduceMax][line 1137] Started
+[08:43:11.953682][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceMax: reductionDim=2, Shape1=5x1024x20x128x, 
+[08:43:12.031890][debug][source CpuImplementation.cpp][function ReduceMax][line 1207] Finished
+[08:43:12.032260][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:43:12.032276][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x1x64x, , Shape2=5x1024x1x64x, 
+[08:43:12.035892][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:43:12.035898][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:43:12.035908][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x1x128x, , Shape2=5x1024x1x64x, 
+[08:43:12.041002][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:43:12.041008][debug][source CpuImplementation.cpp][function Concat2][line 1031] Started
+[08:43:12.041017][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Concat2: concatDim=3, Shape1=5x1024x1x192x, , Shape2=5x1024x1x128x, 
+[08:43:12.049871][debug][source CpuImplementation.cpp][function Concat2][line 1125] Finished
+[08:43:12.050691][debug][source CpuImplementation.cpp][function Conv2D][line 1347] Started
+[08:43:12.050705][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Conv2D: overrideDim2=-1, Shape1=5x1024x1x320x, , Shape2=1x1x320x1024x, 
+[08:43:21.924879][debug][source CpuImplementation.cpp][function Conv2D][line 1376] Finished
+[08:43:21.924912][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:21.924930][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:43:21.924935][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:43:21.924943][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:43:22.033881][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:43:22.033903][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:43:22.033908][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:43:22.033926][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:43:22.033932][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:22.033942][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:43:22.033947][debug][source CpuImplementation.cpp][function ReduceSum4D][line 346] Started
+[08:43:22.033956][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum4D: , Shape1=5x1024x1x1024x, , Combination=1-1-1-0-, 
+[08:43:22.142512][debug][source CpuImplementation.cpp][function ReduceSum4D][line 390] Finished
+[08:43:22.142532][debug][source CpuImplementation.cpp][function Mean][line 427] Finished
+[08:43:22.301764][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:22.301797][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.000195, Shape1=1024x, 
+[08:43:22.301807][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:22.301811][debug][source CpuImplementation.cpp][function Variance][line 504] Finished
+[08:43:22.301816][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.301824][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:43:22.301843][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.301847][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.301854][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[08:43:22.301888][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.301897][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[08:43:22.301914][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.301918][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.301922][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.301929][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:43:22.301947][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.301950][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.301956][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[08:43:22.301962][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.301968][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[08:43:22.301984][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.301988][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.301992][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.301998][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:43:22.302015][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.302019][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.302025][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[08:43:22.302042][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.302046][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.302053][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:43:22.340942][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.340956][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.340969][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=1024x, 
+[08:43:22.340975][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.340981][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=1024x, , Shape2=1x, 
+[08:43:22.340996][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.340999][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.341002][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:43:22.341008][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=1024x, 
+[08:43:22.341018][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:43:22.341021][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.341028][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:43:22.383636][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.383647][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.383660][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:43:22.423933][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.423949][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.423967][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x1024x1x1024x, , Shape2=1024x, 
+[08:43:22.463837][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.463866][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:43:22.463880][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x1024x1x1024x, 
+[08:43:22.506889][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:43:22.506899][debug][source CpuImplementation.cpp][function ReduceMax][line 1137] Started
+[08:43:22.506911][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceMax: reductionDim=1, Shape1=5x1024x1x1024x, 
+[08:43:22.550268][debug][source CpuImplementation.cpp][function ReduceMax][line 1241] Finished
+[08:43:22.551917][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:43:22.551934][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x1024x, , Shape2=1024x512x, 
+[08:43:22.573147][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:43:22.573161][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573177][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+[08:43:22.573203][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573215][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:22.573224][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x512x, , Combination=1-0-0-0-, 
+[08:43:22.573229][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:43:22.573236][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x512x, , Combination=0-1-0-, 
+[08:43:22.573253][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:43:22.573257][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:22.573265][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=512x, 
+[08:43:22.573271][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:22.573274][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:43:22.573278][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:43:22.573285][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x512x, , Combination=1-0-0-0-, 
+[08:43:22.573289][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:22.573296][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x512x, , Combination=1-0-0-0-, 
+[08:43:22.573300][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:43:22.573307][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x512x, , Combination=0-1-0-, 
+[08:43:22.573321][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:43:22.573325][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:22.573331][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=512x, 
+[08:43:22.573336][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:22.573339][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:43:22.573357][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:22.573363][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=512x, 
+[08:43:22.573369][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:22.573372][debug][source CpuImplementation.cpp][function Variance][line 531] Finished
+[08:43:22.573376][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573382][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:43:22.573417][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573421][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.573427][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=512x, 
+[08:43:22.573432][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573438][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[08:43:22.573449][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573452][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.573456][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573461][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:43:22.573473][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573476][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.573481][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=512x, 
+[08:43:22.573485][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573491][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[08:43:22.573502][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573505][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.573508][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573514][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:43:22.573525][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573529][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573534][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[08:43:22.573545][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573548][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573555][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x512x, , Shape2=512x, 
+[08:43:22.573579][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573583][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.573588][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=512x, 
+[08:43:22.573592][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573598][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=512x, , Shape2=1x, 
+[08:43:22.573608][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573611][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.573615][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:43:22.573620][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=512x, 
+[08:43:22.573628][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:43:22.573632][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573638][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x512x, , Shape2=512x, 
+[08:43:22.573665][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573669][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573675][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x512x, , Shape2=512x, 
+[08:43:22.573700][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573710][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.573717][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x512x, , Shape2=512x, 
+[08:43:22.573742][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.573749][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:43:22.573758][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x512x, 
+[08:43:22.573782][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:43:22.573828][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:43:22.573842][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x512x, , Shape2=512x256x, 
+[08:43:22.579301][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:43:22.579311][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579324][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+[08:43:22.579349][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579366][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:22.579378][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x256x, , Combination=1-0-0-0-, 
+[08:43:22.579384][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:43:22.579393][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x256x, , Combination=0-1-0-, 
+[08:43:22.579408][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:43:22.579413][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:22.579423][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=256x, 
+[08:43:22.579430][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:22.579434][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:43:22.579439][debug][source CpuImplementation.cpp][function Variance][line 463] Started
+[08:43:22.579449][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Variance: , Shape1=5x256x, , Combination=1-0-0-0-, 
+[08:43:22.579455][debug][source CpuImplementation.cpp][function Mean][line 405] Started
+[08:43:22.579464][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## Mean: , Shape1=5x256x, , Combination=1-0-0-0-, 
+[08:43:22.579470][debug][source CpuImplementation.cpp][function ReduceSum][line 213] Started
+[08:43:22.579479][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReduceSum: , Shape1=5x256x, , Combination=0-1-0-, 
+[08:43:22.579494][debug][source CpuImplementation.cpp][function ReduceSum][line 303] Finished
+[08:43:22.579498][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:22.579506][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=256x, 
+[08:43:22.579513][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:22.579517][debug][source CpuImplementation.cpp][function Mean][line 439] Finished
+[08:43:22.579534][debug][source CpuImplementation.cpp][function MatMul][line 177] Started
+[08:43:22.579542][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul_Scalar: , scalarVal: 0.200000, Shape1=256x, 
+[08:43:22.579549][debug][source CpuImplementation.cpp][function MatMul][line 186] Finished
+[08:43:22.579553][debug][source CpuImplementation.cpp][function Variance][line 531] Finished
+[08:43:22.579558][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579566][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:43:22.579580][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579601][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.579610][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=256x, 
+[08:43:22.579616][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579624][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[08:43:22.579637][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579641][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.579646][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579654][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:43:22.579667][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579672][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.579680][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=2, Shape1=256x, 
+[08:43:22.579686][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579693][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[08:43:22.579706][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579710][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.579715][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579722][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:43:22.579735][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579740][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579747][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[08:43:22.579764][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579769][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579777][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=1, Shape1=5x256x, , Shape2=256x, 
+[08:43:22.579801][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579806][debug][source CpuImplementation.cpp][function MatOps][line 858] Started
+[08:43:22.579813][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps-scalar: mode=0, Shape1=256x, 
+[08:43:22.579819][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579827][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=256x, , Shape2=1x, 
+[08:43:22.579839][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579843][debug][source CpuImplementation.cpp][function MatOps][line 868] Finished
+[08:43:22.579848][debug][source CpuImplementation.cpp][function Sqrt][line 873] Started
+[08:43:22.579855][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatSubTiled: , Shape1=256x, 
+[08:43:22.579863][debug][source CpuImplementation.cpp][function Sqrt][line 880] Finished
+[08:43:22.579881][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579903][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=3, Shape1=5x256x, , Shape2=256x, 
+[08:43:22.579929][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579935][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579943][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=2, Shape1=5x256x, , Shape2=256x, 
+[08:43:22.579968][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.579973][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.579992][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x256x, , Shape2=256x, 
+[08:43:22.580016][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
+[08:43:22.580025][debug][source CpuImplementation.cpp][function ReLU][line 1381] Started
+[08:43:22.580033][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## ReLU: , Shape1=5x256x, 
+[08:43:22.580052][debug][source CpuImplementation.cpp][function ReLU][line 1389] Finished
+[08:43:22.580103][debug][source CpuImplementation.cpp][function MatMul][line 105] Started
+[08:43:22.580113][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatMul: , Shape1=5x256x, , Shape2=256x40x, 
+[08:43:22.580471][debug][source CpuImplementation.cpp][function MatMul][line 172] Finished
+[08:43:22.580477][debug][source CpuImplementation.cpp][function MatOps][line 742] Started
+[08:43:22.580485][debug][source CpuImplementation.cpp][function PrintInfo][line 56] ## MatOps: mode=0, Shape1=5x40x, , Shape2=40x, 
+[08:43:22.580494][debug][source CpuImplementation.cpp][function MatOps][line 853] Finished
