@@ -17,6 +17,198 @@ constexpr unsigned MAX_POW_Y_MINUS_ONE = (ConfigTaskReduce::Sum4D::MaxPowY-1);
 
 
 /**
+ * @brief      ReduceSumRank3Axis2_V2, Unit Read.
+ *             Optimized for burst i/o(subvec and supervec).
+ *             Supports any dim2.
+ *
+ * @param[in]  inputTn  The input tn
+ * @param      stream   The stream
+ * @param[in]  dim0     The dim 0
+ * @param[in]  dim1     The dim 1
+ * @param[in]  dim2     The dim 2
+ */
+void ReduceSumRank3Axis2_V2_UnitRead(
+    const MemoryPackF_t *inputTn,
+    Stream<MemoryPackF_t, ConfigTaskReduce::Sum3D::PipeDepth> &stream,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2){
+
+    const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSliceIn = dim2Padded/CONFIG_M_AXI_WIDTH;
+
+    // This is done to force mem accesses to be burst
+    if(vecsPerSliceIn<=1){
+        LoopBatch0x:
+        for(unsigned batchD0=0; batchD0<dim0; batchD0++){
+            #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+            LoopBatch1x:
+            for(unsigned batchD1=0; batchD1<dim1; batchD1++){
+                #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
+                #pragma HLS PIPELINE II=1
+
+                const unsigned indxS =  batchD0*dim1+ batchD1; // always vecsPerSliceIn=1 and  iVec=0
+                stream.Push(inputTn[indxS]);
+            }
+        }
+    }else{
+        LoopBatch0:
+        for(unsigned batchD0=0; batchD0<dim0; batchD0++){
+            #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+            LoopBatch1:
+            for(unsigned batchD1=0; batchD1<dim1; batchD1++){
+                #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
+                LoopSlice0:
+                for(unsigned iVec=0; iVec<vecsPerSliceIn; iVec++){
+                    #pragma HLS LOOP_TRIPCOUNT min=4 max=4
+                    #pragma HLS PIPELINE II=1
+                    const unsigned indxS =  batchD0*dim1*vecsPerSliceIn+
+                                            batchD1*vecsPerSliceIn+
+                                            iVec;
+                    stream.Push(inputTn[indxS]);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief      ReduceSumRank3Axis2_V2, Unit Process.
+ *             Optimized for:
+ *                 -sub-vec:    dim2=3
+ *                 -super-vec:  dim2=64
+ *             Only supports dim2=3 or 64
+ *             
+ * @param      stream    The stream
+ * @param      outputTn  The output tn
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  dim2      The dim 2
+ */
+void ReduceSumRank3Axis2_V2_UnitProcess(
+    Stream<MemoryPackF_t, ConfigTaskReduce::Sum3D::PipeDepth> &stream,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2){
+
+    const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSliceIn = dim2Padded/CONFIG_M_AXI_WIDTH;
+    const unsigned dim1Padded = MakeDivisible<unsigned>(dim1, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSliceOut = dim1Padded/CONFIG_M_AXI_WIDTH;
+    constexpr unsigned buffVecCount = ConfigTaskReduce::Sum3D::MaxSliceLen/CONFIG_M_AXI_WIDTH;
+
+    // This is done to improve speedup ratio of the kernel as it otherwise reduces a constantly sized array. 
+    if(vecsPerSliceIn<=1){
+        //Sub-vector Reduction
+
+        // Optimized for 
+        assert(dim2==3);
+        
+        MemoryPackF_t vecOut;
+
+        LoopBatch0:
+        for(unsigned batchD0=0; batchD0<dim0; batchD0++){
+            #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+            LoopBatch1:
+            for(unsigned batchD1=0; batchD1<dim1; batchD1++){
+                #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
+                #pragma HLS PIPELINE II=1
+
+                const unsigned indxS =  batchD0*dim1+ batchD1;
+                const MemoryPackF_t vec = stream.Pop();
+                
+                CONFIG_DTYPE reduced = vec[0]+vec[1]+vec[2]; // Optimized for dim2==3
+
+                const unsigned vecOutSubIndex = batchD1%CONFIG_M_AXI_WIDTH;
+                const unsigned vecOutIndex = batchD0*vecsPerSliceOut + batchD1/CONFIG_M_AXI_WIDTH;
+                vecOut[vecOutSubIndex] = reduced;
+                if( vecOutSubIndex==(CONFIG_M_AXI_WIDTH-1) || batchD1==(dim1-1) ){ ///TODO: This conditional might hinder burst write. 
+                    outputTn[vecOutIndex] = vecOut;
+                }
+            }
+        }
+
+    }else{
+        //Super-vector Reduction
+
+        // Optimized for 
+        assert(dim2==64);
+        
+        CONFIG_DTYPE buffResult1[ConfigTaskReduce::Sum3D::MaxSliceLen];
+        #pragma HLS ARRAY_PARTITION variable=buffResult1 cyclic factor=16 dim=1
+
+        MemoryPackF_t vecOut;
+
+        LoopBatch0X:
+        for(unsigned batchD0=0; batchD0<dim0; batchD0++){
+            #pragma HLS LOOP_TRIPCOUNT min=5 max=5
+            LoopBatch1X:
+            for(unsigned batchD1=0; batchD1<dim1; batchD1++){
+                #pragma HLS LOOP_TRIPCOUNT min=1024 max=1024
+                #pragma HLS PIPELINE II=4
+
+                LoopSlice0X:
+                for(unsigned iVec=0; iVec<buffVecCount; iVec++){ // buffVecCount is 4, so unrolling wont be that bad of an idea!
+                    #pragma HLS UNROLL
+                    const MemoryPackF_t vec = stream.Pop();
+                    LoopSlice1Unrolled:
+                    for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                        #pragma HLS UNROLL
+                        buffResult1[iVec*CONFIG_M_AXI_WIDTH+i] = vec[i];
+                    }
+                }
+
+                CONFIG_DTYPE reduced =
+                    hlslib::TreeReduce<
+                        CONFIG_DTYPE, hlslib::op::Add<CONFIG_DTYPE>,
+                        ConfigTaskReduce::Sum3D::MaxSliceLen>(
+                            buffResult1
+                    );
+
+                const unsigned vecOutSubIndex = batchD1%CONFIG_M_AXI_WIDTH;
+                const unsigned vecOutIndex = batchD0*vecsPerSliceOut + batchD1/CONFIG_M_AXI_WIDTH;
+                vecOut[vecOutSubIndex] = reduced;
+                if( vecOutSubIndex==(CONFIG_M_AXI_WIDTH-1) || batchD1==(dim1-1) ){ ///TODO: This conditional might hinder burst write.
+                    outputTn[vecOutIndex] = vecOut;
+                }
+            }
+        }
+    }
+}
+
+void ReduceSumRank3Axis2_V2(
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2){
+#pragma HLS DATAFLOW
+
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+
+    // The kernel is optimized for these values:
+    assert(
+        (dim2==64)||
+        (dim2==3)
+        );
+
+    Stream<MemoryPackF_t, ConfigTaskReduce::Sum3D::PipeDepth> streamData;
+#pragma HLS STREAM variable=streamData depth=ConfigTaskReduce::Sum3D::PipeDepth
+
+    HLSLIB_DATAFLOW_INIT();
+
+    HLSLIB_DATAFLOW_FUNCTION(ReduceSumRank3Axis2_V2_UnitRead,
+        inputTn, streamData, dim0, dim1, dim2);
+    HLSLIB_DATAFLOW_FUNCTION(ReduceSumRank3Axis2_V2_UnitProcess,
+        streamData, outputTn, dim0, dim1, dim2);
+
+    HLSLIB_DATAFLOW_FINALIZE();
+}
+
+/**
  * @brief      Reduces the input tensor of rank 3 over the axis 2.(FFT) 
  *             This kernel complies with the padded last dim policy:
  *                  1) For the input tensor, last dimension should be padded to be divisible by m_axi_width
@@ -374,9 +566,9 @@ void task_reduce(
 
     if(mode==1){
 #ifdef KERNEL_LOGS
-        cout<<"ReduceSum3Axis2_V1 is selected."<<endl;
+        cout<<"ReduceSumRank3Axis2_V2 is selected."<<endl;
 #endif
-        ReduceSum3Axis2_V1(inputTn, outputTn, dim0, dim1, dim2); // Non-dataflow
+        ReduceSumRank3Axis2_V2(inputTn, outputTn, dim0, dim1, dim2); // Dataflow
     }
 
     if(mode==2){

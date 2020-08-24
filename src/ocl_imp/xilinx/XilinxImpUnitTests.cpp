@@ -456,31 +456,24 @@ ReportObject* XilinxImpUnitTests::KernelReduceSum4D(){
 }
 
 ReportObject* XilinxImpUnitTests::KernelReduceSum(){
-    bool comparisonResult1,comparisonResult2,comparisonResult3;
+    bool comparisonResult1,comparisonResult2;
 
     {
         //TEST(Rank3_OverAxis2)
-        TensorF* tensorSrc3 = GenerateTensor(0,{2,3,17});
+        TensorF* tensorSrc3 = GenerateTensor(0,{1,1024,3});
         TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
         TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
         comparisonResult1 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
     }
     {
         //TEST(Rank3_OverAxis2)
-        TensorF* tensorSrc3 = GenerateTensor(0,{2,16,60});
+        TensorF* tensorSrc3 = GenerateTensor(0,{1,1024,64});
         TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
         TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
         comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
     }
-    {
-        //TEST(Rank3_OverAxis2)
-        TensorF* tensorSrc3 = GenerateTensor(0,{2,17,16});
-        TensorF* tensorCpu3 = platformSelector->ReduceSum(PLATFORMS::CPU,scheduler,tensorSrc3,false,false,true);
-        TensorF* tensorGpu3 = platformSelector->ReduceSum(PLATFORMS::GPU_OCL,scheduler,tensorSrc3,false,false,true);
-        comparisonResult3 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu3,tensorGpu3);
-    }
 
-    bool comparisonResult = comparisonResult1 && comparisonResult2 && comparisonResult3;
+    bool comparisonResult = comparisonResult1 && comparisonResult2;
     ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult);
     return obj;
 }
@@ -1025,9 +1018,10 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelTopK());                    //OK
     PrintReport(KernelMatops());                  //OK
     PrintReport(KernelReduceSum4D());             //OK
-    PrintReport(KernelReduceMax());               //OK
-    PrintReport(KernelReduceSum());               //OK, No burst R/W!
-    PrintReport(KernelMean());                    //OK
+    PrintReport(KernelReduceMax());               //OK */
+    PrintReport(KernelReduceSum());               //OK, No burst R/W! 
+    /*
+    PrintReport(KernelMean());                    //OK 
     PrintReport(KernelVariance());                //OK
     PrintReport(KernelMatmul());                  //OK
     PrintReport(KernelTile());                    //OK
@@ -1035,8 +1029,8 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelConcat2());                 //OK
     PrintReport(KernelRelu());                    //OK
     PrintReport(KernelSqrt());                    //OK
-    PrintReport(KernelSquare());                  //OK*/
-    PrintReport(KernelTranspose());               //OK, No burst R/W!
+    PrintReport(KernelSquare());                  //OK
+    PrintReport(KernelTranspose());               //OK */
 
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
 }
