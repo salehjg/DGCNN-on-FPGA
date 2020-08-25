@@ -1147,8 +1147,8 @@ TensorF* CpuImplementation::ReduceMax(
         if(reductionDim==3){
             float* rslt= new float[dim0*dim1*dim2];
             unsigned indxS,indxD;
-            float max_cte= -numeric_limits<float>::infinity();
-            float max= -numeric_limits<float>::infinity();
+            float max_cte= -numeric_limits<float>::max();
+            float max= -numeric_limits<float>::max();
 
             for(int d0=0;d0<dim0;d0++){
                 for(int d1=0;d1<dim1;d1++){
@@ -1178,7 +1178,7 @@ TensorF* CpuImplementation::ReduceMax(
         if(reductionDim==2){
             float* rslt= new float[dim0*dim1*dim3];
             unsigned indxS,indxD;
-            float max_cte= -numeric_limits<float>::infinity();
+            float max_cte= -numeric_limits<float>::max();
             float max= 0;
 
             for(int d0=0;d0<dim0;d0++){
@@ -1211,7 +1211,7 @@ TensorF* CpuImplementation::ReduceMax(
         if(reductionDim==1){
             float* rslt= new float[dim0*dim2*dim3];
             unsigned indxS,indxD;
-            float max_cte= -numeric_limits<float>::infinity();
+            float max_cte= -numeric_limits<float>::max();
             float max= 0;
 
             for(int d0=0;d0<dim0;d0++){

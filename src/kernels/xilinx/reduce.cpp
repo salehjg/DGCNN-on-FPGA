@@ -448,7 +448,11 @@ void ReduceMaxRank3Axis1_V2(
     const unsigned dim1,
     const unsigned dim2){
 
-    #pragma HLS INLINE
+    // DO NOT inline this sub-func as it causes the kernel to produce a wrong output.
+    // By looks of it sdx2019.1 has issues with sub-functions and inline pragma cuz it also
+    // can cause a burst or non burst external memory access for the sub function.
+    
+    //#pragma HLS INLINE
 
 #ifdef KERNEL_LOGS
     cout<<"Simulation mode is enabled."<<endl;
@@ -472,7 +476,9 @@ void ReduceMaxRank3Axis1_V2(
             LoopClear1:
             for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
                 #pragma HLS UNROLL
-                buffResult1[iVec][i] = numeric_limits<CONFIG_DTYPE>::min();
+                // numeric_limits<CONFIG_DTYPE>::min() is the smallest floating point number possible that is greater than zero
+                // but here we need the smallest negative number possible which is -1*FLT_MAX
+                buffResult1[iVec][i] = -numeric_limits<CONFIG_DTYPE>::max();
             }
         }
 

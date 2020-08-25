@@ -37,7 +37,7 @@ void GoldReduceMax(
     assert(!overaxis0 && overaxis1 && !overaxis2);
     for(unsigned d0=0; d0<dim0; d0++){
         for(unsigned d2=0; d2<dim2; d2++){
-            CONFIG_DTYPE maxVal = numeric_limits<CONFIG_DTYPE>::min();
+            CONFIG_DTYPE maxVal = -numeric_limits<CONFIG_DTYPE>::max();
             for(unsigned d1=0; d1<dim1; d1++){
                 indxS = d0*dim1*dim2 + d1*dim2 + d2;
                 const CONFIG_DTYPE val = inputTn[indxS];
@@ -135,8 +135,8 @@ int TestReduceMax(
 }
 
 int main(int argc, char **argv) {
-    int rslt0 = TestReduceMax<16>("ReduceMax3D_FTF", {2,2,17}, false, true, false);
-    rslt0 += TestReduceMax<16>("ReduceMax3D_FTF", {2,2,64}, false, true, false);
+    int rslt0 = TestReduceMax<16>("ReduceMax3D_FTF", {5,1024,17}, false, true, false);
+    rslt0 += TestReduceMax<16>("ReduceMax3D_FTF", {2,1024,64}, false, true, false);
     rslt0 += TestReduceMax<16>("ReduceMax3D_FTF", {2,2,50}, false, true, false);
     return rslt0;
 }
