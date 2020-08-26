@@ -429,19 +429,19 @@ void task_datamover(
         const unsigned destBank,
         const unsigned vecCount){
 #ifdef USEMEMORYBANK0
-    #pragma HLS INTERFACE m_axi port=dataBank0 offset=slave bundle=gmem1 max_read_burst_length=64 max_write_burst_length=64
+    #pragma HLS INTERFACE m_axi port=dataBank0 offset=slave bundle=gmem1 max_read_burst_length=32 max_write_burst_length=32
     #pragma HLS INTERFACE s_axilite port=dataBank0 bundle=control
 #endif
 #ifdef USEMEMORYBANK1
-    #pragma HLS INTERFACE m_axi port=dataBank1 offset=slave bundle=gmem2 max_read_burst_length=64 max_write_burst_length=64
+    #pragma HLS INTERFACE m_axi port=dataBank1 offset=slave bundle=gmem2 max_read_burst_length=32 max_write_burst_length=32
     #pragma HLS INTERFACE s_axilite port=dataBank1 bundle=control
 #endif
 #ifdef USEMEMORYBANK2
-    #pragma HLS INTERFACE m_axi port=dataBank2 offset=slave bundle=gmem3 max_read_burst_length=64 max_write_burst_length=64
+    #pragma HLS INTERFACE m_axi port=dataBank2 offset=slave bundle=gmem3 max_read_burst_length=32 max_write_burst_length=32
     #pragma HLS INTERFACE s_axilite port=dataBank2 bundle=control
 #endif
 #ifdef USEMEMORYBANK3
-    #pragma HLS INTERFACE m_axi port=dataBank3 offset=slave bundle=gmem4 max_read_burst_length=64 max_write_burst_length=64
+    #pragma HLS INTERFACE m_axi port=dataBank3 offset=slave bundle=gmem4 max_read_burst_length=32 max_write_burst_length=32
     #pragma HLS INTERFACE s_axilite port=dataBank3 bundle=control
 #endif
 #pragma HLS INTERFACE s_axilite port=srcBank bundle=control
