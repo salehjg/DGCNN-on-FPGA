@@ -5,10 +5,12 @@ import numpy as np
 import pandas as pd
 import sys
 import datetime
+import performance as perfhelper
 
 
 class ReportGenerator:
-    def __init__(self, layers: List[analyzer.Layer]):
+    def __init__(self, layers: List[analyzer.Layer], path_to_config_h, design_freq_mhz):
+        self.perf = perfhelper.PerformanceHelper(path_to_config_h, design_freq_mhz)
         self.layers = layers
 
     def get_sublayer_depth(self, layer: analyzer.Layer, depth, index):
@@ -68,6 +70,7 @@ class ReportGenerator:
             perlayer_dataframe['Shape2'] = []
             perlayer_dataframe['AccumulatedHostOnly(us)'] = []
             perlayer_dataframe['AccumulatedDeviceOnly(us)'] = []
+            perlayer_dataframe['Msg'] = []
             perlayer_dataframe['Total(us)'] = []
 
             for layer in sorted_by_layername[name]:
@@ -78,6 +81,7 @@ class ReportGenerator:
                 total_usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
                 perlayer_dataframe['AccumulatedHostOnly(us)'].append(total_usec - total_device_usec)
                 perlayer_dataframe['AccumulatedDeviceOnly(us)'].append(total_device_usec)
+                perlayer_dataframe['Msg'].append(layer.msg)
                 perlayer_dataframe['Total(us)'].append(total_usec)
 
             df = pd.DataFrame(perlayer_dataframe)
@@ -165,12 +169,77 @@ class ReportGenerator:
             perlayer_dataframe = {}
             perlayer_dataframe['Shape1'] = []
             perlayer_dataframe['Shape2'] = []
+            perlayer_dataframe['Msg'] = []
             perlayer_dataframe['DeviceOnly(us)'] = []
+            perlayer_dataframe['Throughput Read(MB/s)'] = []
+            perlayer_dataframe['Throughput Write(MB/s)'] = []
+            perlayer_dataframe['n_OPS'] = []
+            perlayer_dataframe['Expected(GFLOP/s)'] = []
+            perlayer_dataframe['Actual(GFLOP/s)'] = []
+            perlayer_dataframe['Performance_Message'] = []
 
             for layer in sorted_by_layername[name]:
                 perlayer_dataframe['Shape1'].append(str(layer.shape1))
                 perlayer_dataframe['Shape2'].append(str(layer.shape2))
+                perlayer_dataframe['Msg'].append(str(layer.msg))
                 perlayer_dataframe['DeviceOnly(us)'].append(layer.device_elapsed_us)
+
+                perf_report = 0
+
+                if layer.layer_name == 'Transpose':
+                    perf_report = self.perf.calc_performance_transpose(layer.shape1, layer.device_elapsed_us)
+
+                if layer.layer_name == 'LaunchDataMover':
+                    perf_report = self.perf.calc_performance_datamover(layer.shape1, layer.device_elapsed_us)
+
+                if layer.layer_name == 'MatMul':
+                    perf_report = self.perf.calc_performance_matmul(layer.shape1, layer.shape2, layer.device_elapsed_us)
+
+                if layer.layer_name == 'MatOps':
+                    perf_report = self.perf.calc_performance_matops(layer.shape1, layer.device_elapsed_us)
+
+                if layer.layer_name == '_ReluSqrtSquare':
+                    perf_report = self.perf.calc_performance_relusqrtsquare(layer.shape1, layer.device_elapsed_us)
+
+                if layer.layer_name == '_Reduce_Task':
+                    perf_report = self.perf.calc_performance_reduce(layer.shape1, layer.msg, layer.device_elapsed_us)
+
+                if layer.layer_name == 'Tile':
+                    perf_report = self.perf.calc_performance_tile(layer.shape1, layer.msg, layer.device_elapsed_us)
+
+                if layer.layer_name == 'TopK':
+                    perf_report = self.perf.calc_performance_topk(layer.shape1, layer.device_elapsed_us)
+
+                if layer.layer_name == 'Gather':
+                    perf_report = self.perf.calc_performance_gather(layer.shape1, layer.shape2, layer.device_elapsed_us)
+
+                if layer.layer_name == 'Concat2':
+                    perf_report = self.perf.calc_performance_concat(layer.shape1, layer.shape2, layer.device_elapsed_us)
+
+                if layer.layer_name == 'Conv2D':
+                    perf_report = self.perf.calc_performance_conv(layer.shape1, layer.shape2, layer.device_elapsed_us)
+
+                if layer.layer_name == '_PadUnpadLastDim':
+                    perf_report = self.perf.calc_performance_padunpad(layer.shape1, layer.msg, layer.device_elapsed_us)
+
+                perlayer_dataframe['Throughput Read(MB/s)'] .append(
+                    str(perf_report['throughput_read_bytes_per_second']/1024/1024)
+                )
+                perlayer_dataframe['Throughput Write(MB/s)'] .append(
+                    str(perf_report['throughput_write_bytes_per_second']/1024/1024)
+                )
+                perlayer_dataframe['n_OPS'] .append(
+                    str(perf_report['n_ops'])
+                )
+                perlayer_dataframe['Expected(GFLOP/s)'] .append(
+                    str(perf_report['flop_per_second_expected']/1e+09)
+                )
+                perlayer_dataframe['Actual(GFLOP/s)'] .append(
+                    str(perf_report['flop_per_second_actual']/1e+09)
+                )
+                perlayer_dataframe['Performance_Message'] .append(
+                    str(perf_report['message'])
+                )
 
             df = pd.DataFrame(perlayer_dataframe)
             df.to_excel(writer, sheet_name=name)
@@ -240,11 +309,13 @@ class ReportGenerator:
             perlayer_dataframe = {}
             perlayer_dataframe['Shape1'] = []
             perlayer_dataframe['Shape2'] = []
+            perlayer_dataframe['Msg'] = []
             perlayer_dataframe['Total(us)'] = []
 
             for layer in sorted_by_layername[name]:
                 perlayer_dataframe['Shape1'].append(str(layer.shape1))
                 perlayer_dataframe['Shape2'].append(str(layer.shape2))
+                perlayer_dataframe['Msg'].append(str(layer.msg))
                 total_usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
                 perlayer_dataframe['Total(us)'].append(total_usec)
 
@@ -319,6 +390,7 @@ class ReportGenerator:
             perlayer_dataframe = {}
             perlayer_dataframe['Shape1'] = []
             perlayer_dataframe['Shape2'] = []
+            perlayer_dataframe['Msg'] = []
             perlayer_dataframe['AccumulatedHostOnly(us)'] = []
             perlayer_dataframe['AccumulatedDeviceOnly(us)'] = []
             perlayer_dataframe['Total(us)'] = []
@@ -326,6 +398,7 @@ class ReportGenerator:
             for layer in sorted_by_layername[name]:
                 perlayer_dataframe['Shape1'].append(str(layer.shape1))
                 perlayer_dataframe['Shape2'].append(str(layer.shape2))
+                perlayer_dataframe['Msg'].append(str(layer.msg))
 
                 total_device_usec = accumulate_device_times(layer)
                 total_usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
@@ -421,11 +494,13 @@ class ReportGenerator:
             perlayer_dataframe = {}
             perlayer_dataframe['Shape1'] = []
             perlayer_dataframe['Shape2'] = []
+            perlayer_dataframe['Msg'] = []
             perlayer_dataframe['DeviceOnly(us)'] = []
 
             for layer in sorted_by_layername[name]:
                 perlayer_dataframe['Shape1'].append(str(layer.shape1))
                 perlayer_dataframe['Shape2'].append(str(layer.shape2))
+                perlayer_dataframe['Msg'].append(str(layer.msg))
                 perlayer_dataframe['DeviceOnly(us)'].append(layer.device_elapsed_us)
 
             df = pd.DataFrame(perlayer_dataframe)
@@ -454,12 +529,16 @@ class ReportGenerator:
 
 
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 4:
         print("DeepPointV1-FPGA Log Analyzer")
-        print("Error, python3 analyze.py  <path to report_host_kernel.log   OR   report_kernel.log>")
+        print("Error, python3 analyze.py <arg1> <arg2> <arg3>")
+        print("\t<arg1>: Path to report_host_kernel.log   OR   report_kernel.log")
+        print("\t<arg2>: Path to config.h.log")
+        print("\t<arg3>: Design frequency in MHz")
         sys.exit(1)
+
     layers = analyzer.analyze(sys.argv[1])
-    obj = ReportGenerator(layers)
+    obj = ReportGenerator(layers, sys.argv[2], int(sys.argv[3]))
     obj.generate_cpuimplementation_layerbased()
     obj.generate_xilinximplementaion_layerbased_host_device()
     obj.generate_xilinximplementaion_kernelbased_deviceonly()

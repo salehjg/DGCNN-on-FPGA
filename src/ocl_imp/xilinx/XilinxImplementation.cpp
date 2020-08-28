@@ -590,7 +590,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
         unsigned lastDimPadded,
         unsigned lastDimUnpadded){
     SPDLOG_LOGGER_DEBUG(reporter,"Started");
-    PrintInfo("_PadUnpadLastDim","lastDimUnpadded",lastDimUnpadded,"",0,"",0,inputTn->getShape(),{},{});
+    PrintInfo("_PadUnpadLastDim","lastDimUnpadded",lastDimUnpadded,"lastDimPadded",lastDimPadded,"",0,inputTn->getShape(),{},{});
     datamoverLaunches.push_back("abs("+ ((OclTensorF*)inputTn)->GetTensorTag() +"-padunpad_in)");
 
     TensorF* _inputTn = ((OclTensorF*)inputTn)->CloneIfNeededToDDRBank(program,context,queue,ConfigTaskPadUnpad::BankIndex_inputTn);

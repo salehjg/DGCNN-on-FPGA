@@ -179,6 +179,7 @@ class Layer:
         self.device_elapsed_s = 0
         self.shape1 = 0
         self.shape2 = 0
+        self.msg = ''
 
     def add_stop_time(self, stop_time):
         self.stop_time = stop_time
@@ -193,6 +194,9 @@ class Layer:
 
     def add_shape2(self, shape):
         self.shape2 = shape
+
+    def add_msg(self, msg):
+        self.msg = msg
 
     def add_fpga_elapsed(self, us, ms, s):
         self.device_elapsed_us = us
@@ -220,7 +224,7 @@ class AnalyzeHostAndKernelLog:
                 obj = LogLineDecoder(line)
 
                 # debug
-                if obj.layer_name == 'Variance':
+                if obj.layer_name == '_PadUnpadLastDim':
                     aaa = 100
 
                 if obj.message == 'Started':
@@ -258,9 +262,11 @@ class AnalyzeHostAndKernelLog:
                             if depth is 0:
                                 self.layers[-1].add_shape1(obj.shape1)
                                 self.layers[-1].add_shape2(obj.shape2)
+                                self.layers[-1].add_msg(obj.message)
                             if depth >= 1:
                                 self.get_sublayer_depth(self.layers[-1], depth).add_shape1(obj.shape1)
                                 self.get_sublayer_depth(self.layers[-1], depth).add_shape2(obj.shape2)
+                                self.get_sublayer_depth(self.layers[-1], depth).add_msg(obj.message)
 
                         if obj.is_reportduration:
                             if depth is 0:

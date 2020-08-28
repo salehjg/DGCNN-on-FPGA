@@ -31,6 +31,49 @@ static void ReportDuration(const std::string &name, const bool &isNDRange, const
             ns/1000000000.0f);
 }
 
+inline void PrintInfo(
+        string opName,
+        const string &setting1, int val1,
+        const string &setting2, int val2,
+        const string &setting3, float val3,
+        vector<unsigned int> shape1,
+        vector<unsigned int> shape2,
+        vector<bool> comb){
+
+    string finalStr ;
+    if(!setting1.empty() && !setting2.empty()){
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1)+ ", " + setting2+ "=" + to_string(val2);
+    }else if(!setting1.empty() && setting2.empty()){
+        finalStr = "## " + opName + ": " + setting1+ "=" + to_string(val1);
+    }else if(setting1.empty() && !setting2.empty()){
+        finalStr = "## " + opName + ": " + setting2+ "=" + to_string(val2);
+    }else if(setting1.empty() && setting2.empty()){
+        finalStr = "## " + opName + ": " ;
+    }
+
+    if(!setting3.empty()){
+        finalStr += ", " + setting3 + ": " + to_string(val3);
+    }
+
+    if(!shape1.empty()){
+        finalStr += ", Shape1=";
+        for(unsigned int i : shape1){ finalStr += to_string(i) + "x"; }
+        finalStr += ", ";
+    }
+    if(!shape2.empty()){
+        finalStr += ", Shape2=";
+        for(unsigned int i : shape2){ finalStr += to_string(i) + "x"; }
+        finalStr += ", ";
+    }
+    if(!comb.empty()){
+        finalStr += ", Combination=";
+        for(bool i : comb){ finalStr += to_string(i) + "-"; }
+        finalStr += ", ";
+    }
+    //finalStr+="\n";
+    SPDLOG_LOGGER_INFO(reporter, "{}", finalStr);
+}
+
 int LaunchDataMover( 
     cl::Program *program,
     cl::CommandQueue *queue,
@@ -136,6 +179,7 @@ int LaunchDataMover(
     exeEvt.wait();
     //queue->finish();
 
+    PrintInfo("LaunchDataMover","",0,"",0,"",0,{len},{});
     ReportDuration(__func__, false, exeEvt);
     SPDLOG_LOGGER_DEBUG(logger,"Internal data-mover kernel executed successfully");
 
