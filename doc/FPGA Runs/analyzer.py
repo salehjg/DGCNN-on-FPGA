@@ -223,19 +223,19 @@ class ReportGenerator:
                     perf_report = self.perf.calc_performance_padunpad(layer.shape1, layer.msg, layer.device_elapsed_us)
 
                 perlayer_dataframe['Throughput Read(MB/s)'] .append(
-                    str(perf_report['throughput_read_bytes_per_second']/1024/1024)
+                    round(perf_report['throughput_read_bytes_per_second']/1024/1024, 2)
                 )
                 perlayer_dataframe['Throughput Write(MB/s)'] .append(
-                    str(perf_report['throughput_write_bytes_per_second']/1024/1024)
+                    round(perf_report['throughput_write_bytes_per_second']/1024/1024, 2)
                 )
                 perlayer_dataframe['n_OPS'] .append(
                     str(perf_report['n_ops'])
                 )
                 perlayer_dataframe['Expected(GFLOP/s)'] .append(
-                    str(perf_report['flop_per_second_expected']/1e+09)
+                    round(perf_report['flop_per_second_expected']/1e+09, 2)
                 )
                 perlayer_dataframe['Actual(GFLOP/s)'] .append(
-                    str(perf_report['flop_per_second_actual']/1e+09)
+                    round(perf_report['flop_per_second_actual']/1e+09, 2)
                 )
                 perlayer_dataframe['Performance_Message'] .append(
                     str(perf_report['message'])

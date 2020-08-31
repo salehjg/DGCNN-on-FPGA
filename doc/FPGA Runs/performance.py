@@ -105,6 +105,11 @@ class PerformanceHelper:
         assert len(_shape_weight) == 4
         assert _shape_weight[0] == 1
         assert _shape_weight[1] == 1
+
+        if _shape_weight[3] < self.configs['ConfigTaskConv2']['kOuterTileSizeM']:
+            print("Shared_MLP(gemmHLS): Auto padding weight tensor in axis-3 from ", _shape_weight[3], " to kOuterTileSizeM = ", self.configs['ConfigTaskConv2']['kOuterTileSizeM'],"...")
+            _shape_weight[3] = self.configs['ConfigTaskConv2']['kOuterTileSizeM']
+
         shape_weight = _shape_weight[2:]
         assert shape_input[3] == shape_weight[0]
         size_n = shape_input[0] * shape_input[1] * shape_input[2]
