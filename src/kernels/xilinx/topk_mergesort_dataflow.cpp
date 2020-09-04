@@ -15,8 +15,8 @@ using hlslib::Stream;
 struct PairDataIndex_t{
 public:
     PairDataIndex_t(){
-    	// This constructor should NOT initialize data and index
-    	// as it causes the vivado hls dataflow form checks to fail.
+        // This constructor should NOT initialize data and index
+        // as it causes the vivado hls dataflow form checks to fail.
     }
 
     PairDataIndex_t(CONFIG_DTYPE data, unsigned index){
@@ -95,6 +95,7 @@ void TopK_MergeSortDF_V1_UnitWrite(
     }
 }
 
+/*
 template<
      unsigned windowWidth, // 2,4,8,...,512
      unsigned depthInputs,
@@ -243,6 +244,164 @@ void TopK_MergeSortDF_V1_UnitMergeLast(
         }
     }
 }
+*/
+
+
+
+
+ template<
+         unsigned windowWidth, // 2,4,8,...,512
+         unsigned depthInputs,
+         unsigned depthOutputs
+ >
+ void TopK_MergeSortDF_V1_UnitMergeX(
+         Stream<PairDataIndex_t, depthInputs> &streamDataInL,
+         Stream<PairDataIndex_t, depthInputs> &streamDataInR,
+         Stream<PairDataIndex_t, depthOutputs> &streamDataOutL,
+         Stream<PairDataIndex_t, depthOutputs> &streamDataOutR,
+         const unsigned dim0,
+         const unsigned dim1){
+
+     assert(dim1 % windowWidth == 0);
+     assert(dim1 <= MaxSliceLen);
+
+     constexpr unsigned win2 = (2 * windowWidth);
+     const unsigned pairsToBeMerged = MaxSliceLen / win2;
+
+     LoopBatch:
+     for(unsigned batch=0; batch<dim0; batch++) {
+#pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+         LoopPairs:
+         for (unsigned pair = 0; pair < pairsToBeMerged; pair++) {
+             PairDataIndex_t lastFetch1, lastFetch2;
+
+             // ---------------------------------------------
+             // 1. Merge the pairs
+             int f1 = 0, lastF1 = -1;
+             int f2 = windowWidth, lastF2 = -1;
+             unsigned i2 = windowWidth;
+             unsigned i3 = win2;
+             if (i2 >= win2) i2 = win2;
+             if (i3 >= win2) i3 = win2;
+
+             LoopMerge1:
+             for (unsigned i = 0; i < win2; i++) {
+#pragma HLS PIPELINE II=1
+
+                 PairDataIndex_t t1, t2;
+
+                 if(lastF1 != f1 && f1<i2){
+                     lastFetch1 = streamDataInL.Pop();
+                     t1 = lastFetch1;
+                     lastF1 = f1;
+                 }else{
+                     t1 = lastFetch1;
+                 }
+
+                 if(lastF2 != f2 && f2<i3){
+                     lastFetch2 = streamDataInR.Pop();
+                     t2 = lastFetch2;
+                     lastF2 = f2;
+                 }else{
+                     t2 = lastFetch2;
+                 }
+
+                 if (f2 == i3 || (f1 < i2 && t1.data <= t2.data)) {
+                     if (pair % 2 == 0) {
+                         streamDataOutL.Push(t1);
+                     } else {
+                         streamDataOutR.Push(t1);
+                     }
+                     f1++;
+                 } else {
+                     assert(f2 < i3);
+                     if (pair % 2 == 0) {
+                         streamDataOutL.Push(t2);
+                     } else {
+                         streamDataOutR.Push(t2);
+                     }
+                     f2++;
+                 }
+             }
+         }
+     }
+ }
+
+ template<
+         unsigned windowWidth, // 512 only
+         unsigned depthInputs,
+         unsigned depthOutput
+ >
+ void TopK_MergeSortDF_V1_UnitMergeLast(
+         Stream<PairDataIndex_t, depthInputs> &streamDataInL,
+         Stream<PairDataIndex_t, depthInputs> &streamDataInR,
+         Stream<PairDataIndex_t, depthOutput> &streamDataOutL,
+         const unsigned dim0,
+         const unsigned dim1,
+         const unsigned vecsPerOutputSlice){
+
+     assert(dim1 % windowWidth == 0);
+     assert(dim1 <= MaxSliceLen);
+
+     constexpr unsigned win2 = (2 * windowWidth);
+     const unsigned pairsToBeMerged = MaxSliceLen / win2;
+     const unsigned kValuePadded = vecsPerOutputSlice * CONFIG_M_AXI_WIDTH;
+
+     LoopBatch:
+     for(unsigned batch=0; batch<dim0; batch++) {
+#pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+         LoopPairs:
+         for (unsigned pair = 0; pair < pairsToBeMerged; pair++) {
+             PairDataIndex_t lastFetch1, lastFetch2;
+
+             // ---------------------------------------------
+             // 1. Merge the pairs
+             int f1 = 0, lastF1 = 1;
+             int f2 = windowWidth, lastF2 = windowWidth+1;
+             unsigned i2 = windowWidth;
+             unsigned i3 = win2;
+             if (i2 >= win2) i2 = win2;
+             if (i3 >= win2) i3 = win2;
+
+             LoopMerge1:
+             for (unsigned i = 0; i < win2; i++) {
+#pragma HLS PIPELINE II=1
+
+                 PairDataIndex_t t1, t2;
+
+                 if(lastF1 != f1 && f1<i2){
+                     lastFetch1 = streamDataInL.Pop();
+                     t1 = lastFetch1;
+                     lastF1 = f1;
+                 }else{
+                     t1 = lastFetch1;
+                 }
+
+                 if(lastF2 != f2 && f2<i3){
+                     lastFetch2 = streamDataInR.Pop();
+                     t2 = lastFetch2;
+                     lastF2 = f2;
+                 }else{
+                     t2 = lastFetch2;
+                 }
+                 if (f2 == i3 || (f1 < i2 && t1.data <= t2.data)) {
+                     if (i < kValuePadded) {
+                         streamDataOutL.Push(t1);
+                     }
+                     f1++;
+                 } else {
+                     assert(f2 < i3);
+                     if (i < kValuePadded) {
+                         streamDataOutL.Push(t2);
+                     }
+                     f2++;
+                 }
+             }
+         }
+     }
+ }
+
+
 
 void TopK_MergeSortDF_V1_UnitMerge1(
     Stream<PairDataIndex_t, 8> &streamDataInL,
