@@ -6,137 +6,94 @@
 #include "hlslib/xilinx/DataPack.h"
 #include "AxiHelper.h"
 #include "xilinx/config.h"
+#include "ap_int.h"
 
 using namespace std;
 using namespace ConfigTaskTopK;
 using hlslib::Stream;
 
+struct PairDataIndex_t{
+public:
+    PairDataIndex_t(){
+    	// This constructor should NOT initialize data and index
+    	// as it causes the vivado hls dataflow form checks to fail.
+    }
+
+    PairDataIndex_t(CONFIG_DTYPE data, unsigned index){
+        this->data = data;
+        this->index = index;
+    }
+    CONFIG_DTYPE data;
+    ap_uint<ConstexperCeilLog2(MaxSliceLen)> index;
+    //unsigned index;
+};
+
 void TopK_MergeSortDF_V1_UnitRead(
     const MemoryPackF_t *inputTn,
-    Stream<CONFIG_DTYPE, 8> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 8> &streamDataOutR,
+    Stream<PairDataIndex_t, 8> &streamDataOutL,
+    Stream<PairDataIndex_t, 8> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1,
     const unsigned vecsPerSlice){
 
-    assert(dim0==1);
     assert(dim1==MaxSliceLen);
 
-    LoopVecsPerPE:
-    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-		#pragma HLS LOOP_TRIPCOUNT min=64 max=64
-        #pragma HLS PIPELINE II=1
+    LoopBatch:
+    for(unsigned batch=0; batch<dim0; batch++){
+#pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+        LoopVecsPerPE:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=64 max=64
+            #pragma HLS PIPELINE II=1
 
-        const unsigned d0 = 0;
-        const unsigned indxS = iVec;
+            const unsigned indxS = batch*vecsPerSlice + iVec;
+            MemoryPackF_t vec = inputTn[indxS];
 
-        MemoryPackF_t vec = inputTn[indxS];
-
-        LoopPush:
-        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
-            #pragma HLS UNROLL
-            if(i%2==0){
-                streamDataOutL.Push(vec[i]);
-            }else{
-                streamDataOutR.Push(vec[i]);
+            LoopPush:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+                PairDataIndex_t pair(vec[i], iVec*CONFIG_M_AXI_WIDTH+i);
+                if(i%2==0){
+                    streamDataOutL.Push(pair);
+                }else{
+                    streamDataOutR.Push(pair);
+                }
             }
         }
     }
 }
 
 void TopK_MergeSortDF_V1_UnitWrite(
-    MemoryPackF_t *outputTn,
-    Stream<CONFIG_DTYPE, 1024> &streamDataInL,
+    MemoryPackI_t *indicesSplitedTn,
+    Stream<PairDataIndex_t, 1024> &streamDataInL,
     const unsigned dim0,
     const unsigned dim1,
-    const unsigned vecsPerSlice){
+    const unsigned vecsPerOutputSlice){
 
-    assert(dim0==1);
     assert(dim1==MaxSliceLen);
 
-    LoopVecsPerPE:
-    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-		#pragma HLS LOOP_TRIPCOUNT min=64 max=64
-        #pragma HLS PIPELINE II=1
+    LoopBatch:
+    for(unsigned batch=0; batch<dim0; batch++) {
+#pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+        LoopVecsPerPE:
+        for (unsigned iVec = 0; iVec < vecsPerOutputSlice; iVec++) {
+#pragma HLS LOOP_TRIPCOUNT min=2 max=2
+#pragma HLS PIPELINE II=1
 
-        const unsigned d0 = 0;
-        const unsigned indxD = iVec;
+            const unsigned indxD = batch*vecsPerOutputSlice + iVec;
+            MemoryPackI_t vec;
 
-        MemoryPackF_t vec;
-
-        LoopPush:
-        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
-            #pragma HLS UNROLL
-            vec[i] = streamDataInL.Pop();
-        }
-
-        outputTn[indxD] = vec;
-    }
-}
-
-/*
-template<
-    unsigned windowWidth, // 2,4,8,...,512
-    unsigned depthInputs,
-    unsigned depthOutputs
->
-void TopK_MergeSortDF_V1_UnitMergeX(
-    Stream<CONFIG_DTYPE, depthInputs> &streamDataInL,
-    Stream<CONFIG_DTYPE, depthInputs> &streamDataInR,
-    Stream<CONFIG_DTYPE, depthOutputs> &streamDataOutL,
-    Stream<CONFIG_DTYPE, depthOutputs> &streamDataOutR,
-    const unsigned dim0,
-    const unsigned dim1){
-
-    assert(dim1 % windowWidth == 0);
-    assert(dim1 <= MaxSliceLen); 
-    assert(windowWidth != (MaxSliceLen/2));
-
-    constexpr unsigned win2 = (2 * windowWidth);
-    constexpr unsigned MaxSliceLenBy2 = MaxSliceLen/2;
-
-    int f1 = 0;
-    int f2 = windowWidth;
-    int i2 = windowWidth;
-    int i3 = win2;
-    if(i2 >= MaxSliceLen) i2 = MaxSliceLen;
-    if(i3 >= MaxSliceLen) i3 = MaxSliceLen;
-
-    LoopMergeArrays:
-    for (int i = 0; i < MaxSliceLen; i++) {
-        #pragma HLS pipeline II=1
-
-        CONFIG_DTYPE t1 = streamDataInL.Pop();
-        CONFIG_DTYPE t2 = (f2 == i3) ? 0 : streamDataInR.Pop();
-        const unsigned offset = i % win2;
-
-        if(f2 == i3 || (f1 < i2 && t1 <= t2)) {
-            if(offset<windowWidth){
-                streamDataOutL.Push(t1);
-            }else{
-                streamDataOutR.Push(t1);
+            LoopPush:
+            for (unsigned i = 0; i < CONFIG_M_AXI_WIDTH; i++) {
+#pragma HLS UNROLL
+                PairDataIndex_t result = streamDataInL.Pop();
+                vec[i] = result.index;
             }
-            f1++;
-        } else {
-            if(offset<windowWidth){
-                streamDataOutL.Push(t2);
-            }else{
-                streamDataOutR.Push(t2);
-            }
-            assert(f2 < i3);
-            f2++;
-        }
-        if(f1 == i2 && f2 == i3) {
-            f1 = i3;
-            i2 += 2*windowWidth;
-            i3 += 2*windowWidth;
-            if(i2 >= MaxSliceLen) i2 = MaxSliceLen;
-            if(i3 >= MaxSliceLen) i3 = MaxSliceLen;
-            f2 = i2;
+
+            indicesSplitedTn[indxD] = vec;
         }
     }
 }
-*/
 
 template<
      unsigned windowWidth, // 2,4,8,...,512
@@ -144,69 +101,72 @@ template<
      unsigned depthOutputs
 >
 void TopK_MergeSortDF_V1_UnitMergeX(
-     Stream<CONFIG_DTYPE, depthInputs> &streamDataInL,
-     Stream<CONFIG_DTYPE, depthInputs> &streamDataInR,
-     Stream<CONFIG_DTYPE, depthOutputs> &streamDataOutL,
-     Stream<CONFIG_DTYPE, depthOutputs> &streamDataOutR,
+     Stream<PairDataIndex_t, depthInputs> &streamDataInL,
+     Stream<PairDataIndex_t, depthInputs> &streamDataInR,
+     Stream<PairDataIndex_t, depthOutputs> &streamDataOutL,
+     Stream<PairDataIndex_t, depthOutputs> &streamDataOutR,
      const unsigned dim0,
      const unsigned dim1){
 
     assert(dim1 % windowWidth == 0);
     assert(dim1 <= MaxSliceLen);
-    //assert(windowWidth != (MaxSliceLen/2));
 
     constexpr unsigned win2 = (2 * windowWidth);
-    constexpr unsigned MaxSliceLenBy2 = MaxSliceLen/2;
-
     const unsigned pairsToBeMerged = MaxSliceLen / win2;
 
-    LoopPairs:
-    for(unsigned pair=0; pair<pairsToBeMerged; pair++){
-        CONFIG_DTYPE buffPair[win2];
+    LoopBatch:
+    for(unsigned batch=0; batch<dim0; batch++) {
+#pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+        LoopPairs:
+        for (unsigned pair = 0; pair < pairsToBeMerged; pair++) {
+            PairDataIndex_t buffPair[win2];
 #pragma HLS ARRAY_PARTITION variable=buffPair complete dim=1
 
-        // ---------------------------------------------
-        // 1. Fetch two pairs before merging
-        LoopFetchPairs:
-        for(unsigned w=0; w<win2; w++){
-            if(w<windowWidth){
-                buffPair[w] = streamDataInL.Pop();
-            }else{
-                buffPair[w] = streamDataInR.Pop();
+            // ---------------------------------------------
+            // 1. Fetch two pairs before merging
+            LoopFetchPairs:
+            for (unsigned w = 0; w < win2; w++) {
+                if (w < windowWidth) {
+                    buffPair[w] = streamDataInL.Pop();
+                } else {
+                    buffPair[w] = streamDataInR.Pop();
+                }
             }
-        }
 
-        // ---------------------------------------------
-        // 2. Merge the pairs
-        unsigned f1 = 0;
-        unsigned f2 = windowWidth;
-        unsigned i2 = windowWidth;
-        unsigned i3 = win2;
-        if(i2 >= win2) i2 = win2;
-        if(i3 >= win2) i3 = win2;
+            // ---------------------------------------------
+            // 2. Merge the pairs
+            unsigned f1 = 0;
+            unsigned f2 = windowWidth;
+            unsigned i2 = windowWidth;
+            unsigned i3 = win2;
+            if (i2 >= win2) i2 = win2;
+            if (i3 >= win2) i3 = win2;
 
-        LoopMerge1:
-        for(unsigned i=0; i<win2; i++){
-            #pragma HLS PIPELINE II=1
+            LoopMerge1:
+            for (unsigned i = 0; i < win2; i++) {
+#pragma HLS PIPELINE II=1
 
-            CONFIG_DTYPE t1 = buffPair[f1];
-            CONFIG_DTYPE t2 = (f2 == i3) ? 0 : buffPair[f2];
+                PairDataIndex_t t1 = buffPair[f1];
+                //PairDataIndex_t t2 = (f2 == i3) ? PairDataIndex_t(0, buffPair[f2].index) : buffPair[f2];
+                PairDataIndex_t t2 = buffPair[f2];
 
-            if(f2 == i3 || (f1 < i2 && t1 <= t2)) {
-                if(pair%2==0){
-                    streamDataOutL.Push(t1);
-                }else{
-                    streamDataOutR.Push(t1);
+
+                if (f2 == i3 || (f1 < i2 && t1.data <= t2.data)) {
+                    if (pair % 2 == 0) {
+                        streamDataOutL.Push(t1);
+                    } else {
+                        streamDataOutR.Push(t1);
+                    }
+                    f1++;
+                } else {
+                    assert(f2 < i3);
+                    if (pair % 2 == 0) {
+                        streamDataOutL.Push(t2);
+                    } else {
+                        streamDataOutR.Push(t2);
+                    }
+                    f2++;
                 }
-                f1++;
-            } else {
-                assert(f2 < i3);
-                if(pair%2==0){
-                    streamDataOutL.Push(t2);
-                }else{
-                    streamDataOutR.Push(t2);
-                }
-                f2++;
             }
         }
     }
@@ -218,69 +178,77 @@ template<
     unsigned depthOutput
 >
 void TopK_MergeSortDF_V1_UnitMergeLast(
-    Stream<CONFIG_DTYPE, depthInputs> &streamDataInL,
-    Stream<CONFIG_DTYPE, depthInputs> &streamDataInR,
-    Stream<CONFIG_DTYPE, depthOutput> &streamDataOutL,
+    Stream<PairDataIndex_t, depthInputs> &streamDataInL,
+    Stream<PairDataIndex_t, depthInputs> &streamDataInR,
+    Stream<PairDataIndex_t, depthOutput> &streamDataOutL,
     const unsigned dim0,
-    const unsigned dim1){
+    const unsigned dim1,
+    const unsigned vecsPerOutputSlice){
 
     assert(dim1 % windowWidth == 0);
     assert(dim1 <= MaxSliceLen);
-    //assert(windowWidth != (MaxSliceLen/2));
 
     constexpr unsigned win2 = (2 * windowWidth);
-    constexpr unsigned MaxSliceLenBy2 = MaxSliceLen/2;
-
     const unsigned pairsToBeMerged = MaxSliceLen / win2;
+    const unsigned kValuePadded = vecsPerOutputSlice * CONFIG_M_AXI_WIDTH;
 
-    LoopPairs:
-    for(unsigned pair=0; pair<pairsToBeMerged; pair++){
-        CONFIG_DTYPE buffPair[win2];
+    LoopBatch:
+    for(unsigned batch=0; batch<dim0; batch++) {
+#pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+        LoopPairs:
+        for (unsigned pair = 0; pair < pairsToBeMerged; pair++) {
+            PairDataIndex_t buffPair[win2];
 
-        // ---------------------------------------------
-        // 1. Fetch two pairs before merging
-        LoopFetchPairs:
-        for(unsigned w=0; w<win2; w++){
-            if(w<windowWidth){
-                buffPair[w] = streamDataInL.Pop();
-            }else{
-                buffPair[w] = streamDataInR.Pop();
+            // ---------------------------------------------
+            // 1. Fetch two pairs before merging
+            LoopFetchPairs:
+            for (unsigned w = 0; w < win2; w++) {
+                if (w < windowWidth) {
+                    buffPair[w] = streamDataInL.Pop();
+                } else {
+                    buffPair[w] = streamDataInR.Pop();
+                }
             }
-        }
 
-        // ---------------------------------------------
-        // 2. Merge the pairs
-        unsigned f1 = 0;
-        unsigned f2 = windowWidth;
-        unsigned i2 = windowWidth;
-        unsigned i3 = win2;
-        if(i2 >= win2) i2 = win2;
-        if(i3 >= win2) i3 = win2;
+            // ---------------------------------------------
+            // 2. Merge the pairs
+            unsigned f1 = 0;
+            unsigned f2 = windowWidth;
+            unsigned i2 = windowWidth;
+            unsigned i3 = win2;
+            if (i2 >= win2) i2 = win2;
+            if (i3 >= win2) i3 = win2;
 
-        LoopMerge1:
-        for(unsigned i=0; i<win2; i++){
+            LoopMerge1:
+            for (unsigned i = 0; i < win2; i++) {
 #pragma HLS PIPELINE II=1
 
-            CONFIG_DTYPE t1 = buffPair[f1];
-            CONFIG_DTYPE t2 = (f2 == i3) ? 0 : buffPair[f2];
+                PairDataIndex_t t1 = buffPair[f1];
+                //PairDataIndex_t t2 = (f2 == i3) ? PairDataIndex_t(0, buffPair[f2].index) : buffPair[f2];
+                PairDataIndex_t t2 = buffPair[f2];
 
-            if(f2 == i3 || (f1 < i2 && t1 <= t2)) {
-                streamDataOutL.Push(t1);
-                f1++;
-            } else {
-                assert(f2 < i3);
-                streamDataOutL.Push(t2);
-                f2++;
+                if (f2 == i3 || (f1 < i2 && t1.data <= t2.data)) {
+                    if (i < kValuePadded) {
+                        streamDataOutL.Push(t1);
+                    }
+                    f1++;
+                } else {
+                    assert(f2 < i3);
+                    if (i < kValuePadded) {
+                        streamDataOutL.Push(t2);
+                    }
+                    f2++;
+                }
             }
         }
     }
 }
 
 void TopK_MergeSortDF_V1_UnitMerge1(
-    Stream<CONFIG_DTYPE, 8> &streamDataInL,
-    Stream<CONFIG_DTYPE, 8> &streamDataInR,
-    Stream<CONFIG_DTYPE, 2> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 2> &streamDataOutR,
+    Stream<PairDataIndex_t, 8> &streamDataInL,
+    Stream<PairDataIndex_t, 8> &streamDataInR,
+    Stream<PairDataIndex_t, 2> &streamDataOutL,
+    Stream<PairDataIndex_t, 2> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -296,10 +264,10 @@ void TopK_MergeSortDF_V1_UnitMerge1(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge2(
-    Stream<CONFIG_DTYPE, 2> &streamDataInL,
-    Stream<CONFIG_DTYPE, 2> &streamDataInR,
-    Stream<CONFIG_DTYPE, 4> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 4> &streamDataOutR,
+    Stream<PairDataIndex_t, 2> &streamDataInL,
+    Stream<PairDataIndex_t, 2> &streamDataInR,
+    Stream<PairDataIndex_t, 4> &streamDataOutL,
+    Stream<PairDataIndex_t, 4> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -315,10 +283,10 @@ void TopK_MergeSortDF_V1_UnitMerge2(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge4(
-    Stream<CONFIG_DTYPE, 4> &streamDataInL,
-    Stream<CONFIG_DTYPE, 4> &streamDataInR,
-    Stream<CONFIG_DTYPE, 8> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 8> &streamDataOutR,
+    Stream<PairDataIndex_t, 4> &streamDataInL,
+    Stream<PairDataIndex_t, 4> &streamDataInR,
+    Stream<PairDataIndex_t, 8> &streamDataOutL,
+    Stream<PairDataIndex_t, 8> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -334,10 +302,10 @@ void TopK_MergeSortDF_V1_UnitMerge4(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge8(
-    Stream<CONFIG_DTYPE, 8> &streamDataInL,
-    Stream<CONFIG_DTYPE, 8> &streamDataInR,
-    Stream<CONFIG_DTYPE, 16> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 16> &streamDataOutR,
+    Stream<PairDataIndex_t, 8> &streamDataInL,
+    Stream<PairDataIndex_t, 8> &streamDataInR,
+    Stream<PairDataIndex_t, 16> &streamDataOutL,
+    Stream<PairDataIndex_t, 16> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -353,10 +321,10 @@ void TopK_MergeSortDF_V1_UnitMerge8(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge16(
-    Stream<CONFIG_DTYPE, 16> &streamDataInL,
-    Stream<CONFIG_DTYPE, 16> &streamDataInR,
-    Stream<CONFIG_DTYPE, 32> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 32> &streamDataOutR,
+    Stream<PairDataIndex_t, 16> &streamDataInL,
+    Stream<PairDataIndex_t, 16> &streamDataInR,
+    Stream<PairDataIndex_t, 32> &streamDataOutL,
+    Stream<PairDataIndex_t, 32> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -372,10 +340,10 @@ void TopK_MergeSortDF_V1_UnitMerge16(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge32(
-    Stream<CONFIG_DTYPE, 32> &streamDataInL,
-    Stream<CONFIG_DTYPE, 32> &streamDataInR,
-    Stream<CONFIG_DTYPE, 64> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 64> &streamDataOutR,
+    Stream<PairDataIndex_t, 32> &streamDataInL,
+    Stream<PairDataIndex_t, 32> &streamDataInR,
+    Stream<PairDataIndex_t, 64> &streamDataOutL,
+    Stream<PairDataIndex_t, 64> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -391,10 +359,10 @@ void TopK_MergeSortDF_V1_UnitMerge32(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge64(
-    Stream<CONFIG_DTYPE, 64> &streamDataInL,
-    Stream<CONFIG_DTYPE, 64> &streamDataInR,
-    Stream<CONFIG_DTYPE, 128> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 128> &streamDataOutR,
+    Stream<PairDataIndex_t, 64> &streamDataInL,
+    Stream<PairDataIndex_t, 64> &streamDataInR,
+    Stream<PairDataIndex_t, 128> &streamDataOutL,
+    Stream<PairDataIndex_t, 128> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -410,10 +378,10 @@ void TopK_MergeSortDF_V1_UnitMerge64(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge128(
-    Stream<CONFIG_DTYPE, 128> &streamDataInL,
-    Stream<CONFIG_DTYPE, 128> &streamDataInR,
-    Stream<CONFIG_DTYPE, 256> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 256> &streamDataOutR,
+    Stream<PairDataIndex_t, 128> &streamDataInL,
+    Stream<PairDataIndex_t, 128> &streamDataInR,
+    Stream<PairDataIndex_t, 256> &streamDataOutL,
+    Stream<PairDataIndex_t, 256> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -429,10 +397,10 @@ void TopK_MergeSortDF_V1_UnitMerge128(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge256(
-    Stream<CONFIG_DTYPE, 256> &streamDataInL,
-    Stream<CONFIG_DTYPE, 256> &streamDataInR,
-    Stream<CONFIG_DTYPE, 512> &streamDataOutL,
-    Stream<CONFIG_DTYPE, 512> &streamDataOutR,
+    Stream<PairDataIndex_t, 256> &streamDataInL,
+    Stream<PairDataIndex_t, 256> &streamDataInR,
+    Stream<PairDataIndex_t, 512> &streamDataOutL,
+    Stream<PairDataIndex_t, 512> &streamDataOutR,
     const unsigned dim0,
     const unsigned dim1){
 
@@ -448,11 +416,12 @@ void TopK_MergeSortDF_V1_UnitMerge256(
 }
 
 void TopK_MergeSortDF_V1_UnitMerge512(
-    Stream<CONFIG_DTYPE, 512> &streamDataInL,
-    Stream<CONFIG_DTYPE, 512> &streamDataInR,
-    Stream<CONFIG_DTYPE, 1024> &streamDataOutL,
+    Stream<PairDataIndex_t, 512> &streamDataInL,
+    Stream<PairDataIndex_t, 512> &streamDataInR,
+    Stream<PairDataIndex_t, 1024> &streamDataOutL,
     const unsigned dim0,
-    const unsigned dim1){
+    const unsigned dim1,
+    const unsigned vecsPerOutputSlice){
 
     constexpr unsigned windowWidth = 512;
 
@@ -461,12 +430,13 @@ void TopK_MergeSortDF_V1_UnitMerge512(
         streamDataInR,
         streamDataOutL,
         dim0,
-        dim1);
+        dim1,
+        vecsPerOutputSlice);
 }
 
 void TopK_MergeSortDF_V1(
         const MemoryPackF_t *inputTn,
-        MemoryPackF_t *outputTn,
+        MemoryPackI_t *indicesSplitedTn,
         //MemoryPackI_t *indicesSplitedTn,
         const unsigned dim0,
         const unsigned dim1,
@@ -479,37 +449,37 @@ void TopK_MergeSortDF_V1(
 
     #pragma HLS DATAFLOW
 
-    Stream<CONFIG_DTYPE, 8> streamRead_W1[2];
+    Stream<PairDataIndex_t, 8> streamRead_W1[2];
 #pragma HLS STREAM variable=streamRead_W1 depth=8
 
-    Stream<CONFIG_DTYPE, 2> streamW1_W2[2];
+    Stream<PairDataIndex_t, 2> streamW1_W2[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=2
 
-    Stream<CONFIG_DTYPE, 4> streamW2_W4[2];
+    Stream<PairDataIndex_t, 4> streamW2_W4[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=4
 
-    Stream<CONFIG_DTYPE, 8> streamW4_W8[2];
+    Stream<PairDataIndex_t, 8> streamW4_W8[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=8
 
-    Stream<CONFIG_DTYPE, 16> streamW8_W16[2];
+    Stream<PairDataIndex_t, 16> streamW8_W16[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=16
 
-    Stream<CONFIG_DTYPE, 32> streamW16_W32[2];
+    Stream<PairDataIndex_t, 32> streamW16_W32[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=32
 
-    Stream<CONFIG_DTYPE, 64> streamW32_W64[2];
+    Stream<PairDataIndex_t, 64> streamW32_W64[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=64
 
-    Stream<CONFIG_DTYPE, 128> streamW64_W128[2];
+    Stream<PairDataIndex_t, 128> streamW64_W128[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=128
 
-    Stream<CONFIG_DTYPE, 256> streamW128_W256[2];
+    Stream<PairDataIndex_t, 256> streamW128_W256[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=256
 
-    Stream<CONFIG_DTYPE, 512> streamW256_W512[2];
+    Stream<PairDataIndex_t, 512> streamW256_W512[2];
 #pragma HLS STREAM variable=streamReadToW1 depth=512
 
-    Stream<CONFIG_DTYPE, 1024> streamW512_Write;
+    Stream<PairDataIndex_t, 1024> streamW512_Write;
 #pragma HLS STREAM variable=streamReadToW1 depth=1024
 
 
@@ -617,14 +587,15 @@ void TopK_MergeSortDF_V1(
         streamW256_W512[1],
         streamW512_Write,
         dim0,
-        dim1);
+        dim1,
+        vecsPerOutputSlice);
 
-    HLSLIB_DATAFLOW_FUNCTION(TopK_MergeSortDF_V1_UnitWrite, 
-        outputTn, 
+    HLSLIB_DATAFLOW_FUNCTION(TopK_MergeSortDF_V1_UnitWrite,
+        indicesSplitedTn,
         streamW512_Write, 
         dim0, 
-        dim1, 
-        vecsPerSlice); //vecsPerOutputSlice 
+        dim1,
+        vecsPerOutputSlice);
 
     HLSLIB_DATAFLOW_FINALIZE();
 
@@ -633,8 +604,7 @@ void TopK_MergeSortDF_V1(
 extern "C"{
 void task_topk(
         const MemoryPackF_t *inputTn,
-        //MemoryPackI_t *indicesSplitedTn,
-        MemoryPackF_t *indicesSplitedTn,
+        MemoryPackI_t *indicesSplitedTn,
         const unsigned dim0,
         const unsigned dim1,
         const unsigned kValue,

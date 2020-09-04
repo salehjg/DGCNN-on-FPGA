@@ -25,11 +25,11 @@ void MergeSortWithIndices(
 
     CONFIG_DTYPE temp[MaxSliceLen];
 #pragma HLS RESOURCE variable=temp core=RAM_2P_URAM
-DO_PRAGMA(HLS ARRAY_PARTITION variable=temp cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
+#pragma HLS ARRAY_PARTITION variable=temp cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 
     ///TODO: Try implementing the algorithm without the need for indicesTemp.
     unsigned indicesTemp[MaxSliceLen];
-DO_PRAGMA(HLS ARRAY_PARTITION variable=indicesTemp cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
+#pragma HLS ARRAY_PARTITION variable=indicesTemp cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 //#pragma HLS RESOURCE variable=indicesTemp core=RAM_2P_URAM
 
     LoopStage:
@@ -270,19 +270,21 @@ void UnitProcessingElement(
 
     CONFIG_DTYPE sliceData[MaxSliceLen];
 #pragma HLS RESOURCE variable=sliceData core=RAM_2P_URAM
-    DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceData cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
+#pragma HLS ARRAY_PARTITION variable=sliceData cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 
     ///TODO: Change the type to a 10-bit ap_uint to reduce resource usage.
     unsigned sliceIndices[MaxSliceLen];
 //#pragma HLS RESOURCE variable=sliceIndices core=RAM_2P_URAM
-    DO_PRAGMA(HLS ARRAY_PARTITION variable=sliceIndices cyclic factor=CONFIG_M_AXI_WIDTH dim=1)
+#pragma HLS ARRAY_PARTITION variable=sliceIndices cyclic factor=CONFIG_M_AXI_WIDTH dim=1
 
     //MemoryPackF_t sliceVec;
     MemoryPackI_t outputCache;
     unsigned outputCacheVecSubIdx;
 
+    constexpr unsigned tripCountLoopMain = 5 * 1024 / UnitCount;
+
     LoopMain: for(unsigned batch=0; batch<dim0; batch+=UnitCount){
-#pragma HLS LOOP_TRIPCOUNT min=640 max=640
+#pragma HLS LOOP_TRIPCOUNT min=tripCountLoopMain max=tripCountLoopMain
         //--------------------------------------------------
         // 1. Read the current slice and indices into the local memory.
         
@@ -372,7 +374,7 @@ void UnitProcessingElement(
         const unsigned _len2 = UnitCount-unitIndex-1;
         LoopHandleOtherPEsOutput:
         for(unsigned iPE=0; iPE<_len2; iPE++){
-            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS LOOP_TRIPCOUNT min=UnitCount max=UnitCount
             ForOutputVecsPerPEs:
             for(unsigned iVec=0; iVec<vecsPerOutputSlice; iVec++){
                 if(unitIndex<(UnitCount-1)){
@@ -395,7 +397,7 @@ extern "C"{
  * @brief      Finds the least k elements for every slice in batch.
  *             The top-function of the kernel.
  *             Supports handling an input tensor with "dim0 % UnitCount != 0".
- *             The latency will be reported for [5x1024]x1024, k=20, unitcount=8, m_axi_width=16, pipe_depth=2
+ *             The latency will be reported for [5x1024]x1024, k=20, PEs=UnitCount, m_axi_width=16, pipe_depth=2
  *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn             The input tn

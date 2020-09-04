@@ -179,7 +179,7 @@ int LaunchDataMover(
     exeEvt.wait();
     //queue->finish();
 
-    PrintInfo("LaunchDataMover","",0,"",0,"",0,{len},{});
+    PrintInfo("LaunchDataMover","",0,"",0,"",0,{len},{},{});
     ReportDuration(__func__, false, exeEvt);
     SPDLOG_LOGGER_DEBUG(logger,"Internal data-mover kernel executed successfully");
 

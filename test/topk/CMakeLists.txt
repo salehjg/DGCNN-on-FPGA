@@ -31,7 +31,7 @@ target_link_libraries(CpuTestTopkInsertionSort
 
 add_executable(CpuTestTopkMergeSort
     src/CpuTestTopk.cpp 
-    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort.cpp)
+    ${PROJECT_SOURCE_DIR}/src/kernels/xilinx/topk_mergesort_dataflow.cpp)
 
 target_link_libraries(CpuTestTopkMergeSort
     ${SDAccel_LIBRARIES} 

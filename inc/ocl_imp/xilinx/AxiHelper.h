@@ -19,3 +19,13 @@ inline T MakeDivisible(T value, T by){
             value:
             value+(by-value%by);
 }
+
+constexpr unsigned ConstexperFloorLog2(unsigned x)
+{
+    return x == 1 ? 0 : 1+ConstexperFloorLog2(x >> 1);
+}
+
+constexpr unsigned ConstexperCeilLog2(unsigned x)
+{
+    return x == 1 ? 0 : ConstexperFloorLog2(x - 1) + 1;
+}
