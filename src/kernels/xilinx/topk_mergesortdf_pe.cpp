@@ -12,6 +12,8 @@ using namespace std;
 using namespace ConfigTaskTopK;
 using hlslib::Stream;
 
+constexpr unsigned latencyReportBatchSize = 5 * 1024;
+
 struct PairDataIndex_t{
 public:
     PairDataIndex_t(){
@@ -37,6 +39,7 @@ void TopK_MergeSortDF_V1_UnitRead(
 
     assert(inputTn->kWidth==CONFIG_M_AXI_WIDTH);
     assert(dim1==MaxSliceLen);
+    constexpr unsigned tripCountLoopBatch = latencyReportBatchSize / UnitCount;
 
     const unsigned safeDim0 = dim0 - dim0 % UnitCount;
     const unsigned remDim0 = dim0 % UnitCount;
@@ -44,7 +47,7 @@ void TopK_MergeSortDF_V1_UnitRead(
     // Safe (BURST IO)
     LoopBatch:
     for(unsigned batch=0; batch<safeDim0; batch+=UnitCount){
-        #pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+        #pragma HLS LOOP_TRIPCOUNT min=tripCountLoopBatch max=tripCountLoopBatch
         LoopPEs:
         for(unsigned iPE=0; iPE<UnitCount; iPE++){
             LoopVecsPerPE:
@@ -116,11 +119,12 @@ void TopK_MergeSortDF_V1_UnitWrite(
     assert(dim1==MaxSliceLen);
     const unsigned safeDim0 = dim0 - dim0 % UnitCount;
     const unsigned remDim0 = dim0 % UnitCount;
+    constexpr unsigned tripCountLoopBatch = latencyReportBatchSize / UnitCount;
 
     // 1. Handle safe part of data and write out data in burst.
     LoopBatch:
     for(unsigned batch=0; batch<safeDim0; batch+=UnitCount) {
-        #pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+        #pragma HLS LOOP_TRIPCOUNT min=tripCountLoopBatch max=tripCountLoopBatch
         LoopPEs:
         for(unsigned iPE=0; iPE<UnitCount; iPE++){
             LoopVecsPerPE:
@@ -190,11 +194,11 @@ void TopK_MergeSortDF_V1_UnitMergeX(
     constexpr unsigned win2 = (2 * windowWidth);
     const unsigned pairsToBeMerged = MaxSliceLen / win2;
 
-    constexpr unsigned tripCountLoopMain = 5 * 1024 / UnitCount;
+    constexpr unsigned tripCountLoopBatch = latencyReportBatchSize / UnitCount;
 
     LoopBatch:
     for(unsigned batch=0; batch<dim0; batch+=UnitCount) {
-        #pragma HLS LOOP_TRIPCOUNT min=tripCountLoopMain max=tripCountLoopMain
+        #pragma HLS LOOP_TRIPCOUNT min=tripCountLoopBatch max=tripCountLoopBatch
         // It doesn't matter that 'batch' starts from zero instead of iPE.
 
         LoopPairs:
@@ -272,11 +276,11 @@ void TopK_MergeSortDF_V1_UnitMergeLast(
     const unsigned pairsToBeMerged = MaxSliceLen / win2;
     const unsigned kValuePadded = vecsPerOutputSlice * CONFIG_M_AXI_WIDTH;
 
-    constexpr unsigned tripCountLoopMain = 5 * 1024 / UnitCount;
+    constexpr unsigned tripCountLoopBatch = 5 * 1024 / UnitCount;
 
     LoopBatch:
     for(unsigned batch=0; batch<dim0; batch+=UnitCount) {
-        #pragma HLS LOOP_TRIPCOUNT min=tripCountLoopMain max=tripCountLoopMain
+        #pragma HLS LOOP_TRIPCOUNT min=tripCountLoopBatch max=tripCountLoopBatch
         // It doesn't matter that 'batch' starts from zero instead of iPE.
 
         LoopPairs:
