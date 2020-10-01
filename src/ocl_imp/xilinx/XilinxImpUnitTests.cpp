@@ -418,17 +418,37 @@ ReportObject* XilinxImpUnitTests::KernelSqrt(){
 
 
 ReportObject* XilinxImpUnitTests::KernelReduceMax(){
-    TensorF* tensorSrc1 = GenerateTensor(0,{2,2,3,32});
-    TensorF* tensorCpu1 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc1,2);
-    TensorF* tensorGpu1 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,2);
-    bool comparisonResult1 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
+    bool comparisonResult1, comparisonResult2, comparisonResult3, comparisonResult4;
 
-    TensorF* tensorSrc2 = GenerateTensor(0,{2,3,1,16});
-    TensorF* tensorCpu2 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc2,1);
-    TensorF* tensorGpu2 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc2,1);
-    bool comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu2,tensorGpu2);
+    {
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,3,32});
+        TensorF* tensorCpu1 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc1,2);
+        TensorF* tensorGpu1 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,2);
+        comparisonResult1 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
+    }
 
-    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult1 && comparisonResult2);
+    {
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,2,3,16});
+        TensorF* tensorCpu1 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc1,2);
+        TensorF* tensorGpu1 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,2);
+        comparisonResult2 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
+    }
+
+    {
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,1,2,128});
+        TensorF* tensorCpu1 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc1,2);
+        TensorF* tensorGpu1 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,2);
+        comparisonResult3 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
+    }
+
+    {
+        TensorF* tensorSrc1 = GenerateTensor(0,{2,1,1,1024});
+        TensorF* tensorCpu1 = platformSelector->ReduceMax(PLATFORMS::CPU,scheduler,tensorSrc1,2);
+        TensorF* tensorGpu1 = platformSelector->ReduceMax(PLATFORMS::GPU_OCL,scheduler,tensorSrc1,2);
+        comparisonResult4 = platformSelector->CompareTensors(PLATFORMS::CPU,scheduler,tensorCpu1,tensorGpu1);
+    }
+
+    ReportObject* obj = new ReportObject(__FUNCTION__, comparisonResult1 && comparisonResult2 && comparisonResult3 && comparisonResult4);
     return obj;
 }
 

@@ -434,6 +434,99 @@ CONFIG_DTYPE _Max(CONFIG_DTYPE val1, CONFIG_DTYPE val2){
  *             Currently, 'LoopSlice0' achieves II=3.
  *             The latency will be reported for 5x1024x20x128.
  *             This kernel supports burst read/write.
+ *             In this version, the initializing loop has been omitted.
+ *
+ * @param[in]  inputTn   The input tn
+ * @param      outputTn  The output tn
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  dim2      The dim 2
+ */
+void ReduceMaxRank3Axis1_V3(
+    const MemoryPackF_t *inputTn,
+    MemoryPackF_t *outputTn,
+    const unsigned dim0,
+    const unsigned dim1,
+    const unsigned dim2){
+
+    // DO NOT inline this sub-func as it causes the kernel to produce a wrong output.
+    // By looks of it sdx2019.1 has issues with sub-functions and inline pragma cuz it also
+    // can cause a burst or non burst external memory access for the sub function.
+    
+    //#pragma HLS INLINE
+
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+    
+    const unsigned dim2Padded = MakeDivisible<unsigned>(dim2, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSlice = dim2Padded/CONFIG_M_AXI_WIDTH;
+    constexpr unsigned buffVecCount = ConfigTaskReduce::Max3D::MaxSliceLen/CONFIG_M_AXI_WIDTH;
+
+    CONFIG_DTYPE buffResult1[buffVecCount][CONFIG_M_AXI_WIDTH];
+#pragma HLS ARRAY_PARTITION variable=buffResult1 complete dim=2
+
+    LoopD0:
+    for(unsigned d0=0; d0<dim0; d0++){
+        #pragma HLS LOOP_TRIPCOUNT min=5120 max=5120
+
+        LoopPreload0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
+            const unsigned indxS = d0*dim1*vecsPerSlice + /*d1*vecsPerSlice +*/ iVec; // d1=0
+            MemoryPackF_t vec = inputTn[indxS];
+            LoopPreload1:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+                // numeric_limits<CONFIG_DTYPE>::min() is the smallest floating point number possible that is greater than zero
+                // but here we need the smallest negative number possible which is -1*FLT_MAX
+                buffResult1[iVec][i] = vec[i];
+            }
+        }
+
+        LoopD1:
+        for(unsigned d1=1; d1<dim1; d1++){ //Starts from 1
+            #pragma HLS LOOP_TRIPCOUNT min=19 max=19
+
+            LoopSlice0:
+            for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+                #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+                #pragma HLS PIPELINE II=1
+                const unsigned indxS = d0*dim1*vecsPerSlice + d1*vecsPerSlice + iVec;
+                MemoryPackF_t vec = inputTn[indxS];
+                LoopCompute:
+                for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                    #pragma HLS UNROLL
+                    const CONFIG_DTYPE rslt = vec[i];
+                    buffResult1[iVec][i] = _Max(buffResult1[iVec][i], rslt);
+                }
+            }
+        }
+
+        LoopOutput0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
+            const unsigned indxD = d0*vecsPerSlice + iVec;
+            MemoryPackF_t outVec;
+
+            LoopOutput1:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+                outVec[i] = buffResult1[iVec][i];
+            }
+
+            outputTn[indxD] = outVec;
+        }
+    }
+}
+
+/**
+ * @brief      Reduces the input tensor of rank 3 in the middle axis(FTF) with the max op.
+ *             Currently, 'LoopSlice0' achieves II=3.
+ *             The latency will be reported for 5x1024x20x128.
+ *             This kernel supports burst read/write.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn
@@ -588,7 +681,7 @@ void task_reduce(
 #ifdef KERNEL_LOGS
         cout<<"ReduceMaxRank3Axis1_V2 is selected."<<endl;
 #endif
-        ReduceMaxRank3Axis1_V2(inputTn, outputTn, dim0, dim1, dim2); // Non-dataflow
+        ReduceMaxRank3Axis1_V3(inputTn, outputTn, dim0, dim1, dim2); // Non-dataflow
     }
     
 }
