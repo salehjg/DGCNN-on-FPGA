@@ -1039,7 +1039,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelMatops());                  //OK
     PrintReport(KernelReduceSum4D());             //OK
     PrintReport(KernelReduceMax());               //OK 
-    PrintReport(KernelReduceSum());               //OK(No burst writes)
+    PrintReport(KernelReduceSum());               //OK
     PrintReport(KernelMean());                    //OK 
     PrintReport(KernelVariance());                //OK
     PrintReport(KernelMatmul());                  //OK
