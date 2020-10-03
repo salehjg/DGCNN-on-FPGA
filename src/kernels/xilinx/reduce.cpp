@@ -277,6 +277,107 @@ void ReduceSumRank3Axis2_V1(
     }
 }
 
+/**
+ * @brief      Reduces the input tensor in the given dimensions.
+ *             Currently, only TTTF reduction combination is supported.
+ *             
+ *             Unlike V3, this version achieves II=1, but because of non-flatten 
+ *             nested loops, the external memory stall percentage is 2.5% higher.
+ *             
+ *             The latency is reported for inputTn of shape 5x1024x20x128.
+ *             This kernel complies with the padded last dim policy.
+ *             This kernel supports burst read/write.
+ *
+ * @param[in]  inputTn   The input tn
+ * @param      outputTn  The output tn
+ * @param[in]  pow_y     The pow y
+ * @param[in]  dim0      The dim 0
+ * @param[in]  dim1      The dim 1
+ * @param[in]  dim2      The dim 2
+ * @param[in]  dim3      The dim 3
+ */
+void ReduceSumRank4Axes012_V4(
+        const MemoryPackF_t *inputTn,
+        MemoryPackF_t *outputTn,
+        const unsigned pow_y,
+        const unsigned dim0,
+        const unsigned dim1,
+        const unsigned dim2,
+        const unsigned dim3){
+
+#ifdef KERNEL_LOGS
+    cout<<"Simulation mode is enabled."<<endl;
+#endif
+
+    assert(pow_y>=1 && pow_y<=ConfigTaskReduce::Sum4D::MaxPowY);
+
+    CONFIG_DTYPE buffResult1[ConfigTaskReduce::Sum4D::MaxSliceLen];
+    #pragma HLS ARRAY_PARTITION variable=buffResult1 cyclic factor=CONFIG_M_AXI_WIDTH dim=1
+
+    const unsigned batchSize = dim0*dim1*dim2;
+    const unsigned pow_y_minus_one = pow_y -1;
+    const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
+
+    LoopInit0:
+    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+        #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+        LoopInit1:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            buffResult1[iVec*CONFIG_M_AXI_WIDTH+i]=0;
+        }
+    }
+
+    LoopBatch:
+    for(unsigned batch=0; batch<batchSize; batch++){
+        #pragma HLS PIPELINE off
+        #pragma HLS LOOP_FLATTEN off
+        #pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
+
+        LoopSlice0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
+            #pragma HLS DEPENDENCE variable=buffResult1 array inter false
+
+            const unsigned indxS = batch*vecsPerSlice + iVec;
+            MemoryPackF_t vec = inputTn[indxS];
+
+            LoopCompute:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+
+                CONFIG_DTYPE rslt = vec[i];
+                LoopPow:
+                for(unsigned ipwr=0; ipwr<MAX_POW_Y_MINUS_ONE; ipwr++){
+                    #pragma HLS UNROLL
+                    if(ipwr<pow_y_minus_one){
+                        rslt = rslt * rslt;
+                    }
+                }
+                buffResult1[iVec*CONFIG_M_AXI_WIDTH + i] += rslt;
+            }
+
+        }
+    }
+
+    LoopSlice1:
+    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+        #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+
+        MemoryPackF_t outVec;
+
+        LoopOutput:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            outVec[i]=buffResult1[iVec*CONFIG_M_AXI_WIDTH+i];
+        }
+
+        outputTn[iVec] = outVec;
+    }
+}
+
 void ReduceSumRank4Axes012_V3_UnitRead(
     const MemoryPackF_t *inputTn,
     Stream<MemoryPackF_t, ConfigTaskReduce::Sum4D::PipeDepth> &streamsData,
@@ -291,11 +392,11 @@ void ReduceSumRank4Axes012_V3_UnitRead(
 
     LoopBatch:
     for(unsigned batch=0; batch<batchSize; batch++){
-#pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
+        #pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
 
         for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
-#pragma HLS LOOP_TRIPCOUNT min=8 max=8
-#pragma HLS PIPELINE II=1
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
             const unsigned indxS = batch*vecsPerSlice + iVec;
             streamsData.Push(inputTn[indxS]);
         }
@@ -303,6 +404,19 @@ void ReduceSumRank4Axes012_V3_UnitRead(
     }
 }
 
+/**
+ * @brief      This is the V3.0 in which the best achievable II is 5.
+ *             
+ *
+ * @param      streamsData  The streams data
+ * @param      outputTn     The output tn
+ * @param[in]  pow_y        The pow y
+ * @param[in]  dim0         The dim 0
+ * @param[in]  dim1         The dim 1
+ * @param[in]  dim2         The dim 2
+ * @param[in]  dim3         The dim 3
+ */   
+/*
 void ReduceSumRank4Axes012_V3_UnitProcess(
         Stream<MemoryPackF_t, ConfigTaskReduce::Sum4D::PipeDepth> &streamsData,
         MemoryPackF_t *outputTn,
@@ -379,6 +493,101 @@ void ReduceSumRank4Axes012_V3_UnitProcess(
         outputTn[iVec] = outVec;
     }
 }
+*/
+
+
+/**
+ * @brief      This is the improved V3.0 in which the best achievable II is 1.
+ *             But dataflow scheme improves almost nothing
+ *             (only 2.5% less external memory stall compared to V4 which is the non-dataflow version of V3)
+ *
+ * @param      streamsData  The streams data
+ * @param      outputTn     The output tn
+ * @param[in]  pow_y        The pow y
+ * @param[in]  dim0         The dim 0
+ * @param[in]  dim1         The dim 1
+ * @param[in]  dim2         The dim 2
+ * @param[in]  dim3         The dim 3
+ */
+void ReduceSumRank4Axes012_V3_1_UnitProcess(
+        Stream<MemoryPackF_t, ConfigTaskReduce::Sum4D::PipeDepth> &streamsData,
+        MemoryPackF_t *outputTn,
+        const unsigned pow_y,
+        const unsigned dim0,
+        const unsigned dim1,
+        const unsigned dim2,
+        const unsigned dim3){
+
+    assert(pow_y>=1 && pow_y<=ConfigTaskReduce::Sum4D::MaxPowY);
+
+    CONFIG_DTYPE buffResult1[ConfigTaskReduce::Sum4D::MaxSliceLen];
+#pragma HLS ARRAY_PARTITION variable=buffResult1 cyclic factor=CONFIG_M_AXI_WIDTH dim=1
+
+    unsigned indxS;
+
+    const unsigned batchSize = dim0*dim1*dim2;
+    const unsigned pow_y_minus_one = pow_y -1;
+    const unsigned dim3Padded = MakeDivisible<unsigned>(dim3, CONFIG_M_AXI_WIDTH);
+    const unsigned vecsPerSlice = dim3Padded/CONFIG_M_AXI_WIDTH;
+
+    LoopInit0:
+    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+        #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+        LoopInit1:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            buffResult1[iVec*CONFIG_M_AXI_WIDTH+i]=0;
+        }
+    }
+
+    LoopBatch:
+    for(unsigned batch=0; batch<batchSize; batch++){
+#pragma HLS PIPELINE off
+#pragma HLS LOOP_FLATTEN off
+        #pragma HLS LOOP_TRIPCOUNT min=102400 max=102400
+
+        LoopSlice0:
+        for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+            #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+            #pragma HLS PIPELINE II=1
+            #pragma HLS DEPENDENCE variable=buffResult1 array inter false
+
+            indxS = batch*vecsPerSlice + iVec;
+            MemoryPackF_t vec = streamsData.Pop();
+
+            LoopCompute:
+            for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+                #pragma HLS UNROLL
+
+                CONFIG_DTYPE rslt = vec[i];
+                LoopPow:
+                for(unsigned ipwr=0; ipwr<MAX_POW_Y_MINUS_ONE; ipwr++){
+                    #pragma HLS UNROLL
+                    if(ipwr<pow_y_minus_one){
+                        rslt = rslt * rslt;
+                    }
+                }
+                buffResult1[iVec*CONFIG_M_AXI_WIDTH + i] += rslt;
+            }
+
+        }
+    }
+
+    LoopSlice1:
+    for(unsigned iVec=0; iVec<vecsPerSlice; iVec++){
+        #pragma HLS LOOP_TRIPCOUNT min=8 max=8
+
+        MemoryPackF_t outVec;
+
+        LoopOutput:
+        for(unsigned i=0; i<CONFIG_M_AXI_WIDTH; i++){
+            #pragma HLS UNROLL
+            outVec[i]=buffResult1[iVec*CONFIG_M_AXI_WIDTH+i];
+        }
+
+        outputTn[iVec] = outVec;
+    }
+}
 
 /**
  * @brief      Reduces the input tensor in the given dimensions.
@@ -418,7 +627,7 @@ void ReduceSumRank4Axes012_V3(
 
     HLSLIB_DATAFLOW_FUNCTION(ReduceSumRank4Axes012_V3_UnitRead, 
         inputTn, streamData, dim0, dim1, dim2, dim3);
-    HLSLIB_DATAFLOW_FUNCTION(ReduceSumRank4Axes012_V3_UnitProcess, 
+    HLSLIB_DATAFLOW_FUNCTION(ReduceSumRank4Axes012_V3_1_UnitProcess,
         streamData, outputTn, pow_y, dim0, dim1, dim2, dim3);
 
     HLSLIB_DATAFLOW_FINALIZE();
@@ -674,7 +883,7 @@ void task_reduce(
 #ifdef KERNEL_LOGS
         cout<<"ReduceSumRank4Axes012_V3 is selected."<<endl;
 #endif
-        ReduceSumRank4Axes012_V3(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3); // Dataflow
+        ReduceSumRank4Axes012_V4(inputTn, outputTn, pow_y, dim0, dim1, dim2, dim3); // Non-dataflow (V4), Dataflow (V3)
     }
 
     if(mode==3){
