@@ -1023,7 +1023,7 @@ ReportObject* XilinxImpUnitTests::KernelGather(){
 }
 
 void XilinxImpUnitTests::RunAll(){
-    
+    /*
     PrintReport(TensorFloat());
     PrintReport(TensorBankFloat());
     PrintReport(TensorBankInteger());
@@ -1034,9 +1034,9 @@ void XilinxImpUnitTests::RunAll(){
 
     PrintReport(KernelPadLastDimFloat());         //OK
     PrintReport(KernelUnpadLastDimFloat());       //OK
-    PrintReport(KernelConv2Mlp());
+    PrintReport(KernelConv2Mlp());*/
     PrintReport(KernelTopK());                    //OK
-    PrintReport(KernelMatops());                  //OK
+    /*PrintReport(KernelMatops());                  //OK
     PrintReport(KernelReduceSum4D());             //OK
     PrintReport(KernelReduceMax());               //OK 
     PrintReport(KernelReduceSum());               //OK
@@ -1049,7 +1049,7 @@ void XilinxImpUnitTests::RunAll(){
     PrintReport(KernelRelu());                    //OK
     PrintReport(KernelSqrt());                    //OK
     PrintReport(KernelSquare());                  //OK
-    PrintReport(KernelTranspose());               //OK 
+    PrintReport(KernelTranspose());  */             //OK 
     
     platformSelector->DumpImplementationSpecificLogs(PLATFORMS::GPU_OCL);
 }
