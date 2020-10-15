@@ -111,7 +111,7 @@ void TopK_MergeSortDF_V1_UnitRead(
 
 void TopK_MergeSortDF_V1_UnitWrite(
     MemoryPackI_t *indicesSplitedTn,
-    Stream<PairDataIndex_t, 1024> streamDataInL[UnitCount],
+    Stream<PairDataIndex_t, MaxK> streamDataInL[UnitCount],
     const unsigned dim0,
     const unsigned dim1,
     const unsigned vecsPerOutputSlice){
@@ -511,14 +511,14 @@ void TopK_MergeSortDF_V1_UnitMerge256(
 void TopK_MergeSortDF_V1_UnitMerge512(
     Stream<PairDataIndex_t, 512> &streamDataInL,
     Stream<PairDataIndex_t, 512> &streamDataInR,
-    Stream<PairDataIndex_t, 1024> &streamDataOutL,
+    Stream<PairDataIndex_t, MaxK> &streamDataOutL,
     const unsigned dim0,
     const unsigned dim1,
     const unsigned vecsPerOutputSlice){
 
     constexpr unsigned windowWidth = 512;
 
-    TopK_MergeSortDF_V1_UnitMergeLast<windowWidth, windowWidth*1, windowWidth*2>(
+    TopK_MergeSortDF_V1_UnitMergeLast<windowWidth, windowWidth*1, MaxK>(
         streamDataInL,
         streamDataInR,
         streamDataOutL,
@@ -543,37 +543,48 @@ void TopK_MergeSortDF_V1(
     #pragma HLS DATAFLOW
 
     Stream<PairDataIndex_t, 8> streamRead_W1[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamRead_W1 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamRead_W1 depth=8
 
     Stream<PairDataIndex_t, 2> streamW1_W2[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW1_W2 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=2
 
     Stream<PairDataIndex_t, 4> streamW2_W4[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW2_W4 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=4
 
     Stream<PairDataIndex_t, 8> streamW4_W8[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW4_W8 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=8
 
     Stream<PairDataIndex_t, 16> streamW8_W16[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW8_W16 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=16
 
     Stream<PairDataIndex_t, 32> streamW16_W32[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW16_W32 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=32
 
     Stream<PairDataIndex_t, 64> streamW32_W64[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW32_W64 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=64
 
     Stream<PairDataIndex_t, 128> streamW64_W128[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW64_W128 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=128
 
     Stream<PairDataIndex_t, 256> streamW128_W256[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW128_W256 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=256
 
     Stream<PairDataIndex_t, 512> streamW256_W512[UnitCount][2];
+//#pragma HLS RESOURCE variable=streamW256_W512 core=FIFO_LUTRAM
 #pragma HLS STREAM variable=streamReadToW1 depth=512
 
-    Stream<PairDataIndex_t, 1024> streamW512_Write[UnitCount];
-#pragma HLS STREAM variable=streamReadToW1 depth=1024
+    Stream<PairDataIndex_t, 20> streamW512_Write[UnitCount];
+//#pragma HLS RESOURCE variable=streamW512_Write core=FIFO_LUTRAM
+#pragma HLS STREAM variable=streamReadToW1 depth=20
 
 
 #ifndef HLSLIB_SYNTHESIS
@@ -591,7 +602,7 @@ void TopK_MergeSortDF_V1(
             streamW128_W256[iPE][i].set_name(("streamW128_W256["+ std::to_string(iPE)+"]["+std::to_string(i)+"]").c_str());
             streamW256_W512[iPE][i].set_name(("streamW256_W512["+ std::to_string(iPE)+"]["+std::to_string(i)+"]").c_str());
         }
-        streamW512_Write[iPE].set_name(("streamW512_W1024["+ std::to_string(iPE)+"]").c_str());
+        streamW512_Write[iPE].set_name(("streamW512_WK["+ std::to_string(iPE)+"]").c_str());
     }
 #endif
 

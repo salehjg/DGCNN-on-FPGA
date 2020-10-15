@@ -589,10 +589,10 @@ void task_conv2_1x1_direct(
                 const unsigned size_k,
                 const unsigned size_m) {
 
-#pragma HLS INTERFACE m_axi port=a offset=slave bundle=gmem0 max_read_burst_length=32 max_write_burst_length=2
-#pragma HLS INTERFACE m_axi port=b offset=slave bundle=gmem1 max_read_burst_length=32 max_write_burst_length=2
-#pragma HLS INTERFACE m_axi port=e offset=slave bundle=gmem2 max_read_burst_length=32 max_write_burst_length=2
-#pragma HLS INTERFACE m_axi port=c offset=slave bundle=gmem3 max_read_burst_length=2 max_write_burst_length=32
+#pragma HLS INTERFACE m_axi port=a offset=slave bundle=gmem0 max_read_burst_length=16 max_write_burst_length=2
+#pragma HLS INTERFACE m_axi port=b offset=slave bundle=gmem1 max_read_burst_length=16 max_write_burst_length=2
+#pragma HLS INTERFACE m_axi port=e offset=slave bundle=gmem2 max_read_burst_length=16 max_write_burst_length=2
+#pragma HLS INTERFACE m_axi port=c offset=slave bundle=gmem3 max_read_burst_length=2 max_write_burst_length=16
 #pragma HLS INTERFACE s_axilite port=a bundle=control
 #pragma HLS INTERFACE s_axilite port=b bundle=control
 #pragma HLS INTERFACE s_axilite port=e bundle=control
