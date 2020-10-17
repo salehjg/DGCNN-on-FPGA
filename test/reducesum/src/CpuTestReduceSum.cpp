@@ -135,8 +135,7 @@ int TestReduceSum(
 }
 
 int main(int argc, char **argv) {
-    int rslt0 = TestReduceSum<16>("ReduceSum3D_FFT", {2,2,17}, false, false, true);
+    int rslt0 = TestReduceSum<16>("ReduceSum3D_FFT", {2,64,3}, false, false, true);
     rslt0 += TestReduceSum<16>("ReduceSum3D_FFT", {2,2,64}, false, false, true);
-    rslt0 += TestReduceSum<16>("ReduceSum3D_FFT", {2,1024,50}, false, false, true);
     return rslt0;
 }
