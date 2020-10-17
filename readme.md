@@ -19,6 +19,7 @@ python2.7(Symlinked as `python`)
 PasteBin(Library for Python2.7, pip available)
 CMake3 (>3.0, Do **not** use default CMake package available on AWS-F1)
 Bash (>4.0, Dash and others are not tested)
+devtoolset-7 (>7.0, For C++14 support)
 ```
 
 # Configuration
@@ -28,6 +29,13 @@ To make it easier to explore the design space and try different configurations, 
 ```
 mkdir build
 cd build
+```
+For CentOS 7.x, enable devtoolset-7 for C++14 support with:
+```
+scl enable devtoolset-7 bash
+```
+and continue with:
+```
 cmake ..
 make DeepPointV1FPGA
 ```
