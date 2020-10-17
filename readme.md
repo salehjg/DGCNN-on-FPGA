@@ -3,7 +3,7 @@ This repository contains the code base for Xilinx SDAccel FPGA implementation of
 
 
 <p align="center">
-	<img width="50%" src="https://gitlab.com/salehjg/deeppoint-v1-fpga/-/raw/optimizing01_area_f1/cover_rc.png">
+	<img width="75%" src="https://gitlab.com/salehjg/deeppoint-v1-fpga/-/raw/optimizing01_area_f1/cover_rc.png">
 </p>
 
 
