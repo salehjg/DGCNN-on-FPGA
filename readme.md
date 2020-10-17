@@ -97,25 +97,45 @@ sh LaunchDeepPointV1FPGA.sh -t
 ```
 
 # UnitTests for The Kernels
-In order to make debugging of the kernels much more easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
+In order to make debugging of the kernels easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
 ```
 make test
 ```
+
+## 6. AWS F1 Deployment
+Please refer to `AWS-F1-Wiki.md`.
+
+## 7. Project Structure
 # Branches
 This repository contains multiple branches as described below:
 
 Branch | AXI Width | DType | Tool | Notes
 ---  |  --- |  --- |  --- |  ---
-master | 512-bits | float32 | SDx2019.1 | the main branch to be used
+master | 512-bits | float32 | SDx2019.1 | DEPRECATED
 axi32 | 32-bits | float32 | SDx2019.1 | DEPRECATED
+new_transpose | 512-bits | float32 | SDx2019.1 | DEPRECATED
+optimizing01 | 512-bits | float32 | SDx2019.1 | DEPRECATED
+optimizing01_area_f1 | 512-bits | float32 | SDx2019.1 | Up-to-date
 vitis20192_axi512 | 512-bits | float32 | Vitis2019.2 | HW build fails with clock partitioning error
 
+## 8. Useful Tips
 # Debugging Host-side in CLion
 In order to debug the host-side program in any modes(`sw_emu`, `hw_emu`, or `system`), CLion or any other C++ IDE could be used.
 
 Remember to run `scripts/debug_script.sh` before starting debugging session. Note that class `XilinxImplementation` is configured to select `sw_emu` in the case that variable `XCL_EMULATION_MODE` was not set beforehand.  
 
-# Credit
+# Launching Vivado HLS
+It is possible to launch Vivado HLS GUI and optimize the kernel of choice. This could be done after running a `hw_emu` build:
+```
+cd _x/task_<KERNEL>_solution/task_<KERNEL>
+vivado_hls -p task_<KERNEL>
+```
+* Please note that any changes to the source files will be reflected on the main repository files.
+
+## 9. Publication
+TBD.
+
+## 10. References
 These repositories are used in this project:
 * [dgcnn](https://github.com/WangYueFt/dgcnn)
 * [DeepPointV1-GPGPU](https://gitlab.com/salehjg/DeepPoint-V1-GPGPU)

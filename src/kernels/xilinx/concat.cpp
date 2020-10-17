@@ -14,8 +14,6 @@ using namespace std;
 using hlslib::Stream;
 using namespace ConfigTaskConcat;
 
-constexpr int PIPEDEPTH = 2; 
-
 /**
  * @brief      Concatenates the two input tensors over their last dimensions.
  *             Shapes:
@@ -241,7 +239,7 @@ void ConcatLastDimSuperVec_V1(
 
 void ConcatLastDimSuperVec_V2_UnitReadA(
         const MemoryPackF_t *inputTn1,
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamOut1,
+        Stream<MemoryPackF_t, PipeDepth> &streamOut1,
         const unsigned dim0,
         const unsigned dim1,
         const unsigned dim2,
@@ -282,7 +280,7 @@ void ConcatLastDimSuperVec_V2_UnitReadA(
 
 void ConcatLastDimSuperVec_V2_UnitReadB(
         const MemoryPackF_t *inputTn2,
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamOut2,
+        Stream<MemoryPackF_t, PipeDepth> &streamOut2,
         const unsigned dim0,
         const unsigned dim1,
         const unsigned dim2,
@@ -322,8 +320,8 @@ void ConcatLastDimSuperVec_V2_UnitReadB(
 }
 
 void ConcatLastDimSuperVec_V2_UnitProcess(
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamIn1,
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamIn2,
+        Stream<MemoryPackF_t, PipeDepth> &streamIn1,
+        Stream<MemoryPackF_t, PipeDepth> &streamIn2,
         MemoryPackF_t *outputTn,
         const unsigned dim0,
         const unsigned dim1,
@@ -383,10 +381,10 @@ void ConcatLastDimSuperVec_V2(
 
 #pragma HLS DATAFLOW
 
-    Stream<MemoryPackF_t, PIPEDEPTH> streamA;
-#pragma HLS STREAM variable=streamA depth=PIPEDEPTH
-    Stream<MemoryPackF_t, PIPEDEPTH> streamB;
-#pragma HLS STREAM variable=streamB depth=PIPEDEPTH
+    Stream<MemoryPackF_t, PipeDepth> streamA;
+#pragma HLS STREAM variable=streamA depth=PipeDepth
+    Stream<MemoryPackF_t, PipeDepth> streamB;
+#pragma HLS STREAM variable=streamB depth=PipeDepth
 
     HLSLIB_DATAFLOW_INIT();
 

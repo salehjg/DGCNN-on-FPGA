@@ -14,8 +14,6 @@ using namespace std;
 using hlslib::Stream;
 using namespace ConfigTaskTranspose;
 
-
-
 void BatchTranspose_V6_Burst(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,

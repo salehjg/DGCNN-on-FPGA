@@ -8,8 +8,7 @@
 
 using namespace std;
 using hlslib::Stream;
-
-constexpr unsigned PipeDepth = 1;
+using namespace ConfigTaskDataMover;
 
 template<int bankIndex>
 void DataMoverV2_UnitBankX(

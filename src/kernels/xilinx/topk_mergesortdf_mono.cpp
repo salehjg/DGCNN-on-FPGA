@@ -781,6 +781,7 @@ void task_topk(
 #pragma HLS INTERFACE s_axilite port=vecsPerOutputSlice bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control
 
+    static_assert(MaxSliceLen==1024, "Only MaxSliceLen=1024 is supported.");
     TopK_MergeSortDF_V1(inputTn, indicesSplitedTn, dim0, dim1, kValue, vecsPerSlice, vecsPerOutputSlice);
 }
 }

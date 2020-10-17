@@ -15,7 +15,6 @@ using hlslib::Stream;
 
 constexpr unsigned MAX_POW_Y_MINUS_ONE = (ConfigTaskReduce::Sum4D::MaxPowY-1);
 
-
 /**
  * @brief      ReduceSumRank3Axis2_V2, Unit Read.
  *             Optimized for burst i/o(subvec and supervec).
@@ -223,6 +222,7 @@ void ReduceSumRank3Axis2_V2(
  * @param[in]  dim1      The dim 1
  * @param[in]  dim2      The dim 2
  */
+/*
 void ReduceSumRank3Axis2_V1(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
@@ -276,6 +276,7 @@ void ReduceSumRank3Axis2_V1(
         }
     }
 }
+*/
 
 /**
  * @brief      Reduces the input tensor in the given dimensions.
@@ -378,6 +379,7 @@ void ReduceSumRank4Axes012_V4(
     }
 }
 
+/*
 void ReduceSumRank4Axes012_V3_UnitRead(
     const MemoryPackF_t *inputTn,
     Stream<MemoryPackF_t, ConfigTaskReduce::Sum4D::PipeDepth> &streamsData,
@@ -403,9 +405,11 @@ void ReduceSumRank4Axes012_V3_UnitRead(
 
     }
 }
+*/
 
 /**
  * @brief      This is the V3.0 in which the best achievable II is 5.
+ *             OLD
  *             
  *
  * @param      streamsData  The streams data
@@ -509,6 +513,7 @@ void ReduceSumRank4Axes012_V3_UnitProcess(
  * @param[in]  dim2         The dim 2
  * @param[in]  dim3         The dim 3
  */
+/*
 void ReduceSumRank4Axes012_V3_1_UnitProcess(
         Stream<MemoryPackF_t, ConfigTaskReduce::Sum4D::PipeDepth> &streamsData,
         MemoryPackF_t *outputTn,
@@ -588,6 +593,7 @@ void ReduceSumRank4Axes012_V3_1_UnitProcess(
         outputTn[iVec] = outVec;
     }
 }
+*/
 
 /**
  * @brief      Reduces the input tensor in the given dimensions.
@@ -606,6 +612,7 @@ void ReduceSumRank4Axes012_V3_1_UnitProcess(
  * @param[in]  dim2      The dim 2
  * @param[in]  dim3      The dim 3
  */
+/*
 void ReduceSumRank4Axes012_V3(
         const MemoryPackF_t *inputTn,
         MemoryPackF_t *outputTn,
@@ -632,11 +639,13 @@ void ReduceSumRank4Axes012_V3(
 
     HLSLIB_DATAFLOW_FINALIZE();
 }
+*/
 
 CONFIG_DTYPE _Max(CONFIG_DTYPE val1, CONFIG_DTYPE val2){
 #pragma HLS INLINE
     return (val2>val1) ? val2 : val1;
 }
+
 
 /**
  * @brief      Reduces the input tensor of rank 3 in the middle axis(FTF) with the max op.
@@ -743,6 +752,7 @@ void ReduceMaxRank3Axis1_V3(
  * @param[in]  dim1      The dim 1
  * @param[in]  dim2      The dim 2
  */
+/*
 void ReduceMaxRank3Axis1_V2(
     const MemoryPackF_t *inputTn,
     MemoryPackF_t *outputTn,
@@ -820,6 +830,7 @@ void ReduceMaxRank3Axis1_V2(
         }
     }
 }
+*/
 
 extern "C" {
 

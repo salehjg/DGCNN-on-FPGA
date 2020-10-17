@@ -10,13 +10,11 @@ using namespace std;
 using hlslib::Stream;
 using namespace ConfigTaskMatOps;
 
-constexpr int PIPEDEPTH = 2;
-
 void MatOpsRank4Rankx_V2_UnitRead(
         const MemoryPackF_t *inputTn1,
         const MemoryPackF_t *inputTn2,
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamOut1,
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamOut2,
+        Stream<MemoryPackF_t, PipeDepth> &streamOut1,
+        Stream<MemoryPackF_t, PipeDepth> &streamOut2,
         const unsigned dim0,
         const unsigned dim1,
         const unsigned dim2,
@@ -112,8 +110,8 @@ void MatOpsRank4Rankx_V2_UnitRead(
 }
 
 void MatOpsRank4Rankx_V2_UnitProcess(
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamIn1,
-        Stream<MemoryPackF_t, PIPEDEPTH> &streamIn2,
+        Stream<MemoryPackF_t, PipeDepth> &streamIn1,
+        Stream<MemoryPackF_t, PipeDepth> &streamIn2,
         MemoryPackF_t *outputTn,
         const unsigned dim0,
         const unsigned dim1,
@@ -238,10 +236,10 @@ void MatOpsRank4Rankx_V2(
 
 #pragma HLS DATAFLOW
 
-    Stream<MemoryPackF_t, PIPEDEPTH> stream1;
-#pragma HLS STREAM variable=stream1 depth=PIPEDEPTH
-    Stream<MemoryPackF_t, PIPEDEPTH> stream2;
-#pragma HLS STREAM variable=stream2 depth=PIPEDEPTH
+    Stream<MemoryPackF_t, PipeDepth> stream1;
+#pragma HLS STREAM variable=stream1 depth=PipeDepth
+    Stream<MemoryPackF_t, PipeDepth> stream2;
+#pragma HLS STREAM variable=stream2 depth=PipeDepth
 
     HLSLIB_DATAFLOW_INIT();
 
