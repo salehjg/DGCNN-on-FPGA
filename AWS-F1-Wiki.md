@@ -1,7 +1,7 @@
 # Notes
 * It is recommended to choose `r5.2xLarge` as the instance type. This would provide you with 64GB of RAM and 8 CPU-cores.
 * If an instance type with plenty of CPU-cores and a small amount of RAM is selected, make sure to override `CpuCount` in the main `CMakeLists.txt` to prevent launching too many jobs at the same time which will cause Vivado to fatally crash with `failed to allocate memory` error.
-* Do not use instance-specific ephemeral storage. This will cause the build directory to be lost after issuing the shutdown command by the automated build script. Instance types like `r5` instead of `r5d` do not offer ephemeral storage and usually, they are cheaper.
+* Do not use instance-specific ephemeral storage. This will lead to data loss (build directory) following a shutdown command issued by the automated build script. The instance types like `r5` instead of `r5d` do not offer ephemeral storage and they usually are cheaper.
 * Choose appropriate AWS FPGA AMI version for your Deeppoint branch of choice. For SDx2019.1(branch `axi512`) the AMI version 1.7.0 should be selected and for Vitis2019.2(branch `vitis_axi512`) the AMI version 1.8.1 should be selected(or the lastest one).
 * After terminating an instance, do not forget to manually delete detached EBS drives. Each FPGA AMI almost takes up 120GBs of SSD gp2 storage.
 
