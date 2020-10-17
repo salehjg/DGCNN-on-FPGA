@@ -89,14 +89,14 @@ Name | Supported Platform | Implementation | Notes
 ModelArch01 | CPU         | CPU | CPU Only
 ModelArch02 | CPU, FPGA   | Xilinx SDAccel Platform | FPGA Only
 
-## UnitTests for The Platforms
-To run OCl unittests:
+## OpenCL UnitTests
+To run the OCL unittests:
 ```
 sh LaunchDeepPointV1FPGA.sh -t
 ```
 
-## UnitTests for The Kernels
-In order to make debugging of the kernels easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU codes.
+## Kernel-specific UnitTests
+In order to make debugging of the kernels easier, separate unit tests are developed(`test` directory). These tests are isolated from OpenCL platform and therefore could be debugged as normal CPU c++ codes.
 ```
 make test
 ```
