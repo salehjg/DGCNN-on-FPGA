@@ -312,12 +312,12 @@ set(SP_TAG_CONCAT
  --sp task_concat_1.outputTn:bank${CFG8_Concat_DDRBANK_outputTn}")
 
 set(SP_TAG_TRANSPOSE
-"--sp task_transpose_1.inputTn:bank${CFG10_Transpose_DDRBANK_inputTn}\
- --sp task_transpose_1.outputTn:bank${CFG10_Transpose_DDRBANK_outputTn}")
+"--sp task_transpose_1.inputTn:bank${CFG9_Transpose_DDRBANK_inputTn}\
+ --sp task_transpose_1.outputTn:bank${CFG9_Transpose_DDRBANK_outputTn}")
 
 set(SP_TAG_RELUSQRTSQUARE
-"--sp task_relu_sqrt_square_1.inputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_inputTn}\
- --sp task_relu_sqrt_square_1.outputTn:bank${CFG12_ReluSqrtSquare_DDRBANK_outputTn}")
+"--sp task_relu_sqrt_square_1.inputTn:bank${CFG10_ReluSqrtSquare_DDRBANK_inputTn}\
+ --sp task_relu_sqrt_square_1.outputTn:bank${CFG10_ReluSqrtSquare_DDRBANK_outputTn}")
 
 set(SP_TAG_DATAMOVER "")
 if(${UseMemoryBank0})
@@ -336,8 +336,8 @@ string(REPLACE ";" " " SP_TAG_DATAMOVER "${SP_TAG_DATAMOVER}" )
 message("DataMover SP Tag: ${SP_TAG_DATAMOVER}")
 
 set(SP_TAG_PADUNPAD
-"--sp task_pad_unpad_1.inputTn:bank${CFG13_PadUnpad_DDRBANK_inputTn}\
- --sp task_pad_unpad_1.outputTn:bank${CFG13_PadUnpad_DDRBANK_outputTn}")
+"--sp task_pad_unpad_1.inputTn:bank${CFG11_PadUnpad_DDRBANK_inputTn}\
+ --sp task_pad_unpad_1.outputTn:bank${CFG11_PadUnpad_DDRBANK_outputTn}")
 
 
 
