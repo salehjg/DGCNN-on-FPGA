@@ -1034,8 +1034,8 @@ void XilinxImpUnitTests::RunAll(){
 
     PrintReport(KernelPadLastDimFloat());         //OK
     PrintReport(KernelUnpadLastDimFloat());       //OK
-    //PrintReport(KernelConv2Mlp());
-    //PrintReport(KernelTopK());                  //OK
+    PrintReport(KernelConv2Mlp());                //OK
+    PrintReport(KernelTopK());                    //OK
     PrintReport(KernelMatops());                  //OK
     PrintReport(KernelReduceSum4D());             //OK
     PrintReport(KernelReduceMax());               //OK 
