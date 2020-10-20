@@ -137,7 +137,7 @@ def brute_force():
                                                 util_cond_bank3 = True
 
                                                 # 15 = 16 -1, 1 axi is reserved for DataMover
-                                                if min_datamover_launches > val and \
+                                                if min_datamover_launches >= val and \
                                                         bank0<=15 and bank1<=15 and \
                                                         bank2<=15 and bank3<=15 and \
                                                         abs(bank1-bank2)<10 and \
@@ -164,7 +164,7 @@ def brute_force():
 
 kernelnames = ["transpose","matmul","matops","relusqrtsquare","reduce","tile","topk","gather","concat","padunpad","conv"]
 solutions = brute_force()
-print('Solutions Count: ', len(solutions))
+print('Solution Found: ', len(solutions))
 for solution in solutions:
     print('=====================================================================================================')
     kernels_on_bank1 = []

@@ -1242,10 +1242,10 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
         if(D2%ConfigTaskConv2::kOuterTileSizeM!=0){ //same as Block2
             //Super-vec Unpadding( 128->64 )
             rsltTn = UnpadLastDim(scheduler, rsltTnPadded, D2);
-            SPDLOG_LOGGER_DEBUG(logger, "Unpadding results(super-vec unpadding)");
+            SPDLOG_LOGGER_DEBUG(logger, "Unpadding the results(super-vec unpadding)");
         }else{
             rsltTn = rsltTnPadded;
-            SPDLOG_LOGGER_DEBUG(logger, "Bypassing super-vec unpadding of results");
+            SPDLOG_LOGGER_DEBUG(logger, "Bypassing super-vec unpadding of the results");
         }        
 
         //-----------------------------------------------------------------
