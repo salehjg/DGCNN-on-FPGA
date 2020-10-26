@@ -150,16 +150,19 @@ TBD.
 
 # 10. References
 These repositories are used in this project:
-* [dgcnn](https://github.com/WangYueFt/dgcnn)
-* [DeepPointV1-GPGPU](https://gitlab.com/salehjg/DeepPoint-V1-GPGPU)
-* [hlslib](https://github.com/definelicht/hlslib)
-* [gemm_hls](https://github.com/spcl/gemm_hls)
-* [pp4fpgas](https://github.com/KastnerRG/pp4fpgas)
-* [cnpy](https://github.com/rogersce/cnpy)
-* [PointNet](https://github.com/charlesq34/pointnet)
-* [PointNet++](https://github.com/charlesq34/pointnet2)
-* [argparse](https://github.com/jamolnng/argparse)
-* [spdlog](https://github.com/gabime/spdlog)
+| Repo                                                                   | Description                                                                                                                                                        | License                                   |
+|------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
+| [dgcnn](https://github.com/WangYueFt/dgcnn)                            | ([Paper(ACM)](https://dl.acm.org/doi/10.1145/3326362), [Paper(Arxiv)](https://arxiv.org/abs/1801.07829)) Dynamic Graph CNN for Point Clouds (Tensorflow)           | N/S                                       |
+| [DeepPointV1-GPGPU](https://gitlab.com/salehjg/DeepPoint-V1-GPGPU)     | Our CUDA/OCL Version of DGCNN                                                                                                                                      | N/S                                       |
+| [hlslib](https://github.com/definelicht/hlslib)                        | ([Paper](https://arxiv.org/abs/1910.04436)) CMake/HLS Libraries for Intel and Xilinx                                                                               | BSD 3-Clause                              |
+| [gemm_hls](https://github.com/spcl/gemm_hls)                           | ([Paper(ACM)](https://dl.acm.org/doi/abs/10.1145/3373087.3375296), [Paper(Arxiv)](https://arxiv.org/abs/1912.06526)) Scalable matrix matrix multiplication on FPGA | BSD 3-Clause                              |
+| [pp4fpgas](https://github.com/KastnerRG/pp4fpgas)                      | ([Book(Arxiv)](https://arxiv.org/abs/1805.03648)) Parallel Programming for FPGAs                                                                                   | N/S                                       |
+| [cnpy](https://github.com/rogersce/cnpy)                               | C++ Library for working `*.npy` files                                                                                                                              | MIT                                       |
+| [PointNet](https://github.com/charlesq34/pointnet)                     | ([Paper](https://arxiv.org/abs/1612.00593)) PointNet 1                                                                                                             | MIT                                       |
+| [PointNet++](https://github.com/charlesq34/pointnet2)                  | ([Paper](https://arxiv.org/abs/1706.02413)) PointNet 2                                                                                                             | MIT                                       |
+| [argparse](https://github.com/jamolnng/argparse)                       | C++ Library for handling arguments                                                                                                                                 | Apache-2.0-with-LLVM-Exception or GPL-3.0 |
+| [spdlog](https://github.com/gabime/spdlog)                             | C++ Library for fast logging                                                                                                                                       | MIT                                       |
+| [hls_tutorial_examples](https://github.com/spcl/hls_tutorial_examples) | ([Paper](https://arxiv.org/abs/1805.08288)) HLS examples and tutorials (Workshop)                                                                                  | BSD 3-Clause                              |
 
 
 
