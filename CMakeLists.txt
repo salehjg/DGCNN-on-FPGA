@@ -562,9 +562,11 @@ configure_file(${CMAKE_SOURCE_DIR}/scripts/LaunchDeepPointV1FPGA.sh.in LaunchDee
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_swemu.sh ${CMAKE_BINARY_DIR}/autobuild_swemu.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hwemu.sh ${CMAKE_BINARY_DIR}/autobuild_hwemu.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/autobuild_hw.sh ${CMAKE_BINARY_DIR}/autobuild_hw.sh @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/scripts/PasteBinAgentForAutoBuilds.py ${CMAKE_BINARY_DIR}/PasteBinAgentForAutoBuilds.py @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/PasteBinScript.py ${CMAKE_BINARY_DIR}/PasteBinScript.py @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/SimplePasteBin/SimplePasteBin.py ${CMAKE_BINARY_DIR}/SimplePasteBin.py COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/sdaccel.ini ${CMAKE_BINARY_DIR}/sdaccel.ini COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/gather_results.sh ${CMAKE_BINARY_DIR}/gather_results.sh COPYONLY)
+
 
 include(CTest)
 add_subdirectory("test")

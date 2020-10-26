@@ -30,7 +30,8 @@ cd 00_workspace
 sudo yum -y install centos-release-scl epel-release nano cmake3 zip htop
 sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
 sudo yum -y install devtoolset-7
-sudo pip install PasteBin
+sudo pip install PasteBin #only for old commits of this repo
+sudo amazon-linux-extras install python3 #for the new pastebin script(1v1) and the bank_opt script.
 git clone https://github.com/aws/aws-fpga.git $AWS_FPGA_REPO_DIR
 source /home/centos/src/project_data/aws-fpga/sdaccel_setup.sh
 echo 'export AWS_PLATFORM=/home/centos/src/project_data/aws-fpga/SDAccel/aws_platform/xilinx_aws-vu9p-f1-04261818_dynamic_5_0/xilinx_aws-vu9p-f1-04261818_dynamic_5_0.xpfm' >> ~/.bashrc

@@ -1,4 +1,4 @@
-import pastebin
+import SimplePasteBin as helper
 import time
 import sys
 from datetime import timedelta
@@ -8,6 +8,12 @@ APIKEY = "@PASTEBIN_API_KEY@"
 USERNAME = "@PASTEBIN_USERNAME@"
 PASSWORD = "@PASTEBIN_PASSWORD@"
 PRIVATEKEY = ""
+
+pb = helper.SimplePasteBin(
+    username=USERNAME,
+    password=PASSWORD,
+    api_key=APIKEY,
+    is_verbose=True)
 
 pname = time.strftime("%Y%m%d-%H%M%S")
 
@@ -20,7 +26,7 @@ def GetUpTime():
 def GetAgentsBanner():
     str = ''.join([
         "##############################################\n",
-        "  Python PasteBin Agent V1.0\n",
+        "  Python PasteBin Agent V1.1\n",
         "  Instance Up-time: ", GetUpTime(), '\n',
         "  Date: ", pname, '\n',
         "##############################################\n\n",
@@ -34,52 +40,42 @@ def ReadLogFile(fname):
     final_content = ''.join([GetAgentsBanner(), content])
     return final_content
 
-def LoginToPasteBin():
-    private_key = pastebin.generate_user_key(APIKEY, USERNAME, PASSWORD)
-    return private_key
-
 def TryUpload(fname, pastename="AutoBuild-", mode="HW-"):
-    success = True
+    ret_vals = 0
     try:
-        PRIVATEKEY = LoginToPasteBin()
+        ret_vals += pb.login()
         logcontent = ReadLogFile(fname)
         joinedpname = ''.join([pastename, mode, pname])
-        pastebin.paste(APIKEY, logcontent, api_user_key=PRIVATEKEY, paste_private='private', paste_name=joinedpname)
-    except not pastebin.PastebinError:
-        print("An exception occurred")
-        success = False
-    except pastebin.PastebinError as e:
-        print "\tPasteBin Controller Handled Exception:"
-        print ''.join(['\t', str(e)])
-    return success
+        ret_vals +=  pb.create_paste(joinedpname, logcontent, 'N', 'private')
+    except Exception as e:
+        print(e)
+        ret_vals += 1
+    return ret_vals
 
 def MainFunc():
-    print "Running python pastebin log uploader agent..."
-    rslt1 = True
-    rslt2 = True
-    rslt3 = True
+    print("Running python3 pastebin script...")
+    rslt = 0
 
     fname = "autobuild_hw_log.txt"
     if os.path.isfile(fname):
-        print "Found HW log file."
-        rslt1 = TryUpload(fname, mode="HW-")
+        print("Found HW log file.")
+        rslt += TryUpload(fname, mode="HW-")
 
     fname = "autobuild_hwemu_log.txt"
     if os.path.isfile(fname):
-        print "Found HW-EMU log file."
-        rslt2 = TryUpload(fname, mode="HWEMU-")
+        print("Found HW-EMU log file.")
+        rslt += TryUpload(fname, mode="HWEMU-")
 
     fname = "autobuild_swemu_log.txt"
     if os.path.isfile(fname):
-        print "Found SW-EMU log file."
-        rslt3 = TryUpload(fname, mode="SWEMU-")
+        print("Found SW-EMU log file.")
+        rslt += TryUpload(fname, mode="SWEMU-")
 
-    rslt = rslt1 and rslt2 and rslt3
-    if rslt:
-        print "Agent has done its work successfully."
+    if rslt == 0:
+        print("The log file has been uploaded to PasteBin.com as a private paste.")
         sys.exit(0)
     else:
-        print "Agent has failed."
+        print("PasteBin script has failed.")
         sys.exit(5)
 
 MainFunc()

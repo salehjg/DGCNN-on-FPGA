@@ -16,11 +16,11 @@ echo "Total Elapsed Hours: ${hours}" | tee -a autobuild_swemu_log.txt
 
 RUN_PASTEBIN_OR_NOT=@PASTEBIN_0_1@
 if [ "$RUN_PASTEBIN_OR_NOT" -eq 1 ] ; then
-	echo "**Running PasteBin agent..."
-	python PasteBinAgentForAutoBuilds.py
+	echo "**Running the PasteBin script..."
+	python3 PasteBinScript.py
 	echo "**Done."
 else
-	echo "PasteBin agent is disabled."
+	echo "The PasteBin script is disabled."
 fi
 
 echo "DONE. RUNNING POWEROFF COMMAND..."
