@@ -567,6 +567,8 @@ configure_file(${CMAKE_SOURCE_DIR}/SimplePasteBin/SimplePasteBin.py ${CMAKE_BINA
 configure_file(${CMAKE_SOURCE_DIR}/scripts/sdaccel.ini ${CMAKE_BINARY_DIR}/sdaccel.ini COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/gather_results.sh ${CMAKE_BINARY_DIR}/gather_results.sh COPYONLY)
 
+configure_file(${CMAKE_SOURCE_DIR}/CMakeLists.txt ${CMAKE_BINARY_DIR}/CMakeLists_main.log COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/config/CMakeLists.txt ${CMAKE_BINARY_DIR}/CMakeLists_config.log COPYONLY)
 
 include(CTest)
 add_subdirectory("test")
