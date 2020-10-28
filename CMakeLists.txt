@@ -36,7 +36,7 @@ set(PROFILE_STALL OFF CACHE BOOL "Stall Profiling Switch (For all of the kernels
 set(PROFILE_EXEC ON CACHE BOOL "Exec Profiling Switch (For all of the kernels)")
 set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(ReportLevel "0" CACHE STRING "0: no DCP, 1: all of DCPs, 2: detailed, estimate: generate design.xml")
-set(KERNEL_CLOCK "154" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
+set(KERNEL_CLOCK "145" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(UseMemoryBank0 OFF CACHE BOOL "Enable/Disable usage of memory bank 0")
 set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
 set(UseMemoryBank2 ON CACHE BOOL "Enable/Disable usage of memory bank 2")
