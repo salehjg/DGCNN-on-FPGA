@@ -2,18 +2,18 @@ import numpy as np
 import kernel_obj as h
 
 # Allowed banks per kernel (banks 0 to 3)
-common_datamover = h.KernelObj('datamover', [1, 2], 12, 0, 1, 1, 0)
-obj_transpose = h.KernelObj('transpose', [1, 2], 10, 1, 1, 3, 0)
-obj_matmul = h.KernelObj('matmul', [1, 2], 8, 14, 4, 6, 0)
-obj_matops = h.KernelObj('matops', [1, 2], 9, 12, 8, 17, 0)
+common_datamover = h.KernelObj('datamover', [0,1], 12, 0, 1, 1, 0)
+obj_transpose = h.KernelObj('transpose', [0,1], 10, 1, 1, 3, 0)
+obj_matmul = h.KernelObj('matmul', [0,1], 8, 14, 4, 6, 0)
+obj_matops = h.KernelObj('matops', [0,1], 9, 12, 8, 17, 0)
 obj_relusqrtsquare = h.KernelObj('relusqrtsquare', [1, 2], 2, 2, 1, 3, 0)
-obj_reduce = h.KernelObj('reduce', [1, 2], 7, 7, 7, 15, 0)
-obj_tile = h.KernelObj('tile', [1, 2], 4, 0, 4, 8, 0)
-obj_topk = h.KernelObj('topk', [1,2], 14, 1, 8, 20, 0)
-obj_gather = h.KernelObj('gather', [1, 2], 7, 3, 4, 7, 0)
-obj_concat = h.KernelObj('concat', [1,2], 8, 7, 16, 36, 0)
-obj_padunpad = h.KernelObj('padunpad', [1,2], 2, 1, 4, 7, 0)
-obj_conv = h.KernelObj('conv', [1,2], 42, 32, 13, 56, 0)
+obj_reduce = h.KernelObj('reduce', [0,1], 7, 7, 7, 15, 0)
+obj_tile = h.KernelObj('tile', [0,1], 4, 0, 4, 8, 0)
+obj_topk = h.KernelObj('topk', [0,1], 14, 1, 8, 20, 0)
+obj_gather = h.KernelObj('gather', [0,1], 7, 3, 4, 7, 0)
+obj_concat = h.KernelObj('concat', [0,1], 8, 7, 16, 36, 0)
+obj_padunpad = h.KernelObj('padunpad', [0,1], 2, 1, 4, 7, 0)
+obj_conv = h.KernelObj('conv', [0,1], 42, 32, 13, 56, 0)
 
 def get_objective(
     transpose_in,
@@ -117,10 +117,10 @@ def brute_force():
                                                     if cloned_objs[i].assigned_bank == 3:
                                                         stats_bank3 = stats_bank3 + cloned_objs[i].util_stats
 
-                                                util_cond_bank0 = stats_bank0 < h.SlrStats(-1,100,100,100,100,100)
-                                                util_cond_bank0 = True
+                                                util_cond_bank0 = stats_bank0 < h.SlrStats(-1,100,100,100,85,100)
+                                                #util_cond_bank0 = True
 
-                                                util_cond_bank1 = stats_bank1 < h.SlrStats(-1,80,80,80,80,80)
+                                                util_cond_bank1 = stats_bank1 < h.SlrStats(-1,200,200,200,100,200)
                                                 #util_cond_bank1 = True
 
                                                 # We are trying to make sure that SLR2(bank1) utilization stays within the limits.
@@ -130,22 +130,21 @@ def brute_force():
                                                 #   SLR0 <---> SLR1 <---> SLR2
                                                 # and here we are trying to minimize the routes that cross multiple SLRs.
 
-                                                util_cond_bank2 = stats_bank2 < h.SlrStats(-1,100,100,100,100,100)
-                                                util_cond_bank2 = True
+                                                util_cond_bank2 = stats_bank2 < h.SlrStats(-1,200,200,200,200,200)
+                                                #util_cond_bank2 = True
 
-                                                util_cond_bank3 = stats_bank3 < h.SlrStats(-1,100,100,100,100,100)
-                                                util_cond_bank3 = True
+                                                util_cond_bank3 = stats_bank3 < h.SlrStats(-1,200,200,200,200,200)
+                                                #util_cond_bank3 = True
 
                                                 # 15 = 16 -1, 1 axi is reserved for DataMover
                                                 if min_datamover_launches >= val and \
                                                         bank0<=15 and bank1<=15 and \
                                                         bank2<=15 and bank3<=15 and \
-                                                        abs(bank1-bank2)<10 and \
                                                         util_cond_bank0 and \
                                                         util_cond_bank1 and \
                                                         util_cond_bank2 and \
                                                         util_cond_bank3 and \
-                                                        True:
+                                                        True: #abs(bank1-bank2)<10 and \
 
                                                     result_bank0 = bank0
                                                     result_bank1 = bank1
@@ -167,21 +166,29 @@ solutions = brute_force()
 print('Solution Found: ', len(solutions))
 for solution in solutions:
     print('=====================================================================================================')
+    kernels_on_bank0 = []
     kernels_on_bank1 = []
     kernels_on_bank2 = []
+    kernels_on_bank3 = []
     for i in range(len(solution['combination'])):
+        if solution['combination'][i].assigned_bank==0:
+            kernels_on_bank0.append(solution['combination'][i].kernel_name)
         if solution['combination'][i].assigned_bank==1:
             kernels_on_bank1.append(solution['combination'][i].kernel_name)
         if solution['combination'][i].assigned_bank==2:
             kernels_on_bank2.append(solution['combination'][i].kernel_name)
+        if solution['combination'][i].assigned_bank==3:
+            kernels_on_bank3.append(solution['combination'][i].kernel_name)
 
     print('Required DataMover Launches: ' + str(solution['datamover_launches']),'\n')
     print('m_axi s on bank 0: ' + str(solution['axi_per_bank'][0]))
     print('m_axi s on bank 1: ' + str(solution['axi_per_bank'][1]))
     print('m_axi s on bank 2: ' + str(solution['axi_per_bank'][2]))
     print('m_axi s on bank 3: ' + str(solution['axi_per_bank'][3]),'\n')
-    print('Kernels on bank 1 : ', kernels_on_bank1)
-    print('Kernels on bank 2 : ', kernels_on_bank2,'\n')
+    print('Kernels on bank 0 = SLR1 : ', kernels_on_bank0)
+    print('Kernels on bank 1 = SLR2 : ', kernels_on_bank1)
+    print('Kernels on bank 2 = SLR2 : ', kernels_on_bank2)
+    print('Kernels on bank 3 = SLR0 : ', kernels_on_bank3,'\n')
     print('SLR usage for bank 0: ', solution['per_bank_util'][0])
     print('SLR usage for bank 1: ', solution['per_bank_util'][1])
     print('SLR usage for bank 2: ', solution['per_bank_util'][2])

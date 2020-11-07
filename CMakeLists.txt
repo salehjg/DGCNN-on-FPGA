@@ -33,14 +33,15 @@ set(SYNTH_FLAGS "-DKERNEL_LOGS -DHLSLIB_SYNTHESIS -DHLSLIB_XILINX -std=c++11 -I$
 set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information (Master Switch)")
 set(PROFILE_DATA OFF CACHE BOOL "Data Profiling ON/OFF (For all of the kernels)")
 set(PROFILE_STALL OFF CACHE BOOL "Stall Profiling Switch (For all of the kernels)")
-set(PROFILE_EXEC ON CACHE BOOL "Exec Profiling Switch (For all of the kernels)")
-set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
+set(PROFILE_EXEC OFF CACHE BOOL "Exec Profiling Switch (For all of the kernels)")
+set(OPTIMIZATION_OPTION "s" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
 set(ReportLevel "0" CACHE STRING "0: no DCP, 1: all of DCPs, 2: detailed, estimate: generate design.xml")
-set(KERNEL_CLOCK "145" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
-set(UseMemoryBank0 OFF CACHE BOOL "Enable/Disable usage of memory bank 0")
+set(KERNEL_CLOCK "130" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
+set(UseMemoryBank0 ON CACHE BOOL "Enable/Disable usage of memory bank 0")
 set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
-set(UseMemoryBank2 ON CACHE BOOL "Enable/Disable usage of memory bank 2")
+set(UseMemoryBank2 OFF CACHE BOOL "Enable/Disable usage of memory bank 2")
 set(UseMemoryBank3 OFF CACHE BOOL "Enable/Disable usage of memory bank 3")
+set(VivadoOptions "--xp vivado_prop:run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={SSI_SpreadSLLs} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}" CACHE STRING "Extra options for implementation steps")
 
 set(PASTEBIN_0_1 "0" CACHE STRING "Enable or disable PasteBin agent for uploading autobuild log files to PasteBin.")
 set(PASTEBIN_USERNAME "" CACHE STRING "PasteBin Account's Username")
@@ -178,7 +179,7 @@ function(sdaccel_target
         --jobs ${CpuCount}
         --xp prop:kernel.${KERNEL_NAME}.kernel_flags="${KERNEL_FLAGS}"
         --xp misc:solution_name="${KERNEL_NAME}_solution"
-        --max_memory_ports all
+        ${VivadoOptions}
     )
 
     if(ENABLE_PROFILING AND PROFILE_STALL)
@@ -472,6 +473,7 @@ add_custom_target(compile_hwemu COMMAND sh Compile_HwEmu_Batch.sh)
 add_custom_target(compile_swemu COMMAND sh Compile_SwEmu_Batch.sh)
 
 set(SlrUtilOutputFile ${CMAKE_BINARY_DIR}/SLR_UTILIZATION.log)
+set(PblockUtilOutputFile ${CMAKE_BINARY_DIR}/PBLOCK_UTILIZATION.log)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 set(SlrUtilFilePath ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
 
@@ -495,7 +497,7 @@ if(ENABLE_PROFILING)
 endif()
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh"
-    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} --optimize ${OPTIMIZATION_OPTION} --report_level ${ReportLevel} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} ${VivadoOptions} --optimize ${OPTIMIZATION_OPTION} --report_level ${ReportLevel} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh"

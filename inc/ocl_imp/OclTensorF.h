@@ -17,8 +17,8 @@ struct SameBankException : public std::exception {
    }
 };
 
-constexpr int DATAMOVER_KERNEL_BANK_A_INDEX = 1;
-constexpr int DATAMOVER_KERNEL_BANK_B_INDEX = 2;
+constexpr int DATAMOVER_KERNEL_BANK_A_INDEX = 0;
+constexpr int DATAMOVER_KERNEL_BANK_B_INDEX = 1;
 
 class OclTensorF: public TensorF {
 public:
