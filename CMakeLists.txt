@@ -34,14 +34,14 @@ set(ENABLE_PROFILING OFF CACHE BOOL "Collect profiling information (Master Switc
 set(PROFILE_DATA OFF CACHE BOOL "Data Profiling ON/OFF (For all of the kernels)")
 set(PROFILE_STALL OFF CACHE BOOL "Stall Profiling Switch (For all of the kernels)")
 set(PROFILE_EXEC OFF CACHE BOOL "Exec Profiling Switch (For all of the kernels)")
-set(OPTIMIZATION_OPTION "s" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation")
+#set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation, This option overrides VivadoOptions.")
 set(ReportLevel "0" CACHE STRING "0: no DCP, 1: all of DCPs, 2: detailed, estimate: generate design.xml")
 set(KERNEL_CLOCK "130" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(UseMemoryBank0 ON CACHE BOOL "Enable/Disable usage of memory bank 0")
 set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
 set(UseMemoryBank2 OFF CACHE BOOL "Enable/Disable usage of memory bank 2")
 set(UseMemoryBank3 OFF CACHE BOOL "Enable/Disable usage of memory bank 3")
-set(VivadoOptions "--xp vivado_prop:run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={SSI_SpreadSLLs} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}" CACHE STRING "Extra options for implementation steps")
+set(VivadoOptions "--xp vivado_prop:run.impl_1.{STEPS.OPT_DESIGN.ARGS.DIRECTIVE}={ExploreSequentialArea} --xp vivado_prop:run.impl_1.{STEPS.PLACE_DESIGN.ARGS.DIRECTIVE}={SSI_SpreadSLLs} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE}={AggressiveExplore}" CACHE STRING "Extra options for implementation steps")
 
 set(PASTEBIN_0_1 "0" CACHE STRING "Enable or disable PasteBin agent for uploading autobuild log files to PasteBin.")
 set(PASTEBIN_USERNAME "" CACHE STRING "PasteBin Account's Username")
@@ -497,15 +497,15 @@ if(ENABLE_PROFILING)
 endif()
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh"
-    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} ${VivadoOptions} --optimize ${OPTIMIZATION_OPTION} --report_level ${ReportLevel} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} ${VivadoOptions} --report_level ${ReportLevel} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh"
-    "${SDAccel_XOCC} -g -l -t hw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
+    "${SDAccel_XOCC} -g -l -t hw_emu --platform ${DSA_NAME} --jobs ${CpuCount} ${hwemu_link_command} ${hwemu_link} -o ${CMAKE_PROJECT_NAME}_hw_emu.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_SwEmu_Batch.sh"
-    "${SDAccel_XOCC} -g -l -t sw_emu --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} --jobs ${CpuCount} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
+    "${SDAccel_XOCC} -g -l -t sw_emu --platform ${DSA_NAME} --jobs ${CpuCount} ${swemu_link_command} ${swemu_link} -o ${CMAKE_PROJECT_NAME}_sw_emu.xclbin"
 )
 add_custom_target(link_hw COMMAND sh Link_Hw_Batch.sh)
 add_custom_target(link_hwemu COMMAND sh Link_HwEmu_Batch.sh )
@@ -513,7 +513,7 @@ add_custom_target(link_swemu COMMAND sh Link_SwEmu_Batch.sh )
 
 
 file(WRITE "${CMAKE_BINARY_DIR}/Interactrive_Hw_Batch.sh"
-    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --optimize ${OPTIMIZATION_OPTION} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin --interactive synth"
+    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin --interactive synth"
 )
 add_custom_target(interactive_hw COMMAND sh Interactrive_Hw_Batch.sh)
 
