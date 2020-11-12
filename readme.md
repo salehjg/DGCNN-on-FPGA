@@ -24,6 +24,7 @@ devtoolset-7 (>7.0, For C++14 support)
 
 # Configuration
 To make it easier to explore the design space and try different configurations, all of the parameters that affect the output performance of the task kernels are gathered in a separate submodule repository at directory `config`. 
+Also please note that various vivado directives for different steps are used to facilitate design implementation (opt, place, and route).
 
 # 1. Building The Host Program
 ```
@@ -165,5 +166,5 @@ These repositories are used in this project:
 | [argparse](https://github.com/jamolnng/argparse) | C++ Library for handling arguments | Apache-2.0-with-LLVM-Exception or GPL-3.0 |
 | [spdlog](https://github.com/gabime/spdlog) | C++ Library for fast logging | MIT |
 | [hls_tutorial_examples](https://github.com/spcl/hls_tutorial_examples) | ([Paper](https://arxiv.org/abs/1805.08288)) HLS examples and tutorials (Workshop) | BSD 3-Clause |
-| [SimplePasteBin](https://github.com/salehjg/SimplePasteBin) | C++ Library for working with PasteBin.com | GPL-3.0 |
+| [SimplePasteBin](https://github.com/salehjg/SimplePasteBin) | Python Library for working with PasteBin.com | GPL-3.0 |
 
