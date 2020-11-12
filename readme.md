@@ -20,6 +20,7 @@ CMake3 (>3.0, Do **not** use default CMake package available on AWS-F1)
 Bash (>4.0, Dash and others are not tested)
 devtoolset-7 (>7.0, For C++14 support)
 ```
+* Make sure that the latest vivado patches are applied, such as `AR73068`.
 
 # Configuration
 To make it easier to explore the design space and try different configurations, all of the parameters that affect the output performance of the task kernels are gathered in a separate submodule repository at directory `config`. 
