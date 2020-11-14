@@ -962,7 +962,7 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
     }
     const unsigned kVal=20;
     const unsigned B = 1; //ConfigTaskTopK::UnitCount+2
-    const unsigned N1 = ConfigTaskTopK::MaxSliceLen;
+    const unsigned N1 = 2;//ConfigTaskTopK::MaxSliceLen;
     const unsigned N2 = ConfigTaskTopK::MaxSliceLen;
 
     SPDLOG_LOGGER_INFO(logger,"Please confirm that TOPK kernel is configured for K={} and N={}, Press ESC to skip...",kVal,N2);   
@@ -987,6 +987,19 @@ ReportObject* XilinxImpUnitTests::KernelTopK(){
                     unsigned int i = b*N1*kVal + n1*kVal + kk;
                     int rCpu = tensorCpu->_buff[i];
                     int rUdt = tensorGpuTransfered->_buff[i];
+
+                    if(!(rCpu>0 && rCpu<N2)){
+                        SPDLOG_LOGGER_ERROR(logger,"Out of bound rCPU={}",rCpu);
+                        comparisonResult=false;
+                        continue;
+                    }
+
+                    if(!(rUdt>0 && rUdt<N2)){
+                        SPDLOG_LOGGER_ERROR(logger,"Out of bound rUDT={}",rUdt);
+                        comparisonResult=false;
+                        continue;
+                    }
+
                     SPDLOG_LOGGER_INFO(
                         logger,
                         "Index(B,N,K)= ({},{},{}), rCPU={}, rUDT={}, Value[rCPU]={}, Value[rUDT]={}",

@@ -1264,22 +1264,23 @@ TensorI* CpuImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat, i
         SPDLOG_LOGGER_ERROR(logger,"TopK: ERROR_BAD_K");
         return nullptr;
     }
+    /*
     if(batchedMat->getShape()[1] != batchedMat->getShape()[2]){
         SPDLOG_LOGGER_ERROR(logger,"TopK: ERROR_BAD_TENSOR_SHAPE");
         return nullptr;
-    }
+    }*/
 
     // batchedMat is considered as BxNxN
     // std::sort in ascending order:
     unsigned indxS=0;
-    unsigned B = batchedMat->getShape()[0], N = batchedMat->getShape()[1], K = (unsigned)k;
+    unsigned B = batchedMat->getShape()[0], N2 = batchedMat->getShape()[1], N = batchedMat->getShape()[2], K = (unsigned)k;
 
-    TensorI* rslt = new TensorI({B,N,K});
+    TensorI* rslt = new TensorI({B,N2,K});
 
     float tmp_array[N];
     unsigned indices[N];
 
-    for(unsigned b=0;b<B*N;b++){
+    for(unsigned b=0;b<B*N2;b++){
         for(unsigned i = 0 ;i<N;i++){
             indices[i]=i;
         }
