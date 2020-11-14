@@ -1,0 +1,1066 @@
+[16:01:42.264148][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Transpose: , Shape1=6x1024x3x, 
+[16:01:42.277866][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=98304x, 
+[16:01:42.277937][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 297.753, (ms): 0.297753, (s): 0.000297753
+[16:01:42.289918][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Transpose(task):: (us): 694.123, (ms): 0.694123, (s): 0.000694123
+[16:01:42.290594][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x3x, , Shape2=6x3x1024x, 
+[16:01:42.292938][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=98304x, 
+[16:01:42.292966][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 203.777, (ms): 0.203777, (s): 0.000203777
+[16:01:42.326812][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 13088.616, (ms): 13.088616, (s): 0.013088616
+[16:01:42.326838][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=6x1024x1024x, 
+[16:01:42.327035][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x1024x, , Shape2=1x, 
+[16:01:42.358723][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10109.886, (ms): 10.109886, (s): 0.010109886
+[16:01:42.359437][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Square: , Shape1=6x1024x3x, 
+[16:01:42.359447][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=6x1024x3x, 
+[16:01:42.361863][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=98304x, 
+[16:01:42.361891][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 213.789, (ms): 0.213789, (s): 0.000213789
+[16:01:42.373720][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 156.979, (ms): 0.156979, (s): 0.000156979
+[16:01:42.373774][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceSum: , Shape1=6x1024x3x, , Combination=0-0-1-, 
+[16:01:42.373795][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x3x, , Combination=0-0-1-0-, 
+[16:01:42.385863][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 303.295, (ms): 0.303295, (s): 0.000303295
+[16:01:42.385892][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=1024, Shape1=6x1024x, 
+[16:01:42.413014][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5467.713, (ms): 5.467713, (s): 0.005467713
+[16:01:42.413041][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=1, tileCount=1024, Shape1=6x1024x, 
+[16:01:42.430991][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5450.729, (ms): 5.450729, (s): 0.005450729
+[16:01:42.431017][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:42.454399][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10770.505, (ms): 10.770505, (s): 0.010770505
+[16:01:42.454427][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:42.477819][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10782.301, (ms): 10.782301, (s): 0.010782301
+[16:01:42.510248][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## TopK: axis=2, k=20, Shape1=6x1024x1024x, 
+[16:01:42.549761][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:42.549795][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6432.476, (ms): 6.432476, (s): 0.006432476
+[16:01:42.725367][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** TopK(task):: (us): 157679.75, (ms): 157.67975, (s): 0.15767974
+[16:01:42.727111][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Gather: indices_axis=1, Shape1=6x1024x3x, , Shape2=6x1024x20x, 
+[16:01:42.729351][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=98304x, 
+[16:01:42.729395][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 205.601, (ms): 0.205601, (s): 0.000205601
+[16:01:42.732259][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=196608x, 
+[16:01:42.732287][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 299.448, (ms): 0.299448, (s): 0.000299448
+[16:01:42.756433][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Gather(task):: (us): 8368.699, (ms): 8.368699, (s): 0.008368699
+[16:01:42.757116][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=20, Shape1=6x1024x3x, 
+[16:01:42.759428][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=98304x, 
+[16:01:42.759456][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 210.743, (ms): 0.210743, (s): 0.000210743
+[16:01:42.780296][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 14573.387, (ms): 14.573387, (s): 0.014573387
+[16:01:42.780322][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x3x, , Shape2=6x1024x20x3x, 
+[16:01:42.798612][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 9314.61, (ms): 9.31461, (s): 0.00931461
+[16:01:42.798639][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x20x3x, , Shape2=6x1024x20x3x, 
+[16:01:42.820428][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 6110.889, (ms): 6.110889, (s): 0.006110889
+[16:01:42.829525][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x20x6x, , Shape2=1x1x6x64x, 
+[16:01:42.829548][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## PadLastDim: lastDimPadded=128, Shape1=1x1x6x64x, 
+[16:01:42.829556][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=0, lastDimPadded=128, Shape1=1x1x6x64x, 
+[16:01:42.842896][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 112.859, (ms): 0.112859, (s): 0.000112859
+[16:01:42.856213][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=1966080x, 
+[16:01:42.856241][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 2072.93, (ms): 2.07293, (s): 0.00207293
+[16:01:42.951914][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 59606.902, (ms): 59.606903, (s): 0.059606902
+[16:01:42.951943][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## UnpadLastDim: lastDimUnpadded=64, Shape1=6x1024x20x128x, 
+[16:01:42.951950][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=64, lastDimPadded=0, Shape1=6x1024x20x128x, 
+[16:01:43.001241][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 33818.71, (ms): 33.81871, (s): 0.03381871
+[16:01:43.041484][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.041519][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.041526][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.041537][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.095812][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:43.095845][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 8000.12, (ms): 8.00012, (s): 0.00800012
+[16:01:43.165982][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64045.117, (ms): 64.04511, (s): 0.06404512
+[16:01:43.166010][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:43.166143][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:43.166790][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 112.288, (ms): 0.112288, (s): 0.000112288
+[16:01:43.166834][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.166841][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.166847][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.166874][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.211963][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:43.211996][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 8054.304, (ms): 8.054304, (s): 0.008054304
+[16:01:43.282197][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64044.547, (ms): 64.04455, (s): 0.06404455
+[16:01:43.282228][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.282235][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.282244][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:43.326662][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:43.326695][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 8058.398, (ms): 8.058398, (s): 0.008058398
+[16:01:43.396745][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64039.35, (ms): 64.03935, (s): 0.06403935
+[16:01:43.396799][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:43.396973][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:43.397616][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 114.298, (ms): 0.114298, (s): 0.000114298
+[16:01:43.397641][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:43.397766][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:43.398414][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 114.132, (ms): 0.114132, (s): 0.000114132
+[16:01:43.398439][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+[16:01:43.399070][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.149, (ms): 0.113149, (s): 0.000113149
+[16:01:43.399094][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:43.399722][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.718, (ms): 0.108718, (s): 0.000108718
+[16:01:43.399899][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:43.400510][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 117.533, (ms): 0.117533, (s): 0.000117533
+[16:01:43.400533][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:43.400644][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:43.401252][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.343, (ms): 0.113343, (s): 0.000113343
+[16:01:43.401277][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:43.401902][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.305, (ms): 0.113305, (s): 0.000113305
+[16:01:43.401941][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:43.402056][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:43.402622][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.594, (ms): 0.113594, (s): 0.000113594
+[16:01:43.402647][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:43.403296][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.394, (ms): 0.111394, (s): 0.000111394
+[16:01:43.403322][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:43.403947][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 121.191, (ms): 0.121191, (s): 0.000121191
+[16:01:43.403972][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:43.451655][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:43.451722][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7984.885, (ms): 7.984885, (s): 0.007984885
+[16:01:43.502838][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31246.418, (ms): 31.246418, (s): 0.031246418
+[16:01:43.502865][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=64x, 
+[16:01:43.503038][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[16:01:43.503653][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 129.895, (ms): 0.129895, (s): 0.000129895
+[16:01:43.503679][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=64x, 
+[16:01:43.503687][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+[16:01:43.504343][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 107.261, (ms): 0.107261, (s): 0.000107261
+[16:01:43.504368][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:43.550473][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31109.293, (ms): 31.109291, (s): 0.031109292
+[16:01:43.550498][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:43.596515][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31059.492, (ms): 31.059492, (s): 0.031059492
+[16:01:43.596541][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:43.642833][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31073.178, (ms): 31.073177, (s): 0.031073177
+[16:01:43.694324][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x20x64x, 
+[16:01:43.694337][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x20x64x, 
+[16:01:43.714016][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 4361.995, (ms): 4.361995, (s): 0.004361995
+[16:01:43.746131][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x20x64x, , Shape2=1x1x64x128x, 
+[16:01:43.794037][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:43.794070][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 8056.63, (ms): 8.05663, (s): 0.00805663
+[16:01:43.937742][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 110304.08, (ms): 110.30408, (s): 0.11030408
+[16:01:44.016444][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.016454][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.016489][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.016501][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.116098][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:44.116131][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15867.753, (ms): 15.867753, (s): 0.015867753
+[16:01:44.196424][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 68924.97, (ms): 68.924965, (s): 0.06892497
+[16:01:44.196453][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=128x, 
+[16:01:44.196588][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+[16:01:44.199963][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 117.033, (ms): 0.117033, (s): 0.000117033
+[16:01:44.199993][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.200000][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.200007][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.200032][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.292258][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:44.292291][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15880.79, (ms): 15.88079, (s): 0.01588079
+[16:01:44.372358][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 68653.08, (ms): 68.65308, (s): 0.06865308
+[16:01:44.372404][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.372411][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.372419][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:44.464369][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:44.464403][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15858.069, (ms): 15.858069, (s): 0.015858069
+[16:01:44.544484][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 68647.17, (ms): 68.64717, (s): 0.06864717
+[16:01:44.544513][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=128x, 
+[16:01:44.544678][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+[16:01:44.545342][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 114.501, (ms): 0.114501, (s): 0.000114501
+[16:01:44.545366][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=128x, 
+[16:01:44.545481][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+[16:01:44.546105][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 122.812, (ms): 0.122812, (s): 0.000122812
+[16:01:44.546133][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=128x, , Shape2=128x, 
+[16:01:44.546738][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.324, (ms): 0.111324, (s): 0.000111324
+[16:01:44.546782][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:44.547409][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 107.558, (ms): 0.107558, (s): 0.000107558
+[16:01:44.547518][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:44.548158][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 116.597, (ms): 0.116597, (s): 0.000116597
+[16:01:44.548184][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=128x, 
+[16:01:44.548311][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[16:01:44.548963][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 119.893, (ms): 0.119893, (s): 0.000119893
+[16:01:44.548990][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:44.549553][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 104.28, (ms): 0.10428, (s): 0.00010428
+[16:01:44.549592][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=128x, 
+[16:01:44.549705][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[16:01:44.550287][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 98.49, (ms): 0.09849, (s): 9.849e-05
+[16:01:44.550312][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:44.550869][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 98.022, (ms): 0.098022, (s): 9.8022e-05
+[16:01:44.550894][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:44.551543][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.089, (ms): 0.111089, (s): 0.000111089
+[16:01:44.551576][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:44.642375][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:44.642410][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15935.182, (ms): 15.935182, (s): 0.015935183
+[16:01:44.740920][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64115.45, (ms): 64.11545, (s): 0.06411545
+[16:01:44.740949][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=128x, 
+[16:01:44.741107][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=128x, , Shape2=1x, 
+[16:01:44.741730][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.353, (ms): 0.110353, (s): 0.000110353
+[16:01:44.741755][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=128x, 
+[16:01:44.741762][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=128x, 
+[16:01:44.745648][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 97.176, (ms): 0.097176, (s): 9.7176e-05
+[16:01:44.745675][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:44.839583][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64069.246, (ms): 64.069244, (s): 0.06406925
+[16:01:44.839614][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:44.933720][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64070.9375, (ms): 64.07094, (s): 0.06407093
+[16:01:44.933753][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:45.027638][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64119.76, (ms): 64.11976, (s): 0.06411976
+[16:01:45.117510][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x20x128x, 
+[16:01:45.117523][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x20x128x, 
+[16:01:45.162786][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 8499.614, (ms): 8.499614, (s): 0.008499614
+[16:01:45.244432][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceMax: reductionDim=2, Shape1=6x1024x20x128x, 
+[16:01:45.244443][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=0, reduceMax: 1.000000, Shape1=6x1024x20x128x, , Combination=0-0-1-0-, 
+[16:01:45.323430][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 76879.26, (ms): 76.87926, (s): 0.076879255
+[16:01:45.326189][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x1x128x, , Shape2=1x1x128x1024x, 
+[16:01:45.332517][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=786432x, 
+[16:01:45.332545][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 888.455, (ms): 0.888455, (s): 0.000888455
+[16:01:45.421639][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 70876.234, (ms): 70.87623, (s): 0.07087623
+[16:01:45.446799][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.446808][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.446829][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.446840][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.485227][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:45.485260][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6415.318, (ms): 6.415318, (s): 0.006415318
+[16:01:45.496610][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 6404.259, (ms): 6.404259, (s): 0.006404259
+[16:01:45.496638][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=1024x, 
+[16:01:45.496796][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+[16:01:45.502947][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 115.439, (ms): 0.115439, (s): 0.000115439
+[16:01:45.502977][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.502984][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.502990][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.502998][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.537676][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:45.537707][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6410.601, (ms): 6.410601, (s): 0.006410601
+[16:01:45.549042][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 6403.852, (ms): 6.403852, (s): 0.006403852
+[16:01:45.549071][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.549078][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.549096][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:45.582979][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:45.583011][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6417.152, (ms): 6.417152, (s): 0.006417152
+[16:01:45.594257][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 6403.418, (ms): 6.403418, (s): 0.006403418
+[16:01:45.594287][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=1024x, 
+[16:01:45.594429][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+[16:01:45.595123][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 116.039, (ms): 0.116039, (s): 0.000116039
+[16:01:45.595149][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=1024x, 
+[16:01:45.595273][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+[16:01:45.595891][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.088, (ms): 0.108088, (s): 0.000108088
+[16:01:45.595916][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=1024x, , Shape2=1024x, 
+[16:01:45.596464][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.092, (ms): 0.108092, (s): 0.000108092
+[16:01:45.596490][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:45.597068][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.53, (ms): 0.10853, (s): 0.00010853
+[16:01:45.597173][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:45.597755][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 112.481, (ms): 0.112481, (s): 0.000112481
+[16:01:45.597795][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[16:01:45.597963][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[16:01:45.598601][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.118, (ms): 0.113118, (s): 0.000113118
+[16:01:45.598628][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:45.599288][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.892, (ms): 0.106892, (s): 0.000106892
+[16:01:45.599313][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[16:01:45.599439][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[16:01:45.600052][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.48, (ms): 0.10548, (s): 0.00010548
+[16:01:45.600076][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:45.600702][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 101.624, (ms): 0.101624, (s): 0.000101624
+[16:01:45.600728][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:45.601344][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.005, (ms): 0.103005, (s): 0.000103005
+[16:01:45.601369][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:45.635966][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:45.635999][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6453.262, (ms): 6.453262, (s): 0.006453262
+[16:01:45.659445][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10769.732, (ms): 10.769732, (s): 0.010769732
+[16:01:45.659490][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=1024x, 
+[16:01:45.659625][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=1024x, , Shape2=1x, 
+[16:01:45.660213][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.526, (ms): 0.106526, (s): 0.000106526
+[16:01:45.660237][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=1024x, 
+[16:01:45.660244][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=1024x, 
+[16:01:45.673740][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 99.575, (ms): 0.099575, (s): 9.9575e-05
+[16:01:45.673765][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:45.696413][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10774.672, (ms): 10.774672, (s): 0.010774672
+[16:01:45.696441][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:45.719388][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10771.932, (ms): 10.771932, (s): 0.010771932
+[16:01:45.719416][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:45.742563][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10777.025, (ms): 10.777025, (s): 0.010777025
+[16:01:45.771850][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x1x1024x, 
+[16:01:45.771862][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x1x1024x, 
+[16:01:45.787672][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 3468.963, (ms): 3.468963, (s): 0.003468963
+[16:01:45.813174][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceMax: reductionDim=1, Shape1=6x1024x1x1024x, 
+[16:01:45.813185][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=0, reduceMax: 1.000000, Shape1=6x1024x1x1024x, , Combination=0-1-0-0-, 
+[16:01:45.825907][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 12113.637, (ms): 12.113637, (s): 0.012113637
+[16:01:45.826188][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x, , Shape2=1024x512x, 
+[16:01:45.832223][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 2810.317, (ms): 2.810317, (s): 0.002810317
+[16:01:45.832249][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x512x, , Shape2=512x, 
+[16:01:45.835143][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.863, (ms): 0.113863, (s): 0.000113863
+[16:01:45.835413][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x512x, , Combination=1-0-0-0-, 
+[16:01:45.835421][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.835428][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.835436][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.836012][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 110.841, (ms): 0.110841, (s): 0.000110841
+[16:01:45.836037][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=512x, 
+[16:01:45.836159][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+[16:01:45.836757][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.305, (ms): 0.110305, (s): 0.000110305
+[16:01:45.836803][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x512x, , Combination=1-0-0-0-, 
+[16:01:45.836810][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.836834][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.836842][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.837394][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 113.832, (ms): 0.113832, (s): 0.000113832
+[16:01:45.837421][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.837427][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.837435][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:45.837999][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 104.768, (ms): 0.104768, (s): 0.000104768
+[16:01:45.838025][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=512x, 
+[16:01:45.838150][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+[16:01:45.838721][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.551, (ms): 0.106551, (s): 0.000106551
+[16:01:45.838748][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=512x, 
+[16:01:45.838887][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+[16:01:45.839479][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.428, (ms): 0.110428, (s): 0.000110428
+[16:01:45.839504][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=512x, , Shape2=512x, 
+[16:01:45.840103][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 101.451, (ms): 0.101451, (s): 0.000101451
+[16:01:45.840126][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:45.840682][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 99.933, (ms): 0.099933, (s): 9.9933e-05
+[16:01:45.840804][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:45.841435][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 135.35, (ms): 0.13535, (s): 0.00013535
+[16:01:45.841460][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=512x, 
+[16:01:45.841580][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[16:01:45.842226][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.443, (ms): 0.106443, (s): 0.000106443
+[16:01:45.842252][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:45.842872][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.063, (ms): 0.110063, (s): 0.000110063
+[16:01:45.842897][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=512x, 
+[16:01:45.843020][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[16:01:45.843638][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.827, (ms): 0.111827, (s): 0.000111827
+[16:01:45.843679][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:45.844282][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 133.881, (ms): 0.133881, (s): 0.000133881
+[16:01:45.844307][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:45.844871][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 107.619, (ms): 0.107619, (s): 0.000107619
+[16:01:45.844896][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x512x, , Shape2=512x, 
+[16:01:45.845491][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 115.069, (ms): 0.115069, (s): 0.000115069
+[16:01:45.845516][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=512x, 
+[16:01:45.845644][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=512x, , Shape2=1x, 
+[16:01:45.846254][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 112.425, (ms): 0.112425, (s): 0.000112425
+[16:01:45.846279][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=512x, 
+[16:01:45.846286][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=512x, 
+[16:01:45.852082][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 98.518, (ms): 0.098518, (s): 9.8518e-05
+[16:01:45.852107][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x512x, , Shape2=512x, 
+[16:01:45.852726][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 118.122, (ms): 0.118122, (s): 0.000118122
+[16:01:45.852749][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x512x, , Shape2=512x, 
+[16:01:45.853368][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 116.038, (ms): 0.116038, (s): 0.000116038
+[16:01:45.853392][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x512x, , Shape2=512x, 
+[16:01:45.853969][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.824, (ms): 0.109824, (s): 0.000109824
+[16:01:45.854421][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x512x, 
+[16:01:45.854428][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x512x, 
+[16:01:45.854945][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 102.518, (ms): 0.102518, (s): 0.000102518
+[16:01:45.855198][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x512x, , Shape2=512x256x, 
+[16:01:45.857087][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 1317.922, (ms): 1.317922, (s): 0.001317922
+[16:01:45.857110][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x256x, , Shape2=256x, 
+[16:01:45.857721][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.343, (ms): 0.109343, (s): 0.000109343
+[16:01:45.857993][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x256x, , Combination=1-0-0-0-, 
+[16:01:45.858000][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.858007][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.858015][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.858647][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 112.357, (ms): 0.112357, (s): 0.000112357
+[16:01:45.858673][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=256x, 
+[16:01:45.858788][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+[16:01:45.859495][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.661, (ms): 0.102661, (s): 0.000102661
+[16:01:45.859522][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x256x, , Combination=1-0-0-0-, 
+[16:01:45.859529][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.859535][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.859543][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.860115][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 104.984, (ms): 0.104984, (s): 0.000104984
+[16:01:45.860142][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.860148][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.860156][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:45.860634][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 105.668, (ms): 0.105668, (s): 0.000105668
+[16:01:45.860659][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=256x, 
+[16:01:45.860779][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+[16:01:45.861357][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.715, (ms): 0.102715, (s): 0.000102715
+[16:01:45.861397][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=256x, 
+[16:01:45.861524][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+[16:01:45.862155][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.668, (ms): 0.105668, (s): 0.000105668
+[16:01:45.862195][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=256x, , Shape2=256x, 
+[16:01:45.862725][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 97.895, (ms): 0.097895, (s): 9.7895e-05
+[16:01:45.862750][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:45.863370][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 100.226, (ms): 0.100226, (s): 0.000100226
+[16:01:45.863496][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:45.864135][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.3, (ms): 0.1083, (s): 0.0001083
+[16:01:45.864160][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=256x, 
+[16:01:45.864294][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[16:01:45.864931][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.893, (ms): 0.105893, (s): 0.000105893
+[16:01:45.864957][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:45.865533][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.457, (ms): 0.106457, (s): 0.000106457
+[16:01:45.865557][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=256x, 
+[16:01:45.865677][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[16:01:45.866269][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 101.732, (ms): 0.101732, (s): 0.000101732
+[16:01:45.866312][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:45.866919][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.251, (ms): 0.105251, (s): 0.000105251
+[16:01:45.866943][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:45.867548][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.079, (ms): 0.110079, (s): 0.000110079
+[16:01:45.867572][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x256x, , Shape2=256x, 
+[16:01:45.868166][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.527, (ms): 0.105527, (s): 0.000105527
+[16:01:45.868188][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=256x, 
+[16:01:45.868301][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=256x, , Shape2=1x, 
+[16:01:45.868897][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 104.828, (ms): 0.104828, (s): 0.000104828
+[16:01:45.868922][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=256x, 
+[16:01:45.868928][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=256x, 
+[16:01:45.869464][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 93.062, (ms): 0.093062, (s): 9.3062e-05
+[16:01:45.869487][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x256x, , Shape2=256x, 
+[16:01:45.870076][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.0, (ms): 0.106, (s): 0.000106
+[16:01:45.870100][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x256x, , Shape2=256x, 
+[16:01:45.870753][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 118.151, (ms): 0.118151, (s): 0.000118151
+[16:01:45.870797][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x256x, , Shape2=256x, 
+[16:01:45.871410][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.91, (ms): 0.10891, (s): 0.00010891
+[16:01:45.871863][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x256x, 
+[16:01:45.871871][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x256x, 
+[16:01:45.872389][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 101.853, (ms): 0.101853, (s): 0.000101853
+[16:01:45.872749][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=9x, , Shape2=9x, 
+[16:01:45.874475][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=16x, 
+[16:01:45.874502][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 99.715, (ms): 0.099715, (s): 9.9715e-05
+[16:01:45.876335][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=16x, 
+[16:01:45.876361][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 97.773, (ms): 0.097773, (s): 9.7773e-05
+[16:01:45.877020][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.159, (ms): 0.111159, (s): 0.000111159
+[16:01:45.877228][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x256x, , Shape2=256x9x, 
+[16:01:45.879003][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=4096x, 
+[16:01:45.879030][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 103.939, (ms): 0.103939, (s): 0.000103939
+[16:01:45.880213][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 613.614, (ms): 0.613614, (s): 0.000613614
+[16:01:45.880424][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x9x, , Shape2=9x, 
+[16:01:45.880994][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 112.406, (ms): 0.112406, (s): 0.000112406
+[16:01:45.882250][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x3x, , Shape2=6x3x3x, 
+[16:01:45.884535][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=98304x, 
+[16:01:45.884581][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 203.748, (ms): 0.203748, (s): 0.000203748
+[16:01:45.886518][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=288x, 
+[16:01:45.886546][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 88.971, (ms): 0.088971, (s): 8.8971e-05
+[16:01:45.894100][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 6953.476, (ms): 6.953476, (s): 0.006953476
+[16:01:45.897469][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Transpose: , Shape1=6x1024x3x, 
+[16:01:45.898651][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Transpose(task):: (us): 681.611, (ms): 0.681611, (s): 0.000681611
+[16:01:45.898675][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x3x, , Shape2=6x3x1024x, 
+[16:01:45.923790][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 13093.088, (ms): 13.093088, (s): 0.013093088
+[16:01:45.923815][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=6x1024x1024x, 
+[16:01:45.923990][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x1024x, , Shape2=1x, 
+[16:01:45.946484][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10136.208, (ms): 10.136208, (s): 0.010136208
+[16:01:45.946511][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Square: , Shape1=6x1024x3x, 
+[16:01:45.946518][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=6x1024x3x, 
+[16:01:45.947454][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 161.252, (ms): 0.161252, (s): 0.000161252
+[16:01:45.947490][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceSum: , Shape1=6x1024x3x, , Combination=0-0-1-, 
+[16:01:45.947499][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x3x, , Combination=0-0-1-0-, 
+[16:01:45.948346][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 293.154, (ms): 0.293154, (s): 0.000293154
+[16:01:45.948371][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=1024, Shape1=6x1024x, 
+[16:01:45.966196][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5493.637, (ms): 5.493637, (s): 0.005493637
+[16:01:45.966221][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=1, tileCount=1024, Shape1=6x1024x, 
+[16:01:45.983852][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5445.164, (ms): 5.445164, (s): 0.005445164
+[16:01:45.983877][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:46.006884][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10764.785, (ms): 10.764785, (s): 0.010764785
+[16:01:46.006912][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:46.029948][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10814.024, (ms): 10.814024, (s): 0.010814024
+[16:01:46.032298][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## TopK: axis=2, k=20, Shape1=6x1024x1024x, 
+[16:01:46.070755][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:46.070788][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6417.812, (ms): 6.417812, (s): 0.006417812
+[16:01:46.233922][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** TopK(task):: (us): 157726.4, (ms): 157.7264, (s): 0.1577264
+[16:01:46.233950][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Gather: indices_axis=1, Shape1=6x1024x3x, , Shape2=6x1024x20x, 
+[16:01:46.243837][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=196608x, 
+[16:01:46.243866][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 293.445, (ms): 0.293445, (s): 0.000293445
+[16:01:46.256234][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Gather(task):: (us): 8331.727, (ms): 8.331727, (s): 0.008331727
+[16:01:46.256259][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=20, Shape1=6x1024x3x, 
+[16:01:46.277052][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 14556.349, (ms): 14.556349, (s): 0.014556349
+[16:01:46.277078][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x3x, , Shape2=6x1024x20x3x, 
+[16:01:46.295001][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 9318.876, (ms): 9.318876, (s): 0.009318876
+[16:01:46.295028][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x20x3x, , Shape2=6x1024x20x3x, 
+[16:01:46.307665][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 6096.169, (ms): 6.096169, (s): 0.006096169
+[16:01:46.307725][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x20x6x, , Shape2=1x1x6x64x, 
+[16:01:46.307751][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## PadLastDim: lastDimPadded=128, Shape1=1x1x6x64x, 
+[16:01:46.307758][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=0, lastDimPadded=128, Shape1=1x1x6x64x, 
+[16:01:46.311857][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 101.913, (ms): 0.101913, (s): 0.000101913
+[16:01:46.325210][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=1966080x, 
+[16:01:46.325239][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 2132.259, (ms): 2.132259, (s): 0.002132259
+[16:01:46.417278][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 59602.88, (ms): 59.60288, (s): 0.05960288
+[16:01:46.417305][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## UnpadLastDim: lastDimUnpadded=64, Shape1=6x1024x20x128x, 
+[16:01:46.417329][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=64, lastDimPadded=0, Shape1=6x1024x20x128x, 
+[16:01:46.466158][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 33757.785, (ms): 33.757786, (s): 0.033757783
+[16:01:46.498328][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.498337][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.498344][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.498355][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.546459][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:46.546493][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7990.54, (ms): 7.99054, (s): 0.00799054
+[16:01:46.616622][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64043.54, (ms): 64.04354, (s): 0.06404354
+[16:01:46.616650][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:46.616786][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:46.617416][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 115.919, (ms): 0.115919, (s): 0.000115919
+[16:01:46.617444][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.617451][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.617473][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.617489][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.661051][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:46.661085][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7987.176, (ms): 7.987176, (s): 0.007987176
+[16:01:46.731111][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64036.645, (ms): 64.036644, (s): 0.064036645
+[16:01:46.731141][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.731148][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.731156][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:46.774147][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:46.774181][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7986.639, (ms): 7.986639, (s): 0.007986639
+[16:01:46.844298][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64054.22, (ms): 64.05422, (s): 0.06405422
+[16:01:46.844327][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:46.844467][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:46.845116][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.695, (ms): 0.113695, (s): 0.000113695
+[16:01:46.845161][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:46.845296][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:46.845940][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 107.489, (ms): 0.107489, (s): 0.000107489
+[16:01:46.845965][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+[16:01:46.846570][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.386, (ms): 0.102386, (s): 0.000102386
+[16:01:46.846594][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:46.847197][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.06, (ms): 0.11106, (s): 0.00011106
+[16:01:46.847303][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:46.847934][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.994, (ms): 0.111994, (s): 0.000111994
+[16:01:46.847959][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:46.848079][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:46.848660][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 107.229, (ms): 0.107229, (s): 0.000107229
+[16:01:46.848685][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:46.849316][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.06, (ms): 0.11006, (s): 0.00011006
+[16:01:46.849341][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:46.849471][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:46.850045][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.247, (ms): 0.108247, (s): 0.000108247
+[16:01:46.850070][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:46.850624][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.051, (ms): 0.108051, (s): 0.000108051
+[16:01:46.850650][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:46.851267][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.502, (ms): 0.105502, (s): 0.000105502
+[16:01:46.851294][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:46.895160][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:46.895192][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7988.407, (ms): 7.988407, (s): 0.007988407
+[16:01:46.945212][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31203.469, (ms): 31.203468, (s): 0.031203467
+[16:01:46.945240][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=64x, 
+[16:01:46.945401][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[16:01:46.946043][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 129.428, (ms): 0.129428, (s): 0.000129428
+[16:01:46.946068][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=64x, 
+[16:01:46.946075][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+[16:01:46.946639][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 102.911, (ms): 0.102911, (s): 0.000102911
+[16:01:46.946667][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:46.993265][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31069.572, (ms): 31.069572, (s): 0.031069571
+[16:01:46.993292][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:47.039768][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31061.656, (ms): 31.061657, (s): 0.031061657
+[16:01:47.039800][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:47.086061][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31065.477, (ms): 31.065475, (s): 0.031065475
+[16:01:47.124229][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x20x64x, 
+[16:01:47.124242][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x20x64x, 
+[16:01:47.143858][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 4305.786, (ms): 4.305786, (s): 0.004305786
+[16:01:47.143885][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceMax: reductionDim=2, Shape1=6x1024x20x64x, 
+[16:01:47.143894][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=0, reduceMax: 1.000000, Shape1=6x1024x20x64x, , Combination=0-0-1-0-, 
+[16:01:47.210096][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64980.56, (ms): 64.98056, (s): 0.06498056
+[16:01:47.213847][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Transpose: , Shape1=6x1024x64x, 
+[16:01:47.217843][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Transpose(task):: (us): 2859.894, (ms): 2.859894, (s): 0.002859894
+[16:01:47.217868][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x64x, , Shape2=6x64x1024x, 
+[16:01:47.391173][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 158963.52, (ms): 158.96352, (s): 0.15896352
+[16:01:47.391200][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=6x1024x1024x, 
+[16:01:47.399104][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x1024x, , Shape2=1x, 
+[16:01:47.423992][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10098.971, (ms): 10.098971, (s): 0.010098971
+[16:01:47.424020][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Square: , Shape1=6x1024x64x, 
+[16:01:47.424027][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=6x1024x64x, 
+[16:01:47.428810][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 318.542, (ms): 0.318542, (s): 0.000318542
+[16:01:47.428853][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceSum: , Shape1=6x1024x64x, , Combination=0-0-1-, 
+[16:01:47.428862][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x64x, , Combination=0-0-1-0-, 
+[16:01:47.433573][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 1519.209, (ms): 1.519209, (s): 0.001519209
+[16:01:47.433599][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=1024, Shape1=6x1024x, 
+[16:01:47.451012][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5446.944, (ms): 5.446944, (s): 0.005446944
+[16:01:47.451039][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=1, tileCount=1024, Shape1=6x1024x, 
+[16:01:47.468647][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5441.586, (ms): 5.441586, (s): 0.005441586
+[16:01:47.468674][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:47.491780][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10778.316, (ms): 10.778316, (s): 0.010778316
+[16:01:47.491807][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:47.514765][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10764.671, (ms): 10.764671, (s): 0.010764671
+[16:01:47.517214][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## TopK: axis=2, k=20, Shape1=6x1024x1024x, 
+[16:01:47.555532][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:47.555565][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6421.126, (ms): 6.421126, (s): 0.006421126
+[16:01:47.718632][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** TopK(task):: (us): 157746.125, (ms): 157.74612, (s): 0.15774612
+[16:01:47.718660][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Gather: indices_axis=1, Shape1=6x1024x64x, , Shape2=6x1024x20x, 
+[16:01:47.721685][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=196608x, 
+[16:01:47.721734][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 304.346, (ms): 0.304346, (s): 0.000304346
+[16:01:47.770126][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Gather(task):: (us): 33030.88, (ms): 33.03088, (s): 0.03303088
+[16:01:47.770153][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=20, Shape1=6x1024x64x, 
+[16:01:47.814364][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 27092.684, (ms): 27.092684, (s): 0.027092684
+[16:01:47.814392][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x64x, , Shape2=6x1024x20x64x, 
+[16:01:47.867316][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 33141.66, (ms): 33.14166, (s): 0.03314166
+[16:01:47.867347][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x20x64x, , Shape2=6x1024x20x64x, 
+[16:01:47.943268][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 43719.27, (ms): 43.71927, (s): 0.04371927
+[16:01:47.943335][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x20x128x, , Shape2=1x1x128x64x, 
+[16:01:47.943368][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## PadLastDim: lastDimPadded=128, Shape1=1x1x128x64x, 
+[16:01:47.943401][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=0, lastDimPadded=128, Shape1=1x1x128x64x, 
+[16:01:47.947660][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 147.289, (ms): 0.147289, (s): 0.000147289
+[16:01:48.041550][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:48.041587][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15860.554, (ms): 15.860554, (s): 0.015860554
+[16:01:48.259419][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 176962.47, (ms): 176.96246, (s): 0.17696247
+[16:01:48.259442][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## UnpadLastDim: lastDimUnpadded=64, Shape1=6x1024x20x128x, 
+[16:01:48.259448][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=64, lastDimPadded=0, Shape1=6x1024x20x128x, 
+[16:01:48.308777][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 33813.055, (ms): 33.813057, (s): 0.033813056
+[16:01:48.308879][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.308887][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.308893][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.308902][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.356649][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:48.356684][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7988.258, (ms): 7.988258, (s): 0.007988258
+[16:01:48.426737][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64043.36, (ms): 64.04336, (s): 0.06404336
+[16:01:48.426794][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:48.433643][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:48.434388][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 120.308, (ms): 0.120308, (s): 0.000120308
+[16:01:48.434419][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.434427][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.434433][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.434441][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.481845][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:48.481879][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 8001.572, (ms): 8.001572, (s): 0.008001572
+[16:01:48.551831][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64046.723, (ms): 64.04672, (s): 0.064046726
+[16:01:48.551863][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.551869][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.551878][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:48.599539][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:48.599603][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7994.54, (ms): 7.99454, (s): 0.00799454
+[16:01:48.669694][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64050.223, (ms): 64.050224, (s): 0.06405023
+[16:01:48.669722][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:48.669860][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:48.670528][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 112.529, (ms): 0.112529, (s): 0.000112529
+[16:01:48.670552][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:48.670681][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:48.671296][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.75, (ms): 0.10675, (s): 0.00010675
+[16:01:48.671320][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+[16:01:48.671895][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.286, (ms): 0.108286, (s): 0.000108286
+[16:01:48.671918][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:48.672516][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.191, (ms): 0.109191, (s): 0.000109191
+[16:01:48.672624][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:48.673292][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 101.919, (ms): 0.101919, (s): 0.000101919
+[16:01:48.673316][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:48.673469][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:48.674126][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.082, (ms): 0.106082, (s): 0.000106082
+[16:01:48.674151][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:48.674706][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 99.883, (ms): 0.099883, (s): 9.9883e-05
+[16:01:48.674733][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:48.674871][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:48.675423][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.594, (ms): 0.103594, (s): 0.000103594
+[16:01:48.675449][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:48.676030][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 99.426, (ms): 0.099426, (s): 9.9426e-05
+[16:01:48.676055][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:48.676669][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.37, (ms): 0.10537, (s): 0.00010537
+[16:01:48.676694][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:48.724148][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:48.724217][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7990.481, (ms): 7.990481, (s): 0.007990481
+[16:01:48.775803][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31209.768, (ms): 31.209768, (s): 0.031209769
+[16:01:48.775833][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=64x, 
+[16:01:48.776021][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[16:01:48.776713][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 114.151, (ms): 0.114151, (s): 0.000114151
+[16:01:48.776739][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=64x, 
+[16:01:48.776746][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+[16:01:48.777477][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 99.218, (ms): 0.099218, (s): 9.9218e-05
+[16:01:48.777502][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:48.823930][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31060.367, (ms): 31.060368, (s): 0.031060368
+[16:01:48.823960][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:48.870259][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31056.783, (ms): 31.056784, (s): 0.031056784
+[16:01:48.870289][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:48.916558][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31061.076, (ms): 31.061075, (s): 0.031061076
+[16:01:48.922304][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x20x64x, 
+[16:01:48.922328][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x20x64x, 
+[16:01:48.941373][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 4292.186, (ms): 4.292186, (s): 0.004292186
+[16:01:48.941401][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceMax: reductionDim=2, Shape1=6x1024x20x64x, 
+[16:01:48.941410][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=0, reduceMax: 1.000000, Shape1=6x1024x20x64x, , Combination=0-0-1-0-, 
+[16:01:49.007635][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64913.742, (ms): 64.91374, (s): 0.06491374
+[16:01:49.011293][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Transpose: , Shape1=6x1024x64x, 
+[16:01:49.015263][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Transpose(task):: (us): 2866.49, (ms): 2.86649, (s): 0.00286649
+[16:01:49.015287][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x64x, , Shape2=6x64x1024x, 
+[16:01:49.188560][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 158947.64, (ms): 158.94765, (s): 0.15894765
+[16:01:49.188587][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=6x1024x1024x, 
+[16:01:49.188742][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x1024x, , Shape2=1x, 
+[16:01:49.213571][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10104.769, (ms): 10.104769, (s): 0.010104769
+[16:01:49.213599][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Square: , Shape1=6x1024x64x, 
+[16:01:49.213607][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=6x1024x64x, 
+[16:01:49.217867][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 307.704, (ms): 0.307704, (s): 0.000307704
+[16:01:49.217894][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceSum: , Shape1=6x1024x64x, , Combination=0-0-1-, 
+[16:01:49.217903][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x64x, , Combination=0-0-1-0-, 
+[16:01:49.222667][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 1511.651, (ms): 1.511651, (s): 0.001511651
+[16:01:49.222693][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=1024, Shape1=6x1024x, 
+[16:01:49.240315][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5446.364, (ms): 5.446364, (s): 0.005446364
+[16:01:49.240343][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=1, tileCount=1024, Shape1=6x1024x, 
+[16:01:49.258091][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5443.667, (ms): 5.443667, (s): 0.005443667
+[16:01:49.258116][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:49.281134][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10765.021, (ms): 10.765021, (s): 0.010765021
+[16:01:49.281161][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:49.304202][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10764.013, (ms): 10.764013, (s): 0.010764013
+[16:01:49.306565][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## TopK: axis=2, k=20, Shape1=6x1024x1024x, 
+[16:01:49.344663][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:49.344695][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6473.342, (ms): 6.473342, (s): 0.006473342
+[16:01:49.507908][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** TopK(task):: (us): 157713.36, (ms): 157.71336, (s): 0.15771335
+[16:01:49.507936][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Gather: indices_axis=1, Shape1=6x1024x64x, , Shape2=6x1024x20x, 
+[16:01:49.517462][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=196608x, 
+[16:01:49.517489][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 298.532, (ms): 0.298532, (s): 0.000298532
+[16:01:49.567630][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Gather(task):: (us): 33022.36, (ms): 33.02236, (s): 0.03302236
+[16:01:49.567660][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=20, Shape1=6x1024x64x, 
+[16:01:49.611990][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 27104.127, (ms): 27.104126, (s): 0.027104126
+[16:01:49.612051][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x64x, , Shape2=6x1024x20x64x, 
+[16:01:49.664623][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 33154.79, (ms): 33.15479, (s): 0.03315479
+[16:01:49.664656][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x20x64x, , Shape2=6x1024x20x64x, 
+[16:01:49.749470][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 43724.43, (ms): 43.724426, (s): 0.04372443
+[16:01:49.749540][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x20x128x, , Shape2=1x1x128x64x, 
+[16:01:49.749574][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## PadLastDim: lastDimPadded=128, Shape1=1x1x128x64x, 
+[16:01:49.749581][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=0, lastDimPadded=128, Shape1=1x1x128x64x, 
+[16:01:49.752963][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 143.018, (ms): 0.143018, (s): 0.000143018
+[16:01:49.846898][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:49.846933][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15906.573, (ms): 15.906573, (s): 0.015906572
+[16:01:50.064144][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 176919.11, (ms): 176.9191, (s): 0.1769191
+[16:01:50.064177][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## UnpadLastDim: lastDimUnpadded=64, Shape1=6x1024x20x128x, 
+[16:01:50.064185][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _PadUnpadLastDim: lastDimUnpadded=64, lastDimPadded=0, Shape1=6x1024x20x128x, 
+[16:01:50.113304][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _PadUnpadLastDim(task):: (us): 33773.695, (ms): 33.773697, (s): 0.033773694
+[16:01:50.113363][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.113396][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.113402][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.113418][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.161953][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:50.161988][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 8024.438, (ms): 8.024438, (s): 0.008024438
+[16:01:50.232206][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64041.98, (ms): 64.04198, (s): 0.06404198
+[16:01:50.232234][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:50.232370][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:50.233020][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 142.084, (ms): 0.142084, (s): 0.000142084
+[16:01:50.233049][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.233056][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.233062][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.233070][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.279921][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:50.279955][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7991.994, (ms): 7.991994, (s): 0.007991994
+[16:01:50.350155][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64046.613, (ms): 64.046616, (s): 0.064046614
+[16:01:50.350214][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.350220][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.350229][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x64x, , Combination=1-1-1-0-, 
+[16:01:50.396968][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:50.397001][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7987.879, (ms): 7.987879, (s): 0.007987879
+[16:01:50.467325][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64047.227, (ms): 64.047226, (s): 0.064047225
+[16:01:50.467352][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:50.467495][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:50.468125][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 114.868, (ms): 0.114868, (s): 0.000114868
+[16:01:50.468153][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=64x, 
+[16:01:50.468281][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=64x, , Shape2=1x, 
+[16:01:50.468938][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.456, (ms): 0.113456, (s): 0.000113456
+[16:01:50.468965][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=64x, 
+[16:01:50.469552][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.906, (ms): 0.110906, (s): 0.000110906
+[16:01:50.469595][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:50.470178][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.956, (ms): 0.106956, (s): 0.000106956
+[16:01:50.470286][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:50.470921][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.866, (ms): 0.105866, (s): 0.000105866
+[16:01:50.470945][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:50.471062][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:50.471611][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 104.076, (ms): 0.104076, (s): 0.000104076
+[16:01:50.471636][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:50.472254][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.412, (ms): 0.102412, (s): 0.000102412
+[16:01:50.472277][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=64x, 
+[16:01:50.472384][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=64x, , Shape2=1x, 
+[16:01:50.473015][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 145.146, (ms): 0.145146, (s): 0.000145146
+[16:01:50.473042][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:50.473597][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.376, (ms): 0.103376, (s): 0.000103376
+[16:01:50.473621][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=64x, , Shape2=64x, 
+[16:01:50.474226][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.64, (ms): 0.10364, (s): 0.00010364
+[16:01:50.474264][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:50.521204][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=7864320x, 
+[16:01:50.521238][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 7990.658, (ms): 7.990658, (s): 0.007990658
+[16:01:50.579762][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31243.32, (ms): 31.24332, (s): 0.03124332
+[16:01:50.579791][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=64x, 
+[16:01:50.579982][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=64x, , Shape2=1x, 
+[16:01:50.580624][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 114.226, (ms): 0.114226, (s): 0.000114226
+[16:01:50.580649][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=64x, 
+[16:01:50.580656][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=64x, 
+[16:01:50.581347][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 100.431, (ms): 0.100431, (s): 0.000100431
+[16:01:50.581374][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:50.627703][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31118.363, (ms): 31.118364, (s): 0.031118363
+[16:01:50.627745][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:50.673862][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31056.72, (ms): 31.05672, (s): 0.03105672
+[16:01:50.673891][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x20x64x, , Shape2=64x, 
+[16:01:50.719994][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 31064.707, (ms): 31.064709, (s): 0.031064708
+[16:01:50.725939][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x20x64x, 
+[16:01:50.725947][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x20x64x, 
+[16:01:50.745093][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 4285.498, (ms): 4.285498, (s): 0.004285498
+[16:01:50.745119][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceMax: reductionDim=2, Shape1=6x1024x20x64x, 
+[16:01:50.745128][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=0, reduceMax: 1.000000, Shape1=6x1024x20x64x, , Combination=0-0-1-0-, 
+[16:01:50.811319][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 64923.86, (ms): 64.92386, (s): 0.06492386
+[16:01:50.815006][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Transpose: , Shape1=6x1024x64x, 
+[16:01:50.818972][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Transpose(task):: (us): 2854.732, (ms): 2.854732, (s): 0.002854732
+[16:01:50.818997][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x64x, , Shape2=6x64x1024x, 
+[16:01:50.992357][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 158956.52, (ms): 158.95651, (s): 0.15895651
+[16:01:50.992382][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=6x1024x1024x, 
+[16:01:50.992533][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x1024x, , Shape2=1x, 
+[16:01:51.017257][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10104.079, (ms): 10.104079, (s): 0.010104079
+[16:01:51.017287][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Square: , Shape1=6x1024x64x, 
+[16:01:51.017295][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=0, runSquare: 1.000000, Shape1=6x1024x64x, 
+[16:01:51.021573][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 339.454, (ms): 0.339454, (s): 0.000339454
+[16:01:51.021619][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceSum: , Shape1=6x1024x64x, , Combination=0-0-1-, 
+[16:01:51.021627][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x64x, , Combination=0-0-1-0-, 
+[16:01:51.026440][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 1517.44, (ms): 1.51744, (s): 0.00151744
+[16:01:51.026466][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=1024, Shape1=6x1024x, 
+[16:01:51.043919][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5448.212, (ms): 5.448212, (s): 0.005448212
+[16:01:51.043944][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=1, tileCount=1024, Shape1=6x1024x, 
+[16:01:51.061648][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 5441.346, (ms): 5.441346, (s): 0.005441346
+[16:01:51.061696][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:51.084727][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10765.905, (ms): 10.765905, (s): 0.010765905
+[16:01:51.084754][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1024x, , Shape2=6x1024x1024x, 
+[16:01:51.107785][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10759.803, (ms): 10.759803, (s): 0.010759803
+[16:01:51.110153][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## TopK: axis=2, k=20, Shape1=6x1024x1024x, 
+[16:01:51.148662][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:51.148696][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6416.933, (ms): 6.416933, (s): 0.006416933
+[16:01:51.311887][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** TopK(task):: (us): 157738.95, (ms): 157.73895, (s): 0.15773895
+[16:01:51.311935][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Gather: indices_axis=1, Shape1=6x1024x64x, , Shape2=6x1024x20x, 
+[16:01:51.314690][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=196608x, 
+[16:01:51.314717][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 301.155, (ms): 0.301155, (s): 0.000301155
+[16:01:51.365231][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Gather(task):: (us): 33013.62, (ms): 33.01362, (s): 0.03301362
+[16:01:51.365257][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Tile: tileAxis=2, tileCount=20, Shape1=6x1024x64x, 
+[16:01:51.409752][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Tile(task):: (us): 27180.836, (ms): 27.180836, (s): 0.027180836
+[16:01:51.409780][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x64x, , Shape2=6x1024x20x64x, 
+[16:01:51.462377][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 33184.105, (ms): 33.184105, (s): 0.033184104
+[16:01:51.462405][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x20x64x, , Shape2=6x1024x20x64x, 
+[16:01:51.546355][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 43713.383, (ms): 43.713383, (s): 0.043713383
+[16:01:51.546422][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x20x128x, , Shape2=1x1x128x128x, 
+[16:01:51.646125][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:51.646160][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15869.184, (ms): 15.869184, (s): 0.015869183
+[16:01:51.864146][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 176950.3, (ms): 176.9503, (s): 0.1769503
+[16:01:51.864197][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:51.864204][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:51.864211][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:51.864245][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:51.957319][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:51.957354][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15897.414, (ms): 15.897414, (s): 0.015897414
+[16:01:52.037677][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 68684.18, (ms): 68.68417, (s): 0.068684176
+[16:01:52.037707][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=128x, 
+[16:01:52.037844][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+[16:01:52.038492][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.236, (ms): 0.113236, (s): 0.000113236
+[16:01:52.038524][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:52.038531][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:52.038537][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:52.038545][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:52.131026][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:52.131060][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15896.908, (ms): 15.896908, (s): 0.015896907
+[16:01:52.211687][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 68907.89, (ms): 68.90789, (s): 0.06890789
+[16:01:52.211742][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:52.211749][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:52.211758][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x20x128x, , Combination=1-1-1-0-, 
+[16:01:52.304776][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:52.304810][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15934.634, (ms): 15.934634, (s): 0.015934633
+[16:01:52.385274][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 68905.055, (ms): 68.90506, (s): 0.068905056
+[16:01:52.385302][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=128x, 
+[16:01:52.385429][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+[16:01:52.386075][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 144.981, (ms): 0.144981, (s): 0.000144981
+[16:01:52.386102][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=128x, 
+[16:01:52.386237][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=128x, , Shape2=1x, 
+[16:01:52.386838][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.95, (ms): 0.11195, (s): 0.00011195
+[16:01:52.386862][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=128x, , Shape2=128x, 
+[16:01:52.387476][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.951, (ms): 0.102951, (s): 0.000102951
+[16:01:52.387499][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:52.388097][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.913, (ms): 0.103913, (s): 0.000103913
+[16:01:52.388238][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:52.388874][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.955, (ms): 0.113955, (s): 0.000113955
+[16:01:52.388900][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=128x, 
+[16:01:52.389036][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[16:01:52.389666][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.029, (ms): 0.103029, (s): 0.000103029
+[16:01:52.389693][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:52.390384][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 107.712, (ms): 0.107712, (s): 0.000107712
+[16:01:52.390409][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=128x, 
+[16:01:52.390543][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=128x, , Shape2=1x, 
+[16:01:52.391161][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.336, (ms): 0.106336, (s): 0.000106336
+[16:01:52.391187][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:52.391811][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.914, (ms): 0.105914, (s): 0.000105914
+[16:01:52.391883][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=128x, , Shape2=128x, 
+[16:01:52.392518][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.803, (ms): 0.109803, (s): 0.000109803
+[16:01:52.392543][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:52.485450][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=15728640x, 
+[16:01:52.485486][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 15918.897, (ms): 15.918897, (s): 0.015918897
+[16:01:52.590055][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64083.27, (ms): 64.08327, (s): 0.06408327
+[16:01:52.590086][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=128x, 
+[16:01:52.596592][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=128x, , Shape2=1x, 
+[16:01:52.597282][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 120.257, (ms): 0.120257, (s): 0.000120257
+[16:01:52.597310][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=128x, 
+[16:01:52.597317][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=128x, 
+[16:01:52.598037][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 100.223, (ms): 0.100223, (s): 0.000100223
+[16:01:52.598063][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:52.692086][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64121.31, (ms): 64.12131, (s): 0.064121306
+[16:01:52.692117][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:52.786140][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64071.08, (ms): 64.07108, (s): 0.06407108
+[16:01:52.786172][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x20x128x, , Shape2=128x, 
+[16:01:52.880165][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 64116.88, (ms): 64.11688, (s): 0.06411688
+[16:01:52.891479][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x20x128x, 
+[16:01:52.891503][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x20x128x, 
+[16:01:52.929630][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 8490.63, (ms): 8.49063, (s): 0.00849063
+[16:01:52.929661][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceMax: reductionDim=2, Shape1=6x1024x20x128x, 
+[16:01:52.929670][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=0, reduceMax: 1.000000, Shape1=6x1024x20x128x, , Combination=0-0-1-0-, 
+[16:01:53.008814][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 76998.42, (ms): 76.99842, (s): 0.07699843
+[16:01:53.013588][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x1x64x, , Shape2=6x1024x1x64x, 
+[16:01:53.026133][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 2286.567, (ms): 2.286567, (s): 0.002286567
+[16:01:53.026180][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x1x128x, , Shape2=6x1024x1x64x, 
+[16:01:53.032192][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 2932.029, (ms): 2.932029, (s): 0.002932029
+[16:01:53.032238][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Concat2: concatDim=3, Shape1=6x1024x1x192x, , Shape2=6x1024x1x128x, 
+[16:01:53.040722][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Concat2(task):: (us): 4103.484, (ms): 4.103484, (s): 0.004103484
+[16:01:53.046755][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Conv2D: overrideDim2=-1, Shape1=6x1024x1x320x, , Shape2=1x1x320x1024x, 
+[16:01:53.059742][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=1966080x, 
+[16:01:53.059770][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 2081.793, (ms): 2.081793, (s): 0.002081793
+[16:01:53.227438][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** Conv2D(task):: (us): 150799.86, (ms): 150.79985, (s): 0.15079986
+[16:01:53.263268][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.263277][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.263284][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.263295][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.301651][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:53.301684][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6414.094, (ms): 6.414094, (s): 0.006414094
+[16:01:53.313156][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 6404.487, (ms): 6.404487, (s): 0.006404487
+[16:01:53.313204][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=1024x, 
+[16:01:53.313336][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+[16:01:53.319603][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.896, (ms): 0.110896, (s): 0.000110896
+[16:01:53.319633][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.319639][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.319646][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.319654][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.356717][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:53.356748][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6450.742, (ms): 6.450742, (s): 0.006450742
+[16:01:53.368163][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 6404.498, (ms): 6.404498, (s): 0.006404498
+[16:01:53.368193][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.368199][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.368207][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=6x1024x1x1024x, , Combination=1-1-1-0-, 
+[16:01:53.405014][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:53.405046][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6415.491, (ms): 6.415491, (s): 0.006415491
+[16:01:53.416539][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 6439.094, (ms): 6.439094, (s): 0.006439094
+[16:01:53.416567][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=1024x, 
+[16:01:53.416697][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+[16:01:53.417388][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 107.368, (ms): 0.107368, (s): 0.000107368
+[16:01:53.417414][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=1024x, 
+[16:01:53.417544][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=1024x, , Shape2=1x, 
+[16:01:53.418142][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.623, (ms): 0.113623, (s): 0.000113623
+[16:01:53.418190][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=1024x, , Shape2=1024x, 
+[16:01:53.418801][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.404, (ms): 0.109404, (s): 0.000109404
+[16:01:53.418826][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:53.419442][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.513, (ms): 0.106513, (s): 0.000106513
+[16:01:53.419549][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:53.420220][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 98.674, (ms): 0.098674, (s): 9.8674e-05
+[16:01:53.420243][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[16:01:53.420356][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[16:01:53.420901][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.0, (ms): 0.103, (s): 0.000103
+[16:01:53.420927][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:53.421519][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.307, (ms): 0.105307, (s): 0.000105307
+[16:01:53.421542][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=1024x, 
+[16:01:53.421654][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=1024x, , Shape2=1x, 
+[16:01:53.422294][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.365, (ms): 0.102365, (s): 0.000102365
+[16:01:53.422319][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:53.422861][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.252, (ms): 0.102252, (s): 0.000102252
+[16:01:53.422898][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=1024x, , Shape2=1024x, 
+[16:01:53.423488][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 104.342, (ms): 0.104342, (s): 0.000104342
+[16:01:53.423513][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:53.461562][info][source DataMover.cpp][function PrintInfo][line 74] ## LaunchDataMover: , Shape1=6291456x, 
+[16:01:53.461594][info][source DataMover.cpp][function ReportDuration][line 31] ** LaunchDataMover(task):: (us): 6419.698, (ms): 6.419698, (s): 0.006419698
+[16:01:53.488797][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10769.864, (ms): 10.769864, (s): 0.010769864
+[16:01:53.488825][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=1024x, 
+[16:01:53.488996][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=1024x, , Shape2=1x, 
+[16:01:53.489630][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.794, (ms): 0.111794, (s): 0.000111794
+[16:01:53.489654][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=1024x, 
+[16:01:53.489661][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=1024x, 
+[16:01:53.501274][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 115.476, (ms): 0.115476, (s): 0.000115476
+[16:01:53.501302][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:53.524178][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10772.168, (ms): 10.772168, (s): 0.010772168
+[16:01:53.524204][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:53.547234][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10771.667, (ms): 10.771667, (s): 0.010771667
+[16:01:53.547260][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x1024x1x1024x, , Shape2=1024x, 
+[16:01:53.570253][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 10767.84, (ms): 10.76784, (s): 0.01076784
+[16:01:53.600002][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x1024x1x1024x, 
+[16:01:53.600014][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x1024x1x1024x, 
+[16:01:53.622150][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 3469.11, (ms): 3.46911, (s): 0.00346911
+[16:01:53.622178][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReduceMax: reductionDim=1, Shape1=6x1024x1x1024x, 
+[16:01:53.622187][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=0, reduceSum=0, reduceMax: 1.000000, Shape1=6x1024x1x1024x, , Combination=0-1-0-0-, 
+[16:01:53.634767][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 12095.494, (ms): 12.095494, (s): 0.012095494
+[16:01:53.635099][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x1024x, , Shape2=1024x512x, 
+[16:01:53.640783][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 2812.087, (ms): 2.812087, (s): 0.002812087
+[16:01:53.640808][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x512x, , Shape2=512x, 
+[16:01:53.643645][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.923, (ms): 0.111923, (s): 0.000111923
+[16:01:53.643892][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x512x, , Combination=1-0-0-0-, 
+[16:01:53.643900][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.643906][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.643914][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.644439][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 118.134, (ms): 0.118134, (s): 0.000118134
+[16:01:53.644466][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=512x, 
+[16:01:53.644606][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+[16:01:53.645237][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 114.054, (ms): 0.114054, (s): 0.000114054
+[16:01:53.645265][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x512x, , Combination=1-0-0-0-, 
+[16:01:53.645272][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.645278][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.645285][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.645813][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 110.971, (ms): 0.110971, (s): 0.000110971
+[16:01:53.645840][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.645847][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.645871][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x512x, , Combination=1-1-1-0-, 
+[16:01:53.646411][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 105.516, (ms): 0.105516, (s): 0.000105516
+[16:01:53.646450][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=512x, 
+[16:01:53.646573][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+[16:01:53.647160][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.926, (ms): 0.108926, (s): 0.000108926
+[16:01:53.647184][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=512x, 
+[16:01:53.647299][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=512x, , Shape2=1x, 
+[16:01:53.647863][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.213, (ms): 0.102213, (s): 0.000102213
+[16:01:53.647887][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=512x, , Shape2=512x, 
+[16:01:53.648441][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 116.071, (ms): 0.116071, (s): 0.000116071
+[16:01:53.648466][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:53.649110][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.028, (ms): 0.110028, (s): 0.000110028
+[16:01:53.649219][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:53.649779][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.876, (ms): 0.113876, (s): 0.000113876
+[16:01:53.649803][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=512x, 
+[16:01:53.649937][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[16:01:53.650551][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 107.901, (ms): 0.107901, (s): 0.000107901
+[16:01:53.650587][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:53.651181][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.995, (ms): 0.109995, (s): 0.000109995
+[16:01:53.651206][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=512x, 
+[16:01:53.651325][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=512x, , Shape2=1x, 
+[16:01:53.651947][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 120.903, (ms): 0.120903, (s): 0.000120903
+[16:01:53.651975][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:53.652536][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.808, (ms): 0.105808, (s): 0.000105808
+[16:01:53.652559][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=512x, , Shape2=512x, 
+[16:01:53.653162][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.589, (ms): 0.111589, (s): 0.000111589
+[16:01:53.653188][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x512x, , Shape2=512x, 
+[16:01:53.653782][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 117.352, (ms): 0.117352, (s): 0.000117352
+[16:01:53.653823][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=512x, 
+[16:01:53.653965][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=512x, , Shape2=1x, 
+[16:01:53.654529][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 103.75, (ms): 0.10375, (s): 0.00010375
+[16:01:53.654553][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=512x, 
+[16:01:53.654559][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=512x, 
+[16:01:53.659948][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 94.892, (ms): 0.094892, (s): 9.4892e-05
+[16:01:53.659990][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x512x, , Shape2=512x, 
+[16:01:53.660604][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 108.847, (ms): 0.108847, (s): 0.000108847
+[16:01:53.660629][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x512x, , Shape2=512x, 
+[16:01:53.661193][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.881, (ms): 0.106881, (s): 0.000106881
+[16:01:53.661217][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x512x, , Shape2=512x, 
+[16:01:53.661822][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 131.947, (ms): 0.131947, (s): 0.000131947
+[16:01:53.662304][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x512x, 
+[16:01:53.662312][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x512x, 
+[16:01:53.662846][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 98.968, (ms): 0.098968, (s): 9.8968e-05
+[16:01:53.662906][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x512x, , Shape2=512x256x, 
+[16:01:53.664687][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 1321.735, (ms): 1.321735, (s): 0.001321735
+[16:01:53.664711][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x256x, , Shape2=256x, 
+[16:01:53.665408][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 113.114, (ms): 0.113114, (s): 0.000113114
+[16:01:53.665625][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Mean: , Shape1=6x256x, , Combination=1-0-0-0-, 
+[16:01:53.665632][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.665638][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.665670][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.666282][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 109.188, (ms): 0.109188, (s): 0.000109188
+[16:01:53.666307][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=256x, 
+[16:01:53.666435][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+[16:01:53.667020][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 115.77, (ms): 0.11577, (s): 0.00011577
+[16:01:53.667048][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Variance: , Shape1=6x256x, , Combination=1-0-0-0-, 
+[16:01:53.667067][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.667073][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=1, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.667082][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=1, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.667569][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 104.475, (ms): 0.104475, (s): 0.000104475
+[16:01:53.667596][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D: pow_y=2, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.667602][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _ReduceSum4D_Task: pow_y=2, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.667610][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## _Reduce_Task: pow_y=2, reduceSum=1, reduceMax: 0.000000, Shape1=1x1x6x256x, , Combination=1-1-1-0-, 
+[16:01:53.668162][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _Reduce_Task(task):: (us): 100.63, (ms): 0.10063, (s): 0.00010063
+[16:01:53.668203][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=256x, 
+[16:01:53.668320][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+[16:01:53.668945][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 118.714, (ms): 0.118714, (s): 0.000118714
+[16:01:53.668971][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=3, Shape1=256x, 
+[16:01:53.669093][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=256x, , Shape2=1x, 
+[16:01:53.669675][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.823, (ms): 0.109823, (s): 0.000109823
+[16:01:53.669701][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=256x, , Shape2=256x, 
+[16:01:53.670347][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.745, (ms): 0.106745, (s): 0.000106745
+[16:01:53.670371][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:53.670968][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 116.458, (ms): 0.116458, (s): 0.000116458
+[16:01:53.671073][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:53.671638][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 100.152, (ms): 0.100152, (s): 0.000100152
+[16:01:53.671662][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=256x, 
+[16:01:53.671773][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[16:01:53.672355][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 102.134, (ms): 0.102134, (s): 0.000102134
+[16:01:53.672394][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:53.672949][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 115.695, (ms): 0.115695, (s): 0.000115695
+[16:01:53.672972][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=2, Shape1=256x, 
+[16:01:53.673090][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=256x, , Shape2=1x, 
+[16:01:53.673688][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 100.171, (ms): 0.100171, (s): 0.000100171
+[16:01:53.673712][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:53.674283][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 100.003, (ms): 0.100003, (s): 0.000100003
+[16:01:53.674309][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=256x, , Shape2=256x, 
+[16:01:53.674882][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.108, (ms): 0.109108, (s): 0.000109108
+[16:01:53.674906][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=1, Shape1=6x256x, , Shape2=256x, 
+[16:01:53.675523][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 111.062, (ms): 0.111062, (s): 0.000111062
+[16:01:53.675547][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps-scalar: mode=0, Shape1=256x, 
+[16:01:53.675665][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=256x, , Shape2=1x, 
+[16:01:53.676289][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 100.302, (ms): 0.100302, (s): 0.000100302
+[16:01:53.676313][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## Sqrt: , Shape1=256x, 
+[16:01:53.676320][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=0, runSqrt=1, runSquare: 0.000000, Shape1=256x, 
+[16:01:53.676803][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 92.031, (ms): 0.092031, (s): 9.2031e-05
+[16:01:53.676842][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=3, Shape1=6x256x, , Shape2=256x, 
+[16:01:53.677438][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 106.068, (ms): 0.106068, (s): 0.000106068
+[16:01:53.677461][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=2, Shape1=6x256x, , Shape2=256x, 
+[16:01:53.678005][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 110.69, (ms): 0.11069, (s): 0.00011069
+[16:01:53.678029][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x256x, , Shape2=256x, 
+[16:01:53.678625][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 109.602, (ms): 0.109602, (s): 0.000109602
+[16:01:53.679139][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReLU: , Shape1=6x256x, 
+[16:01:53.679147][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## ReluSqrtSquare: runRelu=1, runSqrt=0, runSquare: 0.000000, Shape1=6x256x, 
+[16:01:53.679679][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** _ReluSqrtSquare(task):: (us): 113.31, (ms): 0.11331, (s): 0.00011331
+[16:01:53.679737][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatMul: , Shape1=6x256x, , Shape2=256x40x, 
+[16:01:53.680796][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatMul(task):: (us): 639.402, (ms): 0.639402, (s): 0.000639402
+[16:01:53.680835][info][source XilinxImplementation.cpp][function PrintInfo][line 245] ## MatOps: mode=0, Shape1=6x40x, , Shape2=40x, 
+[16:01:53.681465][info][source XilinxImplementation.cpp][function ReportDuration][line 1535] ** MatOps(task):: (us): 105.231, (ms): 0.105231, (s): 0.000105231

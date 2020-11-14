@@ -1,0 +1,151 @@
+// main repository commit hash: 
+// c711ac1163576a25d611918e6df09ff143dc08d8
+
+
+// config repository commit hash: 
+// 253e7b37833ddb22f6b86dcf5b0de01a86660843
+
+
+#pragma once
+#include <cstddef>
+#include <cstdint>
+#include "hls_half.h"
+#include "hlslib/xilinx/Operators.h"
+#include "hlslib/xilinx/DataPack.h"
+#include "hlslib/xilinx/Resource.h"
+#include "hlslib/xilinx/Stream.h"
+
+using CONFIG_DTYPE = float;
+constexpr unsigned CONFIG_DTYPE_SIZE = 4;
+constexpr unsigned CONFIG_M_AXI_WIDTH = 16;
+
+using MemoryPackF_t = hlslib::DataPack<CONFIG_DTYPE, CONFIG_M_AXI_WIDTH>;
+using MemoryPackI_t = hlslib::DataPack<unsigned, CONFIG_M_AXI_WIDTH>;
+
+namespace ConfigTaskConv2
+{
+    constexpr int BankIndex_inputTn = 0;
+    constexpr int BankIndex_weightTn = 0;
+    constexpr int BankIndex_biasTn = 0;
+    constexpr int BankIndex_outputTn = 0;
+
+    constexpr int kMemoryWidthBytesN = 64;
+    constexpr int kMemoryWidthBytesK = 64;
+    constexpr int kMemoryWidthBytesM = 64;
+    constexpr unsigned long kOuterTileSizeN = 256;
+    constexpr unsigned long kOuterTileSizeM = 128;
+    constexpr unsigned long kInnerTileSizeN = 16;
+    constexpr int kComputeTileSizeM = 8; 
+    constexpr int kComputeTileSizeN = 1;
+    constexpr int kTransposeWidthBytes = 64;
+    constexpr float kFrequency = 130; 
+    using OperatorMap = hlslib::op::Multiply<CONFIG_DTYPE>;
+    using OperatorReduce = hlslib::op::Add<CONFIG_DTYPE>;
+    #if 64 != 32 
+        #define MM_CONVERT_B
+    #endif
+    // When A is not transposed, the data width must be converted if a PE buffers
+    // more than one row of A (currently unsupported). When A is transposed, the
+    // data width must be converted if the memory bus is wider than the number of
+    // rows buffered per PE.
+    #if (defined(MM_TRANSPOSED_A) && \
+         (4 != 64))
+        #define MM_CONVERT_A
+    #endif
+}
+
+namespace ConfigTaskTopK
+{
+    constexpr int BankIndex_inputTn = 0;
+    constexpr int BankIndex_indicesSplitedTn = 0;
+    constexpr unsigned MaxSliceLen = 1024;
+    //constexpr unsigned PipeDepth = ;
+    constexpr unsigned UnitCount = 1;
+    constexpr unsigned MaxK = 20;
+}
+
+namespace ConfigTaskMatOps
+{
+    constexpr int BankIndex_inputTn1 = 1;
+    constexpr int BankIndex_inputTn2 = 1;
+    constexpr int BankIndex_outputTn = 1;
+    constexpr unsigned PipeDepth = 1;
+}
+
+namespace ConfigTaskReduce
+{
+    constexpr int BankIndex_inputTn  = 1; 
+    constexpr int BankIndex_outputTn = 1;
+    namespace Sum4D{
+        constexpr int MaxPowY = 2;
+        constexpr unsigned MaxSliceLen = 1024;
+        //constexpr unsigned PipeDepth = ;
+    }
+    namespace Max3D{
+        constexpr unsigned MaxSliceLen = 1024;
+    }
+    namespace Sum3D{
+        constexpr unsigned MaxSliceLen = 64;
+        constexpr unsigned PipeDepth = 1;
+    }
+}
+
+namespace ConfigTaskMatMul
+{
+    constexpr int BankIndex_inputTn1 = 1;
+    constexpr int BankIndex_inputTn2 = 1;
+    constexpr int BankIndex_outputTn = 1;
+    constexpr unsigned MaxM = 1024;
+    constexpr unsigned RowTileSizeD = 4;
+}
+
+namespace ConfigTaskTile
+{
+    constexpr int BankIndex_inputTn = 1;
+    constexpr int BankIndex_outputTn = 1;
+    constexpr unsigned MaxSliceLen = 1024; 
+}
+
+namespace ConfigTaskGather
+{
+    constexpr int BankIndex_inputTn = 1; 
+    constexpr int BankIndex_indicesTn = 1; 
+    constexpr int BankIndex_outputTn = 1;
+    constexpr unsigned PipeDepth = 1;
+}
+
+namespace ConfigTaskConcat 
+{    
+    constexpr int BankIndex_inputTn1 = 1;
+    constexpr int BankIndex_inputTn2 = 1;
+    constexpr int BankIndex_outputTn = 1;
+    constexpr unsigned PipeDepth = 1;
+}
+
+namespace ConfigTaskTranspose
+{
+    constexpr int BankIndex_inputTn = 1;
+    constexpr int BankIndex_outputTn = 1;
+    constexpr unsigned PipeDepth1 = 32;
+    constexpr unsigned PipeDepth2 = 32;
+}
+
+namespace ConfigTaskReluSqrtSquare
+{
+    constexpr int BankIndex_inputTn = 1;
+    constexpr int BankIndex_outputTn = 1;
+    constexpr unsigned ModeRelu = 0;
+    constexpr unsigned ModeSqrt = 1;
+    constexpr unsigned ModeSquare = 2;
+}
+
+namespace ConfigTaskPadUnpad
+{
+    constexpr int BankIndex_inputTn = 0;
+    constexpr int BankIndex_outputTn = 0;
+}
+
+namespace ConfigTaskDataMover
+{
+    constexpr unsigned PipeDepth = 1;
+}
