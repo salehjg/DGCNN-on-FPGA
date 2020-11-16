@@ -106,18 +106,22 @@ class ReportGenerator:
         summary_dataframe['Launch Count'] = []
         summary_dataframe['AccumulatedHostOnly(us)'] = []
         summary_dataframe['AccumulatedDeviceOnly(us)'] = []
+        summary_dataframe['AccumulatedDataMovereOnly(us)'] = []
         summary_dataframe['Total(us)'] = []
         for name in layer_names:
             launch_cnt = 0
             total_device_usec = 0
+            total_device_datamover_usec = 0
             total_usec = 0
             total_host_usec = 0
             for layer in sorted_by_layername[name]:
                 launch_cnt += 1
                 __device_usec = accumulate_device_times(layer)
+                __device_datamover_usec = accumulate_device_datamover_times(layer)
                 __usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
-                __host_usec = __usec - __device_usec
+                __host_usec = __usec - __device_usec - __device_datamover_usec
                 total_device_usec += accumulate_device_times(layer)
+                total_device_datamover_usec += accumulate_device_datamover_times(layer)
                 total_usec += layer.host_elapsed / datetime.timedelta(microseconds=1)
                 total_host_usec += __host_usec
 
@@ -125,6 +129,7 @@ class ReportGenerator:
             summary_dataframe['Launch Count'].append(launch_cnt)
             summary_dataframe['AccumulatedHostOnly(us)'].append(total_host_usec)
             summary_dataframe['AccumulatedDeviceOnly(us)'].append(total_device_usec)
+            summary_dataframe['AccumulatedDataMovereOnly(us)'].append(total_device_datamover_usec)
             summary_dataframe['Total(us)'].append(total_usec)
 
         df = pd.DataFrame(summary_dataframe)
@@ -440,18 +445,22 @@ class ReportGenerator:
         summary_dataframe['Launch Count'] = []
         summary_dataframe['AccumulatedHostOnly(us)'] = []
         summary_dataframe['AccumulatedDeviceOnly(us)'] = []
+        summary_dataframe['AccumulatedDataMoverOnly(us)'] = []
         summary_dataframe['Total(us)'] = []
         for name in layer_names:
             launch_cnt = 0
             total_device_usec = 0
+            total_device_datamover_usec = 0
             total_usec = 0
             total_host_usec = 0
             for layer in sorted_by_layername[name]:
                 launch_cnt += 1
                 __device_usec = accumulate_device_times(layer)
+                __device_datamover_usec = accumulate_device_datamover_times(layer)
                 __usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
-                __host_usec = __usec - __device_usec
+                __host_usec = __usec - __device_usec - __device_datamover_usec
                 total_device_usec += __device_usec
+                total_device_datamover_usec += __device_datamover_usec
                 total_usec += __usec
                 total_host_usec += __host_usec
 
@@ -459,6 +468,7 @@ class ReportGenerator:
             summary_dataframe['Launch Count'].append(launch_cnt)
             summary_dataframe['AccumulatedHostOnly(us)'].append(total_host_usec)
             summary_dataframe['AccumulatedDeviceOnly(us)'].append(total_device_usec)
+            summary_dataframe['AccumulatedDataMoverOnly(us)'].append(total_device_datamover_usec)
             summary_dataframe['Total(us)'].append(total_usec)
 
         df = pd.DataFrame(summary_dataframe)
