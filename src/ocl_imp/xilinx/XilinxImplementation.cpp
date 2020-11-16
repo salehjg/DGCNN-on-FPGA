@@ -276,6 +276,7 @@ TensorF* XilinxImplementation::Transpose(WorkScheduler scheduler, TensorF *batch
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -346,6 +347,7 @@ TensorF* XilinxImplementation::MatMul(WorkScheduler scheduler,
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -487,6 +489,7 @@ TensorF* XilinxImplementation::_Reduce_Task(
 
     cl::Event exeEvt;
     OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+    OCL_CHECK(error, error = queue->flush());
     exeEvt.wait();
     //queue->finish();
 
@@ -652,6 +655,7 @@ TensorF* XilinxImplementation::_PadUnpadLastDim(
 
     cl::Event exeEvt;
     OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+    OCL_CHECK(error, error = queue->flush());
     exeEvt.wait();
     //queue->finish();
 
@@ -885,6 +889,7 @@ TensorF* XilinxImplementation::MatOps(WorkScheduler scheduler, TensorF *inputTn1
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -970,6 +975,7 @@ TensorF* XilinxImplementation::Concat2(
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -1060,6 +1066,7 @@ TensorI* XilinxImplementation::TopK(WorkScheduler scheduler, TensorF* batchedMat
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -1112,6 +1119,7 @@ TensorF* XilinxImplementation::Gather(WorkScheduler scheduler, TensorF* inputTn,
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -1230,6 +1238,7 @@ TensorF* XilinxImplementation::Conv2D(WorkScheduler scheduler, TensorF* inputTn,
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -1296,6 +1305,7 @@ TensorF* XilinxImplementation::_ReluSqrtSquare(WorkScheduler scheduler, TensorF*
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 
@@ -1390,6 +1400,7 @@ TensorF* XilinxImplementation::Tile(WorkScheduler scheduler, TensorF *inputTn, i
 
         cl::Event exeEvt;
         OCL_CHECK(error,error = queue->enqueueTask(*kernelObject->kernel_task, nullptr, &exeEvt));
+        OCL_CHECK(error, error = queue->flush());
         exeEvt.wait();
         //queue->finish();
 

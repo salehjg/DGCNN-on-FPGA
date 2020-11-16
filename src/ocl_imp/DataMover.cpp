@@ -89,16 +89,28 @@ int LaunchDataMover(
 
     cl_int error;
 #ifdef USEMEMORYBANK0
-    OclTensorF *tnDummyBank0 = new OclTensorF(context, queue, {len}, 0, true);
+    OclTensorF *tnDummyBank0;
+    if(!(srcBank==0 || dstBank==0)){
+        tnDummyBank0 = new OclTensorF(context, queue, {len}, 0, true);
+    }
 #endif
 #ifdef USEMEMORYBANK1
-    OclTensorF *tnDummyBank1 = new OclTensorF(context, queue, {len}, 1, true);
+    OclTensorF *tnDummyBank1;
+    if(!(srcBank==1 || dstBank==1)){
+        tnDummyBank1 = new OclTensorF(context, queue, {len}, 1, true);
+    }
 #endif
 #ifdef USEMEMORYBANK2
-    OclTensorF *tnDummyBank2 = new OclTensorF(context, queue, {len}, 2, true);
+    OclTensorF *tnDummyBank2;
+    if(!(srcBank==2 || dstBank==2)){
+        tnDummyBank2 = new OclTensorF(context, queue, {len}, 2, true);
+    }
 #endif
 #ifdef USEMEMORYBANK3
-    OclTensorF *tnDummyBank3 = new OclTensorF(context, queue, {len}, 3, true);
+    OclTensorF *tnDummyBank3;
+    if(!(srcBank==3 || dstBank==3)){
+        tnDummyBank3 = new OclTensorF(context, queue, {len}, 3, true);
+    }
 #endif
 
     if(!(srcBank>=0 && srcBank<=3)){
@@ -175,7 +187,8 @@ int LaunchDataMover(
     OCL_CHECK(error, error = kernel_datamover.setArg(argcnt++, lenVec));
 
     cl::Event exeEvt;
-    OCL_CHECK(error,error = queue->enqueueTask(kernel_datamover, nullptr, &exeEvt));
+    OCL_CHECK(error, error = queue->enqueueTask(kernel_datamover, nullptr, &exeEvt));
+    OCL_CHECK(error, error = queue->flush());
     exeEvt.wait();
     //queue->finish();
 
@@ -184,16 +197,24 @@ int LaunchDataMover(
     SPDLOG_LOGGER_DEBUG(logger,"Internal data-mover kernel executed successfully");
 
 #ifdef USEMEMORYBANK0
-    delete(tnDummyBank0);
+    if(!(srcBank==0 || dstBank==0)){
+        delete(tnDummyBank0);
+    }
 #endif
 #ifdef USEMEMORYBANK1
-    delete(tnDummyBank1);
+    if(!(srcBank==1 || dstBank==1)){
+        delete(tnDummyBank1);
+    }
 #endif
 #ifdef USEMEMORYBANK2
-    delete(tnDummyBank2);
+    if(!(srcBank==2 || dstBank==2)){
+        delete(tnDummyBank2);
+    }
 #endif
 #ifdef USEMEMORYBANK3
-    delete(tnDummyBank3);
+    if(!(srcBank==3 || dstBank==3)){
+        delete(tnDummyBank3);
+    }
 #endif
     SPDLOG_LOGGER_DEBUG(reporter,"Finished");
 }
