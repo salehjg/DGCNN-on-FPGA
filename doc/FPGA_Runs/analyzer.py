@@ -35,11 +35,20 @@ class ReportGenerator:
 
         def accumulate_device_times(src_layer: analyzer.Layer):
             deviceonly_usec = 0
-            if src_layer.is_fpga:
+            if src_layer.is_fpga and src_layer.layer_name != 'LaunchDataMover':
                 deviceonly_usec += src_layer.device_elapsed_us
             subs = len(src_layer.sub_layers)
             for i in range(subs):
                 deviceonly_usec += accumulate_device_times(src_layer.sub_layers[i])
+            return deviceonly_usec
+
+        def accumulate_device_datamover_times(src_layer: analyzer.Layer):
+            deviceonly_usec = 0
+            if src_layer.is_fpga and src_layer.layer_name == 'LaunchDataMover':
+                deviceonly_usec += src_layer.device_elapsed_us
+            subs = len(src_layer.sub_layers)
+            for i in range(subs):
+                deviceonly_usec += accumulate_device_datamover_times(src_layer.sub_layers[i])
             return deviceonly_usec
 
         # ---------------------------------------------------
@@ -70,6 +79,7 @@ class ReportGenerator:
             perlayer_dataframe['Shape2'] = []
             perlayer_dataframe['AccumulatedHostOnly(us)'] = []
             perlayer_dataframe['AccumulatedDeviceOnly(us)'] = []
+            perlayer_dataframe['AccumulatedDataMoverOnly(us)'] = []
             perlayer_dataframe['Msg'] = []
             perlayer_dataframe['Total(us)'] = []
 
@@ -78,9 +88,11 @@ class ReportGenerator:
                 perlayer_dataframe['Shape2'].append(str(layer.shape2))
 
                 total_device_usec = accumulate_device_times(layer)
+                total_device_datamover_usec = accumulate_device_datamover_times(layer)
                 total_usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
-                perlayer_dataframe['AccumulatedHostOnly(us)'].append(total_usec - total_device_usec)
+                perlayer_dataframe['AccumulatedHostOnly(us)'].append(total_usec - total_device_usec - total_device_datamover_usec)
                 perlayer_dataframe['AccumulatedDeviceOnly(us)'].append(total_device_usec)
+                perlayer_dataframe['AccumulatedDataMoverOnly(us)'].append(total_device_datamover_usec)
                 perlayer_dataframe['Msg'].append(layer.msg)
                 perlayer_dataframe['Total(us)'].append(total_usec)
 
@@ -359,11 +371,20 @@ class ReportGenerator:
 
         def accumulate_device_times(src_layer: analyzer.Layer):
             deviceonly_usec = 0
-            if src_layer.is_fpga:
+            if src_layer.is_fpga and src_layer.layer_name != 'LaunchDataMover':
                 deviceonly_usec += src_layer.device_elapsed_us
             subs = len(src_layer.sub_layers)
             for i in range(subs):
                 deviceonly_usec += accumulate_device_times(src_layer.sub_layers[i])
+            return deviceonly_usec
+
+        def accumulate_device_datamover_times(src_layer: analyzer.Layer):
+            deviceonly_usec = 0
+            if src_layer.is_fpga and src_layer.layer_name == 'LaunchDataMover':
+                deviceonly_usec += src_layer.device_elapsed_us
+            subs = len(src_layer.sub_layers)
+            for i in range(subs):
+                deviceonly_usec += accumulate_device_datamover_times(src_layer.sub_layers[i])
             return deviceonly_usec
 
         # ---------------------------------------------------
@@ -393,6 +414,7 @@ class ReportGenerator:
             perlayer_dataframe['Msg'] = []
             perlayer_dataframe['AccumulatedHostOnly(us)'] = []
             perlayer_dataframe['AccumulatedDeviceOnly(us)'] = []
+            perlayer_dataframe['AccumulatedDataMoverOnly(us)'] = []
             perlayer_dataframe['Total(us)'] = []
 
             for layer in sorted_by_layername[name]:
@@ -401,9 +423,11 @@ class ReportGenerator:
                 perlayer_dataframe['Msg'].append(str(layer.msg))
 
                 total_device_usec = accumulate_device_times(layer)
+                total_device_datamover_usec = accumulate_device_datamover_times(layer)
                 total_usec = layer.host_elapsed / datetime.timedelta(microseconds=1)
-                perlayer_dataframe['AccumulatedHostOnly(us)'].append(total_usec - total_device_usec)
+                perlayer_dataframe['AccumulatedHostOnly(us)'].append(total_usec - total_device_usec - total_device_datamover_usec)
                 perlayer_dataframe['AccumulatedDeviceOnly(us)'].append(total_device_usec)
+                perlayer_dataframe['AccumulatedDataMoverOnly(us)'].append(total_device_datamover_usec)
                 perlayer_dataframe['Total(us)'].append(total_usec)
 
             df = pd.DataFrame(perlayer_dataframe)
