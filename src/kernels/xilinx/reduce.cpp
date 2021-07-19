@@ -288,6 +288,8 @@ void ReduceSumRank3Axis2_V1(
  *             The latency is reported for inputTn of shape 5x1024x20x128.
  *             This kernel complies with the padded last dim policy.
  *             This kernel supports burst read/write.
+ *             
+ *             This version has less performance than V3 but also uses less resources.
  *
  * @param[in]  inputTn   The input tn
  * @param      outputTn  The output tn

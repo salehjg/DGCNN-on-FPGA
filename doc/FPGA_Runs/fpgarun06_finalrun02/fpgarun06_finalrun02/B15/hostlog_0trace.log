@@ -1,0 +1,820 @@
+[22:15:14.119794][info][source MainExecutable.cpp][function main][line 168] Batch-size: 15
+[22:15:14.119905][info][source MainExecutable.cpp][function main][line 172] FPGA Image: /home/centos/deeppoint-v1-fpga/build/DeepPointV1FPGA_hw.awsxclbin
+[22:15:14.119915][info][source MainExecutable.cpp][function main][line 177] Data Directory: /home/centos/deeppoint-v1-fpga/data
+[22:15:14.119923][info][source MainExecutable.cpp][function main][line 214] ======================================================
+[22:15:14.119927][info][source MainExecutable.cpp][function main][line 215] Running Selected ModelArch ...
+[22:15:14.119941][warning][source XilinxImplementation.cpp][function XilinxImplementation][line 23] XCL_EMULATION_MODE is not set. System run(real FPGA) is considered.
+[22:15:14.459511][trace][source xcl2.cpp][function get_devices][line 49] Found Platform
+[22:15:14.459531][trace][source xcl2.cpp][function get_devices][line 50] Platform Name: Xilinx
+[22:15:14.459583][trace][source XilinxImplementation.cpp][function XilinxImplementation][line 36] Xilinx Devices Found: 1
+[22:15:14.459588][trace][source XilinxImplementation.cpp][function XilinxImplementation][line 39] Using device index 0
+[22:15:14.459676][trace][source XilinxImplementation.cpp][function XilinxImplementation][line 45] Found Device: xilinx_aws-vu9p-f1-04261818_dynamic_5_0
+[22:15:14.459682][trace][source xcl2.cpp][function read_binary_file][line 69] Reading /home/centos/deeppoint-v1-fpga/build/DeepPointV1FPGA_hw.awsxclbin
+[22:15:14.459694][trace][source xcl2.cpp][function read_binary_file][line 76] Loading /home/centos/deeppoint-v1-fpga/build/DeepPointV1FPGA_hw.awsxclbin
+[22:15:14.719424][trace][source PlatformSelector.cpp][function PlatformSelector][line 53] Weights Dir: /home/centos/deeppoint-v1-fpga/data/weights/
+[22:15:14.719437][trace][source PlatformSelector.cpp][function PlatformSelector][line 54] Weights File List Path: /home/centos/deeppoint-v1-fpga/data/weights/filelist.txt
+[22:15:14.720036][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "agg.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.720216][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "agg.bn.agg.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.720403][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "agg.bn.agg.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.720960][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "agg.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.721451][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "agg.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.729450][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "agg.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.732668][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn1.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.733150][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn1.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.733325][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn1.bn.dgcnn1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.733542][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn1.bn.dgcnn1.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.734018][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn1.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.734522][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn1.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.735003][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn2.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.735498][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn2.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.735688][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn2.bn.dgcnn2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.735858][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn2.bn.dgcnn2.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.736337][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn2.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.736965][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn2.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.737496][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn3.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.737966][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn3.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.738138][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn3.bn.dgcnn3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.738312][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn3.bn.dgcnn3.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.738829][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn3.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.739438][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn3.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.739997][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn4.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.740465][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn4.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.740677][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn4.bn.dgcnn4.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.740853][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn4.bn.dgcnn4.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.741337][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "dgcnn4.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.742065][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "dgcnn4.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.742662][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc1.biases.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.743163][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc1.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.743341][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc1.bn.fc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.743533][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc1.bn.fc1.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.744015][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc1.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.756928][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 338] The weight tensor "fc1.weights.npy" is considered to be related to the layer "MatMul" and will be transfered to the DDR bank 1
+[22:15:14.761143][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc2.biases.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.761651][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc2.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.761824][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc2.bn.fc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.761994][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc2.bn.fc2.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.762491][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc2.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.764812][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 338] The weight tensor "fc2.weights.npy" is considered to be related to the layer "MatMul" and will be transfered to the DDR bank 1
+[22:15:14.766028][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "fc3.biases.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.766711][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 338] The weight tensor "fc3.weights.npy" is considered to be related to the layer "MatMul" and will be transfered to the DDR bank 1
+[22:15:14.767271][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "transform_net1.tconv1.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.767762][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv1.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.768247][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv1.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.768422][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.768698][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv1.bn.transform_net1.tconv1.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.769191][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "transform_net1.tconv1.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.769696][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "transform_net1.tconv2.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.770201][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv2.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.770712][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv2.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.770880][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.771058][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv2.bn.transform_net1.tconv2.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.771701][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "transform_net1.tconv2.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.772243][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "transform_net1.tconv3.biases.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.772738][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv3.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.773226][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv3.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.773418][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.773622][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tconv3.bn.transform_net1.tconv3.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.775942][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 328] The weight tensor "transform_net1.tconv3.weights.npy" is considered to be related to the layer "Conv2" and will be transfered to the DDR bank 0
+[22:15:14.777152][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc1.biases.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.777667][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc1.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.778150][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc1.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.778318][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.778512][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc1.bn.transform_net1.tfc1.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.789410][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 338] The weight tensor "transform_net1.tfc1.weights.npy" is considered to be related to the layer "MatMul" and will be transfered to the DDR bank 1
+[22:15:14.793864][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc2.biases.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.794344][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc2.bn.beta.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.794841][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc2.bn.gamma.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.795015][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze_1.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.795186][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 333] The weight tensor "transform_net1.tfc2.bn.transform_net1.tfc2.bn.moments.Squeeze.ExponentialMovingAverage.npy" is considered to be related to the layer "MatOps" and will be transfered to the DDR bank 1
+[22:15:14.797515][debug][source WeightsLoader.cpp][function _ResolveMemoryBankOclXilinx][line 338] The weight tensor "transform_net1.tfc2.weights.npy" is considered to be related to the layer "MatMul" and will be transfered to the DDR bank 1
+[22:15:14.799538][info][source ClassifierMultiPlatform.cpp][function ClassifierMultiplatform][line 69] PCL NPY PATH: /home/centos/deeppoint-v1-fpga/data/dataset/dataset_B2048_pcl.npy
+[22:15:14.799551][info][source ClassifierMultiPlatform.cpp][function ClassifierMultiplatform][line 70] LBL NPY PATH: /home/centos/deeppoint-v1-fpga/data/dataset/dataset_B2048_labels_int32.npy
+[22:15:14.812322][info][source ModelArchTop02.cpp][function Execute][line 521] Starting Process...
+[22:15:14.812345][info][source ModelArchTop02.cpp][function Execute][line 522] Batch Size: 15
+[22:15:14.812350][info][source ModelArchTop02.cpp][function Execute][line 523] Point Count: 1024
+[22:15:14.829740][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:14.847076][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:14.847205][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:14.922084][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:14.922123][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:14.988589][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:15.002379][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.016559][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.072683][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.116688][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.116715][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.174009][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.174036][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.362244][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:15.363181][debug][source XilinxImplementation.cpp][function TopK][line 1053] BatchSize: 15360
+[22:15:15.363196][debug][source XilinxImplementation.cpp][function TopK][line 1054] vecsPerSlice: 64
+[22:15:15.363200][debug][source XilinxImplementation.cpp][function TopK][line 1055] vecsPerOutputSlice: 2
+[22:15:15.363204][debug][source XilinxImplementation.cpp][function TopK][line 1056] _dim2: 1024
+[22:15:15.363209][debug][source XilinxImplementation.cpp][function TopK][line 1057] k: 20
+[22:15:15.790545][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:15.793748][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:15.840023][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:15.891723][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.891746][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.935976][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.935999][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.993373][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:15.993426][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:15.993579][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 6, dim1: 64, lastDimPadded: 128, lcm: 0, lastDimUnpadded: 0
+[22:15:16.010790][debug][source XilinxImplementation.cpp][function Conv2D][line 1190] Padding weightTn(super-vec padding):
+[22:15:16.010802][debug][source XilinxImplementation.cpp][function Conv2D][line 1191] D2: 64
+[22:15:16.010806][debug][source XilinxImplementation.cpp][function Conv2D][line 1192] D2Padded: 128
+[22:15:16.026688][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:16.026760][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:16.026771][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:16.086523][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:16.086552][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [307200, 6, 128]
+[22:15:16.253214][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:16.253261][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:16.282680][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 307200, dim1: 128, lastDimPadded: 0, lcm: 0, lastDimUnpadded: 64
+[22:15:16.375726][debug][source XilinxImplementation.cpp][function Conv2D][line 1254] Unpadding the results(super-vec unpadding)
+[22:15:16.535027][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:16.695745][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:16.695761][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:16.754624][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:16.981744][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:17.142409][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.142429][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.143249][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.143264][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.143928][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.143941][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.144574][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.144601][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.145298][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.145311][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.146125][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.146138][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.146741][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.146754][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.147532][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.147548][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.148159][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.148173][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.148807][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.148820][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.207896][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:17.207960][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.323296][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.323318][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.324044][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.324704][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.324720][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.439607][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.439636][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.554654][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.554677][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.783085][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.930894][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:17.930916][debug][source XilinxImplementation.cpp][function Conv2D][line 1195] Bypassing super-vec padding for weightTn
+[22:15:17.998281][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:17.998349][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:17.998360][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:18.056467][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:18.056512][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [307200, 64, 128]
+[22:15:18.348790][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:18.348830][debug][source XilinxImplementation.cpp][function Conv2D][line 1257] Bypassing super-vec unpadding of the results
+[22:15:18.658517][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:18.831445][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:18.831460][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:18.953730][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:19.249441][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:19.421829][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.421844][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.422703][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.422717][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.423312][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.423325][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.423963][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.423976][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.424697][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.424710][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.425426][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.425439][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.426204][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.426233][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.427028][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.427042][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.427683][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.427697][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.428292][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.428305][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.544240][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:19.544309][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.779450][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.779474][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.780193][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.788829][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:19.788846][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:20.022975][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:20.023005][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:20.268721][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:20.268748][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:20.728572][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.031080][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.237610][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:21.237626][debug][source XilinxImplementation.cpp][function Conv2D][line 1195] Bypassing super-vec padding for weightTn
+[22:15:21.251070][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:21.251123][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.251133][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.290532][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:21.290556][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [15360, 128, 1024]
+[22:15:21.474454][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:21.474471][debug][source XilinxImplementation.cpp][function Conv2D][line 1257] Bypassing super-vec unpadding of the results
+[22:15:21.600550][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:21.617149][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.617165][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.679208][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:21.742776][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:21.759312][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.759330][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.760225][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.760241][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.760910][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.760924][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.761559][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.761590][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.762317][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.762331][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.763177][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.763190][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.763792][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.763805][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.764523][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.764537][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.765155][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.765169][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.765863][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.765877][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.813929][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:21.814019][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.871472][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.871495][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.872204][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.905307][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.905324][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.962071][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:21.962098][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.019102][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.019130][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.166149][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.284909][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.322625][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.322642][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.335306][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.335322][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.341642][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.342386][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.342400][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.343067][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.343694][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.344359][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.344391][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.345243][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.345258][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.345992][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.346006][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.346608][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.346623][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.347337][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.347350][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.348166][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.348180][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.348772][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.348785][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.349491][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.349504][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.350090][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.350102][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.350713][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.350728][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.351384][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.351398][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.352160][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.352173][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.352746][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.366223][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.366238][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.366924][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.366939][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.367588][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.367602][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.368770][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.369606][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.369635][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.372844][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.372859][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.373822][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.374615][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.374629][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.375317][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.375896][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.376586][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.376598][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.377368][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.377380][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.377978][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.377991][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.378598][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.378610][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.379325][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.379351][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.380095][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.380108][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.380749][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.380763][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.381452][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.381464][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.382130][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.382142][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.382721][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.382742][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.383396][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.383409][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.384167][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.384180][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.384777][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.385328][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.385341][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.386035][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.386047][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.386753][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.386769][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.387865][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.390450][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:22.392232][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:22.393102][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.394907][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:22.396832][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.396846][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.402092][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:22.403879][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:22.429549][info][source ModelArchTop02.cpp][function Execute][line 559] DGCCN0 Started...
+[22:15:22.429580][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.431711][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.431724][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.495497][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.495519][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.551249][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.552623][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.553788][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.597642][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.641228][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.641256][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.698138][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.698160][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:22.807228][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:22.808139][debug][source XilinxImplementation.cpp][function TopK][line 1053] BatchSize: 15360
+[22:15:22.808153][debug][source XilinxImplementation.cpp][function TopK][line 1054] vecsPerSlice: 64
+[22:15:22.808157][debug][source XilinxImplementation.cpp][function TopK][line 1055] vecsPerOutputSlice: 2
+[22:15:22.808161][debug][source XilinxImplementation.cpp][function TopK][line 1056] _dim2: 1024
+[22:15:22.808165][debug][source XilinxImplementation.cpp][function TopK][line 1057] k: 20
+[22:15:23.203377][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.206653][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:23.239056][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.290073][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.290091][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.333876][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.333892][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.373536][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:23.373571][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.373633][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 6, dim1: 64, lastDimPadded: 128, lcm: 0, lastDimUnpadded: 0
+[22:15:23.382710][debug][source XilinxImplementation.cpp][function Conv2D][line 1190] Padding weightTn(super-vec padding):
+[22:15:23.382722][debug][source XilinxImplementation.cpp][function Conv2D][line 1191] D2: 64
+[22:15:23.382726][debug][source XilinxImplementation.cpp][function Conv2D][line 1192] D2Padded: 128
+[22:15:23.398522][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:23.398589][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.398599][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.463464][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:23.463499][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [307200, 6, 128]
+[22:15:23.629407][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:23.629454][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:23.658234][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 307200, dim1: 128, lastDimPadded: 0, lcm: 0, lastDimUnpadded: 64
+[22:15:23.751279][debug][source XilinxImplementation.cpp][function Conv2D][line 1254] Unpadding the results(super-vec unpadding)
+[22:15:23.908771][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:24.069441][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.069459][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.128312][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:24.347321][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:24.517803][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.517819][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.518634][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.518665][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.519307][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.519321][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.519987][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.520000][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.520701][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.520716][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.521594][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.521626][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.522238][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.522251][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.523014][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.523030][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.523692][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.523707][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.524349][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.524362][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.583720][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:24.583787][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.699710][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.699733][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.700468][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.701174][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.701187][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.816287][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.816328][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.930839][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:24.930868][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.158181][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.205186][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.379897][info][source ModelArchTop02.cpp][function Execute][line 603] DGCCN1 Started...
+[22:15:25.379944][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.395663][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.395696][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.829392][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.829414][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.892294][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.903559][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.914775][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:25.958250][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.001361][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.001389][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.057830][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.057858][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.167872][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:26.168760][debug][source XilinxImplementation.cpp][function TopK][line 1053] BatchSize: 15360
+[22:15:26.168768][debug][source XilinxImplementation.cpp][function TopK][line 1054] vecsPerSlice: 64
+[22:15:26.168772][debug][source XilinxImplementation.cpp][function TopK][line 1055] vecsPerOutputSlice: 2
+[22:15:26.168776][debug][source XilinxImplementation.cpp][function TopK][line 1056] _dim2: 1024
+[22:15:26.168780][debug][source XilinxImplementation.cpp][function TopK][line 1057] k: 20
+[22:15:26.563837][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.572810][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:26.694769][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.805851][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.805881][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.937712][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:26.937736][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:27.127015][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:27.127067][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:27.127160][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 128, dim1: 64, lastDimPadded: 128, lcm: 0, lastDimUnpadded: 0
+[22:15:27.135894][debug][source XilinxImplementation.cpp][function Conv2D][line 1190] Padding weightTn(super-vec padding):
+[22:15:27.135905][debug][source XilinxImplementation.cpp][function Conv2D][line 1191] D2: 64
+[22:15:27.135909][debug][source XilinxImplementation.cpp][function Conv2D][line 1192] D2Padded: 128
+[22:15:27.252240][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:27.252306][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:27.252316][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:27.310132][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:27.310157][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [307200, 128, 128]
+[22:15:27.769132][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:27.769177][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:27.805903][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 307200, dim1: 128, lastDimPadded: 0, lcm: 0, lastDimUnpadded: 64
+[22:15:27.898780][debug][source XilinxImplementation.cpp][function Conv2D][line 1254] Unpadding the results(super-vec unpadding)
+[22:15:27.957445][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:28.118276][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.118295][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.175984][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:28.394998][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:28.555727][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.555743][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.556499][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.556515][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.557202][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.557216][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.557829][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.557842][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.558629][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.558642][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.559413][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.559437][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.560156][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.560169][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.560949][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.560963][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.561607][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.561621][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.562225][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.562242][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.621149][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:28.621208][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.736285][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.736308][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.736984][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.738020][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.738034][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.853311][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.853334][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.974040][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:28.974061][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.102822][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.150448][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.325436][info][source ModelArchTop02.cpp][function Execute][line 645] DGCCN2 Started...
+[22:15:29.325467][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.334807][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.334833][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.768163][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.768184][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.830190][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.840164][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.851358][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.894572][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.943969][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:29.943997][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.000580][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.000601][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.109592][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:30.110424][debug][source XilinxImplementation.cpp][function TopK][line 1053] BatchSize: 15360
+[22:15:30.110432][debug][source XilinxImplementation.cpp][function TopK][line 1054] vecsPerSlice: 64
+[22:15:30.110436][debug][source XilinxImplementation.cpp][function TopK][line 1055] vecsPerOutputSlice: 2
+[22:15:30.110440][debug][source XilinxImplementation.cpp][function TopK][line 1056] _dim2: 1024
+[22:15:30.110444][debug][source XilinxImplementation.cpp][function TopK][line 1057] k: 20
+[22:15:30.505716][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.508855][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:30.635464][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.745853][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.745880][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.876658][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:30.876681][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:31.087745][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:31.087794][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:31.094531][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 128, dim1: 64, lastDimPadded: 128, lcm: 0, lastDimUnpadded: 0
+[22:15:31.102037][debug][source XilinxImplementation.cpp][function Conv2D][line 1190] Padding weightTn(super-vec padding):
+[22:15:31.102062][debug][source XilinxImplementation.cpp][function Conv2D][line 1191] D2: 64
+[22:15:31.102066][debug][source XilinxImplementation.cpp][function Conv2D][line 1192] D2Padded: 128
+[22:15:31.218739][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:31.218806][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:31.218818][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:31.276962][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:31.276991][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [307200, 128, 128]
+[22:15:31.735803][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:31.735845][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:31.764524][debug][source XilinxImplementation.cpp][function _PadUnpadLastDim][line 645] dim0: 307200, dim1: 128, lastDimPadded: 0, lcm: 0, lastDimUnpadded: 64
+[22:15:31.857427][debug][source XilinxImplementation.cpp][function Conv2D][line 1254] Unpadding the results(super-vec unpadding)
+[22:15:31.915385][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:32.076109][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.076124][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.134560][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:32.359652][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:32.520334][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.520350][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.521241][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.521256][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.521960][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.521973][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.522622][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.522639][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.523373][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.523388][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.524291][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.524308][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.524969][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.524983][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.525764][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.525778][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.526421][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.526437][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.527126][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.527140][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.585739][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:32.585806][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.700809][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.700831][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.701515][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.702468][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.702549][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.817220][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.817249][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.931771][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:32.931797][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.060856][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.108916][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.283722][info][source ModelArchTop02.cpp][function Execute][line 687] DGCCN3 Started...
+[22:15:33.283761][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.299248][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.299271][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.732535][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.732557][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.794322][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.804206][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.815391][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.858427][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.901794][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.901821][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.958578][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:33.958599][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:34.067519][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:34.068359][debug][source XilinxImplementation.cpp][function TopK][line 1053] BatchSize: 15360
+[22:15:34.068366][debug][source XilinxImplementation.cpp][function TopK][line 1054] vecsPerSlice: 64
+[22:15:34.068370][debug][source XilinxImplementation.cpp][function TopK][line 1055] vecsPerOutputSlice: 2
+[22:15:34.068374][debug][source XilinxImplementation.cpp][function TopK][line 1056] _dim2: 1024
+[22:15:34.068378][debug][source XilinxImplementation.cpp][function TopK][line 1057] k: 20
+[22:15:34.464042][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:34.473010][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:34.599448][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:34.709713][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:34.709756][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:34.840769][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:34.840796][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:35.050890][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:35.050913][debug][source XilinxImplementation.cpp][function Conv2D][line 1195] Bypassing super-vec padding for weightTn
+[22:15:35.165678][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:35.165740][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:35.165750][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:35.223239][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:35.223264][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [307200, 128, 128]
+[22:15:35.682216][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:35.682232][debug][source XilinxImplementation.cpp][function Conv2D][line 1257] Bypassing super-vec unpadding of the results
+[22:15:35.803509][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:35.976476][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:35.976492][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.091257][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:36.377765][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:36.550206][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.550221][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.551045][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.551059][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.551774][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.551789][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.552429][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.552443][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.553229][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.553243][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.554105][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.554121][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.554756][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.554769][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.555512][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.555525][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.556175][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.556201][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.556795][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.556807][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.671531][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:36.671618][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.911641][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.911662][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.912357][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.913372][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:36.913389][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.147657][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.147687][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.381924][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.381947][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.643933][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.739119][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.951530][info][source ModelArchTop02.cpp][function Execute][line 728] Agg Layer Started...
+[22:15:37.951568][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.951593][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.987434][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:37.987451][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.001579][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.001596][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.046831][debug][source XilinxImplementation.cpp][function Conv2D][line 1163] vecSizeTranspose: 16
+[22:15:38.046851][debug][source XilinxImplementation.cpp][function Conv2D][line 1195] Bypassing super-vec padding for weightTn
+[22:15:38.063184][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:38.063244][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.063255][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.100189][debug][source XilinxImplementation.cpp][function Conv2D][line 1236] Launching Conv2 gemmHLS
+[22:15:38.100212][debug][source XilinxImplementation.cpp][function Conv2D][line 1237] [N K M] = [15360, 320, 1024]
+[22:15:38.484011][debug][source XilinxImplementation.cpp][function Conv2D][line 1246] Launching Conv2 gemmHLS...DONE
+[22:15:38.484026][debug][source XilinxImplementation.cpp][function Conv2D][line 1257] Bypassing super-vec unpadding of the results
+[22:15:38.608583][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:38.625168][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.625183][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.686624][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:38.750115][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:38.766712][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.766729][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.767542][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.767555][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.768186][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.768202][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.768857][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.768872][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.769660][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.769687][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.770512][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.770525][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.771194][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.771207][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.771976][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.771989][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.772666][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.772678][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.773256][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.773268][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.820587][debug][source DataMover.cpp][function LaunchDataMover][line 197] Internal data-mover kernel executed successfully
+[22:15:38.820645][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.877913][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.877934][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.878682][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.906936][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.906953][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.963952][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:38.963979][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.026157][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.026186][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.171137][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.208906][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.239934][info][source ModelArchTop02.cpp][function Execute][line 795] FC Layer1 Started...
+[22:15:39.239973][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.239982][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.252032][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.252055][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.258612][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.259332][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.259348][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.260071][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.260673][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.261361][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.261377][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.262187][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.262201][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.262830][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.262844][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.263506][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.263520][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.264200][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.264214][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.265012][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.265024][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.265637][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.265652][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.266368][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.266381][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.267022][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.267034][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.267684][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.267697][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.268350][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.268366][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.269171][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.269198][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.269845][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.282441][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.282456][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.283129][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.283144][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.283847][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.283860][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.285010][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.285604][info][source ModelArchTop02.cpp][function Execute][line 828] FC Layer2 Started...
+[22:15:39.285635][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.285644][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.288758][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.288773][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.289747][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.290614][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.290628][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.291299][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.291960][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.292668][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.292681][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.293393][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.293408][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.294066][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.294079][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.294739][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.294754][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.295433][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.295448][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.296249][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.296264][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.296924][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.296936][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.297641][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.297654][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.298352][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.298365][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.298983][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.298996][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.299619][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.299632][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.300348][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.300372][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.301010][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.301551][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.301565][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.302200][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.302213][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.302825][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.302847][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.303907][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.304420][info][source ModelArchTop02.cpp][function Execute][line 862] FC Layer3 Started...
+[22:15:39.304454][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.304462][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.306231][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.306246][debug][source OclTensorF.cpp][function CloneIfNeededToDDRBank][line 227] CloneIfNeededToDDRBank: same banks detected, returning the original tensor
+[22:15:39.307062][info][source ModelArchTop02.cpp][function Execute][line 874] Dumping Optimization Objective Started...
+[22:15:39.307189][trace][source XilinxImplementation.cpp][function DumpDataMoverLaunchLogs][line 173] abs(defaultBankTag-transpose_in) + abs(defaultBankTag-matmul_in1) + abs(transpose_out-matmul_in2) + abs(matmul_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(defaultBankTag-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-tile_in) + abs(reduce_out-tile_in) + abs(tile_out-matops_in1) + abs(tile_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-topk_in) + abs(defaultBankTag-gather_in1) + abs(topk_out-gather_in2) + abs(defaultBankTag-tile_in) + abs(gather_out-matops_in1) + abs(tile_out-matops_in2) + abs(tile_out-concat_in1) + abs(matops_out-concat_in2) + abs(concat_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_w-padunpad_in) + abs(defaultBankTag-padunpad_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-matmul_in1) + abs(matmul_in2-matmul_in2) + abs(matmul_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-reduce_in) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-matmul_in1) + abs(matmul_in2-matmul_in2) + abs(matmul_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-reduce_in) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(undefined_tag-matops_in1) + abs(defaultBankTag-matops_in2) + abs(relusqrtsquare_out-matmul_in1) + abs(undefined_tag-matmul_in2) + abs(matmul_out-matops_in1) + abs(matops_out-matops_in2) + abs(defaultBankTag-matmul_in1) + abs(defaultBankTag-matmul_in2) + abs(matmul_out-transpose_in) + abs(matmul_out-matmul_in1) + abs(transpose_out-matmul_in2) + abs(matmul_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matmul_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-tile_in) + abs(reduce_out-tile_in) + abs(tile_out-matops_in1) + abs(tile_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-topk_in) + abs(matmul_out-gather_in1) + abs(topk_out-gather_in2) + abs(matmul_out-tile_in) + abs(gather_out-matops_in1) + abs(tile_out-matops_in2) + abs(tile_out-concat_in1) + abs(matops_out-concat_in2) + abs(concat_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_w-padunpad_in) + abs(defaultBankTag-padunpad_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-transpose_in) + abs(reduce_out-matmul_in1) + abs(transpose_out-matmul_in2) + abs(matmul_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-tile_in) + abs(reduce_out-tile_in) + abs(tile_out-matops_in1) + abs(tile_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-topk_in) + abs(reduce_out-gather_in1) + abs(topk_out-gather_in2) + abs(reduce_out-tile_in) + abs(gather_out-matops_in1) + abs(tile_out-matops_in2) + abs(tile_out-concat_in1) + abs(matops_out-concat_in2) + abs(concat_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_w-padunpad_in) + abs(defaultBankTag-padunpad_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-transpose_in) + abs(reduce_out-matmul_in1) + abs(transpose_out-matmul_in2) + abs(matmul_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-tile_in) + abs(reduce_out-tile_in) + abs(tile_out-matops_in1) + abs(tile_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-topk_in) + abs(reduce_out-gather_in1) + abs(topk_out-gather_in2) + abs(reduce_out-tile_in) + abs(gather_out-matops_in1) + abs(tile_out-matops_in2) + abs(tile_out-concat_in1) + abs(matops_out-concat_in2) + abs(concat_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_w-padunpad_in) + abs(defaultBankTag-padunpad_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-transpose_in) + abs(reduce_out-matmul_in1) + abs(transpose_out-matmul_in2) + abs(matmul_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-tile_in) + abs(reduce_out-tile_in) + abs(tile_out-matops_in1) + abs(tile_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-topk_in) + abs(reduce_out-gather_in1) + abs(topk_out-gather_in2) + abs(reduce_out-tile_in) + abs(gather_out-matops_in1) + abs(tile_out-matops_in2) + abs(tile_out-concat_in1) + abs(matops_out-concat_in2) + abs(concat_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-concat_in1) + abs(reduce_out-concat_in2) + abs(concat_out-concat_in1) + abs(reduce_out-concat_in2) + abs(concat_out-concat_in1) + abs(reduce_out-concat_in2) + abs(concat_out-conv_in) + abs(conv_w-conv_w) + abs(conv_b-conv_b) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(conv_out-reduce_in) + abs(conv_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(conv_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-reduce_in) + abs(reduce_out-matmul_in1) + abs(matmul_in2-matmul_in2) + abs(matmul_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-reduce_in) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-matmul_in1) + abs(matmul_in2-matmul_in2) + abs(matmul_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-reduce_in) + abs(matops_out-reduce_in) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(reduce_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_in1-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_out-matops_in2) + abs(matops_out-matops_in1) + abs(defaultBankTag-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(matops_out-matops_in1) + abs(relusqrtsquare_out-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-matops_in1) + abs(matops_in2-matops_in2) + abs(matops_out-relusqrtsquare_in) + abs(relusqrtsquare_out-matmul_in1) + abs(matmul_in2-matmul_in2) + abs(matmul_out-matops_in1) + abs(matops_in2-matops_in2) + 
+[22:15:39.307454][info][source ModelArchTop02.cpp][function Execute][line 876] Dumping Optimization Objective Finished.
+[22:15:39.307687][info][source ClassifierMultiPlatform.cpp][function ClassifierMultiplatform][line 77] Model execution time with batchsize(15): 24.495359897613525 Seconds
+[22:15:39.307700][info][source ClassifierMultiPlatform.cpp][function CalculateAccuracy][line 15] Computing Accuracy...
+[22:15:39.307714][info][source ClassifierMultiPlatform.cpp][function CalculateAccuracy][line 57] Correct Count: 15.0
+[22:15:39.307719][info][source ClassifierMultiPlatform.cpp][function CalculateAccuracy][line 58] Accuracy: 1.0
