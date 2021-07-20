@@ -22,4 +22,4 @@ Currently, only Xilinx devices are supported.
 |10.1|tile|TileRank2Axis1|512b|1|Yes|-|No|
 |10.2|tile|TileRank2Axis2|512b|1|Yes|-|No|
 |11|topk_mergesortdf_pe|-|512b|2|Yes|Multiple|Yes|
-|12|transpose|-|512b|1|No|-|No|
+|12|transpose|-|512b|1|Yes|-|No|
