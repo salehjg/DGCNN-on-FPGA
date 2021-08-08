@@ -35,7 +35,7 @@ set(PROFILE_DATA OFF CACHE BOOL "Data Profiling ON/OFF (For all of the kernels)"
 set(PROFILE_STALL OFF CACHE BOOL "Stall Profiling Switch (For all of the kernels)")
 set(PROFILE_EXEC OFF CACHE BOOL "Exec Profiling Switch (For all of the kernels)")
 #set(OPTIMIZATION_OPTION "0" CACHE STRING "0:default, 1:reduce power, 2:increase kernel speed, 3:highest level of optimization, s:optimize for size, quick:quick compilation, This option overrides VivadoOptions.")
-set(ReportLevel "2" CACHE STRING "0: no DCP, 1: all of DCPs, 2: detailed, estimate: generate design.xml")
+set(ReportLevel "0" CACHE STRING "0: no DCP, 1: all of DCPs, 2: detailed, estimate: generate design.xml")
 set(KERNEL_CLOCK "130" CACHE STRING "MHz, For XOCC Compile and Link Procedures. All of the kernels will use this clock frequency. Set to -1 to ignore frequency override.")
 set(UseMemoryBank0 ON CACHE BOOL "Enable/Disable usage of memory bank 0")
 set(UseMemoryBank1 ON CACHE BOOL "Enable/Disable usage of memory bank 1")
