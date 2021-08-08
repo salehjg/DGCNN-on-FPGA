@@ -23,7 +23,7 @@ devtoolset-7 (>7.0, For C++14 support)
 * Make sure that the latest vivado patches are applied, such as `AR73068`.
 
 # Configuration
-To make it easier to explore the design space and try different configurations, all of the parameters that affect the output performance of the task kernels are gathered in a separate submodule repository at directory `config`. 
+To make it easier to explore the design space and try different configurations, all of the parameters that affect the output performance of the task kernels are gathered in a separate submodule repository at directory `config`.
 Also please note that various vivado directives for different steps are used to facilitate design implementation (opt, place, and route).
 
 # 1. Building The Host Program
@@ -133,6 +133,12 @@ optimizing01_area_f1 | 512-bits | float32 | SDx2019.1 | Up-to-date
 vitis20192_axi512 | 512-bits | float32 | Vitis2019.2 | HW build fails with clock partitioning error
 
 # 8. Useful Tips
+## TCL scripts
+There are two TCL scripts named `PreRoute.tcl` and `PostRoute.tcl`. 
+- The pre-route script is reponsible for generating the placed design `Pre_route_checkpoint.dcp` file.
+- The post-route script generates SLR and per-block utilization reports along with the routed design `Post_route_checkpoint.dcp` file.
+Please note that Vivado could be used to open the design checkpoint files (`*.dcp`) to further explore the design implementation space. Open Vivado and choose `File: Checkpoint: Open` menu to import the desired checkpoint file.
+
 ## Debugging Host-side in CLion
 In order to debug the host-side program in any modes(`sw_emu`, `hw_emu`, or `system`), CLion or any other C++ IDE could be used.
 
@@ -167,4 +173,3 @@ These repositories are used in this project:
 | [spdlog](https://github.com/gabime/spdlog) | C++ Library for fast logging | MIT |
 | [hls_tutorial_examples](https://github.com/spcl/hls_tutorial_examples) | ([Paper](https://arxiv.org/abs/1805.08288)) HLS examples and tutorials (Workshop) | BSD 3-Clause |
 | [SimplePasteBin](https://github.com/salehjg/SimplePasteBin) | Python Library for working with PasteBin.com | GPL-3.0 |
-

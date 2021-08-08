@@ -478,9 +478,9 @@ set(PreRouteCheckpointFile ${CMAKE_BINARY_DIR}/Pre_route_checkpoint.dcp)
 set(PostRouteCheckpointFile ${CMAKE_BINARY_DIR}/Post_route_checkpoint.dcp)
 set(PowerReportTextFile ${CMAKE_BINARY_DIR}/PowerReportPostRoute.log)
 set(PowerReportRpxFile ${CMAKE_BINARY_DIR}/PowerReportPostRoute.rpx)
-configure_file(${CMAKE_SOURCE_DIR}/scripts/SlrUtilizationReport.tcl ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
+configure_file(${CMAKE_SOURCE_DIR}/scripts/PreRoute.tcl ${CMAKE_BINARY_DIR}/PreRoute.tcl)
 configure_file(${CMAKE_SOURCE_DIR}/scripts/PostRoute.tcl ${CMAKE_BINARY_DIR}/PostRoute.tcl)
-set(SlrUtilFilePath ${CMAKE_BINARY_DIR}/SlrUtilizationReport.tcl)
+set(PreRouteFilePath ${CMAKE_BINARY_DIR}/PreRoute.tcl)
 set(PostRouteFilePath ${CMAKE_BINARY_DIR}/PostRoute.tcl)
 
 # Time to link *.xo files that have been generated from the kernels, to generate *.xclbin
@@ -503,7 +503,7 @@ if(ENABLE_PROFILING)
 endif()
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_Hw_Batch.sh"
-    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${SlrUtilFilePath}} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.POST}={${PostRouteFilePath}} ${VivadoOptions} --report_level ${ReportLevel} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
+    "${SDAccel_XOCC} -g -l -t hw --platform ${DSA_NAME} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.PRE}={${PreRouteFilePath}} --xp vivado_prop:run.impl_1.{STEPS.ROUTE_DESIGN.TCL.POST}={${PostRouteFilePath}} ${VivadoOptions} --report_level ${ReportLevel} --jobs ${CpuCount} ${hw_link_command} ${hw_link} -o ${CMAKE_PROJECT_NAME}_hw.xclbin"
 )
 
 file(WRITE "${CMAKE_BINARY_DIR}/Link_HwEmu_Batch.sh"
