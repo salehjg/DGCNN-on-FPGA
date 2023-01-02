@@ -1,7 +1,7 @@
 # ARCHIVED REPO
 This is repo contains **the in-order host program** along with the FPGA implementation of DGCNN. 
 Please use the new **out-of-order** version of the implementation available [here](https://github.com/salehjg/DeepPoint-V2-FPGA).
-**The latest changes and optimazations are only applied to the out-of-order implementation's repository.**
+**The latest changes and optimazations are only available on the out-of-order implementation's repository.**
 
 
 # DeepPoint-V1 Project
