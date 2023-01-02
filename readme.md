@@ -161,8 +161,18 @@ vivado_hls -p task_<KERNEL>
 ```
 * Please note that any changes to the source files will be reflected on the main repository files.
 
-# 9. Publication
-TBD.
+# 9. Citation
+Please use the following BibTeX entry:
+```
+@article{jamali2022dgcnn,
+  title={DGCNN on FPGA: Acceleration of the Point Cloud Classifier Using FPGAs},
+  author={Jamali Golzar, Saleh and Karimian, Ghader and Shoaran, Maryam and Fattahi Sani, Mohammad},
+  journal={Circuits, Systems, and Signal Processing},
+  pages={1--32},
+  year={2022},
+  publisher={Springer}
+}
+```
 
 # 10. References
 These repositories are used in this project:
